@@ -51,7 +51,6 @@ include_directories(
    ${CMAKE_SOURCE_DIR}/src/3rdparty/libtiff/libtiff
    ${CMAKE_SOURCE_DIR}/src/3rdparty/libmng
    ${CMAKE_SOURCE_DIR}/src/3rdparty/libpng
-   ${CMAKE_SOURCE_DIR}/src/3rdparty/zlib
 )
 
 if (${JPEG_FOUND})
@@ -62,6 +61,17 @@ if (${JPEG_FOUND})
 else()
    include_directories(
       ${CMAKE_SOURCE_DIR}/src/3rdparty/libjpeg
+   )
+endif()
+
+if (${ZLIB_FOUND})
+   include_directories(
+      # using system library
+      ${ZLIB_INCLUDE_DIR}
+   )
+else()
+   include_directories(
+      ${CMAKE_SOURCE_DIR}/src/3rdparty/zlib
    )
 endif()
 
