@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,8 +23,13 @@
 
 #include <qhostaddress.h>
 #include <qhostaddress_p.h>
-#include <qipaddress_p.h>
+
+#include <qdatastream.h>
 #include <qdebug.h>
+#include <qendian.h>
+#include <qstringlist.h>
+
+#include <qipaddress_p.h>
 
 #if defined(Q_OS_WIN)
 # include <winsock2.h>
@@ -32,10 +37,8 @@
 # include <netinet/in.h>
 #endif
 
+// order dependent, must be after winsock2.h
 #include <qplatformdefs.h>
-#include <qstringlist.h>
-#include <qendian.h>
-#include <qdatastream.h>
 
 #ifdef __SSE2__
 #  include <qsimd_p.h>
@@ -187,27 +190,30 @@ bool QHostAddressPrivate::parse()
 {
    isParsed = true;
    protocol = QAbstractSocket::UnknownNetworkLayerProtocol;
-   QString a = ipString.simplified();
 
-   if (a.isEmpty()) {
+   QString hostAddress = ipString.simplified();
+
+   if (hostAddress.isEmpty()) {
       return false;
    }
 
    // All IPv6 addresses contain a ':', and may contain a '.'.
-   if (a.contains(':')) {
+   if (hostAddress.contains(':')) {
       quint8 maybeIp6[16];
 
-      if (parseIp6(a, maybeIp6, &scopeId)) {
+      if (parseIp6(hostAddress, maybeIp6, &scopeId)) {
          setAddress(maybeIp6);
          return true;
       }
    }
 
    quint32 maybeIp4 = 0;
-   if (QIPAddressUtils::parseIp4(maybeIp4, a.constBegin(), a.constEnd())) {
+
+   if (QIPAddressUtils::parseIp4(maybeIp4, hostAddress.constBegin(), hostAddress.constEnd())) {
       setAddress(maybeIp4);
       return true;
    }
+
    return false;
 }
 
@@ -357,24 +363,16 @@ void QNetmaskAddress::setPrefixLength(QAbstractSocket::NetworkLayerProtocol prot
    }
 }
 
-
-
-
-
 QHostAddress::QHostAddress()
    : d(new QHostAddressPrivate)
 {
 }
 
-/*!
-    Constructs a host address object with the IPv4 address \a ip4Addr.
-*/
 QHostAddress::QHostAddress(quint32 ip4Addr)
    : d(new QHostAddressPrivate)
 {
    setAddress(ip4Addr);
 }
-
 
 QHostAddress::QHostAddress(const quint8 *ip6Addr)
    : d(new QHostAddressPrivate)
@@ -388,7 +386,6 @@ QHostAddress::QHostAddress(const Q_IPV6ADDR &ip6Addr)
 {
    setAddress(ip6Addr);
 }
-
 
 QHostAddress::QHostAddress(const QString &address)
    : d(new QHostAddressPrivate)
@@ -409,15 +406,11 @@ QHostAddress::QHostAddress(const struct sockaddr *sockaddr)
    }
 }
 
-
 QHostAddress::QHostAddress(const QHostAddress &address)
    : d(new QHostAddressPrivate(*address.d.data()))
 {
 }
 
-/*!
-    Constructs a QHostAddress object for \a address.
-*/
 QHostAddress::QHostAddress(SpecialAddress address)
    : d(new QHostAddressPrivate)
 {
@@ -543,8 +536,10 @@ QString QHostAddress::toString() const
          || d->protocol == QAbstractSocket::AnyIPProtocol) {
 
       quint32 i = toIPv4Address();
+
       QString s;
       QIPAddressUtils::toString(s, i);
+
       return s;
    }
 
@@ -553,7 +548,7 @@ QString QHostAddress::toString() const
       QIPAddressUtils::toString(s, d->a6.c);
 
       if (! d->scopeId.isEmpty()) {
-         s.append(QLatin1Char('%') + d->scopeId);
+         s.append(QChar('%') + d->scopeId);
       }
 
       return s;
@@ -709,23 +704,27 @@ QPair<QHostAddress, int> QHostAddress::parseSubnet(const QString &subnet)
       return invalid;
    }
 
-   int slash = subnet.indexOf(QLatin1Char('/'));
+   int slash = subnet.indexOf(QChar('/'));
    QString netStr = subnet;
+
    if (slash != -1) {
       netStr.truncate(slash);
    }
 
    int netmask = -1;
-   bool isIpv6 = netStr.contains(QLatin1Char(':'));
+   bool isIpv6 = netStr.contains(QChar(':'));
 
    if (slash != -1) {
       // is the netmask given in IP-form or in bit-count form?
-      if (!isIpv6 && subnet.indexOf(QLatin1Char('.'), slash + 1) != -1) {
+
+      if (!isIpv6 && subnet.indexOf(QChar('.'), slash + 1) != -1) {
          // IP-style, convert it to bit-count form
+
          QNetmaskAddress parser;
          if (! parser.setAddress(subnet.mid(slash + 1))) {
             return invalid;
          }
+
          netmask = parser.prefixLength();
 
       } else {
@@ -760,7 +759,7 @@ QPair<QHostAddress, int> QHostAddress::parseSubnet(const QString &subnet)
    }
 
    // parse the address manually
-   QStringList parts = netStr.split(QLatin1Char('.'));
+   QStringList parts = netStr.split(QChar('.'));
    if (parts.isEmpty() || parts.count() > 4) {
       return invalid;   // invalid IPv4 address
    }
@@ -846,10 +845,15 @@ QDebug operator<<(QDebug d, const QHostAddress &address)
    return d;
 }
 
-uint qHash(const QHostAddress &key, uint seed)
+uint QHostAddress::hash(const QHostAddress &key, uint seed)
 {
    QT_ENSURE_PARSED(&key);
    return qHashBits(key.d->a6.c, 16, seed);
+}
+
+uint qHash(const QHostAddress &key, uint seed)
+{
+   return QHostAddress::hash(key, seed);
 }
 
 QDataStream &operator<<(QDataStream &out, const QHostAddress &address)

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,25 +23,26 @@
 
 #include <qplatform_pixmap.h>
 
-#include <qbuffer.h>
 #include <qbitmap.h>
+#include <qbuffer.h>
 #include <qimagereader.h>
 #include <qplatform_integration.h>
 
-#include <qguiapplication_p.h>
+#include <qapplication_p.h>
 #include <qimagepixmapcleanuphooks_p.h>
 
 QPlatformPixmap *QPlatformPixmap::create(int w, int h, PixelType type)
 {
-   QPlatformPixmap *data = QGuiApplicationPrivate::platformIntegration()->
+   QPlatformPixmap *pixmapData = QGuiApplicationPrivate::platformIntegration()->
                   createPlatformPixmap(static_cast<QPlatformPixmap::PixelType>(type));
-   data->resize(w, h);
 
-   return data;
+   pixmapData->resize(w, h);
+
+   return pixmapData;
 }
 
 QPlatformPixmap::QPlatformPixmap(PixelType pixelType, int objectId)
-   : w(0), h(0), d(0), is_null(true), ref(0), detach_no(0), type(pixelType),
+   : m_pixmap_w(0), m_pixmap_h(0), m_pixmap_d(0), is_null(true), ref(0), detach_no(0), m_platformType(pixelType),
      id(objectId), ser_no(0), is_cached(false)
 {
 }
@@ -53,6 +54,7 @@ QPlatformPixmap::~QPlatformPixmap()
    // or EGL Pixmap Surface for a given pixmap _before_ the native X11 pixmap is deleted,
    // otherwise some drivers will leak the GL surface. In this case, QX11PlatformPixmap will
    // call the cleanup hooks itself before deleting the native pixmap and set is_cached to false.
+
    if (is_cached) {
       QImagePixmapCleanupHooks::executePlatformPixmapDestructionHooks(this);
       is_cached = false;
@@ -61,8 +63,8 @@ QPlatformPixmap::~QPlatformPixmap()
 
 QPlatformPixmap *QPlatformPixmap::createCompatiblePlatformPixmap() const
 {
-   QPlatformPixmap *d = QGuiApplicationPrivate::platformIntegration()->createPlatformPixmap(pixelType());
-   return d;
+   QPlatformPixmap *pixmapData = QGuiApplicationPrivate::platformIntegration()->createPlatformPixmap(pixelType());
+   return pixmapData;
 }
 
 static QImage makeBitmapCompliantIfNeeded(QPlatformPixmap *d, const QImage &image, Qt::ImageConversionFlags flags)
@@ -150,7 +152,7 @@ void QPlatformPixmap::setDetachNumber(int detNo)
 
 QImage QPlatformPixmap::toImage(const QRect &rect) const
 {
-   if (rect.contains(QRect(0, 0, w, h))) {
+   if (rect.contains(QRect(0, 0, m_pixmap_w, m_pixmap_h))) {
       return toImage();
    } else {
       return toImage().copy(rect);
@@ -161,5 +163,3 @@ QImage *QPlatformPixmap::buffer()
 {
    return nullptr;
 }
-
-

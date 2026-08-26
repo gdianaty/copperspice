@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,14 @@
 #ifndef QCAMERAIMAGECAPTURE_H
 #define QCAMERAIMAGECAPTURE_H
 
-#include <qmediaobject.h>
-#include <qmediaencodersettings.h>
 #include <qmediabindableinterface.h>
+#include <qmediaencodersettings.h>
+#include <qmediaobject.h>
 #include <qvideoframe.h>
 
-class QSize;
-class QImageEncoderSettings;
 class QCameraImageCapturePrivate;
+class QImageEncoderSettings;
+class QSize;
 
 class Q_MULTIMEDIA_EXPORT QCameraImageCapture : public QObject, public QMediaBindableInterface
 {

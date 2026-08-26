@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,11 +22,11 @@
 ***********************************************************************/
 
 #include <qpixmap_blitter_p.h>
-#include <qpainter.h>
+
 #include <qimage.h>
+#include <qpainter.h>
 #include <qscreen.h>
 
-#include <qapplication_p.h>
 #include <qapplication_p.h>
 #include <qblittable_p.h>
 #include <qdrawhelper_p.h>
@@ -38,11 +38,11 @@ static int global_ser_no = 0;
 
 QBlittablePlatformPixmap::QBlittablePlatformPixmap()
    : QPlatformPixmap(QPlatformPixmap::PixmapType, BlitterClass)
-   , m_alpha(false)
-   , m_devicePixelRatio(1.0)
+   , m_alpha(false), m_devicePixelRatio(1.0)
 #ifdef QT_BLITTER_RASTEROVERLAY
    , m_rasterOverlay(0), m_unmergedCopy(0)
 #endif
+
 {
    setSerialNumber(++global_ser_no);
 }
@@ -57,9 +57,9 @@ QBlittablePlatformPixmap::~QBlittablePlatformPixmap()
 
 QBlittable *QBlittablePlatformPixmap::blittable() const
 {
-   if (!m_blittable) {
+   if (! m_blittable) {
       QBlittablePlatformPixmap *that = const_cast<QBlittablePlatformPixmap *>(this);
-      that->m_blittable.reset(this->createBlittable(QSize(w, h), m_alpha));
+      that->m_blittable.reset(this->createBlittable(QSize(m_pixmap_w, m_pixmap_h), m_alpha));
    }
 
    return m_blittable.data();
@@ -73,15 +73,16 @@ void QBlittablePlatformPixmap::setBlittable(QBlittable *blittable)
 
 void QBlittablePlatformPixmap::resize(int width, int height)
 {
-
    m_blittable.reset(nullptr);
    m_engine.reset(nullptr);
 
-   d = QGuiApplication::primaryScreen()->depth();
+   m_pixmap_d = QGuiApplication::primaryScreen()->depth();
 
-   w = width;
-   h = height;
-   is_null = (w <= 0 || h <= 0);
+   m_pixmap_w = width;
+   m_pixmap_h = height;
+
+   is_null = (m_pixmap_w <= 0 || m_pixmap_h <= 0);
+
    setSerialNumber(++global_ser_no);
 }
 
@@ -89,27 +90,36 @@ int QBlittablePlatformPixmap::metric(QPaintDevice::PaintDeviceMetric metric) con
 {
    switch (metric) {
       case QPaintDevice::PdmWidth:
-         return w;
+         return m_pixmap_w;
+
       case QPaintDevice::PdmHeight:
-         return h;
+         return m_pixmap_h;
+
       case QPaintDevice::PdmWidthMM:
-         return qRound(w * 25.4 / qt_defaultDpiX());
+         return qRound(m_pixmap_w * 25.4 / qt_defaultDpiX());
+
       case QPaintDevice::PdmHeightMM:
-         return qRound(h * 25.4 / qt_defaultDpiY());
+         return qRound(m_pixmap_h * 25.4 / qt_defaultDpiY());
+
       case QPaintDevice::PdmDepth:
          return 32;
-      case QPaintDevice::PdmDpiX: // fall-through
+
+      case QPaintDevice::PdmDpiX:
       case QPaintDevice::PdmPhysicalDpiX:
          return qt_defaultDpiX();
-      case QPaintDevice::PdmDpiY: // fall-through
+
+      case QPaintDevice::PdmDpiY:
       case QPaintDevice::PdmPhysicalDpiY:
          return qt_defaultDpiY();
+
       case QPaintDevice::PdmDevicePixelRatio:
          return devicePixelRatio();
+
       case QPaintDevice::PdmDevicePixelRatioScaled:
          return devicePixelRatio() * QPaintDevice::devicePixelRatioFScale();
+
       default:
-         qWarning("QRasterPlatformPixmap::metric(): Unhandled metric type %d", metric);
+         qWarning("QRasterPlatformPixmap::metric() Unhandled metric type %d", metric);
          break;
    }
 
@@ -120,15 +130,16 @@ void QBlittablePlatformPixmap::fill(const QColor &color)
 {
    if (blittable()->capabilities() & QBlittable::AlphaFillRectCapability) {
       blittable()->unlock();
-      blittable()->alphaFillRect(QRectF(0, 0, w, h), color, QPainter::CompositionMode_Source);
+      blittable()->alphaFillRect(QRectF(0, 0, m_pixmap_w, m_pixmap_h), color, QPainter::CompositionMode_Source);
+
    } else if (color.alpha() == 255 && blittable()->capabilities() & QBlittable::SolidRectCapability) {
       blittable()->unlock();
-      blittable()->fillRect(QRectF(0, 0, w, h), color);
+      blittable()->fillRect(QRectF(0, 0, m_pixmap_w, m_pixmap_h), color);
+
    } else {
       // Need to be backed with an alpha channel now. It would be nice
-      // if we could just change the format, e.g. when going from
-      // RGB32 -> ARGB8888.
-      if (color.alpha() != 255 && !hasAlphaChannel()) {
+      // if we could just change the format, e.g. when going from // RGB32 -> ARGB8888
+      if (color.alpha() != 255 && ! hasAlphaChannel()) {
          m_blittable.reset(nullptr);
          m_engine.reset(nullptr);
          m_alpha = true;
@@ -140,10 +151,9 @@ void QBlittablePlatformPixmap::fill(const QColor &color)
 
       layout->convertFromARGB32PM(&pixel, &pixel, 1, layout, nullptr);
 
-      //so premultiplied formats are supported and ARGB32 and RGB32
+      // premultiplied formats are supported and ARGB32 and RGB32
       blittable()->lock()->fill(pixel);
    }
-
 }
 
 QImage *QBlittablePlatformPixmap::buffer()
@@ -161,14 +171,13 @@ bool QBlittablePlatformPixmap::hasAlphaChannel() const
    return blittable()->lock()->hasAlphaChannel();
 }
 
-void QBlittablePlatformPixmap::fromImage(const QImage &image,
-   Qt::ImageConversionFlags flags)
+void QBlittablePlatformPixmap::fromImage(const QImage &image, Qt::ImageConversionFlags flags)
 {
    m_alpha = image.hasAlphaChannel();
    m_devicePixelRatio = image.devicePixelRatio();
 
    resize(image.width(), image.height());
-   markRasterOverlay(QRect(0, 0, w, h));
+   markRasterOverlay(QRect(0, 0, m_pixmap_w, m_pixmap_h));
    QImage *thisImg = buffer();
 
    QImage correctFormatPic = image;
@@ -179,6 +188,7 @@ void QBlittablePlatformPixmap::fromImage(const QImage &image,
    uchar *mem = thisImg->bits();
    const uchar *bits = correctFormatPic.constBits();
    int bytesCopied = 0;
+
    while (bytesCopied < correctFormatPic.byteCount()) {
       memcpy(mem, bits, correctFormatPic.bytesPerLine());
       mem += thisImg->bytesPerLine();
@@ -196,12 +206,14 @@ void QBlittablePlatformPixmap::setDevicePixelRatio(qreal scaleFactor)
 {
    m_devicePixelRatio = scaleFactor;
 }
+
 QPaintEngine *QBlittablePlatformPixmap::paintEngine() const
 {
-   if (!m_engine) {
+   if (! m_engine) {
       QBlittablePlatformPixmap *that = const_cast<QBlittablePlatformPixmap *>(this);
       that->m_engine.reset(new QBlitterPaintEngine(that));
    }
+
    return m_engine.data();
 }
 
@@ -211,9 +223,10 @@ static bool showRasterOverlay = ! qgetenv("QT_BLITTER_RASTEROVERLAY").isEmpty();
 
 void QBlittablePlatformPixmap::mergeOverlay()
 {
-   if (m_unmergedCopy || !showRasterOverlay) {
+   if (m_unmergedCopy || ! showRasterOverlay) {
       return;
    }
+
    m_unmergedCopy = new QImage(buffer()->copy());
    QPainter p(buffer());
    p.setCompositionMode(QPainter::CompositionMode_SourceOver);
@@ -223,9 +236,10 @@ void QBlittablePlatformPixmap::mergeOverlay()
 
 void QBlittablePlatformPixmap::unmergeOverlay()
 {
-   if (!m_unmergedCopy || !showRasterOverlay) {
+   if (! m_unmergedCopy || ! showRasterOverlay) {
       return;
    }
+
    QPainter p(buffer());
    p.setCompositionMode(QPainter::CompositionMode_Source);
    p.drawImage(0, 0, *m_unmergedCopy);
@@ -237,25 +251,27 @@ void QBlittablePlatformPixmap::unmergeOverlay()
 
 QImage *QBlittablePlatformPixmap::overlay()
 {
-   if (!m_rasterOverlay ||
-      m_rasterOverlay->size() != QSize(w, h)) {
+   if (! m_rasterOverlay || m_rasterOverlay->size() != QSize(w, h)) {
       m_rasterOverlay = new QImage(w, h, QImage::Format_ARGB32_Premultiplied);
       m_rasterOverlay->fill(0x00000000);
+
       uint color = (qrand() % 11) + 7;
       m_overlayColor = QColor(Qt::GlobalColor(color));
       m_overlayColor.setAlpha(0x88);
-
    }
+
    return m_rasterOverlay;
 }
 
 void QBlittablePlatformPixmap::markRasterOverlayImpl(const QRectF &rect)
 {
-   if (!showRasterOverlay) {
+   if (! showRasterOverlay) {
       return;
    }
+
    QRectF transformationRect = clipAndTransformRect(rect);
-   if (!transformationRect.isEmpty()) {
+
+   if (! transformationRect.isEmpty()) {
       QPainter p(overlay());
       p.setBrush(m_overlayColor);
       p.setCompositionMode(QPainter::CompositionMode_Source);
@@ -265,10 +281,12 @@ void QBlittablePlatformPixmap::markRasterOverlayImpl(const QRectF &rect)
 
 void QBlittablePlatformPixmap::unmarkRasterOverlayImpl(const QRectF &rect)
 {
-   if (!showRasterOverlay) {
+   if (! showRasterOverlay) {
       return;
    }
+
    QRectF transformationRect = clipAndTransformRect(rect);
+
    if (!transformationRect.isEmpty()) {
       QPainter p(overlay());
       QColor color(0x00, 0x00, 0x00, 0x00);
@@ -282,9 +300,11 @@ QRectF QBlittablePlatformPixmap::clipAndTransformRect(const QRectF &rect) const
 {
    QRectF transformationRect = rect;
    paintEngine();
+
    if (m_engine->state()) {
       transformationRect = m_engine->state()->matrix.mapRect(rect);
       const QClipData *clipData = m_engine->clip();
+
       if (clipData) {
          if (clipData->hasRectClip) {
             transformationRect &= clipData->clipRect;
@@ -296,10 +316,10 @@ QRectF QBlittablePlatformPixmap::clipAndTransformRect(const QRectF &rect) const
          }
       }
    }
+
    return transformationRect;
 }
 
 #endif //QT_BLITTER_RASTEROVERLAY
-
 
 #endif //QT_NO_BLITTABLE

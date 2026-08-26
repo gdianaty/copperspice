@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,22 +21,22 @@
 *
 ***********************************************************************/
 
-#include "qsvgtinydocument_p.h"
+#include <qsvgtinydocument_p.h>
 
-#include "qsvghandler_p.h"
-#include "qsvgfont_p.h"
-#include "qpainter.h"
-#include "qfile.h"
-#include "qbuffer.h"
-#include "qbytearray.h"
-#include "qqueue.h"
-#include "qstack.h"
-#include "qdebug.h"
+#include <qbuffer.h>
+#include <qbytearray.h>
+#include <qdebug.h>
+#include <qfile.h>
+#include <qpainter.h>
+#include <qqueue.h>
+#include <qstack.h>
+
+#include <qsvgfont_p.h>
+#include <qsvghandler_p.h>
 
 #ifndef QT_NO_COMPRESS
 #include <zlib.h>
 #endif
-
 
 QSvgTinyDocument::QSvgTinyDocument()
    : QSvgStructureNode(nullptr), m_widthPercent(false), m_heightPercent(false)
@@ -80,8 +80,8 @@ QByteArray qt_inflateGZipDataFrom(QIODevice *device)
 
    // Adding 16 to the window size gives us gzip decoding
    if (inflateInit2(&zlibStream, MAX_WBITS + 16) != Z_OK) {
-      qWarning("Unable to initialize zlib, because: %s",
-               (zlibStream.msg != nullptr ? zlibStream.msg : "Unknown error"));
+      qWarning("Unable to initialize zlib, %s",
+            (zlibStream.msg != nullptr ? zlibStream.msg : "Unknown error"));
 
       return QByteArray();
    }
@@ -147,8 +147,8 @@ QSvgTinyDocument *QSvgTinyDocument::load(const QString &fileName)
    QFile file(fileName);
 
    if (! file.open(QFile::ReadOnly)) {
-      qWarning("Unable to open file '%s', because: %s",
-               csPrintable(fileName), csPrintable(file.errorString()));
+      qWarning("QSvgTinyDocument::load() Unable to open file %s, %s",
+            csPrintable(fileName), csPrintable(file.errorString()));
 
       return nullptr;
    }
@@ -167,8 +167,8 @@ QSvgTinyDocument *QSvgTinyDocument::load(const QString &fileName)
       doc = handler.document();
       doc->m_animationDuration = handler.animationDuration();
    } else {
-      qWarning("Cannot read file '%s', because: %s (line %d)",
-               csPrintable(fileName), csPrintable(handler.errorString()), handler.lineNumber());
+      qWarning("QSvgTinyDocument::load() Unable to read file %s, %s (line %d)",
+            csPrintable(fileName), csPrintable(handler.errorString()), handler.lineNumber());
    }
 
    return doc;
@@ -254,8 +254,11 @@ void QSvgTinyDocument::draw(QPainter *p, const QString &id, const QRectF &bounds
 {
    QSvgNode *node = scopeNode(id);
 
-   if (!node) {
+   if (! node) {
+#if defined(CS_SHOW_DEBUG_SVG)
       qDebug("Unable to find node %s, skipping rendering.", csPrintable(id));
+#endif
+
       return;
    }
 
@@ -442,8 +445,11 @@ QMatrix QSvgTinyDocument::matrixForElement(const QString &id) const
 {
    QSvgNode *node = scopeNode(id);
 
-   if (!node) {
+   if (! node) {
+#if defined(CS_SHOW_DEBUG_SVG)
       qDebug("Unable to find node %s, skipping rendering.", csPrintable(id));
+#endif
+
       return QMatrix();
    }
 

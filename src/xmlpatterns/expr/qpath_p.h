@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,9 +24,7 @@
 #ifndef QPath_P_H
 #define QPath_P_H
 
-#include "qpaircontainer_p.h"
-
-QT_BEGIN_NAMESPACE
+#include <qpaircontainer_p.h>
 
 namespace QPatternist {
 
@@ -55,9 +53,6 @@ class Path : public PairContainer
    Properties properties() const override;
    Expression::Ptr compress(const StaticContext::Ptr &context) override;
 
-   /**
-    * @returns the item type of the last step's static type.
-    */
    ItemType::Ptr newFocusType() const override;
 
    ID id() const override;
@@ -71,36 +66,18 @@ class Path : public PairContainer
  private:
    typedef QExplicitlySharedDataPointer<const Path> ConstPtr;
 
-   /**
-    * One might think this block exists for preventing multiple
-    * NodeSortExpressions to be created. However, that is not an issue,
-    * since NodeSortExpression optimizes this away anyway.
-    *
-    * The real reason is to avoid infinite recursion. When our typeCheck()
-    * forwards on the type check to the just created
-    * NodeSortExpression, it in turn calls typeCheck() on its child, which
-    * is this Path. Rince and repeat.
-    *
-    * We only create node sorts when we're a regular path expression, and
-    * not when standing in as a generic map expression. */
-   bool        m_hasCreatedSorter;
+   bool m_hasCreatedSorter;
+   bool m_isLast;
+   bool m_checkXPTY0018;
 
-   /**
-    * Whether this path is the step. For instance, in <tt>a/b/c</tt>, the
-    * last path has @c c as the right operand.
-    */
-   bool        m_isLast;
-
-   bool        m_checkXPTY0018;
-   const Kind  m_kind;
+   const Kind m_kind;
 };
 
 void Path::setLast()
 {
    m_isLast = true;
 }
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

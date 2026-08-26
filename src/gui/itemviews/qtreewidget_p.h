@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,20 +24,21 @@
 #ifndef QTREEWIDGET_P_H
 #define QTREEWIDGET_P_H
 
-#include <qabstractitemmodel.h>
-
-#include <qpair.h>
-#include <qbasictimer.h>
 #include <qtreewidget.h>
-#include <qtreeview_p.h>
+
+#include <qabstractitemmodel.h>
+#include <qbasictimer.h>
 #include <qheaderview.h>
+#include <qpair.h>
 
 #include <qabstractitemmodel_p.h>
+#include <qtreeview_p.h>
 
 #ifndef QT_NO_TREEWIDGET
 
 class QTreeWidgetItem;
 class QTreeWidgetItemIterator;
+
 class QTreeModelPrivate;
 
 class QTreeModel : public QAbstractItemModel
@@ -55,7 +56,7 @@ class QTreeModel : public QAbstractItemModel
    explicit QTreeModel(int columns = 0, QTreeWidget *parent = nullptr);
    ~QTreeModel();
 
-   inline QTreeWidget *view() const {
+   QTreeWidget *view() const {
       return qobject_cast<QTreeWidget *>(QObject::parent());
    }
 
@@ -106,7 +107,7 @@ class QTreeModel : public QAbstractItemModel
 
    QMimeData *internalMimeData() const;
 
-   inline QModelIndex createIndexFromItem(int row, int col, QTreeWidgetItem *item) const {
+   QModelIndex createIndexFromItem(int row, int col, QTreeWidgetItem *item) const {
       return createIndex(row, col, item);
    }
 
@@ -141,16 +142,13 @@ class QTreeModel : public QAbstractItemModel
    QList<QTreeWidgetItemIterator *> iterators;
 
    mutable QBasicTimer sortPendingTimer;
-   mutable bool skipPendingSort; //while doing internal operation we don't care about sorting
+   mutable bool skipPendingSort;
    bool inline executePendingSort() const;
 
    bool isChanging() const;
 
    Q_DECLARE_PRIVATE(QTreeModel)
-
 };
-
-
 
 class QTreeModelPrivate : public QAbstractItemModelPrivate
 {
@@ -171,7 +169,6 @@ class QTreeWidgetItemPrivate
    int rowGuess;
    QTreeWidgetItem::ChildIndicatorPolicy policy;
 };
-
 
 inline bool QTreeModel::executePendingSort() const
 {
@@ -194,15 +191,15 @@ class QTreeWidgetPrivate : public QTreeViewPrivate
  public:
    QTreeWidgetPrivate() : QTreeViewPrivate(), explicitSortColumn(-1) {}
 
-   inline QTreeModel *treeModel() const {
+   QTreeModel *treeModel() const {
       return qobject_cast<QTreeModel *>(model);
    }
 
-   inline QModelIndex index(const QTreeWidgetItem *item, int column = 0) const {
+   QModelIndex index(const QTreeWidgetItem *item, int column = 0) const {
       return treeModel()->index(item, column);
    }
 
-   inline QTreeWidgetItem *item(const QModelIndex &index) const {
+   QTreeWidgetItem *item(const QModelIndex &index) const {
       return treeModel()->item(index);
    }
    void _q_emitItemPressed(const QModelIndex &index);

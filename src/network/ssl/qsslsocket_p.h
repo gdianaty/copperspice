@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,19 +25,19 @@
 #define QSSLSOCKET_P_H
 
 #include <qsslsocket.h>
-#include <qsslkey.h>
 
-#include <qtcpsocket_p.h>
+#include <qsslkey.h>
+#include <qstringlist.h>
+
+#include <qringbuffer_p.h>
 #include <qsslconfiguration_p.h>
+#include <qtcpsocket_p.h>
 
 #ifdef QT_OPENSSL
 #   include <qsslcontext_openssl_p.h>
 #else
    class QSslContext;
 #endif
-
-#include <qstringlist.h>
-#include <qringbuffer_p.h>
 
 #if defined(Q_OS_DARWIN)
 #  include <Security/SecCertificate.h>
@@ -154,8 +154,8 @@ public:
 
    static QList<QByteArray> unixRootCertDirectories(); // used also by QSslContext
 
-   virtual qint64 peek(char *data, qint64 maxSize) override;
-   virtual QByteArray peek(qint64 maxSize) override;
+   qint64 peek(char *data, qint64 maxSize) override;
+   QByteArray peek(qint64 maxSize) override;
 
    // Platform specific functions
    virtual void startClientEncryption() = 0;

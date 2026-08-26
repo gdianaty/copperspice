@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,9 +22,10 @@
 ***********************************************************************/
 
 #include <qquaternion.h>
+
+#include <qdebug.h>
 #include <qmath.h>
 #include <qvariant.h>
-#include <qdebug.h>
 
 #ifndef QT_NO_QUATERNION
 
@@ -170,9 +171,6 @@ QQuaternion QQuaternion::nlerp(const QQuaternion &q1, const QQuaternion &q2, qre
    return (q1 * (1.0f - t) + q2b * t).normalized();
 }
 
-/*!
-    Returns the quaternion as a QVariant.
-*/
 QQuaternion::operator QVariant() const
 {
    return QVariant(QVariant::Quaternion, this);

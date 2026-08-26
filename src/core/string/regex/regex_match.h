@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2017-2023 Barbara Geller
-* Copyright (c) 2017-2023 Ansel Sermersheim
+* Copyright (c) 2017-2026 Barbara Geller
+* Copyright (c) 2017-2026 Ansel Sermersheim
 *
 * Copyright (c) 1998-2009 John Maddock
 *

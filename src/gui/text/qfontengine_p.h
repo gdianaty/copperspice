@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,19 +24,19 @@
 #ifndef QFONTENGINE_P_H
 #define QFONTENGINE_P_H
 
-#include <qglobal.h>
 #include <qatomic.h>
-
+#include <qglobal.h>
 #include <qlinkedlist.h>
-#include <qvarlengtharray.h>
 #include <qstringfwd.h>
+#include <qvarlengtharray.h>
+
+#include <qfont_p.h>
 #include <qfontengine_faceid_p.h>
 #include <qtextengine_p.h>
-#include <qfont_p.h>
 
+class QFontEngineGlyphCache;
 class QGlyph;
 class QPainterPath;
-class QFontEngineGlyphCache;
 
 struct QGlyphLayout;
 
@@ -132,7 +132,7 @@ class Q_GUI_EXPORT QFontEngine
 
    virtual ~QFontEngine();
 
-   inline Type type() const {
+   Type type() const {
       return m_type;
    }
 
@@ -262,7 +262,7 @@ class Q_GUI_EXPORT QFontEngine
    virtual void setDefaultHintStyle(HintStyle) {
    }
 
-   inline QVariant userData() const {
+   QVariant userData() const {
       return m_userData;
    }
 
@@ -278,7 +278,7 @@ class Q_GUI_EXPORT QFontEngine
    } faceData;
 
    QAtomicInt m_refCount;
-   QFontDef fontDef;
+   QFontDef m_fontDef;
 
    uint cache_cost;       // amount of memory used in kb by the font
 
@@ -290,7 +290,7 @@ class Q_GUI_EXPORT QFontEngine
       uint left_right;
       QFixed adjust;
 
-      inline bool operator<(const KernPair &other) const {
+      bool operator<(const KernPair &other) const {
          return left_right < other.left_right;
       }
    };
@@ -307,7 +307,7 @@ class Q_GUI_EXPORT QFontEngine
 
    QFixed lastRightBearing(const QGlyphLayout &glyphs, bool round = false);
 
-   inline void setUserData(const QVariant &userData) {
+   void setUserData(const QVariant &userData) {
       m_userData = userData;
    }
 
@@ -448,11 +448,11 @@ class Q_GUI_EXPORT QFontEngineMulti : public QFontEngine
 
    bool canRender(QStringView str) const override;
 
-   inline int fallbackFamilyCount() const {
+   int fallbackFamilyCount() const {
       return m_fallbackFamilies.size();
    }
 
-   inline QString fallbackFamilyAt(int at) const {
+   QString fallbackFamilyAt(int at) const {
       return m_fallbackFamilies.at(at);
    }
 

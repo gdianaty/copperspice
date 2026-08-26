@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,9 +26,8 @@
 
 #include <qpatternplatform_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class MatchesFN : public PatternPlatform
 {
  public:
@@ -40,24 +39,14 @@ class ReplaceFN : public PatternPlatform
 {
  public:
    ReplaceFN();
+
    Item evaluateSingleton(const DynamicContext::Ptr &context) const override;
-   /**
-    * Overridden to attempt to pre-compile the replacement string.
-    */
    Expression::Ptr compress(const StaticContext::Ptr &context) override;
 
  private:
-   /**
-    * @short Centralizes the translation string.
-    */
    static inline QString errorAtEnd(const char ch);
 
-   /**
-    * Reads the string in the third argument and converts it to a a QRegularExpression compatible
-    * replacement string, containing sub-group references and so forth.
-    */
    QString parseReplacement(const int captureCount, const DynamicContext::Ptr &context) const;
-
    QString m_replacementString;
 };
 
@@ -71,8 +60,7 @@ class TokenizeFN : public PatternPlatform
  private:
    typedef QExplicitlySharedDataPointer<const TokenizeFN> ConstPtr;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

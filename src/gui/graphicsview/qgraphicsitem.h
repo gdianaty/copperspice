@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,10 +28,10 @@
 #include <qobject.h>
 #include <qpainterpath.h>
 #include <qpixmap.h>
+#include <qrect.h>
 #include <qscopedpointer.h>
 #include <qtextcursor.h>
 #include <qvariant.h>
-#include <qrect.h>
 
 // accurate file name
 #include <qdeclarativelistproperty.h>
@@ -45,16 +45,15 @@ class QCursor;
 class QFocusEvent;
 class QGraphicsItemGroup;
 class QGraphicsObject;
+class QGraphicsScene;
 class QGraphicsSceneContextMenuEvent;
 class QGraphicsSceneDragDropEvent;
 class QGraphicsSceneEvent;
 class QGraphicsSceneHoverEvent;
 class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
-class QGraphicsScene;
 class QGraphicsTransform;
 class QGraphicsWidget;
-class QStyleOptionGraphicsItem;
 class QInputMethodEvent;
 class QKeyEvent;
 class QMatrix;
@@ -63,22 +62,26 @@ class QPainter;
 class QPen;
 class QPointF;
 class QRectF;
+class QStyleOptionGraphicsItem;
 
-class QGraphicsItemPrivate;
 class QAbstractGraphicsShapeItemPrivate;
-class QGraphicsPathItemPrivate;
-class QGraphicsRectItemPrivate;
 class QGraphicsEllipseItemPrivate;
-class QGraphicsPolygonItemPrivate;
-class QGraphicsLineItemPrivate;
-class QGraphicsPixmapItemPrivate;
-class QGraphicsTextItemPrivate;
-class QGraphicsSimpleTextItemPrivate;
 class QGraphicsItemGroupPrivate;
+class QGraphicsItemPrivate;
+class QGraphicsLineItemPrivate;
+class QGraphicsPathItemPrivate;
+class QGraphicsPixmapItemPrivate;
+class QGraphicsPolygonItemPrivate;
+class QGraphicsRectItemPrivate;
+class QGraphicsSimpleTextItemPrivate;
+class QGraphicsTextItemPrivate;
 
 class Q_GUI_EXPORT QGraphicsItem
 {
  public:
+   static constexpr const int Type = 1;
+   static constexpr const int UserType = 65536;
+
    enum GraphicsItemFlag {
       ItemIsMovable = 0x1,
       ItemIsSelectable = 0x2,
@@ -95,7 +98,7 @@ class Q_GUI_EXPORT QGraphicsItem
       ItemAcceptsInputMethod = 0x1000,
       ItemNegativeZStacksBehindParent = 0x2000,
       ItemIsPanel = 0x4000,
-      ItemIsFocusScope = 0x8000, // internal
+      ItemIsFocusScope = 0x8000,
       ItemSendsScenePositionChanges = 0x10000,
       ItemStopsClickFocusPropagation = 0x20000,
       ItemStopsFocusHandling = 0x40000,
@@ -210,11 +213,11 @@ class Q_GUI_EXPORT QGraphicsItem
    bool isVisibleTo(const QGraphicsItem *graphicsItem) const;
    void setVisible(bool visible);
 
-   inline void hide() {
+   void hide() {
       setVisible(false);
    }
 
-   inline void show() {
+   void show() {
       setVisible(true);
    }
 
@@ -326,7 +329,7 @@ class Q_GUI_EXPORT QGraphicsItem
    QPointF transformOriginPoint() const;
    void setTransformOriginPoint(const QPointF &origin);
 
-   inline void setTransformOriginPoint(qreal x, qreal y) {
+   void setTransformOriginPoint(qreal x, qreal y) {
       setTransformOriginPoint(QPointF(x, y));
    }
 
@@ -431,9 +434,6 @@ class Q_GUI_EXPORT QGraphicsItem
 
    Qt::InputMethodHints inputMethodHints() const;
    void setInputMethodHints(Qt::InputMethodHints hints);
-
-   static constexpr const int Type = 1;
-   static constexpr const int UserType = 65536;
 
    virtual int type() const;
 
@@ -984,7 +984,7 @@ class Q_GUI_EXPORT QGraphicsLineItem : public QGraphicsItem
 
    QLineF line() const;
    void setLine(const QLineF &line);
-   inline void setLine(qreal x1, qreal y1, qreal x2, qreal y2) {
+   void setLine(qreal x1, qreal y1, qreal x2, qreal y2) {
       setLine(QLineF(x1, y1, x2, y2));
    }
 

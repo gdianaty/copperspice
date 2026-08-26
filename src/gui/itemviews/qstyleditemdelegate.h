@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,15 +25,16 @@
 #define QSTYLEDITEMDELEGATE_H
 
 #include <qabstractitemdelegate.h>
-#include <qstring.h>
 #include <qpixmap.h>
-#include <qvariant.h>
 #include <qscopedpointer.h>
+#include <qstring.h>
+#include <qvariant.h>
 
 #ifndef QT_NO_ITEMVIEWS
 
-class QStyledItemDelegatePrivate;
 class QItemEditorFactory;
+
+class QStyledItemDelegatePrivate;
 
 class Q_GUI_EXPORT QStyledItemDelegate : public QAbstractItemDelegate
 {

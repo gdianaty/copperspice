@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -17,10 +17,17 @@
 *
 ***********************************************************************/
 
+#ifndef CS_CATCH2_H
+#define CS_CATCH2_H
+
 #include <qbytearray.h>
 #include <qdate.h>
+#include <qdatetime.h>
 #include <qlocale.h>
+#include <qline.h>
 #include <qmargins.h>
+#include <qpoint.h>
+#include <qrect.h>
 #include <qstring8.h>
 #include <qstring16.h>
 #include <qtime.h>
@@ -65,9 +72,34 @@ namespace Catch {
    };
 
    template <>
+   struct StringMaker<QDateTime> {
+      static std::string convert(const QDateTime &value) {
+         return value.toString().toStdString();
+      }
+   };
+
+   template <>
    struct StringMaker<QLocale> {
       static std::string convert(const QLocale &value) {
          return value.name().toStdString();
+      }
+   };
+
+   template <>
+   struct StringMaker<QLine> {
+      static std::string convert(const QLine &value) {
+         QString retval = QString8("{ %1, %2, %3, %4 }")
+               .formatArgs(value.x1(), value.y1(), value.x2(), value.y2());
+         return retval.toStdString();
+      }
+   };
+
+   template <>
+   struct StringMaker<QLineF> {
+      static std::string convert(const QLineF &value) {
+         QString retval = QString8("{ %1, %2, %3, %4 }")
+               .formatArgs(value.x1(), value.y1(), value.x2(), value.y2());
+         return retval.toStdString();
       }
    };
 
@@ -76,6 +108,42 @@ namespace Catch {
       static std::string convert(const QMargins &value) {
          QString retval = QString8("%1 %2 %3 %4")
                .formatArgs(value.left(), value.top(), value.right(), value.bottom());
+         return retval.toStdString();
+      }
+   };
+
+   template <>
+   struct StringMaker<QPoint> {
+      static std::string convert(const QPoint &value) {
+         QString retval = QString8("{ %1, %2 }")
+               .formatArgs(value.x(), value.y());
+         return retval.toStdString();
+      }
+   };
+
+   template <>
+   struct StringMaker<QPointF> {
+      static std::string convert(const QPointF &value) {
+         QString retval = QString8("{ %1, %2 }")
+               .formatArgs(value.x(), value.y());
+         return retval.toStdString();
+      }
+   };
+
+   template <>
+   struct StringMaker<QRect> {
+      static std::string convert(const QRect &value) {
+         QString retval = QString8("{ %1, %2, %3, %4 }")
+               .formatArgs(value.left(), value.top(), value.width(), value.height());
+         return retval.toStdString();
+      }
+   };
+
+   template <>
+   struct StringMaker<QRectF> {
+      static std::string convert(const QRectF &value) {
+         QString retval = QString8("{ %1, %2, %3, %4 }")
+               .formatArgs(value.left(), value.top(), value.width(), value.height());
          return retval.toStdString();
       }
    };
@@ -108,3 +176,5 @@ namespace Catch {
       }
    };
 }
+
+#endif

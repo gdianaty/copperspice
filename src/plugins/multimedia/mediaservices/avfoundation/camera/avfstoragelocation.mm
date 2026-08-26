@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,6 +22,7 @@
 ***********************************************************************/
 
 #include <avfstoragelocation.h>
+
 #include <qstandardpaths.h>
 
 AVFStorageLocation::AVFStorageLocation()
@@ -32,12 +33,6 @@ AVFStorageLocation::~AVFStorageLocation()
 {
 }
 
-/*!
- * Generate the actual file name from user requested one.
- * requestedName may be either empty (the default dir and naming theme is used),
- * points to existing dir (the default name used)
- * or specify the full actual path.
- */
 QString AVFStorageLocation::generateFileName(const QString &requestedName, QCamera::CaptureMode mode,
       const QString &prefix, const QString &ext) const
 {

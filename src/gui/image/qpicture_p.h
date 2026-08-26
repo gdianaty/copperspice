@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,17 +24,16 @@
 #ifndef QPICTURE_P_H
 #define QPICTURE_P_H
 
+#include <qpicture.h>
+
 #include <qatomic.h>
+#include <qbrush.h>
 #include <qbuffer.h>
 #include <qobject.h>
-#include <qvector.h>
-#include <qpicture.h>
-#include <qpixmap.h>
 #include <qpen.h>
-#include <qbrush.h>
+#include <qpixmap.h>
 #include <qrect.h>
-
-
+#include <qvector.h>
 
 class QPaintEngine;
 

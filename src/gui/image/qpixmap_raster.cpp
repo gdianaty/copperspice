@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,29 +21,28 @@
 *
 ***********************************************************************/
 
+#include <qpixmap_raster_p.h>
+
+#include <qbitmap.h>
+#include <qbuffer.h>
+#include <qimage.h>
+#include <qimagereader.h>
+#include <qpaintengine.h>
 #include <qpixmap.h>
 
-#include <qpaintengine.h>
-#include <qbitmap.h>
-#include <qimage.h>
-#include <qbuffer.h>
-#include <qimagereader.h>
-
+#include <qdrawhelper_p.h>
 #include <qfont_p.h>
 #include <qimage_p.h>
-#include <qnativeimage_p.h>
-#include <qpixmap_raster_p.h>
 #include <qimage_p.h>
+#include <qnativeimage_p.h>
 #include <qsimd_p.h>
 #include <qwidget_p.h>
-#include <qdrawhelper_p.h>
 
 QPixmap qt_toRasterPixmap(const QImage &image)
 {
    QPlatformPixmap *data =
       new QRasterPlatformPixmap(image.depth() == 1
-      ? QPlatformPixmap::BitmapType
-      : QPlatformPixmap::PixmapType);
+      ? QPlatformPixmap::BitmapType : QPlatformPixmap::PixmapType);
 
    data->fromImage(image, Qt::AutoColor);
 
@@ -87,26 +86,28 @@ void QRasterPlatformPixmap::resize(int width, int height)
       format = QNativeImage::systemFormat();
    }
 
+   m_rasterImage = QImage(width, height, format);
 
-   image = QImage(width, height, format);
-   w = width;
-   h = height;
-   d = image.depth();
-   is_null = (w <= 0 || h <= 0);
+   m_pixmap_w = width;
+   m_pixmap_h = height;
+   m_pixmap_d = m_rasterImage.depth();
 
-   if (pixelType() == BitmapType && !image.isNull()) {
-      image.setColorCount(2);
-      image.setColor(0, QColor(Qt::color0).rgba());
-      image.setColor(1, QColor(Qt::color1).rgba());
+   is_null = (m_pixmap_w <= 0 || m_pixmap_h <= 0);
+
+   if (pixelType() == BitmapType && ! m_rasterImage.isNull()) {
+      m_rasterImage.setColorCount(2);
+      m_rasterImage.setColor(0, QColor(Qt::color0).rgba());
+      m_rasterImage.setColor(1, QColor(Qt::color1).rgba());
    }
 
-   setSerialNumber(image.cacheKey() >> 32);
+   setSerialNumber(m_rasterImage.cacheKey() >> 32);
 }
 
 bool QRasterPlatformPixmap::fromData(const uchar *buffer, uint len, const QString &format,
    Qt::ImageConversionFlags flags)
 {
    QByteArray a = QByteArray::fromRawData(reinterpret_cast<const char *>(buffer), len);
+
    QBuffer b(&a);
    b.open(QIODevice::ReadOnly);
    QImage image = QImageReader(&b, format).read();
@@ -119,24 +120,21 @@ bool QRasterPlatformPixmap::fromData(const uchar *buffer, uint len, const QStrin
    return !isNull();
 }
 
-void QRasterPlatformPixmap::fromImage(const QImage &sourceImage,
-   Qt::ImageConversionFlags flags)
+void QRasterPlatformPixmap::fromImage(const QImage &sourceImage, Qt::ImageConversionFlags flags)
 {
-
    QImage image = sourceImage;
    createPixmapForImage(image, flags, /* inplace = */false);
 }
 
-void QRasterPlatformPixmap::fromImageInPlace(QImage &sourceImage,
-   Qt::ImageConversionFlags flags)
+void QRasterPlatformPixmap::fromImageInPlace(QImage &sourceImage, Qt::ImageConversionFlags flags)
 {
    createPixmapForImage(sourceImage, flags, /* inplace = */true);
 }
 
-void QRasterPlatformPixmap::fromImageReader(QImageReader *imageReader,
-   Qt::ImageConversionFlags flags)
+void QRasterPlatformPixmap::fromImageReader(QImageReader *imageReader, Qt::ImageConversionFlags flags)
 {
    (void) flags;
+
    QImage image = imageReader->read();
 
    if (image.isNull()) {
@@ -156,9 +154,10 @@ void QRasterPlatformPixmap::copy(const QPlatformPixmap *data, const QRect &rect)
 
 bool QRasterPlatformPixmap::scroll(int dx, int dy, const QRect &rect)
 {
-   if (!image.isNull()) {
-      qt_scrollRectInImage(image, rect, QPoint(dx, dy));
+   if (! m_rasterImage.isNull()) {
+      qt_scrollRectInImage(m_rasterImage, rect, QPoint(dx, dy));
    }
+
    return true;
 }
 
@@ -166,40 +165,41 @@ void QRasterPlatformPixmap::fill(const QColor &color)
 {
    uint pixel;
 
-   if (image.depth() == 1) {
+   if (m_rasterImage.depth() == 1) {
       int gray = qGray(color.rgba());
+
       // Pick the best approximate color in the image's colortable.
-      if (qAbs(qGray(image.color(0)) - gray) < qAbs(qGray(image.color(1)) - gray)) {
+      if (qAbs(qGray(m_rasterImage.color(0)) - gray) < qAbs(qGray(m_rasterImage.color(1)) - gray)) {
          pixel = 0;
       } else {
          pixel = 1;
       }
 
-   } else if (image.depth() >= 15) {
+   } else if (m_rasterImage.depth() >= 15) {
       int alpha = color.alpha();
 
       if (alpha != 255) {
-         if (!image.hasAlphaChannel()) {
-            QImage::Format toFormat = qt_alphaVersionForPainting(image.format());
+         if (! m_rasterImage.hasAlphaChannel()) {
+            QImage::Format toFormat = qt_alphaVersionForPainting(m_rasterImage.format());
 
-            if (!image.isNull() && qt_depthForFormat(image.format()) == qt_depthForFormat(toFormat)) {
-               image.detach();
-               image.d->format = toFormat;
+            if (! m_rasterImage.isNull() && qt_depthForFormat(m_rasterImage.format()) == qt_depthForFormat(toFormat)) {
+               m_rasterImage.detach();
+               m_rasterImage.d->format = toFormat;
+
             } else {
-               image = QImage(image.width(), image.height(), toFormat);
+               m_rasterImage = QImage(m_rasterImage.width(), m_rasterImage.height(), toFormat);
             }
          }
-
       }
 
       pixel = qPremultiply(color.rgba());
-      const QPixelLayout *layout = &qPixelLayouts[image.format()];
+      const QPixelLayout *layout = &qPixelLayouts[m_rasterImage.format()];
       layout->convertFromARGB32PM(&pixel, &pixel, 1, layout, nullptr);
 
-   } else if (image.format() == QImage::Format_Alpha8) {
+   } else if (m_rasterImage.format() == QImage::Format_Alpha8) {
       pixel = qAlpha(color.rgba());
 
-   } else if (image.format() == QImage::Format_Grayscale8) {
+   } else if (m_rasterImage.format() == QImage::Format_Grayscale8) {
       pixel = qGray(color.rgba());
 
    } else {
@@ -207,89 +207,102 @@ void QRasterPlatformPixmap::fill(const QColor &color)
 
    }
 
-   image.fill(pixel);
+   m_rasterImage.fill(pixel);
 }
 
 bool QRasterPlatformPixmap::hasAlphaChannel() const
 {
-   return image.hasAlphaChannel();
+   return m_rasterImage.hasAlphaChannel();
 }
 
 QImage QRasterPlatformPixmap::toImage() const
 {
-   if (! image.isNull()) {
-      QImageData *data = const_cast<QImage &>(image).data_ptr();
+   if (! m_rasterImage.isNull()) {
+      QImageData *data = const_cast<QImage &>(m_rasterImage).data_ptr();
 
-      if (data->paintEngine && data->paintEngine->isActive() && data->paintEngine->paintDevice() == &image) {
-         return image.copy();
+      if (data->paintEngine && data->paintEngine->isActive() && data->paintEngine->paintDevice() == &m_rasterImage) {
+         return m_rasterImage.copy();
       }
    }
 
-   return image;
+   return m_rasterImage;
 }
 
 QImage QRasterPlatformPixmap::toImage(const QRect &rect) const
 {
    if (rect.isNull()) {
-      return image;
+      return m_rasterImage;
    }
 
-   QRect clipped = rect.intersected(QRect(0, 0, w, h));
-   const uint du = uint(d);
+   QRect clipped = rect.intersected(QRect(0, 0, m_pixmap_w, m_pixmap_h));
+   const uint du = uint(m_pixmap_d);
 
    if ((du % 8 == 0) && (((uint(clipped.x()) * du)) % 32 == 0)) {
-      QImage newImage(image.scanLine(clipped.y()) + clipped.x() * (du / 8),
-         clipped.width(), clipped.height(),
-         image.bytesPerLine(), image.format());
+      QImage newImage(m_rasterImage.scanLine(clipped.y()) + clipped.x() * (du / 8),
+            clipped.width(), clipped.height(), m_rasterImage.bytesPerLine(), m_rasterImage.format());
 
-      newImage.setDevicePixelRatio(image.devicePixelRatio());
+      newImage.setDevicePixelRatio(m_rasterImage.devicePixelRatio());
+
       return newImage;
 
    } else {
-      return image.copy(clipped);
+      return m_rasterImage.copy(clipped);
    }
 }
 
 QPaintEngine *QRasterPlatformPixmap::paintEngine() const
 {
-   return image.paintEngine();
+   return m_rasterImage.paintEngine();
 }
 
 int QRasterPlatformPixmap::metric(QPaintDevice::PaintDeviceMetric metric) const
 {
-   QImageData *d = image.d;
-   if (!d) {
+   QImageData *imageData = m_rasterImage.d;
+
+   if (! imageData) {
       return 0;
    }
 
    // override the image dpi with the screen dpi when rendering to a pixmap
    switch (metric) {
       case QPaintDevice::PdmWidth:
-         return w;
+         return m_pixmap_w;
+
       case QPaintDevice::PdmHeight:
-         return h;
+         return m_pixmap_h;
+
       case QPaintDevice::PdmWidthMM:
-         return qRound(d->width * 25.4 / qt_defaultDpiX());
+         return qRound(imageData->width * 25.4 / qt_defaultDpiX());
+
       case QPaintDevice::PdmHeightMM:
-         return qRound(d->height * 25.4 / qt_defaultDpiY());
+         return qRound(imageData->height * 25.4 / qt_defaultDpiY());
+
       case QPaintDevice::PdmNumColors:
-         return d->colortable.size();
+         return imageData->colortable.size();
+
       case QPaintDevice::PdmDepth:
-         return this->d;
-      case QPaintDevice::PdmDpiX: // fall-through
+         return m_pixmap_d;
+
+      case QPaintDevice::PdmDpiX:
          return qt_defaultDpiX();
+
       case QPaintDevice::PdmPhysicalDpiX:
          return qt_defaultDpiX();
-      case QPaintDevice::PdmDpiY: // fall-through
+
+      case QPaintDevice::PdmDpiY:
          return qt_defaultDpiX();
+
       case QPaintDevice::PdmPhysicalDpiY:
          return qt_defaultDpiY();
+
       case QPaintDevice::PdmDevicePixelRatio:
-         return image.devicePixelRatio();
+         return m_rasterImage.devicePixelRatio();
+
       case QPaintDevice::PdmDevicePixelRatioScaled:
-         return image.devicePixelRatio() * QPaintDevice::devicePixelRatioFScale();
+         return m_rasterImage.devicePixelRatio() * QPaintDevice::devicePixelRatioFScale();
+
       default:
-         qWarning("QRasterPlatformPixmap::metric(): Unhandled metric type %d", metric);
+         qWarning("QRasterPlatformPixmap::metric() Unhandled metric type %d", metric);
          break;
    }
 
@@ -299,30 +312,33 @@ int QRasterPlatformPixmap::metric(QPaintDevice::PaintDeviceMetric metric) const
 void QRasterPlatformPixmap::createPixmapForImage(QImage &sourceImage, Qt::ImageConversionFlags flags, bool inPlace)
 {
    QImage::Format format;
+
    if (flags & Qt::NoFormatConversion) {
       format = sourceImage.format();
    } else
 
       if (pixelType() == BitmapType) {
          format = QImage::Format_MonoLSB;
+
       } else {
          if (sourceImage.depth() == 1) {
-            format = sourceImage.hasAlphaChannel()
-               ? QImage::Format_ARGB32_Premultiplied
-               : QImage::Format_RGB32;
+            format = sourceImage.hasAlphaChannel() ? QImage::Format_ARGB32_Premultiplied : QImage::Format_RGB32;
+
          } else {
             QImage::Format opaqueFormat = QNativeImage::systemFormat();
-            QImage::Format alphaFormat = qt_alphaVersionForPainting(opaqueFormat);
+            QImage::Format alphaFormat  = qt_alphaVersionForPainting(opaqueFormat);
 
-            if (!sourceImage.hasAlphaChannel()) {
+            if (! sourceImage.hasAlphaChannel()) {
                format = opaqueFormat;
 
             } else if ((flags & Qt::NoOpaqueDetection) == 0
-               && !const_cast<QImage &>(sourceImage).data_ptr()->checkForAlphaPixels()) {
+                  && ! const_cast<QImage &>(sourceImage).data_ptr()->checkForAlphaPixels()) {
+
                // image has alpha format but is really opaque, so try to do a
                // more efficient conversion
 
                format = opaqueFormat;
+
             } else {
                format = alphaFormat;
             }
@@ -334,55 +350,59 @@ void QRasterPlatformPixmap::createPixmapForImage(QImage &sourceImage, Qt::ImageC
          || sourceImage.format() == QImage::Format_ARGB32_Premultiplied)) {
 
       inPlace = inPlace && sourceImage.isDetached();
-      image = sourceImage;
+      m_rasterImage = sourceImage;
+
       if (!inPlace) {
-         image.detach();
+         m_rasterImage.detach();
       }
 
-      if (image.d) {
-         image.d->format = QImage::Format_RGB32;
+      if (m_rasterImage.d) {
+         m_rasterImage.d->format = QImage::Format_RGB32;
       }
 
    } else if (inPlace && sourceImage.d->convertInPlace(format, flags)) {
-      image = sourceImage;
+      m_rasterImage = sourceImage;
 
    } else {
-      image = sourceImage.convertToFormat(format);
+      m_rasterImage = sourceImage.convertToFormat(format);
    }
 
-   if (image.d) {
-      w = image.d->width;
-      h = image.d->height;
-      d = image.d->depth;
+   if (m_rasterImage.d) {
+      m_pixmap_w = m_rasterImage.d->width;
+      m_pixmap_h = m_rasterImage.d->height;
+      m_pixmap_d = m_rasterImage.d->depth;
+
    } else {
-      w = h = d = 0;
+      m_pixmap_w = 0;
+      m_pixmap_h = 0;
+      m_pixmap_d = 0;
    }
-   is_null = (w <= 0 || h <= 0);
 
-   if (image.d) {
-      image.d->devicePixelRatio = sourceImage.devicePixelRatio();
+   is_null = (m_pixmap_w <= 0 || m_pixmap_h <= 0);
+
+   if (m_rasterImage.d) {
+      m_rasterImage.d->devicePixelRatio = sourceImage.devicePixelRatio();
    }
 
    //ensure the pixmap and the image resulting from toImage() have the same cacheKey();
-   setSerialNumber(image.cacheKey() >> 32);
+   setSerialNumber(m_rasterImage.cacheKey() >> 32);
 
-   if (image.d) {
-      setDetachNumber(image.d->detach_no);
+   if (m_rasterImage.d) {
+      setDetachNumber(m_rasterImage.d->detach_no);
    }
 }
 
 QImage *QRasterPlatformPixmap::buffer()
 {
-   return &image;
+   return &m_rasterImage;
 }
 
 qreal QRasterPlatformPixmap::devicePixelRatio() const
 {
-   return image.devicePixelRatio();
+   return m_rasterImage.devicePixelRatio();
 }
 
 void QRasterPlatformPixmap::setDevicePixelRatio(qreal scaleFactor)
 {
-   image.setDevicePixelRatio(scaleFactor);
+   m_rasterImage.setDevicePixelRatio(scaleFactor);
 }
-

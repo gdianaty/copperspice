@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,13 +21,14 @@
 *
 ***********************************************************************/
 
+#include <qglpaintdevice_p.h>
+
 #include <qopenglfunctions.h>
 #include <qwindow.h>
 
-#include <qglpaintdevice_p.h>
 #include <qgl_p.h>
-#include <qglpixelbuffer_p.h>
 #include <qglframebufferobject_p.h>
+#include <qglpixelbuffer_p.h>
 
 QGLPaintDevice::QGLPaintDevice()
    : m_thisFBO(0)

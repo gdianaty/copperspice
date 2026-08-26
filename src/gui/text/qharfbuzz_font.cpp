@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,11 +21,11 @@
 *
 ***********************************************************************/
 
-#include <qharfbuzz_p.h>
-
 #include <qstring.h>
 #include <qvector.h>
+
 #include <qfontengine_p.h>
+#include <qharfbuzz_p.h>
 
 // Font routines
 static hb_bool_t cs_font_get_nominal_glyph(hb_font_t *, void *font_data, hb_codepoint_t unicode,
@@ -275,6 +275,7 @@ static hb_blob_t *internal_hb_reference_table(hb_face_t *, hb_tag_t tag, void *u
    }
 
    if (! funcPtr(data->user_data, tag, reinterpret_cast<uchar *>(buffer), &length)) {
+      free(buffer);
       return nullptr;
    }
 
@@ -333,8 +334,8 @@ static std::shared_ptr<hb_font_t> internal_hb_font_create(QFontEngine *fe)
       return nullptr;
    }
 
-   const double y_ppem = fe->fontDef.pixelSize;
-   const double x_ppem = (fe->fontDef.pixelSize * fe->fontDef.stretch) / 100.0;
+   const double y_ppem = fe->m_fontDef.pixelSize;
+   const double x_ppem = (fe->m_fontDef.pixelSize * fe->m_fontDef.stretch) / 100.0;
 
    hb_font_set_funcs(font, cs_get_font_funcs(), fe, nullptr);
 
@@ -345,7 +346,7 @@ static std::shared_ptr<hb_font_t> internal_hb_font_create(QFontEngine *fe)
 #endif
 
    hb_font_set_ppem(font, x_ppem, y_ppem);
-   hb_font_set_ptem(font, fe->fontDef.pointSize);
+   hb_font_set_ptem(font, fe->m_fontDef.pointSize);
 
    return retval;
 }

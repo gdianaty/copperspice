@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,7 +23,6 @@
 
 #include <camera_container.h>
 #include <qregularexpression.h>
-#include <qdebug.h>
 
 CameraBinContainer::CameraBinContainer(QObject *parent)
    : QMediaContainerControl(parent)
@@ -137,9 +136,6 @@ GstEncodingContainerProfile *CameraBinContainer::createProfile()
 
 #endif
 
-/*!
-  Suggest file extension for current container mimetype.
- */
 QString CameraBinContainer::suggestedFileExtension(const QString &containerFormat) const
 {
    // for container names like avi instead of video/x-msvideo, use it as extension
@@ -163,4 +159,3 @@ QString CameraBinContainer::suggestedFileExtension(const QString &containerForma
 
    return extension;
 }
-

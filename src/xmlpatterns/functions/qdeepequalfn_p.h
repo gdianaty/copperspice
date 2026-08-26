@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,15 +28,14 @@
 #include <qcomparisonplatform_p.h>
 #include <qfunctioncall_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class DeepEqualFN : public FunctionCall, public ComparisonPlatform<DeepEqualFN, false>
 {
  public:
-   inline DeepEqualFN() : ComparisonPlatform<DeepEqualFN, false>() {
-   }
+   DeepEqualFN()
+      : ComparisonPlatform<DeepEqualFN, false>()
+   { }
 
    bool evaluateEBV(const DynamicContext::Ptr &context) const override;
    Expression::Ptr typeCheck(const StaticContext::Ptr &context, const SequenceType::Ptr &reqType) override;
@@ -45,8 +44,7 @@ class DeepEqualFN : public FunctionCall, public ComparisonPlatform<DeepEqualFN, 
       return AtomicComparator::OperatorEqual;
    }
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,10 +29,7 @@
 #include "qliteral_p.h"
 #include "qatomicstring_p.h"
 #include "qschematime_p.h"
-
 #include "qcontextfns_p.h"
-
-QT_BEGIN_NAMESPACE
 
 using namespace QPatternist;
 
@@ -81,5 +78,3 @@ Expression::Ptr DefaultCollationFN::typeCheck(const StaticContext::Ptr &context,
    return wrapLiteral(AtomicString::fromValue(context->defaultCollation().toString()), context, this)->typeCheck(context,
           reqType);
 }
-
-QT_END_NAMESPACE

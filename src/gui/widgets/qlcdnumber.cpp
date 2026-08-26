@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,6 +27,7 @@
 
 #include <qbitarray.h>
 #include <qpainter.h>
+
 #include <qframe_p.h>
 
 class QLCDNumberPrivate : public QFramePrivate
@@ -303,10 +304,12 @@ void QLCDNumberPrivate::init()
 {
    Q_Q(QLCDNumber);
 
-   q->setFrameStyle(QFrame::Box | QFrame::Raised);
+   q->setFrameStyle(cs_enum_cast(QFrame::Box) | cs_enum_cast(QFrame::Raised));
+
    val        = 0;
    base       = QLCDNumber::Dec;
    smallPoint = false;
+
    q->setDigitCount(ndigits);
    q->setSegmentStyle(QLCDNumber::Filled);
    q->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum));
@@ -649,7 +652,6 @@ void QLCDNumberPrivate::drawString(const QString &s, QPainter &p, QBitArray *new
    }
 }
 
-// internal
 void QLCDNumberPrivate::drawDigit(const QPoint &pos, QPainter &p, int segLen,
    char newCh, char oldCh)
 {
@@ -706,7 +708,6 @@ static void addPoint(QPolygon &a, const QPoint &p)
    a.setPoint(n, p);
 }
 
-// internal
 void QLCDNumberPrivate::drawSegment(const QPoint &pos, char segmentNo, QPainter &p,
    int segLen, bool erase)
 {

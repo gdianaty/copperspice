@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,8 +24,8 @@
 #ifndef QCAMERAFLASHCONTROL_H
 #define QCAMERAFLASHCONTROL_H
 
-#include <qcameraexposure.h>
 #include <qcamera.h>
+#include <qcameraexposure.h>
 #include <qmediacontrol.h>
 #include <qmediaobject.h>
 #include <qstring.h>

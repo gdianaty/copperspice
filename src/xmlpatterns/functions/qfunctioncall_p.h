@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,9 +28,8 @@
 #include <qfunctionsignature_p.h>
 #include <qxpathhelper_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class FunctionCall : public UnlimitedContainer
 {
  public:
@@ -53,8 +52,7 @@ class FunctionCall : public UnlimitedContainer
  private:
    FunctionSignature::Ptr m_signature;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

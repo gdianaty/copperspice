@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,17 +25,17 @@
 
 #ifndef QT_NO_BLITTABLE
 
-
 class QBlittablePrivate
 {
  public:
    QBlittablePrivate(const QSize &size, QBlittable::Capabilities caps)
-      : caps(caps), m_size(size), locked(false), cachedImg(nullptr)
+      : locked(false), m_caps(caps), m_size(size), cachedImg(nullptr)
    { }
 
-   QBlittable::Capabilities caps;
-   QSize m_size;
    bool locked;
+
+   QBlittable::Capabilities m_caps;
+   QSize m_size;
    QImage *cachedImg;
 };
 
@@ -52,7 +52,7 @@ QBlittable::~QBlittable()
 QBlittable::Capabilities QBlittable::capabilities() const
 {
    Q_D(const QBlittable);
-   return d->caps;
+   return d->m_caps;
 }
 
 QSize QBlittable::size() const
@@ -70,7 +70,8 @@ bool QBlittable::isLocked() const
 QImage *QBlittable::lock()
 {
    Q_D(QBlittable);
-   if (!d->locked) {
+
+   if (! d->locked) {
       d->cachedImg = doLock();
       d->locked = true;
    }
@@ -81,6 +82,7 @@ QImage *QBlittable::lock()
 void QBlittable::unlock()
 {
    Q_D(QBlittable);
+
    if (d->locked) {
       doUnlock();
       d->locked = false;

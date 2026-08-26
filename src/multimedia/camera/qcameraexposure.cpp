@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,12 +26,10 @@
 #include <qcamera.h>
 #include <qcameraexposurecontrol.h>
 #include <qcameraflashcontrol.h>
-#include <qmetaobject.h>
 #include <qdebug.h>
+#include <qmetaobject.h>
 
 #include <qmediaobject_p.h>
-
-//# define DEBUG_EXPOSURE_CHANGES 1
 
 class QCameraExposurePrivate
 {
@@ -75,12 +73,12 @@ void QCameraExposurePrivate::initControls()
    }
 
    if (exposureControl) {
-      q->connect(exposureControl, SIGNAL(actualValueChanged(int)),    q, SLOT(_q_exposureParameterChanged(int)));
-      q->connect(exposureControl, SIGNAL(parameterRangeChanged(int)), q, SLOT(_q_exposureParameterRangeChanged(int)));
+      q->connect(exposureControl, &QCameraExposureControl::actualValueChanged,    q, &QCameraExposure::_q_exposureParameterChanged);
+      q->connect(exposureControl, &QCameraExposureControl::parameterRangeChanged, q, &QCameraExposure::_q_exposureParameterRangeChanged);
    }
 
    if (flashControl) {
-      q->connect(flashControl, SIGNAL(flashReady(bool)), q, SLOT(flashReady(bool)));
+      q->connect(flashControl, &QCameraFlashControl::flashReady, q, &QCameraExposure::flashReady);
    }
 }
 
@@ -121,10 +119,10 @@ void QCameraExposurePrivate::_q_exposureParameterChanged(int parameter)
 {
    Q_Q(QCameraExposure);
 
-#if DEBUG_EXPOSURE_CHANGES
+#if defined(CS_SHOW_DEBUG_MULTIMEDIA)
    qDebug() << "Exposure parameter changed:"
-            << QCameraExposureControl::ExposureParameter(parameter)
-            << exposureControl->actualValue(QCameraExposureControl::ExposureParameter(parameter));
+         << QCameraExposureControl::ExposureParameter(parameter)
+         << exposureControl->actualValue(QCameraExposureControl::ExposureParameter(parameter));
 #endif
 
    switch (parameter) {
@@ -173,6 +171,7 @@ QCameraExposure::QCameraExposure(QCamera *parent):
 QCameraExposure::~QCameraExposure()
 {
    Q_D(QCameraExposure);
+
    if (d->exposureControl) {
       d->camera->service()->releaseControl(d->exposureControl);
    }
@@ -219,11 +218,12 @@ void QCameraExposure::setExposureMode(QCameraExposure::ExposureMode mode)
 
 bool QCameraExposure::isExposureModeSupported(QCameraExposure::ExposureMode mode) const
 {
-   if (!d_func()->exposureControl) {
+   if (! d_func()->exposureControl) {
       return false;
    }
 
    bool continuous = false;
+
    return d_func()->exposureControl->supportedParameterRange(QCameraExposureControl::ExposureMode, &continuous)
           .contains(QVariant::fromValue<QCameraExposure::ExposureMode>(mode));
 }

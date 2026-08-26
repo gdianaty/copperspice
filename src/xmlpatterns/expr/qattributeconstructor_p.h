@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,9 +26,8 @@
 
 #include <qpaircontainer_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class AttributeConstructor : public PairContainer
 {
  public:
@@ -38,18 +37,10 @@ class AttributeConstructor : public PairContainer
    void evaluateToSequenceReceiver(const DynamicContext::Ptr &context) const override;
 
    SequenceType::Ptr staticType() const override;
-
-   /**
-    * The first operand must be exactly one @c xs:QName, and the second
-    * argument can be zero or more items.
-    */
    SequenceType::List expectedOperandTypes() const override;
 
    ExpressionVisitorResult::Ptr accept(const ExpressionVisitor::Ptr &visitor) const override;
 
-   /**
-    * @returns always IDAttributeConstructor.
-    */
    ID id() const override;
 
    Properties properties() const override;
@@ -57,8 +48,7 @@ class AttributeConstructor : public PairContainer
  private:
    static inline QString processValue(const QXmlName name, const Item &value);
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

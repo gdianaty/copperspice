@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,29 +21,31 @@
 *
 ***********************************************************************/
 
-#include <qapplication.h>
-#include <qwidget.h>
-#include <qtabbar.h>
-#include <qstyle.h>
-#include <qdesktopwidget.h>
-#include <qvariant.h>
 #include <qdockarealayout_p.h>
+
+#include <qapplication.h>
+#include <qdesktopwidget.h>
 #include <qdockwidget.h>
 #include <qmainwindow.h>
 #include <qpainter.h>
+#include <qstyle.h>
 #include <qstyleoption.h>
+#include <qtabbar.h>
+#include <qvariant.h>
+#include <qwidget.h>
 
-#include <qwidgetanimator_p.h>
-#include <qmainwindowlayout_p.h>
 #include <qdockwidget_p.h>
 #include <qlayoutengine_p.h>
+#include <qmainwindowlayout_p.h>
+#include <qwidgetanimator_p.h>
 
 #ifndef QT_NO_DOCKWIDGET
 
 // qmainwindow.cpp
 extern QMainWindowLayout *qt_mainwindow_layout(const QMainWindow *window);
 
-enum { StateFlagVisible = 1, StateFlagFloating = 2 };
+static constexpr const int StateFlagVisible  = 1;
+static constexpr const int StateFlagFloating = 2;
 
 QPlaceHolderItem::QPlaceHolderItem(QWidget *w)
 {
@@ -215,10 +217,10 @@ static quintptr tabId(const QDockAreaLayoutItem &item)
 }
 #endif
 
-static const int zero = 0;
+static constexpr const int zero = 0;
 
 QDockAreaLayoutInfo::QDockAreaLayoutInfo()
-   : sep(&zero), dockPos(QInternal::LeftDock), o(Qt::Horizontal), mainWindow(nullptr)
+   : m_dockAreaSep(&zero), m_dockPos(QInternal::LeftDock), m_dockAreaOrientation(Qt::Horizontal), mainWindow(nullptr)
 
 #ifndef QT_NO_TABBAR
    , tabbed(false), tabBar(nullptr), tabBarShape(QTabBar::RoundedSouth)
@@ -227,9 +229,10 @@ QDockAreaLayoutInfo::QDockAreaLayoutInfo()
 {
 }
 
-QDockAreaLayoutInfo::QDockAreaLayoutInfo(const int *_sep, QInternal::DockPosition _dockPos,
-   Qt::Orientation _o, int tbshape, QMainWindow *window)
-   : sep(_sep), dockPos(_dockPos), o(_o), mainWindow(window)
+QDockAreaLayoutInfo::QDockAreaLayoutInfo(const int *sep, QInternal::DockPosition dockPos,
+      Qt::Orientation orientation, int tbshape, QMainWindow *window)
+   : m_dockAreaSep(sep), m_dockPos(dockPos), m_dockAreaOrientation(orientation), mainWindow(window)
+
 #ifndef QT_NO_TABBAR
    , tabbed(false), tabBar(nullptr), tabBarShape(static_cast<QTabBar::Shape>(tbshape))
 #endif
@@ -242,13 +245,13 @@ QDockAreaLayoutInfo::QDockAreaLayoutInfo(const int *_sep, QInternal::DockPositio
 
 QSize QDockAreaLayoutInfo::size() const
 {
-   return isEmpty() ? QSize(0, 0) : rect.size();
+   return isEmpty() ? QSize(0, 0) : m_dockAreaInfoRect.size();
 }
 
 void QDockAreaLayoutInfo::clear()
 {
    item_list.clear();
-   rect = QRect();
+   m_dockAreaInfoRect = QRect();
 
 #ifndef QT_NO_TABBAR
    tabbed = false;
@@ -267,37 +270,45 @@ QSize QDockAreaLayoutInfo::minimumSize() const
       return QSize(0, 0);
    }
 
-   int a = 0, b = 0;
+   int a = 0;
+   int b = 0;
    bool first = true;
+
    for (int i = 0; i < item_list.size(); ++i) {
       const QDockAreaLayoutItem &item = item_list.at(i);
+
       if (item.skip()) {
          continue;
       }
 
       QSize min_size = item.minimumSize();
+
 #ifndef QT_NO_TABBAR
       if (tabbed) {
-         a = qMax(a, pick(o, min_size));
+         a = qMax(a, pick(m_dockAreaOrientation, min_size));
       } else
 #endif
+
       {
-         if (!first) {
-            a += *sep;
+         if (! first) {
+            a += *m_dockAreaSep;
          }
-         a += pick(o, min_size);
+
+         a += pick(m_dockAreaOrientation, min_size);
       }
-      b = qMax(b, perp(o, min_size));
+
+      b = qMax(b, perp(m_dockAreaOrientation, min_size));
 
       first = false;
    }
 
    QSize result;
-   rpick(o, result) = a;
-   rperp(o, result) = b;
+   rpick(m_dockAreaOrientation, result) = a;
+   rperp(m_dockAreaOrientation, result) = b;
 
 #ifndef QT_NO_TABBAR
    QSize tbm = tabBarMinimumSize();
+
    if (!tbm.isNull()) {
       switch (tabBarShape) {
          case QTabBar::RoundedNorth:
@@ -307,6 +318,7 @@ QSize QDockAreaLayoutInfo::minimumSize() const
             result.rheight() += tbm.height();
             result.rwidth() = qMax(tbm.width(), result.width());
             break;
+
          case QTabBar::RoundedEast:
          case QTabBar::RoundedWest:
          case QTabBar::TriangularEast:
@@ -314,11 +326,12 @@ QSize QDockAreaLayoutInfo::minimumSize() const
             result.rheight() = qMax(tbm.height(), result.height());
             result.rwidth() += tbm.width();
             break;
+
          default:
             break;
       }
    }
-#endif // QT_NO_TABBAR
+#endif
 
    return result;
 }
@@ -329,7 +342,9 @@ QSize QDockAreaLayoutInfo::maximumSize() const
       return QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
    }
 
-   int a = 0, b = QWIDGETSIZE_MAX;
+   int a = 0;
+   int b = QWIDGETSIZE_MAX;
+
 #ifndef QT_NO_TABBAR
    if (tabbed) {
       a = QWIDGETSIZE_MAX;
@@ -341,25 +356,28 @@ QSize QDockAreaLayoutInfo::maximumSize() const
    bool first = true;
    for (int i = 0; i < item_list.size(); ++i) {
       const QDockAreaLayoutItem &item = item_list.at(i);
+
       if (item.skip()) {
          continue;
       }
 
       QSize max_size = item.maximumSize();
-      min_perp = qMax(min_perp, perp(o, item.minimumSize()));
+      min_perp = qMax(min_perp, perp(m_dockAreaOrientation, item.minimumSize()));
 
 #ifndef QT_NO_TABBAR
       if (tabbed) {
-         a = qMin(a, pick(o, max_size));
+         a = qMin(a, pick(m_dockAreaOrientation, max_size));
       } else
 #endif
+
       {
-         if (!first) {
-            a += *sep;
+         if (! first) {
+            a += *m_dockAreaSep;
          }
-         a += pick(o, max_size);
+         a += pick(m_dockAreaOrientation, max_size);
       }
-      b = qMin(b, perp(o, max_size));
+
+      b = qMin(b, perp(m_dockAreaOrientation, max_size));
 
       a = qMin(a, int(QWIDGETSIZE_MAX));
       b = qMin(b, int(QWIDGETSIZE_MAX));
@@ -370,26 +388,29 @@ QSize QDockAreaLayoutInfo::maximumSize() const
    b = qMax(b, min_perp);
 
    QSize result;
-   rpick(o, result) = a;
-   rperp(o, result) = b;
+   rpick(m_dockAreaOrientation, result) = a;
+   rperp(m_dockAreaOrientation, result) = b;
 
 #ifndef QT_NO_TABBAR
    QSize tbh = tabBarSizeHint();
+
    if (!tbh.isNull()) {
       switch (tabBarShape) {
          case QTabBar::RoundedNorth:
          case QTabBar::RoundedSouth:
             result.rheight() += tbh.height();
             break;
+
          case QTabBar::RoundedEast:
          case QTabBar::RoundedWest:
             result.rwidth() += tbh.width();
             break;
+
          default:
             break;
       }
    }
-#endif // QT_NO_TABBAR
+#endif
 
    return result;
 }
@@ -403,10 +424,12 @@ QSize QDockAreaLayoutInfo::sizeHint() const
    int a = 0, b = 0;
    int min_perp = 0;
    int max_perp = QWIDGETSIZE_MAX;
+
    const QDockAreaLayoutItem *previous = nullptr;
 
    for (int i = 0; i < item_list.size(); ++i) {
       const QDockAreaLayoutItem &item = item_list.at(i);
+
       if (item.skip()) {
          continue;
       }
@@ -414,22 +437,24 @@ QSize QDockAreaLayoutInfo::sizeHint() const
       bool gap = item.flags & QDockAreaLayoutItem::GapItem;
 
       QSize size_hint = item.sizeHint();
-      min_perp = qMax(min_perp, perp(o, item.minimumSize()));
-      max_perp = qMin(max_perp, perp(o, item.maximumSize()));
+      min_perp = qMax(min_perp, perp(m_dockAreaOrientation, item.minimumSize()));
+      max_perp = qMin(max_perp, perp(m_dockAreaOrientation, item.maximumSize()));
 
 #ifndef QT_NO_TABBAR
       if (tabbed) {
-         a = qMax(a, gap ? item.size : pick(o, size_hint));
+         a = qMax(a, gap ? item.size : pick(m_dockAreaOrientation, size_hint));
       } else
 #endif
+
       {
          if (previous && !gap && !(previous->flags &  QDockAreaLayoutItem::GapItem)
-            && !previous->hasFixedSize(o)) {
-            a += *sep;
+               && ! previous->hasFixedSize(m_dockAreaOrientation)) {
+            a += *m_dockAreaSep;
          }
-         a += gap ? item.size : pick(o, size_hint);
+         a += gap ? item.size : pick(m_dockAreaOrientation, size_hint);
       }
-      b = qMax(b, perp(o, size_hint));
+
+      b = qMax(b, perp(m_dockAreaOrientation, size_hint));
 
       previous = &item;
    }
@@ -439,12 +464,13 @@ QSize QDockAreaLayoutInfo::sizeHint() const
    b = qMin(b, max_perp);
 
    QSize result;
-   rpick(o, result) = a;
-   rperp(o, result) = b;
+   rpick(m_dockAreaOrientation, result) = a;
+   rperp(m_dockAreaOrientation, result) = b;
 
 #ifndef QT_NO_TABBAR
    if (tabbed) {
       QSize tbh = tabBarSizeHint();
+
       switch (tabBarShape) {
          case QTabBar::RoundedNorth:
          case QTabBar::RoundedSouth:
@@ -453,6 +479,7 @@ QSize QDockAreaLayoutInfo::sizeHint() const
             result.rheight() += tbh.height();
             result.rwidth() = qMax(tbh.width(), result.width());
             break;
+
          case QTabBar::RoundedEast:
          case QTabBar::RoundedWest:
          case QTabBar::TriangularEast:
@@ -460,36 +487,32 @@ QSize QDockAreaLayoutInfo::sizeHint() const
             result.rheight() = qMax(tbh.height(), result.height());
             result.rwidth() += tbh.width();
             break;
+
          default:
             break;
       }
    }
-#endif // QT_NO_TABBAR
+#endif
 
    return result;
 }
 
-bool QDockAreaLayoutInfo::expansive(Qt::Orientation o) const
+bool QDockAreaLayoutInfo::expansive(Qt::Orientation newOrientation) const
 {
    for (int i = 0; i < item_list.size(); ++i) {
-      if (item_list.at(i).expansive(o)) {
+      if (item_list.at(i).expansive(newOrientation)) {
          return true;
       }
    }
+
    return false;
 }
-
-/* QDockAreaLayoutInfo::maximumSize() doesn't return the real max size. For example,
-   if the layout is empty, it returns QWIDGETSIZE_MAX. This is so that empty dock areas
-   don't constrain the size of the QMainWindow, but sometimes we really need to know the
-   maximum size. Also, these functions take into account widgets that want to keep their
-   size (f.ex. when they are hidden and then shown, they should not change size).
-*/
 
 static int realMinSize(const QDockAreaLayoutInfo &info)
 {
    int result = 0;
    bool first = true;
+
    for (int i = 0; i < info.item_list.size(); ++i) {
       const QDockAreaLayoutItem &item = info.item_list.at(i);
       if (item.skip()) {
@@ -500,11 +523,11 @@ static int realMinSize(const QDockAreaLayoutInfo &info)
       if ((item.flags & QDockAreaLayoutItem::KeepSize) && item.size != -1) {
          min = item.size;
       } else {
-         min = pick(info.o, item.minimumSize());
+         min = pick(info.m_dockAreaOrientation, item.minimumSize());
       }
 
       if (!first) {
-         result += *info.sep;
+         result += *info.m_dockAreaSep;
       }
       result += min;
 
@@ -518,6 +541,7 @@ static int realMaxSize(const QDockAreaLayoutInfo &info)
 {
    int result = 0;
    bool first = true;
+
    for (int i = 0; i < info.item_list.size(); ++i) {
       const QDockAreaLayoutItem &item = info.item_list.at(i);
       if (item.skip()) {
@@ -528,11 +552,11 @@ static int realMaxSize(const QDockAreaLayoutInfo &info)
       if ((item.flags & QDockAreaLayoutItem::KeepSize) && item.size != -1) {
          max = item.size;
       } else {
-         max = pick(info.o, item.maximumSize());
+         max = pick(info.m_dockAreaOrientation, item.maximumSize());
       }
 
       if (!first) {
-         result += *info.sep;
+         result += *info.m_dockAreaSep;
       }
       result += max;
 
@@ -557,7 +581,8 @@ void QDockAreaLayoutInfo::fitItems()
    QVector<QLayoutStruct> layout_struct_list(item_list.size() * 2);
    int j = 0;
 
-   int size = pick(o, rect.size());
+   int size = pick(m_dockAreaOrientation, m_dockAreaInfoRect.size());
+
    int min_size = realMinSize(*this);
    int max_size = realMaxSize(*this);
    int last_index = -1;
@@ -565,16 +590,17 @@ void QDockAreaLayoutInfo::fitItems()
    const QDockAreaLayoutItem *previous = nullptr;
    for (int i = 0; i < item_list.size(); ++i) {
       QDockAreaLayoutItem &item = item_list[i];
+
       if (item.skip()) {
          continue;
       }
 
       bool gap = item.flags & QDockAreaLayoutItem::GapItem;
       if (previous && !gap) {
-         if (!(previous->flags & QDockAreaLayoutItem::GapItem)) {
+         if (! (previous->flags & QDockAreaLayoutItem::GapItem)) {
             QLayoutStruct &ls = layout_struct_list[j++];
             ls.init();
-            ls.minimumSize = ls.maximumSize = ls.sizeHint = previous->hasFixedSize(o) ? 0 : *sep;
+            ls.minimumSize = ls.maximumSize = ls.sizeHint = previous->hasFixedSize(m_dockAreaOrientation) ? 0 : *m_dockAreaSep;
             ls.empty = false;
          }
       }
@@ -587,14 +613,14 @@ void QDockAreaLayoutInfo::fitItems()
             // There is too little space to keep this widget's size
             item.flags &= ~QDockAreaLayoutItem::KeepSize;
             min_size -= item.size;
-            min_size += pick(o, item.minimumSize());
+            min_size += pick(m_dockAreaOrientation, item.minimumSize());
             min_size = qMax(0, min_size);
 
          } else if (size > max_size) {
             // There is too much space to keep this widget's size
             item.flags &= ~QDockAreaLayoutItem::KeepSize;
             max_size -= item.size;
-            max_size += pick(o, item.maximumSize());
+            max_size += pick(m_dockAreaOrientation, item.maximumSize());
             max_size = qMin(QWIDGETSIZE_MAX, max_size);
          }
       }
@@ -603,21 +629,23 @@ void QDockAreaLayoutInfo::fitItems()
       QLayoutStruct &ls = layout_struct_list[j++];
       ls.init();
       ls.empty = false;
+
       if (item.flags & QDockAreaLayoutItem::KeepSize) {
          ls.minimumSize = ls.maximumSize = ls.sizeHint = item.size;
          ls.expansive = false;
          ls.stretch = 0;
       } else {
-         ls.maximumSize = pick(o, item.maximumSize());
-         ls.expansive = item.expansive(o);
-         ls.minimumSize = pick(o, item.minimumSize());
-         ls.sizeHint = item.size == -1 ? pick(o, item.sizeHint()) : item.size;
+         ls.maximumSize = pick(m_dockAreaOrientation, item.maximumSize());
+         ls.expansive = item.expansive(m_dockAreaOrientation);
+         ls.minimumSize = pick(m_dockAreaOrientation, item.minimumSize());
+         ls.sizeHint = item.size == -1 ? pick(m_dockAreaOrientation, item.sizeHint()) : item.size;
          ls.stretch = ls.expansive ? ls.sizeHint : 0;
       }
 
       item.flags &= ~QDockAreaLayoutItem::KeepSize;
       previous = &item;
    }
+
    layout_struct_list.resize(j);
 
    // If there is more space than the widgets can take (due to maximum size constraints),
@@ -627,11 +655,13 @@ void QDockAreaLayoutInfo::fitItems()
       layout_struct_list[last_index].expansive = true;
    }
 
-   qGeomCalc(layout_struct_list, 0, j, pick(o, rect.topLeft()), size, 0);
+   qGeomCalc(layout_struct_list, 0, j, pick(m_dockAreaOrientation, m_dockAreaInfoRect.topLeft()), size, 0);
 
    j = 0;
+
    bool prev_gap = false;
-   bool first = true;
+   bool first    = true;
+
    for (int i = 0; i < item_list.size(); ++i) {
       QDockAreaLayoutItem &item = item_list[i];
       if (item.skip()) {
@@ -648,7 +678,7 @@ void QDockAreaLayoutInfo::fitItems()
       item.pos = ls.pos;
 
       if (item.subinfo != nullptr) {
-         item.subinfo->rect = itemRect(i);
+         item.subinfo->m_dockAreaInfoRect = itemRect(i);
          item.subinfo->fitItems();
       }
 
@@ -758,19 +788,15 @@ static QInternal::DockPosition dockPosHelper(const QRect &rect, const QPoint &_p
       }
    } else {
       if (o == Qt::Horizontal) {
-         return x < w / 2
-            ? QInternal::LeftDock
-            : QInternal::RightDock;
+         return x < w / 2 ? QInternal::LeftDock : QInternal::RightDock;
+
       } else {
-         return y < h / 2
-            ? QInternal::TopDock
-            : QInternal::BottomDock;
+         return y < h / 2 ? QInternal::TopDock : QInternal::BottomDock;
       }
    }
 }
 
-QList<int> QDockAreaLayoutInfo::gapIndex(const QPoint &_pos,
-   bool nestingEnabled, TabMode tabMode) const
+QList<int> QDockAreaLayoutInfo::gapIndex(const QPoint &_pos, bool nestingEnabled, TabMode tabMode) const
 {
    QList<int> result;
    QRect item_rect;
@@ -781,8 +807,9 @@ QList<int> QDockAreaLayoutInfo::gapIndex(const QPoint &_pos,
       item_rect = tabContentRect();
    } else
 #endif
+
    {
-      int pos = pick(o, _pos);
+      int pos = pick(m_dockAreaOrientation, _pos);
 
       int last = -1;
       for (int i = 0; i < item_list.size(); ++i) {
@@ -798,12 +825,13 @@ QList<int> QDockAreaLayoutInfo::gapIndex(const QPoint &_pos,
          }
 
          if (item.subinfo != nullptr
+
 #ifndef QT_NO_TABBAR
-            && !item.subinfo->tabbed
+            && ! item.subinfo->tabbed
 #endif
+
          ) {
-            result = item.subinfo->gapIndex(_pos, nestingEnabled,
-                  tabMode);
+            result = item.subinfo->gapIndex(_pos, nestingEnabled, tabMode);
             result.prepend(i);
             return result;
          }
@@ -819,46 +847,51 @@ QList<int> QDockAreaLayoutInfo::gapIndex(const QPoint &_pos,
       }
    }
 
-   Q_ASSERT(!item_rect.isNull());
+   Q_ASSERT(! item_rect.isNull());
 
-   QInternal::DockPosition dock_pos
-      = dockPosHelper(item_rect, _pos, o, nestingEnabled, tabMode);
+   QInternal::DockPosition dock_pos = dockPosHelper(item_rect, _pos, m_dockAreaOrientation, nestingEnabled, tabMode);
 
    switch (dock_pos) {
       case QInternal::LeftDock:
-         if (o == Qt::Horizontal) {
+         if (m_dockAreaOrientation == Qt::Horizontal) {
             result << item_index;
          } else {
             result << item_index << 0;   // this subinfo doesn't exist yet, but insertGap()
          }
+
          // handles this by inserting it
          break;
+
       case QInternal::RightDock:
-         if (o == Qt::Horizontal) {
+         if (m_dockAreaOrientation == Qt::Horizontal) {
             result << item_index + 1;
          } else {
             result << item_index << 1;
          }
          break;
+
       case QInternal::TopDock:
-         if (o == Qt::Horizontal) {
+         if (m_dockAreaOrientation == Qt::Horizontal) {
             result << item_index << 0;
          } else {
             result << item_index;
          }
          break;
+
       case QInternal::BottomDock:
-         if (o == Qt::Horizontal) {
+         if (m_dockAreaOrientation == Qt::Horizontal) {
             result << item_index << 1;
          } else {
             result << item_index + 1;
          }
          break;
+
       case  QInternal::DockCount:
          result << (-item_index - 1) << 0;   // negative item_index means "on top of"
          // -item_index - 1, insertGap()
          // will insert a tabbed subinfo
          break;
+
       default:
          break;
    }
@@ -871,8 +904,10 @@ static inline int shrink(QLayoutStruct &ls, int delta)
    if (ls.empty) {
       return 0;
    }
+
    int old_size = ls.size;
    ls.size = qMax(ls.size - delta, ls.minimumSize);
+
    return old_size - ls.size;
 }
 
@@ -881,8 +916,10 @@ static inline int grow(QLayoutStruct &ls, int delta)
    if (ls.empty) {
       return 0;
    }
+
    int old_size = ls.size;
    ls.size = qMin(ls.size + delta, ls.maximumSize);
+
    return ls.size - old_size;
 }
 
@@ -984,22 +1021,25 @@ int QDockAreaLayoutInfo::separatorMove(int index, int delta)
    for (int i = 0; i < list.size(); ++i) {
       const QDockAreaLayoutItem &item = item_list.at(i);
       QLayoutStruct &ls = list[i];
+
       Q_ASSERT(!(item.flags & QDockAreaLayoutItem::GapItem));
+
       if (item.skip()) {
          ls.empty = true;
       } else {
-         const int separatorSpace = item.hasFixedSize(o) ? 0 : *sep;
+         const int separatorSpace = item.hasFixedSize(m_dockAreaOrientation) ? 0 : *m_dockAreaSep;
          ls.empty = false;
-         ls.pos = item.pos;
-         ls.size = item.size + separatorSpace;
-         ls.minimumSize = pick(o, item.minimumSize()) + separatorSpace;
-         ls.maximumSize = pick(o, item.maximumSize()) + separatorSpace;
+         ls.pos   = item.pos;
+         ls.size  = item.size + separatorSpace;
+
+         ls.minimumSize = pick(m_dockAreaOrientation, item.minimumSize()) + separatorSpace;
+         ls.maximumSize = pick(m_dockAreaOrientation, item.maximumSize()) + separatorSpace;
 
       }
    }
 
    //the separator space has been added to the size, so we pass 0 as a parameter
-   delta = separatorMoveHelper(list, index, delta, 0 /*separator*/);
+   delta = separatorMoveHelper(list, index, delta, 0);
 
    for (int i = 0; i < list.size(); ++i) {
       QDockAreaLayoutItem &item = item_list[i];
@@ -1009,12 +1049,12 @@ int QDockAreaLayoutInfo::separatorMove(int index, int delta)
       }
 
       QLayoutStruct &ls = list[i];
-      const int separatorSpace = item.hasFixedSize(o) ? 0 : *sep;
+      const int separatorSpace = item.hasFixedSize(m_dockAreaOrientation) ? 0 : *m_dockAreaSep;
       item.size = ls.size - separatorSpace;
-      item.pos = ls.pos;
+      item.pos  = ls.pos;
 
       if (item.subinfo != nullptr) {
-         item.subinfo->rect = itemRect(i);
+         item.subinfo->m_dockAreaInfoRect = itemRect(i);
          item.subinfo->fitItems();
       }
    }
@@ -1098,24 +1138,28 @@ QLayoutItem *QDockAreaLayoutInfo::plug(const QList<int> &path)
    if (tabbed) {
    } else
 #endif
+
    {
       int prev = this->prev(index);
       int next = this->next(index);
 
-      if (prev != -1 && !(item_list.at(prev).flags & QDockAreaLayoutItem::GapItem)) {
-         item.pos += *sep;
-         item.size -= *sep;
+      if (prev != -1 && ! (item_list.at(prev).flags & QDockAreaLayoutItem::GapItem)) {
+         item.pos  += *m_dockAreaSep;
+         item.size -= *m_dockAreaSep;
       }
+
       if (next != -1 && !(item_list.at(next).flags & QDockAreaLayoutItem::GapItem)) {
-         item.size -= *sep;
+         item.size -= *m_dockAreaSep;
       }
 
       QPoint pos;
-      rpick(o, pos) = item.pos;
-      rperp(o, pos) = perp(o, rect.topLeft());
+      rpick(m_dockAreaOrientation, pos) = item.pos;
+      rperp(m_dockAreaOrientation, pos) = perp(m_dockAreaOrientation, m_dockAreaInfoRect.topLeft());
+
       QSize s;
-      rpick(o, s) = item.size;
-      rperp(o, s) = perp(o, rect.size());
+      rpick(m_dockAreaOrientation, s) = item.size;
+      rperp(m_dockAreaOrientation, s) = perp(m_dockAreaOrientation, m_dockAreaInfoRect.size());
+
       result = QRect(pos, s);
    }
 
@@ -1124,7 +1168,7 @@ QLayoutItem *QDockAreaLayoutInfo::plug(const QList<int> &path)
 
 QLayoutItem *QDockAreaLayoutInfo::unplug(const QList<int> &path)
 {
-   Q_ASSERT(!path.isEmpty());
+   Q_ASSERT(! path.isEmpty());
 
    const int index = path.first();
 
@@ -1145,14 +1189,15 @@ QLayoutItem *QDockAreaLayoutInfo::unplug(const QList<int> &path)
    if (tabbed) {
    } else
 #endif
+
    {
-      if (prev != -1 && !(item_list.at(prev).flags & QDockAreaLayoutItem::GapItem)) {
-         item.pos -= *sep;
-         item.size += *sep;
+      if (prev != -1 && ! (item_list.at(prev).flags & QDockAreaLayoutItem::GapItem)) {
+         item.pos  -= *m_dockAreaSep;
+         item.size += *m_dockAreaSep;
       }
 
-      if (next != -1 && !(item_list.at(next).flags & QDockAreaLayoutItem::GapItem)) {
-         item.size += *sep;
+      if (next != -1 && ! (item_list.at(next).flags & QDockAreaLayoutItem::GapItem)) {
+         item.size += *m_dockAreaSep;
       }
    }
 
@@ -1160,7 +1205,6 @@ QLayoutItem *QDockAreaLayoutInfo::unplug(const QList<int> &path)
 }
 
 #ifndef QT_NO_TABBAR
-
 quintptr QDockAreaLayoutInfo::currentTabId() const
 {
    if (! tabbed || tabBar == nullptr) {
@@ -1195,8 +1239,7 @@ void QDockAreaLayoutInfo::setCurrentTabId(quintptr id)
       }
    }
 }
-
-#endif // QT_NO_TABBAR
+#endif
 
 static QRect dockedGeometry(QWidget *widget)
 {
@@ -1252,17 +1295,17 @@ bool QDockAreaLayoutInfo::insertGap(const QList<int> &path, QLayoutItem *dockWid
             }
 
          } else {
-            r = subinfo->rect;
+            r = subinfo->m_dockAreaInfoRect;
 
          }
 
-         Qt::Orientation opposite = (o == Qt::Horizontal) ? Qt::Vertical : Qt::Horizontal;
+         Qt::Orientation opposite = (m_dockAreaOrientation == Qt::Horizontal) ? Qt::Vertical : Qt::Horizontal;
 
 #ifdef QT_NO_TABBAR
          const int tabBarShape = 0;
 #endif
 
-         QDockAreaLayoutInfo *new_info = new QDockAreaLayoutInfo(sep, dockPos, opposite, tabBarShape, mainWindow);
+         QDockAreaLayoutInfo *new_info = new QDockAreaLayoutInfo(m_dockAreaSep, m_dockPos, opposite, tabBarShape, mainWindow);
 
          //item become a new top-level
          item.subinfo         = new_info;
@@ -1281,6 +1324,7 @@ bool QDockAreaLayoutInfo::insertGap(const QList<int> &path, QLayoutItem *dockWid
             new_info->tabbed = true;
          }
 #endif
+
       }
 
       return item.subinfo->insertGap(path.mid(1), dockWidgetItem);
@@ -1294,6 +1338,7 @@ bool QDockAreaLayoutInfo::insertGap(const QList<int> &path, QLayoutItem *dockWid
 #ifndef QT_NO_TABBAR
    if (!tabbed)
 #endif
+
    {
       int prev = this->prev(index);
       int next = this->next(index - 1);
@@ -1302,12 +1347,12 @@ bool QDockAreaLayoutInfo::insertGap(const QList<int> &path, QLayoutItem *dockWid
 
       if (isEmpty()) {
          // I am an empty dock area, therefore I am a top-level dock area.
-         switch (dockPos) {
+         switch (m_dockPos) {
             case QInternal::LeftDock:
             case QInternal::RightDock:
-               if (o == Qt::Vertical) {
+               if (m_dockAreaOrientation == Qt::Vertical) {
                   // the "size" is the height of the dock area (remember we are empty)
-                  space = pick(Qt::Vertical, rect.size());
+                  space = pick(Qt::Vertical, m_dockAreaInfoRect.size());
                } else {
                   space = pick(Qt::Horizontal, dockWidgetItem->widget()->size());
                }
@@ -1316,9 +1361,9 @@ bool QDockAreaLayoutInfo::insertGap(const QList<int> &path, QLayoutItem *dockWid
             case QInternal::TopDock:
             case QInternal::BottomDock:
             default:
-               if (o == Qt::Horizontal) {
+               if (m_dockAreaOrientation == Qt::Horizontal) {
                   // the "size" is width of the dock area
-                  space = pick(Qt::Horizontal, rect.size());
+                  space = pick(Qt::Horizontal, m_dockAreaInfoRect.size());
                } else {
                   space = pick(Qt::Vertical, dockWidgetItem->widget()->size());
                }
@@ -1331,8 +1376,10 @@ bool QDockAreaLayoutInfo::insertGap(const QList<int> &path, QLayoutItem *dockWid
             if (item.skip()) {
                continue;
             }
+
             Q_ASSERT(!(item.flags & QDockAreaLayoutItem::GapItem));
-            space += item.size - pick(o, item.minimumSize());
+
+            space += item.size - pick(m_dockAreaOrientation, item.minimumSize());
          }
       }
 
@@ -1343,26 +1390,28 @@ bool QDockAreaLayoutInfo::insertGap(const QList<int> &path, QLayoutItem *dockWid
       if (isEmpty()) {
          gap_size = space;
          sep_size = 0;
+
       } else {
          QRect r = dockedGeometry(dockWidgetItem->widget());
-         gap_size = pick(o, r.size());
+         gap_size = pick(m_dockAreaOrientation, r.size());
+
          if (prev != -1 && !(item_list.at(prev).flags & QDockAreaLayoutItem::GapItem)) {
-            sep_size += *sep;
+            sep_size += *m_dockAreaSep;
          }
          if (next != -1 && !(item_list.at(next).flags & QDockAreaLayoutItem::GapItem)) {
-            sep_size += *sep;
+            sep_size += *m_dockAreaSep;
          }
       }
+
       if (gap_size + sep_size > space) {
-         gap_size = pick(o, gap_item.minimumSize());
+         gap_size = pick(m_dockAreaOrientation, gap_item.minimumSize());
       }
+
       gap_item.size = gap_size + sep_size;
    }
 
    // finally, insert the gap
    item_list.insert(index, gap_item);
-
-   //    dump(qDebug() << "insertGap() after:" << index << tabIndex, *this, QString());
 
    return true;
 }
@@ -1398,6 +1447,7 @@ QDockAreaLayoutInfo *QDockAreaLayoutInfo::info(QWidget *widget)
 QDockAreaLayoutInfo *QDockAreaLayoutInfo::info(const QList<int> &path)
 {
    int index = path.first();
+
    if (index < 0) {
       index = -index - 1;
    }
@@ -1428,15 +1478,18 @@ QRect QDockAreaLayoutInfo::itemRect(int index) const
       if (tabId(item) == currentTabId()) {
          result = tabContentRect();
       }
+
    } else
 #endif
+
    {
       QPoint pos;
-      rpick(o, pos) = item.pos;
-      rperp(o, pos) = perp(o, rect.topLeft());
+      rpick(m_dockAreaOrientation, pos) = item.pos;
+      rperp(m_dockAreaOrientation, pos) = perp(m_dockAreaOrientation, m_dockAreaInfoRect.topLeft());
+
       QSize s;
-      rpick(o, s) = item.size;
-      rperp(o, s) = perp(o, rect.size());
+      rpick(m_dockAreaOrientation, s) = item.size;
+      rperp(m_dockAreaOrientation, s) = perp(m_dockAreaOrientation, m_dockAreaInfoRect.size());
       result = QRect(pos, s);
    }
 
@@ -1470,10 +1523,11 @@ QRect QDockAreaLayoutInfo::separatorRect(int index) const
       return QRect();
    }
 
-   QPoint pos = rect.topLeft();
-   rpick(o, pos) = item.pos + item.size;
-   QSize s = rect.size();
-   rpick(o, s) = *sep;
+   QPoint pos = m_dockAreaInfoRect.topLeft();
+   rpick(m_dockAreaOrientation, pos) = item.pos + item.size;
+
+   QSize s = m_dockAreaInfoRect.size();
+   rpick(m_dockAreaOrientation, s) = *m_dockAreaSep;
 
    return QRect(pos, s);
 }
@@ -1483,15 +1537,17 @@ QRect QDockAreaLayoutInfo::separatorRect(const QList<int> &path) const
    Q_ASSERT(!path.isEmpty());
 
    const int index = path.first();
+
    if (path.count() > 1) {
       const QDockAreaLayoutItem &item = item_list.at(index);
       Q_ASSERT(item.subinfo != nullptr);
+
       return item.subinfo->separatorRect(path.mid(1));
    }
    return separatorRect(index);
 }
 
-QList<int> QDockAreaLayoutInfo::findSeparator(const QPoint &_pos) const
+QList<int> QDockAreaLayoutInfo::findSeparator(const QPoint &newPos) const
 {
 #ifndef QT_NO_TABBAR
    if (tabbed) {
@@ -1499,18 +1555,20 @@ QList<int> QDockAreaLayoutInfo::findSeparator(const QPoint &_pos) const
    }
 #endif
 
-   int pos = pick(o, _pos);
+   int pos = pick(m_dockAreaOrientation, newPos);
 
    for (int i = 0; i < item_list.size(); ++i) {
       const QDockAreaLayoutItem &item = item_list.at(i);
+
       if (item.skip() || (item.flags & QDockAreaLayoutItem::GapItem)) {
          continue;
       }
 
       if (item.pos + item.size > pos) {
          if (item.subinfo != nullptr) {
-            QList<int> result = item.subinfo->findSeparator(_pos);
-            if (!result.isEmpty()) {
+            QList<int> result = item.subinfo->findSeparator(newPos);
+
+            if (! result.isEmpty()) {
                result.prepend(i);
                return result;
             } else {
@@ -1525,14 +1583,14 @@ QList<int> QDockAreaLayoutInfo::findSeparator(const QPoint &_pos) const
       }
 
       QRect sepRect = separatorRect(i);
-      if (!sepRect.isNull() && *sep == 1) {
+      if (!sepRect.isNull() && *m_dockAreaSep == 1) {
          sepRect.adjust(-2, -2, 2, 2);
       }
-      //we also make sure we don't find a separator that's not there
-      if (sepRect.contains(_pos) && !item.hasFixedSize(o)) {
+
+      // we also make sure we don't find a separator that's not there
+      if (sepRect.contains(newPos) && !item.hasFixedSize(m_dockAreaOrientation)) {
          return QList<int>() << i;
       }
-
    }
 
    return QList<int>();
@@ -1599,9 +1657,8 @@ QMainWindowLayout *QDockAreaLayoutInfo::mainWindowLayout() const
 
 bool QDockAreaLayoutInfo::hasFixedSize() const
 {
-   return perp(o, minimumSize()) == perp(o, maximumSize());
+   return perp(m_dockAreaOrientation, minimumSize()) == perp(m_dockAreaOrientation, maximumSize());
 }
-
 
 void QDockAreaLayoutInfo::apply(bool animate)
 {
@@ -1616,23 +1673,24 @@ void QDockAreaLayoutInfo::apply(bool animate)
          switch (tabBarShape) {
             case QTabBar::RoundedNorth:
             case QTabBar::TriangularNorth:
-               tab_rect = QRect(rect.left(), rect.top(), rect.width(), tbh.height());
+               tab_rect = QRect(m_dockAreaInfoRect.left(), m_dockAreaInfoRect.top(), m_dockAreaInfoRect.width(), tbh.height());
                break;
+
             case QTabBar::RoundedSouth:
             case QTabBar::TriangularSouth:
-               tab_rect = QRect(rect.left(), rect.bottom() - tbh.height() + 1,
-                     rect.width(), tbh.height());
+               tab_rect = QRect(m_dockAreaInfoRect.left(), m_dockAreaInfoRect.bottom() - tbh.height() + 1, m_dockAreaInfoRect.width(), tbh.height());
                break;
+
             case QTabBar::RoundedEast:
             case QTabBar::TriangularEast:
-               tab_rect = QRect(rect.right() - tbh.width() + 1, rect.top(),
-                     tbh.width(), rect.height());
+               tab_rect = QRect(m_dockAreaInfoRect.right() - tbh.width() + 1, m_dockAreaInfoRect.top(), tbh.width(), m_dockAreaInfoRect.height());
                break;
+
             case QTabBar::RoundedWest:
             case QTabBar::TriangularWest:
-               tab_rect = QRect(rect.left(), rect.top(),
-                     tbh.width(), rect.height());
+               tab_rect = QRect(m_dockAreaInfoRect.left(), m_dockAreaInfoRect.top(), tbh.width(), m_dockAreaInfoRect.height());
                break;
+
             default:
                break;
          }
@@ -1640,7 +1698,7 @@ void QDockAreaLayoutInfo::apply(bool animate)
 
       widgetAnimator.animate(tabBar, tab_rect, animate);
    }
-#endif // QT_NO_TABBAR
+#endif
 
    for (int i = 0; i < item_list.size(); ++i) {
       QDockAreaLayoutItem &item = item_list[i];
@@ -1679,10 +1737,10 @@ void QDockAreaLayoutInfo::apply(bool animate)
    }
 
 #ifndef QT_NO_TABBAR
-   if (*sep == 1) {
+   if (*m_dockAreaSep == 1) {
       updateSeparatorWidgets();
    }
-#endif //QT_NO_TABBAR
+#endif
 }
 
 static void paintSep(QPainter *p, QWidget *w, const QRect &r, Qt::Orientation o, bool mouse_over)
@@ -1743,13 +1801,12 @@ QRegion QDockAreaLayoutInfo::separatorRegion() const
    return result;
 }
 
-void QDockAreaLayoutInfo::paintSeparators(QPainter *p, QWidget *widget,
-   const QRegion &clip,
-   const QPoint &mouse) const
+void QDockAreaLayoutInfo::paintSeparators(QPainter *p, QWidget *widget, const QRegion &clip, const QPoint &mouse) const
 {
    if (isEmpty()) {
       return;
    }
+
 #ifndef QT_NO_TABBAR
    if (tabbed) {
       return;
@@ -1770,7 +1827,7 @@ void QDockAreaLayoutInfo::paintSeparators(QPainter *p, QWidget *widget,
       }
 
       if (item.subinfo) {
-         if (clip.contains(item.subinfo->rect)) {
+         if (clip.contains(item.subinfo->m_dockAreaInfoRect)) {
             item.subinfo->paintSeparators(p, widget, clip, mouse);
          }
       }
@@ -1778,9 +1835,10 @@ void QDockAreaLayoutInfo::paintSeparators(QPainter *p, QWidget *widget,
       if (next == -1) {
          break;
       }
+
       QRect r = separatorRect(i);
-      if (clip.contains(r) && !item.hasFixedSize(o)) {
-         paintSep(p, widget, r, o, r.contains(mouse));
+      if (clip.contains(r) && !item.hasFixedSize(m_dockAreaOrientation)) {
+         paintSep(p, widget, r, m_dockAreaOrientation, r.contains(mouse));
       }
    }
 }
@@ -1818,7 +1876,7 @@ void QDockAreaLayoutInfo::tab(int index, QLayoutItem *dockWidgetItem)
       setCurrentTab(dockWidgetItem->widget());
 
    } else {
-      QDockAreaLayoutInfo *new_info = new QDockAreaLayoutInfo(sep, dockPos, o, tabBarShape, mainWindow);
+      QDockAreaLayoutInfo *new_info = new QDockAreaLayoutInfo(m_dockAreaSep, m_dockPos, m_dockAreaOrientation, tabBarShape, mainWindow);
       item_list[index].subinfo = new_info;
       new_info->item_list.append(item_list.at(index).widgetItem);
       item_list[index].widgetItem = nullptr;
@@ -1828,13 +1886,12 @@ void QDockAreaLayoutInfo::tab(int index, QLayoutItem *dockWidgetItem)
       new_info->updateTabBar();
       new_info->setCurrentTab(dockWidgetItem->widget());
    }
-#endif // QT_NO_TABBAR
+#endif
 }
 
-void QDockAreaLayoutInfo::split(int index, Qt::Orientation orientation,
-   QLayoutItem *dockWidgetItem)
+void QDockAreaLayoutInfo::split(int index, Qt::Orientation orientation, QLayoutItem *dockWidgetItem)
 {
-   if (orientation == o) {
+   if (orientation == m_dockAreaOrientation) {
       item_list.insert(index + 1, QDockAreaLayoutItem(dockWidgetItem));
 
    } else {
@@ -1843,8 +1900,7 @@ void QDockAreaLayoutInfo::split(int index, Qt::Orientation orientation,
       const int tabBarShape = 0;
 #endif
 
-      QDockAreaLayoutInfo *new_info
-         = new QDockAreaLayoutInfo(sep, dockPos, orientation, tabBarShape, mainWindow);
+      QDockAreaLayoutInfo *new_info = new QDockAreaLayoutInfo(m_dockAreaSep, m_dockPos, orientation, tabBarShape, mainWindow);
 
       item_list[index].subinfo = new_info;
       new_info->item_list.append(item_list.at(index).widgetItem);
@@ -1956,14 +2012,13 @@ void QDockAreaLayoutInfo::saveState(QDataStream &stream) const
       stream << index;
 
    } else
-#endif // QT_NO_TABBAR
+#endif
 
    {
       stream << (uchar) SequenceMarker;
    }
 
-   stream << (uchar) o
-          << item_list.count();
+   stream << (uchar) m_dockAreaOrientation << item_list.count();
 
    for (int i = 0; i < item_list.count(); ++i) {
       const QDockAreaLayoutItem &item = item_list.at(i);
@@ -1975,8 +2030,8 @@ void QDockAreaLayoutInfo::saveState(QDataStream &stream) const
          QString name = w->objectName();
 
          if (name.isEmpty()) {
-            qWarning("QMainWindow::saveState(): 'objectName' not set for QDockWidget %p '%s;",
-               w, csPrintable(w->windowTitle()));
+            qWarning("QDockAreaLayoutInfo::saveState() Object name was not set for this QDockWidget %p %s",
+               static_cast<void *>(w), csPrintable(w->windowTitle()));
          }
          stream << name;
 
@@ -1997,8 +2052,8 @@ void QDockAreaLayoutInfo::saveState(QDataStream &stream) const
 
          } else {
             stream << item.pos << item.size
-                   << pick(o, item.minimumSize())
-                   << pick(o, item.maximumSize());
+                   << pick(m_dockAreaOrientation, item.minimumSize())
+                   << pick(m_dockAreaOrientation, item.maximumSize());
          }
 
       } else if (item.placeHolderItem != nullptr) {
@@ -2025,7 +2080,9 @@ void QDockAreaLayoutInfo::saveState(QDataStream &stream) const
          }
 
       } else if (item.subinfo != nullptr) {
-         stream << (uchar) SequenceMarker << item.pos << item.size << pick(o, item.minimumSize()) << pick(o, item.maximumSize());
+         stream << (uchar) SequenceMarker << item.pos << item.size << pick(m_dockAreaOrientation, item.minimumSize())
+               << pick(m_dockAreaOrientation, item.maximumSize());
+
          item.subinfo->saveState(stream);
       }
    }
@@ -2074,7 +2131,8 @@ bool QDockAreaLayoutInfo::restoreState(QDataStream &stream, QList<QDockWidget *>
 
    uchar orientation;
    stream >> orientation;
-   o = static_cast<Qt::Orientation>(orientation);
+
+   m_dockAreaOrientation = static_cast<Qt::Orientation>(orientation);
 
    decltype(item_list)::size_type cnt;
    stream >> cnt;
@@ -2166,7 +2224,7 @@ bool QDockAreaLayoutInfo::restoreState(QDataStream &stream, QList<QDockWidget *>
                   widget->setFloating(false);
                   widget->setVisible(flags & StateFlagVisible);
 
-                  emit widget->dockLocationChanged(toDockWidgetArea(dockPos));
+                  emit widget->dockLocationChanged(toDockWidgetArea(m_dockPos));
                }
             }
 
@@ -2182,13 +2240,13 @@ bool QDockAreaLayoutInfo::restoreState(QDataStream &stream, QList<QDockWidget *>
 #ifdef QT_NO_TABBAR
          const int tabBarShape = 0;
 #endif
-         QDockAreaLayoutItem item(new QDockAreaLayoutInfo(sep, dockPos, o,
-               tabBarShape, mainWindow));
+
+         QDockAreaLayoutItem item(new QDockAreaLayoutInfo(m_dockAreaSep, m_dockPos, m_dockAreaOrientation, tabBarShape, mainWindow));
 
          stream >> item.pos >> item.size >> dummy >> dummy;
 
          //we need to make sure the element is in the list so the dock widget can eventually be docked correctly
-         if (!testing) {
+         if (! testing) {
             item_list.append(item);
          }
 
@@ -2209,7 +2267,8 @@ bool QDockAreaLayoutInfo::restoreState(QDataStream &stream, QList<QDockWidget *>
       updateTabBar();
       setCurrentTabId(tabId(item_list.at(index)));
    }
-   if (!testing && *sep == 1) {
+
+   if (!testing && *m_dockAreaSep == 1) {
       updateSeparatorWidgets();
    }
 #endif
@@ -2270,7 +2329,7 @@ void QDockAreaLayoutInfo::updateSeparatorWidgets() const
    separatorWidgets.resize(j);
    Q_ASSERT(separatorWidgets.size() == j);
 }
-#endif //QT_NO_TABBAR
+#endif
 
 #ifndef QT_NO_TABBAR
 void QDockAreaLayoutInfo::reparentWidgets(QWidget *parent)
@@ -2306,7 +2365,7 @@ void QDockAreaLayoutInfo::reparentWidgets(QWidget *parent)
       }
    }
 }
-//returns whether the tabbar is visible or not
+
 bool QDockAreaLayoutInfo::updateTabBar() const
 {
    if (!tabbed) {
@@ -2384,6 +2443,7 @@ bool QDockAreaLayoutInfo::updateTabBar() const
 #ifndef QT_NO_TOOLTIP
          tabBar->setTabToolTip(tab_idx, title);
 #endif
+
       }
 
       ++tab_idx;
@@ -2489,7 +2549,7 @@ QRect QDockAreaLayoutInfo::tabContentRect() const
       return QRect();
    }
 
-   QRect result = rect;
+   QRect result = m_dockAreaInfoRect;
    QSize tbh = tabBarSizeHint();
 
    if (!tbh.isNull()) {
@@ -2555,10 +2615,10 @@ QDockAreaLayout::QDockAreaLayout(QMainWindow *win)
    const int tabShape = 0;
 #endif
 
-   docks[QInternal::LeftDock]   = QDockAreaLayoutInfo(&sep, QInternal::LeftDock, Qt::Vertical, tabShape, win);
-   docks[QInternal::RightDock]  = QDockAreaLayoutInfo(&sep, QInternal::RightDock, Qt::Vertical, tabShape, win);
-   docks[QInternal::TopDock]    = QDockAreaLayoutInfo(&sep, QInternal::TopDock, Qt::Horizontal, tabShape, win);
-   docks[QInternal::BottomDock] = QDockAreaLayoutInfo(&sep, QInternal::BottomDock, Qt::Horizontal, tabShape, win);
+   m_docks[QInternal::LeftDock]   = QDockAreaLayoutInfo(&sep, QInternal::LeftDock,   Qt::Vertical,   tabShape, win);
+   m_docks[QInternal::RightDock]  = QDockAreaLayoutInfo(&sep, QInternal::RightDock,  Qt::Vertical,   tabShape, win);
+   m_docks[QInternal::TopDock]    = QDockAreaLayoutInfo(&sep, QInternal::TopDock,    Qt::Horizontal, tabShape, win);
+   m_docks[QInternal::BottomDock] = QDockAreaLayoutInfo(&sep, QInternal::BottomDock, Qt::Horizontal, tabShape, win);
 
    centralWidgetItem = nullptr;
 
@@ -2570,7 +2630,7 @@ QDockAreaLayout::QDockAreaLayout(QMainWindow *win)
 
 bool QDockAreaLayout::isValid() const
 {
-   return rect.isValid();
+   return m_dockAreaRect.isValid();
 }
 
 void QDockAreaLayout::saveState(QDataStream &stream) const
@@ -2579,7 +2639,7 @@ void QDockAreaLayout::saveState(QDataStream &stream) const
    int cnt = 0;
 
    for (int i = 0; i < QInternal::DockCount; ++i) {
-      if (! docks[i].item_list.isEmpty()) {
+      if (! m_docks[i].item_list.isEmpty()) {
          ++cnt;
       }
    }
@@ -2587,12 +2647,12 @@ void QDockAreaLayout::saveState(QDataStream &stream) const
    stream << cnt;
 
    for (int i = 0; i < QInternal::DockCount; ++i) {
-      if (docks[i].item_list.isEmpty()) {
+      if (m_docks[i].item_list.isEmpty()) {
          continue;
       }
 
-      stream << i << docks[i].rect.size();
-      docks[i].saveState(stream);
+      stream << i << m_docks[i].m_dockAreaInfoRect.size();
+      m_docks[i].saveState(stream);
    }
 
    stream << centralWidgetRect.size();
@@ -2619,10 +2679,10 @@ bool QDockAreaLayout::restoreState(QDataStream &stream, const QList<QDockWidget 
       stream >> size;
 
       if (! testing) {
-         docks[pos].rect = QRect(QPoint(0, 0), size);
+         m_docks[pos].m_dockAreaInfoRect = QRect(QPoint(0, 0), size);
       }
 
-      if (! docks[pos].restoreState(stream, dockwidgets, testing)) {
+      if (! m_docks[pos].restoreState(stream, dockwidgets, testing)) {
          stream.setStatus(QDataStream::ReadCorruptData);
          return false;
       }
@@ -2657,7 +2717,7 @@ bool QDockAreaLayout::restoreState(QDataStream &stream, const QList<QDockWidget 
 QList<int> QDockAreaLayout::indexOfPlaceHolder(const QString &objectName) const
 {
    for (int i = 0; i < QInternal::DockCount; ++i) {
-      QList<int> result = docks[i].indexOfPlaceHolder(objectName);
+      QList<int> result = m_docks[i].indexOfPlaceHolder(objectName);
 
       if (! result.isEmpty()) {
          result.prepend(i);
@@ -2671,12 +2731,14 @@ QList<int> QDockAreaLayout::indexOfPlaceHolder(const QString &objectName) const
 QList<int> QDockAreaLayout::indexOf(QWidget *dockWidget) const
 {
    for (int i = 0; i < QInternal::DockCount; ++i) {
-      QList<int> result = docks[i].indexOf(dockWidget);
-      if (!result.isEmpty()) {
+      QList<int> result = m_docks[i].indexOf(dockWidget);
+
+      if (! result.isEmpty()) {
          result.prepend(i);
          return result;
       }
    }
+
    return QList<int>();
 }
 
@@ -2684,13 +2746,14 @@ QList<int> QDockAreaLayout::gapIndex(const QPoint &pos) const
 {
    QMainWindow::DockOptions opts = mainWindow->dockOptions();
    bool nestingEnabled = opts & QMainWindow::AllowNestedDocks;
+
    QDockAreaLayoutInfo::TabMode tabMode = QDockAreaLayoutInfo::NoTabs;
 
 #ifndef QT_NO_TABBAR
-   if (opts & QMainWindow::AllowTabbedDocks
-      || opts & QMainWindow::VerticalTabs) {
+   if (opts & QMainWindow::AllowTabbedDocks || opts & QMainWindow::VerticalTabs) {
       tabMode = QDockAreaLayoutInfo::AllowTabs;
    }
+
    if (opts & QMainWindow::ForceTabbedDocks) {
       tabMode = QDockAreaLayoutInfo::ForceTabs;
    }
@@ -2700,46 +2763,50 @@ QList<int> QDockAreaLayout::gapIndex(const QPoint &pos) const
    }
 #endif
 
-
    for (int i = 0; i < QInternal::DockCount; ++i) {
-      const QDockAreaLayoutInfo &info = docks[i];
+      const QDockAreaLayoutInfo &info = m_docks[i];
 
-      if (!info.isEmpty() && info.rect.contains(pos)) {
-         QList<int> result
-            = docks[i].gapIndex(pos, nestingEnabled, tabMode);
-         if (!result.isEmpty()) {
+      if (!info.isEmpty() && info.m_dockAreaInfoRect.contains(pos)) {
+         QList<int> result = m_docks[i].gapIndex(pos, nestingEnabled, tabMode);
+
+         if (! result.isEmpty()) {
             result.prepend(i);
          }
+
          return result;
       }
    }
 
    for (int i = 0; i < QInternal::DockCount; ++i) {
-      const QDockAreaLayoutInfo &info = docks[i];
+      const QDockAreaLayoutInfo &info = m_docks[i];
 
       if (info.isEmpty()) {
          QRect r;
+
          switch (i) {
             case QInternal::LeftDock:
-               r = QRect(rect.left(), rect.top(), EmptyDropAreaSize, rect.height());
+               r = QRect(m_dockAreaRect.left(), m_dockAreaRect.top(), EmptyDropAreaSize, m_dockAreaRect.height());
                break;
+
             case QInternal::RightDock:
-               r = QRect(rect.right() - EmptyDropAreaSize, rect.top(),
-                     EmptyDropAreaSize, rect.height());
+               r = QRect(m_dockAreaRect.right() - EmptyDropAreaSize, m_dockAreaRect.top(), EmptyDropAreaSize, m_dockAreaRect.height());
                break;
+
             case QInternal::TopDock:
-               r = QRect(rect.left(), rect.top(), rect.width(), EmptyDropAreaSize);
+               r = QRect(m_dockAreaRect.left(), m_dockAreaRect.top(), m_dockAreaRect.width(), EmptyDropAreaSize);
                break;
+
             case QInternal::BottomDock:
-               r = QRect(rect.left(), rect.bottom() - EmptyDropAreaSize,
-                     rect.width(), EmptyDropAreaSize);
+               r = QRect(m_dockAreaRect.left(), m_dockAreaRect.bottom() - EmptyDropAreaSize, m_dockAreaRect.width(), EmptyDropAreaSize);
                break;
          }
+
          if (r.contains(pos)) {
             if (opts & QMainWindow::ForceTabbedDocks && !info.item_list.isEmpty()) {
                //in case of ForceTabbedDocks, we pass -1 in order to force the gap to be tabbed
                //it mustn't be completely empty otherwise it won't work
                return QList<int>() << i << -1 << 0;
+
             } else {
                return QList<int>() << i << 0;
             }
@@ -2753,21 +2820,28 @@ QList<int> QDockAreaLayout::gapIndex(const QPoint &pos) const
 QList<int> QDockAreaLayout::findSeparator(const QPoint &pos) const
 {
    QList<int> result;
+
    for (int i = 0; i < QInternal::DockCount; ++i) {
-      const QDockAreaLayoutInfo &info = docks[i];
+      const QDockAreaLayoutInfo &info = m_docks[i];
+
       if (info.isEmpty()) {
          continue;
       }
+
       QRect rect = separatorRect(i);
-      if (!rect.isNull() && sep == 1) {
+
+      if (! rect.isNull() && sep == 1) {
          rect.adjust(-2, -2, 2, 2);
       }
-      if (rect.contains(pos) && !info.hasFixedSize()) {
+
+      if (rect.contains(pos) && ! info.hasFixedSize()) {
          result << i;
          break;
-      } else if (info.rect.contains(pos)) {
-         result = docks[i].findSeparator(pos);
-         if (!result.isEmpty()) {
+
+      } else if (info.m_dockAreaInfoRect.contains(pos)) {
+         result = m_docks[i].findSeparator(pos);
+
+         if (! result.isEmpty()) {
             result.prepend(i);
             break;
          }
@@ -2780,7 +2854,7 @@ QList<int> QDockAreaLayout::findSeparator(const QPoint &pos) const
 QDockAreaLayoutInfo *QDockAreaLayout::info(QWidget *widget)
 {
    for (int i = 0; i < QInternal::DockCount; ++i) {
-      if (QDockAreaLayoutInfo *result = docks[i].info(widget)) {
+      if (QDockAreaLayoutInfo *result = m_docks[i].info(widget)) {
          return result;
       }
    }
@@ -2792,13 +2866,14 @@ QDockAreaLayoutInfo *QDockAreaLayout::info(const QList<int> &path)
 {
    Q_ASSERT(!path.isEmpty());
    const int index = path.first();
+
    Q_ASSERT(index >= 0 && index < QInternal::DockCount);
 
    if (path.count() == 1) {
-      return &docks[index];
+      return &m_docks[index];
    }
 
-   return docks[index].info(path.mid(1));
+   return m_docks[index].info(path.mid(1));
 }
 
 const QDockAreaLayoutInfo *QDockAreaLayout::info(const QList<int> &path) const
@@ -2813,33 +2888,42 @@ QDockAreaLayoutItem &QDockAreaLayout::item(const QList<int> &path)
    const int index = path.first();
    Q_ASSERT(index >= 0 && index < QInternal::DockCount);
 
-   return docks[index].item(path.mid(1));
+   return m_docks[index].item(path.mid(1));
 }
 
 QRect QDockAreaLayout::itemRect(const QList<int> &path) const
 {
    Q_ASSERT(!path.isEmpty());
+
    const int index = path.first();
    Q_ASSERT(index >= 0 && index < QInternal::DockCount);
-   return docks[index].itemRect(path.mid(1));
+
+   return m_docks[index].itemRect(path.mid(1));
 }
 
 QRect QDockAreaLayout::separatorRect(int index) const
 {
-   const QDockAreaLayoutInfo &dock = docks[index];
+   const QDockAreaLayoutInfo &dock = m_docks[index];
+
    if (dock.isEmpty()) {
       return QRect();
    }
-   QRect r = dock.rect;
+
+   QRect r = dock.m_dockAreaInfoRect;
+
    switch (index) {
       case QInternal::LeftDock:
          return QRect(r.right() + 1, r.top(), sep, r.height());
+
       case QInternal::RightDock:
          return QRect(r.left() - sep, r.top(), sep, r.height());
+
       case QInternal::TopDock:
          return QRect(r.left(), r.bottom() + 1, r.width(), sep);
+
       case QInternal::BottomDock:
          return QRect(r.left(), r.top() - sep, r.width(), sep);
+
       default:
          break;
    }
@@ -2856,7 +2940,7 @@ QRect QDockAreaLayout::separatorRect(const QList<int> &path) const
    if (path.count() == 1) {
       return separatorRect(index);
    } else {
-      return docks[index].separatorRect(path.mid(1));
+      return m_docks[index].separatorRect(path.mid(1));
    }
 }
 
@@ -2864,18 +2948,21 @@ bool QDockAreaLayout::insertGap(const QList<int> &path, QLayoutItem *dockWidgetI
 {
    Q_ASSERT(!path.isEmpty());
    const int index = path.first();
+
    Q_ASSERT(index >= 0 && index < QInternal::DockCount);
-   return docks[index].insertGap(path.mid(1), dockWidgetItem);
+
+   return m_docks[index].insertGap(path.mid(1), dockWidgetItem);
 }
 
 QLayoutItem *QDockAreaLayout::plug(const QList<int> &path)
 {
    Q_ASSERT(!path.isEmpty());
    const int index = path.first();
+
    Q_ASSERT(index >= 0 && index < QInternal::DockCount);
 
-   QLayoutItem *item = docks[index].plug(path.mid(1));
-   docks[index].reparentWidgets(mainWindow);
+   QLayoutItem *item = m_docks[index].plug(path.mid(1));
+   m_docks[index].reparentWidgets(mainWindow);
 
    return item;
 }
@@ -2887,7 +2974,7 @@ QLayoutItem *QDockAreaLayout::unplug(const QList<int> &path)
 
    Q_ASSERT(index >= 0 && index < QInternal::DockCount);
 
-   return docks[index].unplug(path.mid(1));
+   return m_docks[index].unplug(path.mid(1));
 }
 
 void QDockAreaLayout::remove(const QList<int> &path)
@@ -2897,7 +2984,7 @@ void QDockAreaLayout::remove(const QList<int> &path)
 
    Q_ASSERT(index >= 0 && index < QInternal::DockCount);
 
-   docks[index].remove(path.mid(1));
+   m_docks[index].remove(path.mid(1));
 }
 
 void QDockAreaLayout::removePlaceHolder(const QString &name)
@@ -2925,8 +3012,7 @@ static inline int qMax(int i1, int i2, int i3)
    return qMax(i1, qMax(i2, i3));
 }
 
-void QDockAreaLayout::getGrid(QVector<QLayoutStruct> *_ver_struct_list,
-   QVector<QLayoutStruct> *_hor_struct_list)
+void QDockAreaLayout::getGrid(QVector<QLayoutStruct> *_ver_struct_list, QVector<QLayoutStruct> *_hor_struct_list)
 {
    QSize center_hint(0, 0);
    QSize center_min(0, 0);
@@ -2944,50 +3030,58 @@ void QDockAreaLayout::getGrid(QVector<QLayoutStruct> *_ver_struct_list,
       center_max = centralWidgetItem->maximumSize();
    }
 
-   QRect center_rect = rect;
-   if (!docks[QInternal::LeftDock].isEmpty()) {
-      center_rect.setLeft(rect.left() + docks[QInternal::LeftDock].rect.width() + sep);
-   }
-   if (!docks[QInternal::TopDock].isEmpty()) {
-      center_rect.setTop(rect.top() + docks[QInternal::TopDock].rect.height() + sep);
-   }
-   if (!docks[QInternal::RightDock].isEmpty()) {
-      center_rect.setRight(rect.right() - docks[QInternal::RightDock].rect.width() - sep);
-   }
-   if (!docks[QInternal::BottomDock].isEmpty()) {
-      center_rect.setBottom(rect.bottom() - docks[QInternal::BottomDock].rect.height() - sep);
+   QRect center_rect = m_dockAreaRect;
+
+   if (! m_docks[QInternal::LeftDock].isEmpty()) {
+      center_rect.setLeft(m_dockAreaRect.left() + m_docks[QInternal::LeftDock].m_dockAreaInfoRect.width() + sep);
    }
 
-   QSize left_hint = docks[QInternal::LeftDock].size();
-   if (left_hint.isNull() || fallbackToSizeHints) {
-      left_hint = docks[QInternal::LeftDock].sizeHint();
+   if (! m_docks[QInternal::TopDock].isEmpty()) {
+      center_rect.setTop(m_dockAreaRect.top() + m_docks[QInternal::TopDock].m_dockAreaInfoRect.height() + sep);
    }
-   QSize left_min = docks[QInternal::LeftDock].minimumSize();
-   QSize left_max = docks[QInternal::LeftDock].maximumSize();
+
+   if (! m_docks[QInternal::RightDock].isEmpty()) {
+      center_rect.setRight(m_dockAreaRect.right() - m_docks[QInternal::RightDock].m_dockAreaInfoRect.width() - sep);
+   }
+
+   if (! m_docks[QInternal::BottomDock].isEmpty()) {
+      center_rect.setBottom(m_dockAreaRect.bottom() - m_docks[QInternal::BottomDock].m_dockAreaInfoRect.height() - sep);
+   }
+
+   QSize left_hint = m_docks[QInternal::LeftDock].size();
+   if (left_hint.isNull() || fallbackToSizeHints) {
+      left_hint = m_docks[QInternal::LeftDock].sizeHint();
+   }
+
+   QSize left_min = m_docks[QInternal::LeftDock].minimumSize();
+   QSize left_max = m_docks[QInternal::LeftDock].maximumSize();
    left_hint = left_hint.boundedTo(left_max).expandedTo(left_min);
 
-   QSize right_hint = docks[QInternal::RightDock].size();
+   QSize right_hint = m_docks[QInternal::RightDock].size();
    if (right_hint.isNull() || fallbackToSizeHints) {
-      right_hint = docks[QInternal::RightDock].sizeHint();
+      right_hint = m_docks[QInternal::RightDock].sizeHint();
    }
-   QSize right_min = docks[QInternal::RightDock].minimumSize();
-   QSize right_max = docks[QInternal::RightDock].maximumSize();
+
+   QSize right_min = m_docks[QInternal::RightDock].minimumSize();
+   QSize right_max = m_docks[QInternal::RightDock].maximumSize();
    right_hint = right_hint.boundedTo(right_max).expandedTo(right_min);
 
-   QSize top_hint = docks[QInternal::TopDock].size();
+   QSize top_hint = m_docks[QInternal::TopDock].size();
    if (top_hint.isNull() || fallbackToSizeHints) {
-      top_hint = docks[QInternal::TopDock].sizeHint();
+      top_hint = m_docks[QInternal::TopDock].sizeHint();
    }
-   QSize top_min = docks[QInternal::TopDock].minimumSize();
-   QSize top_max = docks[QInternal::TopDock].maximumSize();
+
+   QSize top_min = m_docks[QInternal::TopDock].minimumSize();
+   QSize top_max = m_docks[QInternal::TopDock].maximumSize();
    top_hint = top_hint.boundedTo(top_max).expandedTo(top_min);
 
-   QSize bottom_hint = docks[QInternal::BottomDock].size();
+   QSize bottom_hint = m_docks[QInternal::BottomDock].size();
    if (bottom_hint.isNull() || fallbackToSizeHints) {
-      bottom_hint = docks[QInternal::BottomDock].sizeHint();
+      bottom_hint = m_docks[QInternal::BottomDock].sizeHint();
    }
-   QSize bottom_min = docks[QInternal::BottomDock].minimumSize();
-   QSize bottom_max = docks[QInternal::BottomDock].maximumSize();
+
+   QSize bottom_min = m_docks[QInternal::BottomDock].minimumSize();
+   QSize bottom_max = m_docks[QInternal::BottomDock].maximumSize();
    bottom_hint = bottom_hint.boundedTo(bottom_max).expandedTo(bottom_min);
 
    if (_ver_struct_list != nullptr) {
@@ -3001,37 +3095,40 @@ void QDockAreaLayout::getGrid(QVector<QLayoutStruct> *_ver_struct_list,
       ver_struct_list[0].minimumSize = top_min.height();
       ver_struct_list[0].maximumSize = top_max.height();
       ver_struct_list[0].expansive = false;
-      ver_struct_list[0].empty = docks[QInternal::TopDock].isEmpty();
-      ver_struct_list[0].pos = docks[QInternal::TopDock].rect.top();
-      ver_struct_list[0].size = docks[QInternal::TopDock].rect.height();
+      ver_struct_list[0].empty = m_docks[QInternal::TopDock].isEmpty();
+      ver_struct_list[0].pos   = m_docks[QInternal::TopDock].m_dockAreaInfoRect.top();
+      ver_struct_list[0].size  = m_docks[QInternal::TopDock].m_dockAreaInfoRect.height();
 
       // center --------------------------------------------------
       ver_struct_list[1].init();
       ver_struct_list[1].stretch = center_hint.height();
 
       bool tl_significant = corners[Qt::TopLeftCorner] == Qt::TopDockWidgetArea
-         || docks[QInternal::TopDock].isEmpty();
-      bool bl_significant = corners[Qt::BottomLeftCorner] == Qt::BottomDockWidgetArea
-         || docks[QInternal::BottomDock].isEmpty();
-      bool tr_significant = corners[Qt::TopRightCorner] == Qt::TopDockWidgetArea
-         || docks[QInternal::TopDock].isEmpty();
-      bool br_significant = corners[Qt::BottomRightCorner] == Qt::BottomDockWidgetArea
-         || docks[QInternal::BottomDock].isEmpty();
+         || m_docks[QInternal::TopDock].isEmpty();
 
-      int left = (tl_significant && bl_significant) ? left_hint.height() : 0;
+      bool bl_significant = corners[Qt::BottomLeftCorner] == Qt::BottomDockWidgetArea
+         || m_docks[QInternal::BottomDock].isEmpty();
+
+      bool tr_significant = corners[Qt::TopRightCorner] == Qt::TopDockWidgetArea
+         || m_docks[QInternal::TopDock].isEmpty();
+
+      bool br_significant = corners[Qt::BottomRightCorner] == Qt::BottomDockWidgetArea
+         || m_docks[QInternal::BottomDock].isEmpty();
+
+      int left  = (tl_significant && bl_significant) ? left_hint.height() : 0;
       int right = (tr_significant && br_significant) ? right_hint.height() : 0;
       ver_struct_list[1].sizeHint = qMax(left, center_hint.height(), right);
 
-      left = (tl_significant && bl_significant) ? left_min.height() : 0;
+      left  = (tl_significant && bl_significant) ? left_min.height() : 0;
       right = (tr_significant && br_significant) ? right_min.height() : 0;
       ver_struct_list[1].minimumSize = qMax(left, center_min.height(), right);
       ver_struct_list[1].maximumSize = center_max.height();
 
       ver_struct_list[1].expansive = have_central;
-      ver_struct_list[1].empty = docks[QInternal::LeftDock].isEmpty()
-         && !have_central
-         && docks[QInternal::RightDock].isEmpty();
-      ver_struct_list[1].pos = center_rect.top();
+      ver_struct_list[1].empty = m_docks[QInternal::LeftDock].isEmpty()
+            && ! have_central && m_docks[QInternal::RightDock].isEmpty();
+
+      ver_struct_list[1].pos  = center_rect.top();
       ver_struct_list[1].size = center_rect.height();
 
       // bottom --------------------------------------------------
@@ -3041,9 +3138,9 @@ void QDockAreaLayout::getGrid(QVector<QLayoutStruct> *_ver_struct_list,
       ver_struct_list[2].minimumSize = bottom_min.height();
       ver_struct_list[2].maximumSize = bottom_max.height();
       ver_struct_list[2].expansive = false;
-      ver_struct_list[2].empty = docks[QInternal::BottomDock].isEmpty();
-      ver_struct_list[2].pos = docks[QInternal::BottomDock].rect.top();
-      ver_struct_list[2].size = docks[QInternal::BottomDock].rect.height();
+      ver_struct_list[2].empty = m_docks[QInternal::BottomDock].isEmpty();
+      ver_struct_list[2].pos   = m_docks[QInternal::BottomDock].m_dockAreaInfoRect.top();
+      ver_struct_list[2].size  = m_docks[QInternal::BottomDock].m_dockAreaInfoRect.height();
 
       for (int i = 0; i < 3; ++i) {
          ver_struct_list[i].sizeHint
@@ -3066,22 +3163,22 @@ void QDockAreaLayout::getGrid(QVector<QLayoutStruct> *_ver_struct_list,
       hor_struct_list[0].minimumSize = left_min.width();
       hor_struct_list[0].maximumSize = left_max.width();
       hor_struct_list[0].expansive = false;
-      hor_struct_list[0].empty = docks[QInternal::LeftDock].isEmpty();
-      hor_struct_list[0].pos = docks[QInternal::LeftDock].rect.left();
-      hor_struct_list[0].size = docks[QInternal::LeftDock].rect.width();
+      hor_struct_list[0].empty = m_docks[QInternal::LeftDock].isEmpty();
+      hor_struct_list[0].pos   = m_docks[QInternal::LeftDock].m_dockAreaInfoRect.left();
+      hor_struct_list[0].size  = m_docks[QInternal::LeftDock].m_dockAreaInfoRect.width();
 
       // center --------------------------------------------------
       hor_struct_list[1].init();
       hor_struct_list[1].stretch = center_hint.width();
 
       bool tl_significant = corners[Qt::TopLeftCorner] == Qt::LeftDockWidgetArea
-         || docks[QInternal::LeftDock].isEmpty();
+         || m_docks[QInternal::LeftDock].isEmpty();
       bool tr_significant = corners[Qt::TopRightCorner] == Qt::RightDockWidgetArea
-         || docks[QInternal::RightDock].isEmpty();
+         || m_docks[QInternal::RightDock].isEmpty();
       bool bl_significant = corners[Qt::BottomLeftCorner] == Qt::LeftDockWidgetArea
-         || docks[QInternal::LeftDock].isEmpty();
+         || m_docks[QInternal::LeftDock].isEmpty();
       bool br_significant = corners[Qt::BottomRightCorner] == Qt::RightDockWidgetArea
-         || docks[QInternal::RightDock].isEmpty();
+         || m_docks[QInternal::RightDock].isEmpty();
 
       int top = (tl_significant && tr_significant) ? top_hint.width() : 0;
       int bottom = (bl_significant && br_significant) ? bottom_hint.width() : 0;
@@ -3093,9 +3190,9 @@ void QDockAreaLayout::getGrid(QVector<QLayoutStruct> *_ver_struct_list,
 
       hor_struct_list[1].maximumSize = center_max.width();
       hor_struct_list[1].expansive = have_central;
-      hor_struct_list[1].empty = !have_central;
-      hor_struct_list[1].pos = center_rect.left();
-      hor_struct_list[1].size = center_rect.width();
+      hor_struct_list[1].empty = ! have_central;
+      hor_struct_list[1].pos   = center_rect.left();
+      hor_struct_list[1].size  = center_rect.width();
 
       // right --------------------------------------------------
       hor_struct_list[2].init();
@@ -3104,13 +3201,12 @@ void QDockAreaLayout::getGrid(QVector<QLayoutStruct> *_ver_struct_list,
       hor_struct_list[2].minimumSize = right_min.width();
       hor_struct_list[2].maximumSize = right_max.width();
       hor_struct_list[2].expansive = false;
-      hor_struct_list[2].empty = docks[QInternal::RightDock].isEmpty();
-      hor_struct_list[2].pos = docks[QInternal::RightDock].rect.left();
-      hor_struct_list[2].size = docks[QInternal::RightDock].rect.width();
+      hor_struct_list[2].empty = m_docks[QInternal::RightDock].isEmpty();
+      hor_struct_list[2].pos   = m_docks[QInternal::RightDock].m_dockAreaInfoRect.left();
+      hor_struct_list[2].size  = m_docks[QInternal::RightDock].m_dockAreaInfoRect.width();
 
       for (int i = 0; i < 3; ++i) {
-         hor_struct_list[i].sizeHint
-            = qMax(hor_struct_list[i].sizeHint, hor_struct_list[i].minimumSize);
+         hor_struct_list[i].sizeHint = qMax(hor_struct_list[i].sizeHint, hor_struct_list[i].minimumSize);
       }
 
       if (have_central && hor_struct_list[0].empty && hor_struct_list[2].empty) {
@@ -3119,96 +3215,94 @@ void QDockAreaLayout::getGrid(QVector<QLayoutStruct> *_ver_struct_list,
    }
 }
 
-void QDockAreaLayout::setGrid(QVector<QLayoutStruct> *ver_struct_list,
-   QVector<QLayoutStruct> *hor_struct_list)
+void QDockAreaLayout::setGrid(QVector<QLayoutStruct> *ver_struct_list, QVector<QLayoutStruct> *hor_struct_list)
 {
-
    // top ---------------------------------------------------
 
-   if (!docks[QInternal::TopDock].isEmpty()) {
-      QRect r = docks[QInternal::TopDock].rect;
+   if (! m_docks[QInternal::TopDock].isEmpty()) {
+      QRect r = m_docks[QInternal::TopDock].m_dockAreaInfoRect;
 
       if (hor_struct_list != nullptr) {
          r.setLeft(corners[Qt::TopLeftCorner] == Qt::TopDockWidgetArea
-            || docks[QInternal::LeftDock].isEmpty()
-            ? rect.left() : hor_struct_list->at(1).pos);
+            || m_docks[QInternal::LeftDock].isEmpty() ? m_dockAreaRect.left() : hor_struct_list->at(1).pos);
+
          r.setRight(corners[Qt::TopRightCorner] == Qt::TopDockWidgetArea
-            || docks[QInternal::RightDock].isEmpty()
-            ? rect.right() : hor_struct_list->at(2).pos - sep - 1);
+            || m_docks[QInternal::RightDock].isEmpty() ? m_dockAreaRect.right() : hor_struct_list->at(2).pos - sep - 1);
       }
 
       if (ver_struct_list != nullptr) {
-         r.setTop(rect.top());
+         r.setTop(m_dockAreaRect.top());
          r.setBottom(ver_struct_list->at(1).pos - sep - 1);
       }
-      docks[QInternal::TopDock].rect = r;
-      docks[QInternal::TopDock].fitItems();
+
+      m_docks[QInternal::TopDock].m_dockAreaInfoRect = r;
+      m_docks[QInternal::TopDock].fitItems();
    }
 
    // bottom ---------------------------------------------------
 
-   if (!docks[QInternal::BottomDock].isEmpty()) {
-      QRect r = docks[QInternal::BottomDock].rect;
+   if (! m_docks[QInternal::BottomDock].isEmpty()) {
+      QRect r = m_docks[QInternal::BottomDock].m_dockAreaInfoRect;
 
       if (hor_struct_list != nullptr) {
          r.setLeft(corners[Qt::BottomLeftCorner] == Qt::BottomDockWidgetArea
-            || docks[QInternal::LeftDock].isEmpty()
-            ? rect.left() : hor_struct_list->at(1).pos);
+            || m_docks[QInternal::LeftDock].isEmpty() ? m_dockAreaRect.left() : hor_struct_list->at(1).pos);
+
          r.setRight(corners[Qt::BottomRightCorner] == Qt::BottomDockWidgetArea
-            || docks[QInternal::RightDock].isEmpty()
-            ? rect.right() : hor_struct_list->at(2).pos - sep - 1);
+            || m_docks[QInternal::RightDock].isEmpty() ? m_dockAreaRect.right() : hor_struct_list->at(2).pos - sep - 1);
       }
 
       if (ver_struct_list != nullptr) {
          r.setTop(ver_struct_list->at(2).pos);
-         r.setBottom(rect.bottom());
+         r.setBottom(m_dockAreaRect.bottom());
       }
-      docks[QInternal::BottomDock].rect = r;
-      docks[QInternal::BottomDock].fitItems();
+
+      m_docks[QInternal::BottomDock].m_dockAreaInfoRect = r;
+      m_docks[QInternal::BottomDock].fitItems();
    }
 
    // left ---------------------------------------------------
 
-   if (!docks[QInternal::LeftDock].isEmpty()) {
-      QRect r = docks[QInternal::LeftDock].rect;
+   if (! m_docks[QInternal::LeftDock].isEmpty()) {
+      QRect r = m_docks[QInternal::LeftDock].m_dockAreaInfoRect;
 
       if (hor_struct_list != nullptr) {
-         r.setLeft(rect.left());
+         r.setLeft(m_dockAreaRect.left());
          r.setRight(hor_struct_list->at(1).pos - sep - 1);
       }
 
       if (ver_struct_list != nullptr) {
          r.setTop(corners[Qt::TopLeftCorner] == Qt::LeftDockWidgetArea
-            || docks[QInternal::TopDock].isEmpty()
-            ? rect.top() : ver_struct_list->at(1).pos);
+            || m_docks[QInternal::TopDock].isEmpty() ? m_dockAreaRect.top() : ver_struct_list->at(1).pos);
+
          r.setBottom(corners[Qt::BottomLeftCorner] == Qt::LeftDockWidgetArea
-            || docks[QInternal::BottomDock].isEmpty()
-            ? rect.bottom() : ver_struct_list->at(2).pos - sep - 1);
+            || m_docks[QInternal::BottomDock].isEmpty() ? m_dockAreaRect.bottom() : ver_struct_list->at(2).pos - sep - 1);
       }
-      docks[QInternal::LeftDock].rect = r;
-      docks[QInternal::LeftDock].fitItems();
+
+      m_docks[QInternal::LeftDock].m_dockAreaInfoRect = r;
+      m_docks[QInternal::LeftDock].fitItems();
    }
 
    // right ---------------------------------------------------
 
-   if (!docks[QInternal::RightDock].isEmpty()) {
-      QRect r = docks[QInternal::RightDock].rect;
+   if (! m_docks[QInternal::RightDock].isEmpty()) {
+      QRect r = m_docks[QInternal::RightDock].m_dockAreaInfoRect;
+
       if (hor_struct_list != nullptr) {
          r.setLeft(hor_struct_list->at(2).pos);
-         r.setRight(rect.right());
+         r.setRight(m_dockAreaRect.right());
       }
 
       if (ver_struct_list != nullptr) {
          r.setTop(corners[Qt::TopRightCorner] == Qt::RightDockWidgetArea
-            || docks[QInternal::TopDock].isEmpty()
-            ? rect.top() : ver_struct_list->at(1).pos);
+            || m_docks[QInternal::TopDock].isEmpty() ? m_dockAreaRect.top() : ver_struct_list->at(1).pos);
+
          r.setBottom(corners[Qt::BottomRightCorner] == Qt::RightDockWidgetArea
-            || docks[QInternal::BottomDock].isEmpty()
-            ? rect.bottom() : ver_struct_list->at(2).pos - sep - 1);
+            || m_docks[QInternal::BottomDock].isEmpty() ? m_dockAreaRect.bottom() : ver_struct_list->at(2).pos - sep - 1);
       }
 
-      docks[QInternal::RightDock].rect = r;
-      docks[QInternal::RightDock].fitItems();
+      m_docks[QInternal::RightDock].m_dockAreaInfoRect = r;
+      m_docks[QInternal::RightDock].fitItems();
    }
 
    // center ---------------------------------------------------
@@ -3217,6 +3311,7 @@ void QDockAreaLayout::setGrid(QVector<QLayoutStruct> *ver_struct_list,
       centralWidgetRect.setLeft(hor_struct_list->at(1).pos);
       centralWidgetRect.setWidth(hor_struct_list->at(1).size);
    }
+
    if (ver_struct_list != nullptr) {
       centralWidgetRect.setTop(ver_struct_list->at(1).pos);
       centralWidgetRect.setHeight(ver_struct_list->at(1).size);
@@ -3229,8 +3324,8 @@ void QDockAreaLayout::fitLayout()
    QVector<QLayoutStruct> hor_struct_list(3);
    getGrid(&ver_struct_list, &hor_struct_list);
 
-   qGeomCalc(ver_struct_list, 0, 3, rect.top(), rect.height(), sep);
-   qGeomCalc(hor_struct_list, 0, 3, rect.left(), rect.width(), sep);
+   qGeomCalc(ver_struct_list, 0, 3, m_dockAreaRect.top(), m_dockAreaRect.height(), sep);
+   qGeomCalc(hor_struct_list, 0, 3, m_dockAreaRect.left(), m_dockAreaRect.width(), sep);
 
    setGrid(&ver_struct_list, &hor_struct_list);
 }
@@ -3238,32 +3333,32 @@ void QDockAreaLayout::fitLayout()
 void QDockAreaLayout::clear()
 {
    for (int i = 0; i < QInternal::DockCount; ++i) {
-      docks[i].clear();
+      m_docks[i].clear();
    }
 
-   rect = QRect();
+   m_dockAreaRect = QRect();
    centralWidgetRect = QRect();
 }
 
 QSize QDockAreaLayout::sizeHint() const
 {
-   int left_sep = 0;
-   int right_sep = 0;
-   int top_sep = 0;
-   int bottom_sep = 0;
+   int left_sep   = 0;
+   int right_sep  = 0;
+   int top_sep    = 0;
+   int bottom_dockAreaSep = 0;
 
    if (centralWidgetItem != nullptr) {
-      left_sep = docks[QInternal::LeftDock].isEmpty() ? 0 : sep;
-      right_sep = docks[QInternal::RightDock].isEmpty() ? 0 : sep;
-      top_sep = docks[QInternal::TopDock].isEmpty() ? 0 : sep;
-      bottom_sep = docks[QInternal::BottomDock].isEmpty() ? 0 : sep;
+      left_sep   = m_docks[QInternal::LeftDock].isEmpty() ? 0 : sep;
+      right_sep  = m_docks[QInternal::RightDock].isEmpty() ? 0 : sep;
+      top_sep    = m_docks[QInternal::TopDock].isEmpty() ? 0 : sep;
+      bottom_dockAreaSep = m_docks[QInternal::BottomDock].isEmpty() ? 0 : sep;
    }
 
-   QSize left = docks[QInternal::LeftDock].sizeHint() + QSize(left_sep, 0);
-   QSize right = docks[QInternal::RightDock].sizeHint() + QSize(right_sep, 0);
-   QSize top = docks[QInternal::TopDock].sizeHint() + QSize(0, top_sep);
-   QSize bottom = docks[QInternal::BottomDock].sizeHint() + QSize(0, bottom_sep);
-   QSize center = (centralWidgetItem == nullptr) ? QSize(0, 0) : centralWidgetItem->sizeHint();
+   QSize left    = m_docks[QInternal::LeftDock].sizeHint() + QSize(left_sep, 0);
+   QSize right   = m_docks[QInternal::RightDock].sizeHint() + QSize(right_sep, 0);
+   QSize top     = m_docks[QInternal::TopDock].sizeHint() + QSize(0, top_sep);
+   QSize bottom  = m_docks[QInternal::BottomDock].sizeHint() + QSize(0, bottom_dockAreaSep);
+   QSize center  = (centralWidgetItem == nullptr) ? QSize(0, 0) : centralWidgetItem->sizeHint();
 
    int row1 = top.width();
    int row2 = left.width() + center.width() + right.width();
@@ -3301,23 +3396,23 @@ QSize QDockAreaLayout::sizeHint() const
 
 QSize QDockAreaLayout::minimumSize() const
 {
-   int left_sep = 0;
-   int right_sep = 0;
-   int top_sep = 0;
-   int bottom_sep = 0;
+   int left_sep   = 0;
+   int right_sep  = 0;
+   int top_sep    = 0;
+   int bottom_dockAreaSep = 0;
 
    if (centralWidgetItem != nullptr) {
-      left_sep = docks[QInternal::LeftDock].isEmpty() ? 0 : sep;
-      right_sep = docks[QInternal::RightDock].isEmpty() ? 0 : sep;
-      top_sep = docks[QInternal::TopDock].isEmpty() ? 0 : sep;
-      bottom_sep = docks[QInternal::BottomDock].isEmpty() ? 0 : sep;
+      left_sep   = m_docks[QInternal::LeftDock].isEmpty() ? 0 : sep;
+      right_sep  = m_docks[QInternal::RightDock].isEmpty() ? 0 : sep;
+      top_sep    = m_docks[QInternal::TopDock].isEmpty() ? 0 : sep;
+      bottom_dockAreaSep = m_docks[QInternal::BottomDock].isEmpty() ? 0 : sep;
    }
 
-   QSize left = docks[QInternal::LeftDock].minimumSize() + QSize(left_sep, 0);
-   QSize right = docks[QInternal::RightDock].minimumSize() + QSize(right_sep, 0);
-   QSize top = docks[QInternal::TopDock].minimumSize() + QSize(0, top_sep);
-   QSize bottom = docks[QInternal::BottomDock].minimumSize() + QSize(0, bottom_sep);
-   QSize center = (centralWidgetItem == nullptr) ? QSize(0, 0) : centralWidgetItem->minimumSize();
+   QSize left    = m_docks[QInternal::LeftDock].minimumSize() + QSize(left_sep, 0);
+   QSize right   = m_docks[QInternal::RightDock].minimumSize() + QSize(right_sep, 0);
+   QSize top     = m_docks[QInternal::TopDock].minimumSize() + QSize(0, top_sep);
+   QSize bottom  = m_docks[QInternal::BottomDock].minimumSize() + QSize(0, bottom_dockAreaSep);
+   QSize center  = (centralWidgetItem == nullptr) ? QSize(0, 0) : centralWidgetItem->minimumSize();
 
    int row1 = top.width();
    int row2 = left.width() + center.width() + right.width();
@@ -3421,11 +3516,11 @@ void QDockAreaLayout::addDockWidget(QInternal::DockPosition pos, QDockWidget *do
    Qt::Orientation orientation)
 {
    QLayoutItem *dockWidgetItem = new QDockWidgetItem(dockWidget);
-   QDockAreaLayoutInfo &info = docks[pos];
+   QDockAreaLayoutInfo &info = m_docks[pos];
 
-   if (orientation == info.o || info.item_list.count() <= 1) {
+   if (orientation == info.m_dockAreaOrientation  || info.item_list.count() <= 1) {
       // empty dock areas, or dock areas containing exactly one widget can have their orientation switched
-      info.o = orientation;
+      info.m_dockAreaOrientation = orientation;
 
       QDockAreaLayoutItem new_item(dockWidgetItem);
       info.item_list.append(new_item);
@@ -3467,11 +3562,11 @@ void QDockAreaLayout::tabifyDockWidget(QDockWidget *first, QDockWidget *second)
 
    removePlaceHolder(second->objectName());
 }
-void QDockAreaLayout::resizeDocks(const QList<QDockWidget *> &docks,
-   const QList<int> &sizes, Qt::Orientation o)
+
+void QDockAreaLayout::resizeDocks(const QList<QDockWidget *> &docks, const QList<int> &sizes, Qt::Orientation newOrientation)
 {
    if (docks.count() != sizes.count()) {
-      qWarning("QMainWidget::resizeDocks: size of the lists are not the same");
+      qWarning("QDockAreaLayout::resizeDocks() Sizes are not the same");
       return;
    }
 
@@ -3480,40 +3575,48 @@ void QDockAreaLayout::resizeDocks(const QList<QDockWidget *> &docks,
 
    for (int i = 0; i < count; ++i) {
       QList<int> path = indexOf(docks[i]);
+
       if (path.isEmpty()) {
-         qWarning("QMainWidget::resizeDocks: one QDockWidget is not part of the layout");
+         qWarning("QDockAreaLayout::resizeDocks() QDockWidget is not part of this layout");
          continue;
       }
+
       int size = sizes[i];
+
       if (size <= 0) {
-         qWarning("QMainWidget::resizeDocks: all sizes need to be larger than 0");
+         qWarning("QDockAreaLayout::resizeDocks() Sizes need to be larger than 0");
          size = 1;
       }
 
       while (path.size() > 1) {
          QDockAreaLayoutInfo *info = this->info(path);
-         if (!info->tabbed && info->o == o) {
+
+         if (! info->tabbed && info->m_dockAreaOrientation  == newOrientation) {
             info->item_list[path.last()].size = size;
             int totalSize = 0;
 
             for (const QDockAreaLayoutItem &item : info->item_list) {
-               if (!item.skip()) {
+               if (! item.skip()) {
                   if (totalSize != 0) {
                      totalSize += sep;
                   }
-                  totalSize += item.size == -1 ? pick(o, item.sizeHint()) : item.size;
+
+                  totalSize += item.size == -1 ? pick(newOrientation, item.sizeHint()) : item.size;
                }
             }
             size = totalSize;
          }
+
          path.removeLast();
       }
 
       const int dockNum = path.first();
       Q_ASSERT(dockNum < QInternal::DockCount);
-      QRect &r = this->docks[dockNum].rect;
+
+      QRect &r = m_docks[dockNum].m_dockAreaInfoRect;
+
       QSize s = r.size();
-      rpick(o, s) = size;
+      rpick(newOrientation, s) = size;
       r.setSize(s);
    }
 }
@@ -3537,33 +3640,37 @@ void QDockAreaLayout::apply(bool animate)
    QWidgetAnimator &widgetAnimator = qt_mainwindow_layout(mainWindow)->widgetAnimator;
 
    for (int i = 0; i < QInternal::DockCount; ++i) {
-      docks[i].apply(animate);
+      m_docks[i].apply(animate);
    }
+
    if (centralWidgetItem != nullptr && !centralWidgetItem->isEmpty()) {
-      widgetAnimator.animate(centralWidgetItem->widget(), centralWidgetRect,
-         animate);
+      widgetAnimator.animate(centralWidgetItem->widget(), centralWidgetRect, animate);
    }
+
 #ifndef QT_NO_TABBAR
    if (sep == 1) {
       updateSeparatorWidgets();
    }
-#endif //QT_NO_TABBAR
+#endif
 }
 
 void QDockAreaLayout::paintSeparators(QPainter *p, QWidget *widget, const QRegion &clip, const QPoint &mouse) const
 {
    for (int i = 0; i < QInternal::DockCount; ++i) {
-      const QDockAreaLayoutInfo &dock = docks[i];
+      const QDockAreaLayoutInfo &dock = m_docks[i];
+
       if (dock.isEmpty()) {
          continue;
       }
+
       QRect r = separatorRect(i);
+
       if (clip.contains(r) && !dock.hasFixedSize()) {
-         Qt::Orientation opposite = dock.o == Qt::Horizontal
-            ? Qt::Vertical : Qt::Horizontal;
+         Qt::Orientation opposite = dock.m_dockAreaOrientation  == Qt::Horizontal ? Qt::Vertical : Qt::Horizontal;
          paintSep(p, widget, r, opposite, r.contains(mouse));
       }
-      if (clip.contains(dock.rect)) {
+
+      if (clip.contains(dock.m_dockAreaInfoRect)) {
          dock.paintSeparators(p, widget, clip, mouse);
       }
    }
@@ -3574,10 +3681,12 @@ QRegion QDockAreaLayout::separatorRegion() const
    QRegion result;
 
    for (int i = 0; i < QInternal::DockCount; ++i) {
-      const QDockAreaLayoutInfo &dock = docks[i];
+      const QDockAreaLayoutInfo &dock = m_docks[i];
+
       if (dock.isEmpty()) {
          continue;
       }
+
       result |= separatorRect(i);
       result |= dock.separatorRegion();
    }
@@ -3585,19 +3694,21 @@ QRegion QDockAreaLayout::separatorRegion() const
    return result;
 }
 
-int QDockAreaLayout::separatorMove(const QList<int> &separator, const QPoint &origin,
-   const QPoint &dest)
+int QDockAreaLayout::separatorMove(const QList<int> &separator, const QPoint &origin, const QPoint &dest)
 {
    int delta = 0;
    int index = separator.last();
 
    if (separator.count() > 1) {
       QDockAreaLayoutInfo *info = this->info(separator);
-      delta = pick(info->o, dest - origin);
+      delta = pick(info->m_dockAreaOrientation, dest - origin);
+
       if (delta != 0) {
          delta = info->separatorMove(index, delta);
       }
+
       info->apply(false);
+
       return delta;
    }
 
@@ -3609,13 +3720,12 @@ int QDockAreaLayout::separatorMove(const QList<int> &separator, const QPoint &or
       getGrid(&list, nullptr);
    }
 
-   int sep_index = index == QInternal::LeftDock || index == QInternal::TopDock
-      ? 0 : 1;
-   Qt::Orientation o = index == QInternal::LeftDock || index == QInternal::RightDock
-      ? Qt::Horizontal
-      : Qt::Vertical;
+   int sep_index = (index == QInternal::LeftDock || index == QInternal::TopDock) ? 0 : 1;
 
-   delta = pick(o, dest - origin);
+   Qt::Orientation newOrientation = (index == QInternal::LeftDock || index == QInternal::RightDock)
+         ? Qt::Horizontal : Qt::Vertical;
+
+   delta = pick(newOrientation, dest - origin);
    delta = separatorMoveHelper(list, sep_index, delta, sep);
 
    if (index == QInternal::LeftDock || index == QInternal::RightDock) {
@@ -3630,14 +3740,16 @@ int QDockAreaLayout::separatorMove(const QList<int> &separator, const QPoint &or
 }
 
 #ifndef QT_NO_TABBAR
+
 // Sets the correct positions for the separator widgets
 // Allocates new sepearator widgets with getSeparatorWidget
+
 void QDockAreaLayout::updateSeparatorWidgets() const
 {
    int j = 0;
 
    for (int i = 0; i < QInternal::DockCount; ++i) {
-      const QDockAreaLayoutInfo &dock = docks[i];
+      const QDockAreaLayoutInfo &dock = m_docks[i];
       if (dock.isEmpty()) {
          continue;
       }
@@ -3649,10 +3761,11 @@ void QDockAreaLayout::updateSeparatorWidgets() const
          sepWidget = qt_mainwindow_layout(mainWindow)->getSeparatorWidget();
          separatorWidgets.append(sepWidget);
       }
+
       j++;
 
-
       sepWidget->raise();
+
       QRect sepRect = separatorRect(i).adjusted(-2, -2, 2, 2);
       sepWidget->setGeometry(sepRect);
       sepWidget->setMask( QRegion(separatorRect(i).translated( - sepRect.topLeft())));
@@ -3665,14 +3778,14 @@ void QDockAreaLayout::updateSeparatorWidgets() const
 
    separatorWidgets.resize(j);
 }
-#endif //QT_NO_TABBAR
+#endif
 
 QLayoutItem *QDockAreaLayout::itemAt(int *x, int index) const
 {
    Q_ASSERT(x != nullptr);
 
    for (int i = 0; i < QInternal::DockCount; ++i) {
-      const QDockAreaLayoutInfo &dock = docks[i];
+      const QDockAreaLayoutInfo &dock = m_docks[i];
       if (QLayoutItem *ret = dock.itemAt(x, index)) {
          return ret;
       }
@@ -3690,14 +3803,14 @@ QLayoutItem *QDockAreaLayout::takeAt(int *x, int index)
    Q_ASSERT(x != nullptr);
 
    for (int i = 0; i < QInternal::DockCount; ++i) {
-      QDockAreaLayoutInfo &dock = docks[i];
+      QDockAreaLayoutInfo &dock = m_docks[i];
       if (QLayoutItem *ret = dock.takeAt(x, index)) {
          return ret;
       }
    }
 
    if (centralWidgetItem && (*x)++ == index) {
-      QLayoutItem *ret = centralWidgetItem;
+      QLayoutItem *ret  = centralWidgetItem;
       centralWidgetItem = nullptr;
       return ret;
    }
@@ -3708,7 +3821,7 @@ QLayoutItem *QDockAreaLayout::takeAt(int *x, int index)
 void QDockAreaLayout::deleteAllLayoutItems()
 {
    for (int i = 0; i < QInternal::DockCount; ++i) {
-      docks[i].deleteAllLayoutItems();
+      m_docks[i].deleteAllLayoutItems();
    }
 }
 
@@ -3716,10 +3829,12 @@ void QDockAreaLayout::deleteAllLayoutItems()
 QSet<QTabBar *> QDockAreaLayout::usedTabBars() const
 {
    QSet<QTabBar *> result;
+
    for (int i = 0; i < QInternal::DockCount; ++i) {
-      const QDockAreaLayoutInfo &dock = docks[i];
+      const QDockAreaLayoutInfo &dock = m_docks[i];
       result += dock.usedTabBars();
    }
+
    return result;
 }
 
@@ -3731,10 +3846,12 @@ QSet<QWidget *> QDockAreaLayout::usedSeparatorWidgets() const
    for (int i = 0; i < separatorWidgets.count(); ++i) {
       result << separatorWidgets.at(i);
    }
+
    for (int i = 0; i < QInternal::DockCount; ++i) {
-      const QDockAreaLayoutInfo &dock = docks[i];
+      const QDockAreaLayoutInfo &dock = m_docks[i];
       result += dock.usedSeparatorWidgets();
    }
+
    return result;
 }
 #endif
@@ -3745,14 +3862,20 @@ QRect QDockAreaLayout::gapRect(const QList<int> &path) const
    if (info == nullptr) {
       return QRect();
    }
+
    const QList<QDockAreaLayoutItem> &item_list = info->item_list;
-   Qt::Orientation o = info->o;
+
+   Qt::Orientation newOrientation = info->m_dockAreaOrientation;
+
    int index = path.last();
+
    if (index < 0 || index >= item_list.count()) {
       return QRect();
    }
+
    const QDockAreaLayoutItem &item = item_list.at(index);
-   if (!(item.flags & QDockAreaLayoutItem::GapItem)) {
+
+   if (! (item.flags & QDockAreaLayoutItem::GapItem)) {
       return QRect();
    }
 
@@ -3763,6 +3886,7 @@ QRect QDockAreaLayout::gapRect(const QList<int> &path) const
       result = info->tabContentRect();
    } else
 #endif
+
    {
       int pos = item.pos;
       int size = item.size;
@@ -3779,11 +3903,12 @@ QRect QDockAreaLayout::gapRect(const QList<int> &path) const
       }
 
       QPoint p;
-      rpick(o, p) = pos;
-      rperp(o, p) = perp(o, info->rect.topLeft());
+      rpick(newOrientation, p) = pos;
+      rperp(newOrientation, p) = perp(newOrientation, info->m_dockAreaInfoRect.topLeft());
+
       QSize s;
-      rpick(o, s) = size;
-      rperp(o, s) = perp(o, info->rect.size());
+      rpick(newOrientation, s) = size;
+      rperp(newOrientation, s) = perp(newOrientation, info->m_dockAreaInfoRect.size());
 
       result = QRect(p, s);
    }

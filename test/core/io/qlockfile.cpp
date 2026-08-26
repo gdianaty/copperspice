@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -32,7 +32,7 @@ TEST_CASE("QLockFile traits", "[qlockfile]")
    REQUIRE(std::has_virtual_destructor_v<QLockFile> == false);
 }
 
-TEST_CASE("QLockFile basic", "[qlockfile]")
+TEST_CASE("QLockFile properties", "[qlockfile]")
 {
   QLockFile f("testfile");
 

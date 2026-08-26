@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -331,14 +331,14 @@ static QVariant::Type qDecodePSQLType(int t)
 
 void QPSQLResultPrivate::deallocatePreparedStmt()
 {
-   const QString stmt = "DEALLOCATE " + preparedStmtId;
-   PGresult *result = privDriver()->exec(stmt);
+   const QString stmt   = "DEALLOCATE " + preparedStmtId;
+   PGresult *execResult = privDriver()->exec(stmt);
 
-   if (PQresultStatus(result) != PGRES_COMMAND_OK) {
+   if (PQresultStatus(execResult) != PGRES_COMMAND_OK) {
       qWarning("Unable to free statement: %s", PQerrorMessage(privDriver()->connection));
    }
 
-   PQclear(result);
+   PQclear(execResult);
    preparedStmtId.clear();
 }
 
@@ -1097,7 +1097,7 @@ void QPSQLDriver::close()
 
       d->seid.clear();
       if (d->sn) {
-         disconnect(d->sn, SIGNAL(activated(int)), this, SLOT(_q_handleNotification(int)));
+         disconnect(d->sn, &QSocketNotifier::activated, this, &QPSQLDriver::_q_handleNotification);
          delete d->sn;
          d->sn = nullptr;
       }
@@ -1702,8 +1702,9 @@ bool QPSQLDriver::subscribeToNotification(const QString &name)
 
       if (!d->sn) {
          d->sn = new QSocketNotifier(socket, QSocketNotifier::Read);
-         connect(d->sn, SIGNAL(activated(int)), this, SLOT(_q_handleNotification(int)));
+         connect(d->sn, &QSocketNotifier::activated, this, &QPSQLDriver::_q_handleNotification);
       }
+
    } else {
       qWarning("QPSQLDriver::subscribeToNotificationImplementation: PQsocket did not return a valid socket to listen on");
       return false;
@@ -1740,7 +1741,7 @@ bool QPSQLDriver::unsubscribeFromNotification(const QString &name)
    d->seid.removeAll(name);
 
    if (d->seid.isEmpty()) {
-      disconnect(d->sn, SIGNAL(activated(int)), this, SLOT(_q_handleNotification(int)));
+      disconnect(d->sn, &QSocketNotifier::activated, this, &QPSQLDriver::_q_handleNotification);
       delete d->sn;
       d->sn = nullptr;
    }

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -31,7 +31,9 @@ class QBitRef;
 class Q_CORE_EXPORT QBitArray
 {
  public:
-   inline QBitArray() {}
+   QBitArray()
+   { }
+
    explicit QBitArray(int size, bool value = false);
 
    QBitArray(const QBitArray &other)
@@ -39,52 +41,57 @@ class Q_CORE_EXPORT QBitArray
    {
    }
 
-   inline QBitArray &operator=(const QBitArray &other) {
+   QBitArray(QBitArray &&other)
+      : d(std::move(other.d))
+   {
+   }
+
+   QBitArray &operator=(const QBitArray &other) {
       d = other.d;
       return *this;
    }
 
-   inline QBitArray &operator=(QBitArray && other) {
+   QBitArray &operator=(QBitArray &&other) {
       qSwap(d, other.d);
       return *this;
    }
 
-   inline void swap(QBitArray &other) {
-      qSwap(d, other.d);
-   }
+   bool at(int i) const;
 
-   inline int size() const {
-      return (d.size() << 3) - *d.constData();
-   }
-
-   inline int count() const {
+   int count() const {
       return (d.size() << 3) - *d.constData();
    }
 
    int count(bool on) const;
-   // ### Qt5/Store the number of set bits separately
 
-   inline bool isEmpty() const {
+   void clear() {
+      d.clear();
+   }
+
+   void detach() {
+      d.detach();
+   }
+
+   QByteArray::DataPtr &data_ptr() {
+      return d.data_ptr();
+   }
+
+   inline bool fill(bool value, int size = -1);
+   void fill(bool value, int begin, int end);
+
+   bool isDetached() const {
+      return d.isDetached();
+   }
+
+   bool isEmpty() const {
       return d.isEmpty();
    }
 
-   inline bool isNull() const {
+   bool isNull() const {
       return d.isNull();
    }
 
    void resize(int size);
-
-   inline void detach() {
-      d.detach();
-   }
-
-   inline bool isDetached() const {
-      return d.isDetached();
-   }
-
-   inline void clear() {
-      d.clear();
-   }
 
    bool testBit(int i) const;
    void setBit(int i);
@@ -92,7 +99,20 @@ class Q_CORE_EXPORT QBitArray
    void clearBit(int i);
    bool toggleBit(int i);
 
-   bool at(int i) const;
+   int size() const {
+      return (d.size() << 3) - *d.constData();
+   }
+
+   void swap(QBitArray &other) {
+      qSwap(d, other.d);
+   }
+
+   void truncate(int pos) {
+      if (pos < size()) {
+         resize(pos);
+      }
+   }
+
    QBitRef operator[](int i);
    bool operator[](int i) const;
    QBitRef operator[](uint i);
@@ -103,34 +123,21 @@ class Q_CORE_EXPORT QBitArray
    QBitArray &operator^=(const QBitArray &other);
    QBitArray  operator~() const;
 
-   inline bool operator==(const QBitArray &other) const {
+   bool operator==(const QBitArray &other) const {
       return d == other.d;
    }
 
-   inline bool operator!=(const QBitArray &other) const {
+   bool operator!=(const QBitArray &other) const {
       return d != other.d;
    }
 
-   inline bool fill(bool value, int size = -1);
-   void fill(bool value, int begin, int end);
-
-   inline void truncate(int pos) {
-      if (pos < size()) {
-         resize(pos);
-      }
-   }
-
-   typedef QByteArray::DataPtr DataPtr;
-   inline DataPtr &data_ptr() {
-      return d.data_ptr();
-   }
+   static uint hash(const QBitArray &bitArray, uint seed = 0);
 
  private:
    QByteArray d;
 
    friend Q_CORE_EXPORT QDataStream &operator<<(QDataStream &stream, const QBitArray &bitArray);
    friend Q_CORE_EXPORT QDataStream &operator>>(QDataStream &stream, QBitArray &bitArray);
-   friend Q_CORE_EXPORT uint qHash(const QBitArray &key, uint seed);
 };
 
 inline bool QBitArray::fill(bool value, int size)
@@ -200,11 +207,11 @@ inline bool QBitArray::at(int i) const
 class Q_CORE_EXPORT QBitRef
 {
  public:
-   inline operator bool() const {
+   operator bool() const {
       return a.testBit(i);
    }
 
-   inline bool operator!() const {
+   bool operator!() const {
       return !a.testBit(i);
    }
 
@@ -219,9 +226,9 @@ class Q_CORE_EXPORT QBitRef
    }
 
  private:
-   inline QBitRef(QBitArray &array, int idx)
+   QBitRef(QBitArray &array, int idx)
       : a(array), i(idx)
-   {}
+   { }
 
    QBitArray &a;
    int i;

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -37,12 +37,12 @@ class Q_SQL_EXPORT QSqlIndex : public QSqlRecord
 
    QSqlIndex &operator=(const QSqlIndex &other);
    void setCursorName(const QString &cursorName);
-   inline QString cursorName() const {
+   QString cursorName() const {
       return cursor;
    }
 
    void setName(const QString &name);
-   inline QString name() const {
+   QString name() const {
       return nm;
    }
 

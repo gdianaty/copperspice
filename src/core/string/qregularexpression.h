@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,8 +26,8 @@
 
 #include "regex/regex.h"
 
-#include <qglobal.h>
 #include <qchar32.h>
+#include <qglobal.h>
 #include <qlist.h>
 #include <qstringfwd.h>
 
@@ -83,7 +83,7 @@ inline bool is_combining<QChar32>(QChar32 c)
 }   // namespace
 
 
-// type traits, internal only
+// type traits, only used by CS
 template <typename S>
 class QRegexTraits
 {
@@ -133,7 +133,7 @@ class QRegexTraits
 
       template <typename C = QChar32>
       QChar32 translate_nocase(QChar32 c) const {
-         // broom - modify for case insensitive when multiple chars are returned
+         // BROOM - modify for case insensitive when multiple chars are returned
          return C(c).toCaseFolded()[0];
       }
 
@@ -433,7 +433,6 @@ class Q_CORE_EXPORT QRegularExpressionMatch
       QRegularExpressionMatch(const QRegularExpressionMatch &other) = default;
       QRegularExpressionMatch(QRegularExpressionMatch &&other) = default;
 
-      // internal only
       QRegularExpressionMatch(cs_regex_ns::match_results<QRegexTraits<S>> match, QMatchType matchType, QMatchOptionFlags matchOptions)
          : m_results(std::move(match)), m_matchType(matchType), m_matchOptions(matchOptions), m_valid(true)
       {

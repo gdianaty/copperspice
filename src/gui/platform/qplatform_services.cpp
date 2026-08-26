@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,24 +23,22 @@
 
 #include <qplatform_services.h>
 
-#include <qurl.h>
-#include <qstring.h>
 #include <qdebug.h>
+#include <qstring.h>
+#include <qurl.h>
 
 QPlatformServices::QPlatformServices()
 { }
 
 bool QPlatformServices::openUrl(const QUrl &url)
 {
-   qWarning("This plugin does not support QPlatformServices::openUrl() for '%s'.",
-      csPrintable(url.toString()));
+   qWarning("QPlatformServices::openUrl() Plugin does not support this method, '%s'.", csPrintable(url.toString()));
    return false;
 }
 
 bool QPlatformServices::openDocument(const QUrl &url)
 {
-   qWarning("This plugin does not support QPlatformServices::openDocument() for '%s'.",
-      csPrintable(url.toString()));
+   qWarning("QPlatformServices::openDocument() Plugin does not support this method, '%s'.", csPrintable(url.toString()));
    return false;
 }
 

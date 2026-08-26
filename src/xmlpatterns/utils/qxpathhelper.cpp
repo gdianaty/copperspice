@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,15 +21,14 @@
 *
 ***********************************************************************/
 
-#include <QStringList>
+#include <qxpathhelper_p.h>
 
-#include "qxmlutils_p.h"
-#include "qbuiltintypes_p.h"
-#include "qcommonvalues_p.h"
-#include "qnamepool_p.h"
-#include "qxpathhelper_p.h"
+#include <qstringlist.h>
 
-QT_BEGIN_NAMESPACE
+#include <qxmlutils_p.h>
+#include <qbuiltintypes_p.h>
+#include <qcommonvalues_p.h>
+#include <qnamepool_p.h>
 
 using namespace QPatternist;
 
@@ -113,5 +112,3 @@ QUrl XPathHelper::normalizeQueryURI(const QUrl &uri)
       return uri;
    }
 }
-
-QT_END_NAMESPACE

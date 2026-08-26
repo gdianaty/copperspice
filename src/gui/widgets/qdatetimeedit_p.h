@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,16 +24,17 @@
 #ifndef QDATETIMEEDIT_P_H
 #define QDATETIMEEDIT_P_H
 
-#include <qcombobox.h>
+#include <qdatetimeedit.h>
+
 #include <qcalendarwidget.h>
+#include <qcombobox.h>
+#include <qdebug.h>
+#include <qlabel.h>
+#include <qmenu.h>
 #include <qspinbox.h>
 #include <qtoolbutton.h>
-#include <qmenu.h>
-#include <qlabel.h>
-#include <qdatetimeedit.h>
-#include <qabstractspinbox_p.h>
-#include <qdebug.h>
 
+#include <qabstractspinbox_p.h>
 #include <qdatetimeparser_p.h>
 
 #ifndef QT_NO_DATETIMEEDIT
@@ -99,9 +100,7 @@ class QDateTimeEditPrivate : public QAbstractSpinBoxPrivate, public QDateTimePar
    void setSelected(int index, bool forward = false);
 
    void updateCache(const QVariant &val, const QString &str) const;
-
-   void updateTimeSpec();
-
+   void updateTimeZone();
 
    QString valueToText(const QVariant &var) const {
       return textFromValue(var);
@@ -134,7 +133,6 @@ class QDateTimeEditPrivate : public QAbstractSpinBoxPrivate, public QDateTimePar
 #endif
 };
 
-
 class QCalendarPopup : public QWidget
 {
    GUI_CS_OBJECT(QCalendarPopup)
@@ -165,8 +163,8 @@ class QCalendarPopup : public QWidget
    GUI_CS_SIGNAL_1(Public, void newDateSelected(const QDate &newDate))
    GUI_CS_SIGNAL_2(newDateSelected, newDate)
 
-   GUI_CS_SIGNAL_1(Public, void hidingCalendar(const QDate &oldDate))
-   GUI_CS_SIGNAL_2(hidingCalendar, oldDate)
+   GUI_CS_SIGNAL_1(Public, void hidingCalendar(const QDate &oldCalendarDate))
+   GUI_CS_SIGNAL_2(hidingCalendar, oldCalendarDate)
 
    GUI_CS_SIGNAL_1(Public, void resetButton())
    GUI_CS_SIGNAL_2(resetButton)
@@ -177,7 +175,7 @@ class QCalendarPopup : public QWidget
    void mouseReleaseEvent(QMouseEvent *) override;
    bool event(QEvent *e) override;
 
- private :
+ private:
    GUI_CS_SLOT_1(Private, void dateSelected(const QDate &date))
    GUI_CS_SLOT_2(dateSelected)
 
@@ -190,8 +188,6 @@ class QCalendarPopup : public QWidget
    QDate oldDate;
    bool dateChanged;
 };
-
-
 
 #endif // QT_NO_DATETIMEEDIT
 

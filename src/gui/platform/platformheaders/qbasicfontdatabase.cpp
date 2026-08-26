@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,11 +25,11 @@
 
 #if defined(QT_USE_FREETYPE)
 
-#include <qplatform_screen.h>
 #include <qdir.h>
-#include <qfile.h>
 #include <qendian.h>
+#include <qfile.h>
 #include <qlibraryinfo.h>
+#include <qplatform_screen.h>
 #include <quuid.h>
 
 #include <qapplication_p.h>
@@ -45,7 +45,10 @@ void QBasicFontDatabase::populateFontDatabase()
     QDir dir(fontpath);
 
     if (! dir.exists()) {
-       qWarning("QBasicFontDatabase: Unable to locate the font directory %s", csPrintable(fontpath));
+#if defined(CS_SHOW_DEBUG_PLATFORM)
+       qDebug("QBasicFontDatabase::populateFontDatabase() Unable to locate the font directory %s", csPrintable(fontpath));
+#endif
+
        return;
     }
 
@@ -107,19 +110,21 @@ namespace {
 
         void updateFamilyNameAndStyle()
         {
-            fontDef.family = QString::fromLatin1(freetype->face->family_name);
+            m_fontDef.family = QString::fromLatin1(freetype->m_ft_face->family_name);
 
-            if (freetype->face->style_flags & FT_STYLE_FLAG_ITALIC)
-                fontDef.style = QFont::StyleItalic;
+            if (freetype->m_ft_face->style_flags & FT_STYLE_FLAG_ITALIC) {
+               m_fontDef.style = QFont::StyleItalic;
+            }
 
-            if (freetype->face->style_flags & FT_STYLE_FLAG_BOLD)
-                fontDef.weight = QFont::Bold;
+            if (freetype->m_ft_face->style_flags & FT_STYLE_FLAG_BOLD) {
+               m_fontDef.weight = QFont::Bold;
+            }
         }
 
         bool initFromData(const QByteArray &fontData)
         {
             FaceId faceId;
-            faceId.filename = "";
+            faceId.filename = QString();
             faceId.index = 0;
             faceId.uuid = QUuid::createUuid().toByteArray();
 

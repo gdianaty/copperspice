@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,26 +26,12 @@
 
 #include <qitem_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class SubsequenceIterator : public Item::Iterator
 {
  public:
-   /**
-    * Creates a SubsequenceIterator that extracts a subsequence from the sequence
-    * in @p iterator, as specified by the @p start position and @p length parameter.
-    *
-    * @param iterator the iterator which the subsequence should
-    * be extracted from
-    * @param start the start position of extraction. Must be 1 or larger.
-    * @param length the length of the subsequence to extract. If it is
-    * -1, to the end is returned. The value must be -1 or 1 or larger.
-    */
-   SubsequenceIterator(const Item::Iterator::Ptr &iterator,
-                       const xsInteger start,
-                       const xsInteger length);
+   SubsequenceIterator(const Item::Iterator::Ptr &iterator, const xsInteger start, const xsInteger length);
 
    Item next() override;
    Item current() const override;
@@ -61,8 +47,7 @@ class SubsequenceIterator : public Item::Iterator
    const xsInteger m_len;
    const xsInteger m_stop;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

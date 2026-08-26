@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,15 +24,15 @@
 #ifndef QICON_P_H
 #define QICON_P_H
 
+#include <qicon.h>
+
 #include <qglobal.h>
-#include <qsize.h>
+#include <qiconengine.h>
 #include <qlist.h>
 #include <qpixmap.h>
-#include <qicon.h>
-#include <qiconengine.h>
+#include <qsize.h>
 
 #ifndef QT_NO_ICON
-
 
 class QIconPrivate
 {

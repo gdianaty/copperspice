@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,13 +24,13 @@
 #ifndef QMEDIAPLAYLIST_H
 #define QMEDIAPLAYLIST_H
 
-#include <qobject.h>
+#include <qmediabindableinterface.h>
 #include <qmediacontent.h>
 #include <qmediaobject.h>
-#include <qmediabindableinterface.h>
+#include <qobject.h>
 
-class QMediaPlaylistProvider;
 class QMediaPlaylistPrivate;
+class QMediaPlaylistProvider;
 
 class Q_MULTIMEDIA_EXPORT QMediaPlaylist : public QObject, public QMediaBindableInterface
 {
@@ -53,8 +53,21 @@ class Q_MULTIMEDIA_EXPORT QMediaPlaylist : public QObject, public QMediaBindable
    MULTI_CS_ENUM(Error)
 
  public:
-   enum PlaybackMode { CurrentItemOnce, CurrentItemInLoop, Sequential, Loop, Random };
-   enum Error { NoError, FormatError, FormatNotSupportedError, NetworkError, AccessDeniedError };
+   enum PlaybackMode {
+      CurrentItemOnce,
+      CurrentItemInLoop,
+      Sequential,
+      Loop,
+      Random
+   };
+
+   enum Error {
+      NoError,
+      FormatError,
+      FormatNotSupportedError,
+      NetworkError,
+      AccessDeniedError
+   };
 
    explicit QMediaPlaylist(QObject *parent = nullptr);
    virtual ~QMediaPlaylist();
@@ -99,6 +112,7 @@ class Q_MULTIMEDIA_EXPORT QMediaPlaylist : public QObject, public QMediaBindable
 
    MULTI_CS_SLOT_1(Public, void next())
    MULTI_CS_SLOT_2(next)
+
    MULTI_CS_SLOT_1(Public, void previous())
    MULTI_CS_SLOT_2(previous)
 
@@ -107,24 +121,31 @@ class Q_MULTIMEDIA_EXPORT QMediaPlaylist : public QObject, public QMediaBindable
 
    MULTI_CS_SIGNAL_1(Public, void currentIndexChanged(int index))
    MULTI_CS_SIGNAL_2(currentIndexChanged, index)
+
    MULTI_CS_SIGNAL_1(Public, void playbackModeChanged(QMediaPlaylist::PlaybackMode mode))
    MULTI_CS_SIGNAL_2(playbackModeChanged, mode)
+
    MULTI_CS_SIGNAL_1(Public, void currentMediaChanged(const QMediaContent &content))
    MULTI_CS_SIGNAL_2(currentMediaChanged, content)
 
    MULTI_CS_SIGNAL_1(Public, void mediaAboutToBeInserted(int start, int end))
    MULTI_CS_SIGNAL_2(mediaAboutToBeInserted, start, end)
+
    MULTI_CS_SIGNAL_1(Public, void mediaInserted(int start, int end))
    MULTI_CS_SIGNAL_2(mediaInserted, start, end)
+
    MULTI_CS_SIGNAL_1(Public, void mediaAboutToBeRemoved(int start, int end))
    MULTI_CS_SIGNAL_2(mediaAboutToBeRemoved, start, end)
+
    MULTI_CS_SIGNAL_1(Public, void mediaRemoved(int start, int end))
    MULTI_CS_SIGNAL_2(mediaRemoved, start, end)
+
    MULTI_CS_SIGNAL_1(Public, void mediaChanged(int start, int end))
    MULTI_CS_SIGNAL_2(mediaChanged, start, end)
 
    MULTI_CS_SIGNAL_1(Public, void loaded())
    MULTI_CS_SIGNAL_2(loaded)
+
    MULTI_CS_SIGNAL_1(Public, void loadFailed())
    MULTI_CS_SIGNAL_2(loadFailed)
 
@@ -140,5 +161,3 @@ class Q_MULTIMEDIA_EXPORT QMediaPlaylist : public QObject, public QMediaBindable
 };
 
 #endif
-
-

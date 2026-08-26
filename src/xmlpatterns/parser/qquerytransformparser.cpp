@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -899,11 +899,9 @@ static Expression::Ptr pushVariable(const QXmlName name,
     * In some cases the EvaluationCache instance isn't necessary, but in those cases EvaluationCache
     * optimizes itself away. */
    if (type == VariableDeclaration::ExpressionVariable) {
-      checked = create(new EvaluationCache<false>(checked, var.data(), parseInfo->allocateCacheSlot()), sourceLocator,
-                       parseInfo);
+      checked = create(new EvaluationCache<false>(checked, var, parseInfo->allocateCacheSlot()), sourceLocator, parseInfo);
    } else if (type == VariableDeclaration::GlobalVariable) {
-      checked = create(new EvaluationCache<true>(checked, var.data(), parseInfo->allocateCacheSlot()), sourceLocator,
-                       parseInfo);
+      checked = create(new EvaluationCache<true>(checked, var, parseInfo->allocateCacheSlot()), sourceLocator, parseInfo);
    }
 
    var->setExpression(checked);
@@ -3222,20 +3220,9 @@ yysyntax_error (char *yyresult, int yystate, int yychar)
 | Release the memory associated to this symbol.  |
 `-----------------------------------------------*/
 
-/*ARGSUSED*/
-#if (defined __STDC__ || defined __C99__FUNC__ || defined __cplusplus)
-static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, YYLTYPE *yylocationp, ParserContext *const parseInfo)
-#else
-static void
-yydestruct (yymsg, yytype, yyvaluep, yylocationp, parseInfo)
-const char *yymsg;
-int yytype;
-YYSTYPE *yyvaluep;
-YYLTYPE *yylocationp;
-ParserContext *const parseInfo;
-#endif
+static void yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, YYLTYPE *yylocationp, ParserContext *const parseInfo)
 {
+   (void) yytype;
    (void) yyvaluep;
    (void) yylocationp;
    (void) parseInfo;
@@ -3243,13 +3230,8 @@ ParserContext *const parseInfo;
    if (!yymsg) {
       yymsg = "Deleting";
    }
+
    YY_SYMBOL_PRINT (yymsg, yytype, yyvaluep, yylocationp);
-
-   switch (yytype) {
-
-      default:
-         break;
-   }
 }
 
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,16 +28,16 @@
 
 #ifndef QT_NO_QCOLUMNVIEW
 
-#include <qabstractitemview_p.h>
-
-#include <qabstractitemmodel.h>
-#include <qpropertyanimation.h>
 #include <qabstractitemdelegate.h>
+#include <qabstractitemmodel.h>
 #include <qabstractitemview.h>
+#include <qevent.h>
 #include <qitemdelegate.h>
 #include <qlistview.h>
-#include <qevent.h>
+#include <qpropertyanimation.h>
 #include <qscrollbar.h>
+
+#include <qabstractitemview_p.h>
 
 class QColumnViewPreviewColumn : public QAbstractItemView
 {
@@ -116,8 +116,6 @@ class QColumnViewPreviewColumn : public QAbstractItemView
 
 class QColumnViewPrivate : public QAbstractItemViewPrivate
 {
-   Q_DECLARE_PUBLIC(QColumnView)
-
  public:
    QColumnViewPrivate();
    ~QColumnViewPrivate();
@@ -137,17 +135,21 @@ class QColumnViewPrivate : public QAbstractItemViewPrivate
    void _q_clicked(const QModelIndex &index);
    void _q_columnsInserted(const QModelIndex &parent, int start, int end) override;
 
-   QList<QAbstractItemView *> columns;
-   QVector<int> columnSizes; // used during init and corner moving
    bool showResizeGrips;
-   int offset;
+   int m_columnViewOffset;
 
 #ifndef QT_NO_ANIMATION
    QPropertyAnimation currentAnimation;
 #endif
 
+   QList<QAbstractItemView *> columns;
+   QVector<int> columnSizes;                // used during init and corner moving
+
    QWidget *previewWidget;
    QAbstractItemView *previewColumn;
+
+ private:
+   Q_DECLARE_PUBLIC(QColumnView)
 };
 
 class QColumnViewDelegate : public QItemDelegate

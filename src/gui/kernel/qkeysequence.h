@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -159,39 +159,46 @@ class Q_GUI_EXPORT QKeySequence
 
    QKeySequence &operator=(const QKeySequence &other);
 
-   inline QKeySequence &operator=(QKeySequence &&other) {
+   QKeySequence &operator=(QKeySequence &&other) {
       qSwap(d, other.d);
       return *this;
    }
 
-   inline void swap(QKeySequence &other) {
+   void swap(QKeySequence &other) {
       qSwap(d, other.d);
    }
 
    bool operator==(const QKeySequence &other) const;
-   inline bool operator!= (const QKeySequence &other) const {
+   bool operator!= (const QKeySequence &other) const {
       return !(*this == other);
    }
 
    bool operator< (const QKeySequence &other) const;
 
-   inline bool operator> (const QKeySequence &other) const {
+   bool operator> (const QKeySequence &other) const {
       return other < *this;
    }
 
-   inline bool operator<= (const QKeySequence &other) const {
+   bool operator<= (const QKeySequence &other) const {
       return !(other < *this);
    }
 
-   inline bool operator>= (const QKeySequence &other) const {
+   bool operator>= (const QKeySequence &other) const {
       return !(*this < other);
    }
 
    bool isDetached() const;
 
+   QKeySequencePrivate * &data_ptr() {
+      return d;
+   }
+
+   static uint hash(const QKeySequence &key, uint seed = 0);
+
  private:
    static int decodeString(const QString &ks);
    static QString encodeString(int key);
+
    int assign(const QString &str);
    int assign(const QString &str, SequenceFormat format);
    void setKey(int key, int index);
@@ -200,23 +207,11 @@ class Q_GUI_EXPORT QKeySequence
 
    friend Q_GUI_EXPORT QDataStream &operator<<(QDataStream &stream, const QKeySequence &ks);
    friend Q_GUI_EXPORT QDataStream &operator>>(QDataStream &stream, QKeySequence &ks);
-   friend Q_GUI_EXPORT uint qHash(const QKeySequence &key, uint seed);
    friend class QShortcutMap;
    friend class QShortcut;
-
- public:
-   typedef QKeySequencePrivate *DataPtr;
-   inline DataPtr &data_ptr() {
-      return d;
-   }
-
 };
 
-
-
-
 Q_GUI_EXPORT QDebug operator<<(QDebug, const QKeySequence &);
-
 
 #else
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -81,16 +81,16 @@ CGImageRef qt_mac_toCGImage(const QImage &inImage)
          cgflags = kCGImageAlphaNoneSkipFirst | kCGBitmapByteOrder32Host;
          break;
       case QImage::Format_RGB888:
-         cgflags = kCGImageAlphaNone | kCGBitmapByteOrder32Big;
+         cgflags = cs_enum_cast(kCGImageAlphaNone) | cs_enum_cast(kCGBitmapByteOrder32Big);
          break;
       case QImage::Format_RGBA8888_Premultiplied:
-         cgflags = kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big;
+         cgflags = cs_enum_cast(kCGImageAlphaPremultipliedLast) | cs_enum_cast(kCGBitmapByteOrder32Big);
          break;
       case QImage::Format_RGBA8888:
-         cgflags = kCGImageAlphaLast | kCGBitmapByteOrder32Big;
+         cgflags = cs_enum_cast(kCGImageAlphaLast) | cs_enum_cast(kCGBitmapByteOrder32Big);
          break;
       case QImage::Format_RGBX8888:
-         cgflags = kCGImageAlphaNoneSkipLast | kCGBitmapByteOrder32Big;
+         cgflags = cs_enum_cast(kCGImageAlphaNoneSkipLast) | cs_enum_cast(kCGBitmapByteOrder32Big);
          break;
       default:
          // Everything not recognized explicitly is converted to ARGB32_Premultiplied.
@@ -403,10 +403,6 @@ CGColorSpaceRef qt_mac_genericColorSpace()
 #endif
 }
 
-/*
-    Ideally we should pass the widget in here and use CGGetDisplaysWithRect() etc.
-    to support multiple displays correctly.
-*/
 CGColorSpaceRef qt_mac_displayColorSpace(const QWidget *widget)
 {
    CGColorSpaceRef colorSpace;
@@ -638,15 +634,7 @@ QString qt_mac_removeAmpersandEscapes(QString s)
    return qt_mac_removeMnemonics(s).trimmed();
 }
 
-/*! \internal
-
-   Returns the CoreGraphics CGContextRef of the paint device. 0 is
-   returned if it can't be obtained. It is the caller's responsibility to
-   CGContextRelease the context when finished using it.
-
-   \warning This function is duplicated in qmacstyle_mac.mm
-*/
-
+// duplicated in qmacstyle_mac.mm
 CGContextRef qt_mac_cg_context(QPaintDevice *pdev)
 {
    // QWidget and QPixmap (and QImage) paint devices are all QImages under the hood
@@ -664,11 +652,15 @@ CGContextRef qt_mac_cg_context(QPaintDevice *pdev)
          image = data->buffer();
 
       } else {
-         qDebug() << "qt_mac_cg_context(): Unsupported pixmap class";
+#if defined(CS_SHOW_DEBUG_PLATFORM)
+         qDebug("qt_mac_cg_context() Unsupported pixmap class");
+#endif
       }
 
    } else if (pdev->devType() == QInternal::Widget) {
-      qDebug() << "qt_mac_cg_context(): Not implemented for Widget class";
+#if defined(CS_SHOW_DEBUG_PLATFORM)
+      qDebug("qt_mac_cg_context() Not implemented for Widget class");
+#endif
 
    }
 

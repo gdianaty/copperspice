@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,15 +25,15 @@
 #define QXCB_DRAG_H
 
 #include <qbackingstore.h>
+#include <qdatetime.h>
+#include <qdebug.h>
+#include <qpixmap.h>
 #include <qplatform_drag.h>
 #include <qpoint.h>
+#include <qpointer.h>
 #include <qrect.h>
 #include <qsharedpointer.h>
-#include <qpointer.h>
 #include <qvector.h>
-#include <qdatetime.h>
-#include <qpixmap.h>
-#include <qdebug.h>
 #include <qxcb_object.h>
 
 #include <qsimpledrag_p.h>
@@ -42,14 +42,14 @@
 
 #ifndef QT_NO_DRAGANDDROP
 
-class QWindow;
+class QDrag;
 class QPlatformWindow;
+class QShapedPixmapWindow;
+class QWindow;
 class QXcbConnection;
-class QXcbWindow;
 class QXcbDropData;
 class QXcbScreen;
-class QDrag;
-class QShapedPixmapWindow;
+class QXcbWindow;
 
 class QXcbDrag : public QXcbObject, public QBasicDrag
 {
@@ -57,7 +57,7 @@ class QXcbDrag : public QXcbObject, public QBasicDrag
    QXcbDrag(QXcbConnection *c);
    ~QXcbDrag();
 
-   virtual QMimeData *platformDropData() override;
+   QMimeData *platformDropData() override;
    bool eventFilter(QObject *o, QEvent *e) override;
 
    void startDrag() override;
@@ -87,6 +87,12 @@ class QXcbDrag : public QXcbObject, public QBasicDrag
    void timerEvent(QTimerEvent *e) override;
 
  private:
+   // 10 minute timer used to discard old XdndDrop transactions
+   static constexpr const int XdndDropTransactionTimeout = 600000;
+
+   // the types in this drop. 100 is no good, but at least it's big.
+   static constexpr const int xdnd_max_type = 100;
+
    friend class QXcbDropData;
 
    void init();
@@ -109,8 +115,6 @@ class QXcbDrag : public QXcbObject, public QBasicDrag
 
    xcb_atom_t xdnd_dragsource;
 
-   // the types in this drop. 100 is no good, but at least it's big.
-   enum { xdnd_max_type = 100 };
    QVector<xcb_atom_t> xdnd_types;
 
    // timestamp from XdndPosition and XdndDroptime for retrieving the data
@@ -127,9 +131,6 @@ class QXcbDrag : public QXcbObject, public QBasicDrag
    xcb_window_t current_proxy_target;
 
    QXcbVirtualDesktop *current_virtual_desktop;
-
-   // 10 minute timer used to discard old XdndDrop transactions
-   enum { XdndDropTransactionTimeout = 600000 };
    int cleanup_timer;
 
    QVector<xcb_atom_t> drag_types;

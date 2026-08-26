@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,11 +26,12 @@
 #ifndef QT_NO_GRAPHICSVIEW
 
 #include <qgraphicslayout.h>
-#include <qgraphicslayoutitem.h>
-#include <qgraphicswidget.h>
-#include <qgraphicsscene.h>
-
 #include <qgraphics_layout_p.h>
+
+#include <qgraphicslayoutitem.h>
+#include <qgraphicsscene.h>
+#include <qgraphicswidget.h>
+
 #include <qgraphics_layoutitem_p.h>
 #include <qgraphics_widget_p.h>
 
@@ -44,8 +45,8 @@ QGraphicsLayout::QGraphicsLayout(QGraphicsLayoutItem *parent)
       if (itemParent && itemParent->isWidget()) {
          static_cast<QGraphicsWidget *>(itemParent)->d_func()->setLayout_helper(this);
       } else {
-         qWarning("QGraphicsLayout::QGraphicsLayout: Attempt to create a layout with a parent that is"
-            " neither a QGraphicsWidget nor QGraphicsLayout");
+         qWarning("QGraphicsLayout::QGraphicsLayout() Unable to create a layout with a parent which is not "
+            " a QGraphicsWidget or a QGraphicsLayout");
       }
    }
    d_func()->sizePolicy = QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding, QSizePolicy::DefaultType);
@@ -64,8 +65,8 @@ QGraphicsLayout::QGraphicsLayout(QGraphicsLayoutPrivate &dd, QGraphicsLayoutItem
       if (itemParent && itemParent->isWidget()) {
          static_cast<QGraphicsWidget *>(itemParent)->d_func()->setLayout_helper(this);
       } else {
-         qWarning("QGraphicsLayout::QGraphicsLayout: Attempt to create a layout with a parent that is"
-            " neither a QGraphicsWidget nor QGraphicsLayout");
+         qWarning("QGraphicsLayout::QGraphicsLayout() Unable to create a layout with a parent which is not "
+            " a QGraphicsWidget or a QGraphicsLayout");
       }
    }
 
@@ -80,23 +81,27 @@ QGraphicsLayout::~QGraphicsLayout()
 void QGraphicsLayout::setContentsMargins(qreal left, qreal top, qreal right, qreal bottom)
 {
    Q_D(QGraphicsLayout);
-   if (d->left == left && d->top == top && d->right == right && d->bottom == bottom) {
+
+   if (d->m_layoutLeft == left && d->m_layoutTop == top && d->m_layoutRight == right && d->m_layoutBottom == bottom) {
       return;
    }
-   d->left = left;
-   d->right = right;
-   d->top = top;
-   d->bottom = bottom;
+
+   d->m_layoutLeft   = left;
+   d->m_layoutRight  = right;
+   d->m_layoutTop    = top;
+   d->m_layoutBottom = bottom;
+
    invalidate();
 }
 
 void QGraphicsLayout::getContentsMargins(qreal *left, qreal *top, qreal *right, qreal *bottom) const
 {
    Q_D(const QGraphicsLayout);
-   d->getMargin(left, d->left, QStyle::PM_LayoutLeftMargin);
-   d->getMargin(top, d->top, QStyle::PM_LayoutTopMargin);
-   d->getMargin(right, d->right, QStyle::PM_LayoutRightMargin);
-   d->getMargin(bottom, d->bottom, QStyle::PM_LayoutBottomMargin);
+
+   d->getMargin(left,   d->m_layoutLeft,   QStyle::PM_LayoutLeftMargin);
+   d->getMargin(top,    d->m_layoutTop,    QStyle::PM_LayoutTopMargin);
+   d->getMargin(right,  d->m_layoutRight,  QStyle::PM_LayoutRightMargin);
+   d->getMargin(bottom, d->m_layoutBottom, QStyle::PM_LayoutBottomMargin);
 }
 
 void QGraphicsLayout::activate()

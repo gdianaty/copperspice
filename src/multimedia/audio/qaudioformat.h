@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,17 +24,26 @@
 #ifndef QAUDIOFORMAT_H
 #define QAUDIOFORMAT_H
 
+#include <qmultimedia.h>
 #include <qobject.h>
 #include <qshareddata.h>
-#include <qmultimedia.h>
 
 class QAudioFormatPrivate;
 
 class Q_MULTIMEDIA_EXPORT QAudioFormat
 {
  public:
-   enum SampleType { Unknown, SignedInt, UnSignedInt, Float };
-   enum Endian { BigEndian = QSysInfo::BigEndian, LittleEndian = QSysInfo::LittleEndian };
+   enum SampleType {
+      Unknown,
+      SignedInt,
+      UnSignedInt,
+      Float
+   };
+
+   enum Endian {
+      BigEndian    = QSysInfo::BigEndian,
+      LittleEndian = QSysInfo::LittleEndian
+   };
 
    QAudioFormat();
    QAudioFormat(const QAudioFormat &other);

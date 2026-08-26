@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,6 +22,7 @@
 ***********************************************************************/
 
 #include "avfvideorenderercontrol.h"
+
 #include "avfdisplaylink.h"
 
 #if defined(Q_OS_IOS)
@@ -32,10 +33,10 @@
 
 #include <qabstractvideobuffer.h>
 #include <qabstractvideosurface.h>
+#include <qdebug.h>
 #include <qvideosurfaceformat.h>
 
 #include <qimagevideobuffer_p.h>
-#include <qdebug.h>
 
 #import <AVFoundation/AVFoundation.h>
 
@@ -84,15 +85,18 @@ class TextureVideoBuffer : public QAbstractVideoBuffer
    virtual ~TextureVideoBuffer() {
    }
 
-   MapMode mapMode() const {
+   MapMode mapMode() const override {
       return NotMapped;
    }
-   uchar *map(MapMode, int *, int *) {
+
+   uchar *map(MapMode, int *, int *) override {
       return nullptr;
    }
-   void unmap() {}
 
-   QVariant handle() const {
+   void unmap() override {
+   }
+
+   QVariant handle() const override {
       return QVariant::fromValue<unsigned int>(m_texture);
    }
 
@@ -111,9 +115,6 @@ AVFVideoRendererControl::AVFVideoRendererControl(QObject *parent)
 
 AVFVideoRendererControl::~AVFVideoRendererControl()
 {
-#ifdef QT_DEBUG_AVF
-   qDebug() << Q_FUNC_INFO;
-#endif
    m_displayLink->stop();
    [(AVPlayerLayer *)m_playerLayer release];
 }
@@ -125,7 +126,7 @@ QAbstractVideoSurface *AVFVideoRendererControl::surface() const
 
 void AVFVideoRendererControl::setSurface(QAbstractVideoSurface *surface)
 {
-#ifdef QT_DEBUG_AVF
+#if defined(CS_SHOW_DEBUG_PLUGINS_AVF)
    qDebug() << "Set video surface" << surface;
 #endif
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -93,10 +93,6 @@ inline QString QTgaFile::errorMessage() const
     return mErrorMessage;
 }
 
-/*!
-    \internal
-    Returns the integer encoded in the two little endian bytes at \a d.
-*/
 inline quint16 QTgaFile::littleEndianInt(const unsigned char *d)
 {
     return d[0] + d[1] * 256;

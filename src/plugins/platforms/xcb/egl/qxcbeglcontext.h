@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,11 @@
 #ifndef QXCBEGLCONTEXT_H
 #define QXCBEGLCONTEXT_H
 
-#include "qxcbeglwindow.h"
-#include <qeglplatformcontext_p.h>
+#include <qeglnativecontext.h>
+#include <qxcbeglwindow.h>
+
 #include <qeglpbuffer_p.h>
-#include <QEGLNativeContext>
+#include <qeglplatformcontext_p.h>
 
 //####todo remove the noops (looks like their where there in the initial commit)
 class QXcbEglContext : public QEGLPlatformContext

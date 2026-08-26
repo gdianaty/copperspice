@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,35 +26,16 @@
 
 #include <qsinglecontainer_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class TreatAs : public SingleContainer
 {
  public:
-   /**
-    * Creats a TreatAs where it is checked that the expression @p operand conforms
-    * to the type @p reqType.
-    */
    TreatAs(const Expression::Ptr &operand, const SequenceType::Ptr &reqType);
 
-   /**
-    * This function rewrites always. First the type that this TreatAs expression tests for
-    * is verified. Then, the type the <tt>treat as</tt> expression itself must match, @p reqType,
-    * is verified.
-    */
    Expression::Ptr typeCheck(const StaticContext::Ptr &context, const SequenceType::Ptr &reqType) override;
 
-   /**
-    * @returns always the SequenceType passed in the constructor to this class. That is, the
-    * SequenceType that the operand must conform to.
-    */
    SequenceType::Ptr staticType() const override;
-
-   /**
-    * @returns a list containing one CommonSequenceTypes::ZeroOrMoreItems
-    */
    SequenceType::List expectedOperandTypes() const override;
 
    ExpressionVisitorResult::Ptr accept(const ExpressionVisitor::Ptr &visitor) const override;
@@ -62,8 +43,7 @@ class TreatAs : public SingleContainer
  private:
    const SequenceType::Ptr m_reqType;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,15 @@
 #ifndef QMEDIAOBJECT_H
 #define QMEDIAOBJECT_H
 
+#include <qmultimedia.h>
 #include <qobject.h>
 #include <qstringlist.h>
-#include <qmultimedia.h>
 
 #include <functional>
 
-class QMediaService;
 class QMediaBindableInterface;
+class QMediaService;
+
 class QMediaObjectPrivate;
 
 class Q_MULTIMEDIA_EXPORT QMediaObject : public QObject

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,17 +22,16 @@
 ***********************************************************************/
 
 #include <qemulationpaintengine_p.h>
+
+#include <qdebug.h>
 #include <qpainter_p.h>
 #include <qtextengine_p.h>
-#include <qdebug.h>
-
 
 QEmulationPaintEngine::QEmulationPaintEngine(QPaintEngineEx *engine)
    : real_engine(engine)
 {
-   QPaintEngine::state = real_engine->state();
+   m_engineState = real_engine->state();
 }
-
 
 QPaintEngine::Type QEmulationPaintEngine::type() const
 {
@@ -248,7 +247,7 @@ void QEmulationPaintEngine::transformChanged()
 
 void QEmulationPaintEngine::setState(QPainterState *s)
 {
-   QPaintEngine::state = s;
+   m_engineState = s;
    real_engine->setState(s);
 }
 

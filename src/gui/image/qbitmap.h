@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -40,13 +40,13 @@ class Q_GUI_EXPORT QBitmap : public QPixmap
 
    QBitmap &operator=(const QPixmap &pixmap);
 
-   inline void swap(QBitmap &other) {
+   void swap(QBitmap &other) {
       QPixmap::swap(other);   // prevent QBitmap<->QPixmap swaps
    }
 
    operator QVariant() const;
 
-   inline void clear() {
+   void clear() {
       fill(Qt::color0);
    }
 

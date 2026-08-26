@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,19 +26,11 @@
 
 #include <qitem_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class ToCodepointsIterator : public Item::Iterator
 {
  public:
-   /**
-    * Constructs a ToCodepointsIterator.
-    *
-    * @param string the string to retrieve Unicode codepoints from. Can not be
-    * empty.
-    */
    ToCodepointsIterator(const QString &string);
    Item next() override;
    Item current() const override;
@@ -52,8 +44,7 @@ class ToCodepointsIterator : public Item::Iterator
    Item m_current;
    xsInteger m_position;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

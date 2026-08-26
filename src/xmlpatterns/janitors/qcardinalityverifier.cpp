@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,14 +21,14 @@
 *
 ***********************************************************************/
 
-#include "qcommonsequencetypes_p.h"
-#include "qcommonvalues_p.h"
-#include "qgenericpredicate_p.h"
-#include "qgenericsequencetype_p.h"
-#include "qinsertioniterator_p.h"
-#include "qpatternistlocale_p.h"
+#include <qcardinalityverifier_p.h>
 
-#include "qcardinalityverifier_p.h"
+#include <qcommonsequencetypes_p.h>
+#include <qcommonvalues_p.h>
+#include <qgenericpredicate_p.h>
+#include <qgenericsequencetype_p.h>
+#include <qinsertioniterator_p.h>
+#include <qpatternistlocale_p.h>
 
 using namespace QPatternist;
 
@@ -53,7 +53,7 @@ Expression::Ptr CardinalityVerifier::verifyCardinality(const Expression::Ptr &op
       return GenericPredicate::createFirstItem(operand);
 
    } else {
-      /* Sequences within this cardinality can never match. */
+      // Sequences within this cardinality can never match.
       context->error(wrongCardinality(requiredCard, opCard), code, operand.data());
       return operand;
    }
@@ -86,7 +86,7 @@ Item::Iterator::Ptr CardinalityVerifier::evaluateSequence(const DynamicContext::
             return CommonValues::emptyIterator;
          }
       } else {
-         /* We might be instantiated for the empty sequence. */
+         // We might be instantiated for the empty sequence.
          if (m_reqCard.isEmpty()) {
             context->error(wrongCardinality(m_reqCard, Cardinality::twoOrMore()), m_errorCode, this);
             return CommonValues::emptyIterator;

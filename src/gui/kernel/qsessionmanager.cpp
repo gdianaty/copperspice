@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,12 +22,13 @@
 ***********************************************************************/
 
 #include <qsessionmanager.h>
-#include <qplatform_sessionmanager.h>
-#include <qplatform_integration.h>
+#include <qsessionmanager_p.h>
 
 #include <qapplication.h>
-#include <qguiapplication_p.h>
-#include <qsessionmanager_p.h>
+#include <qplatform_integration.h>
+#include <qplatform_sessionmanager.h>
+
+#include <qapplication_p.h>
 
 #ifndef QT_NO_SESSIONMANAGER
 

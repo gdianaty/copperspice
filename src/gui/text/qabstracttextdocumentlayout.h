@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,16 +25,17 @@
 #define QABSTRACTTEXTDOCUMENTLAYOUT_H
 
 #include <qobject.h>
-#include <qtextlayout.h>
-#include <qtextdocument.h>
-#include <qtextcursor.h>
 #include <qpalette.h>
-#include <QTextBlock>
-#include <QScopedPointer>
+#include <qscopedpointer.h>
+#include <qtextblock.h>
+#include <qtextcursor.h>
+#include <qtextdocument.h>
+#include <qtextlayout.h>
+
+class QTextFrame;
+class QTextObjectInterface;
 
 class QAbstractTextDocumentLayoutPrivate;
-class QTextObjectInterface;
-class QTextFrame;
 
 class Q_GUI_EXPORT QAbstractTextDocumentLayout : public QObject
 {

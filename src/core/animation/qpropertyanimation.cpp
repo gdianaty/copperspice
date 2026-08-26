@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,10 +22,11 @@
 ***********************************************************************/
 
 #include <qpropertyanimation.h>
+#include <qpropertyanimation_p.h>
+
 #include <qanimationgroup.h>
 #include <qhash.h>
 
-#include <qpropertyanimation_p.h>
 #include <qmutexpool_p.h>
 
 #ifndef QT_NO_ANIMATION
@@ -53,11 +54,11 @@ void QPropertyAnimationPrivate::updateMetaProperty()
       propertyType = QVariant::Invalid;
 
       if (! targetValue->dynamicPropertyNames().contains(propertyName)) {
-         qWarning("QPropertyAnimation: Trying to animate a non existent property %s", csPrintable(propertyName));
+         qWarning("QPropertyAnimationPrivate::updateMetaProperty() Trying to animate a non existent property %s", csPrintable(propertyName));
       }
 
    } else if (! targetValue->metaObject()->property(propertyIndex).isWritable()) {
-      qWarning("QPropertyAnimation: Trying to animate a read only property %s", csPrintable(propertyName));
+      qWarning("QPropertyAnimationPrivate::updateMetaProperty() Trying to animate a read only property %s", csPrintable(propertyName));
    }
 }
 
@@ -107,7 +108,7 @@ void QPropertyAnimation::setTargetObject(QObject *target)
    }
 
    if (d->state != QAbstractAnimation::Stopped) {
-      qWarning("QPropertyAnimation::setTargetObject: Not allowed to change the target of a running animation");
+      qWarning("QPropertyAnimation::setTargetObject() Unable to change the target of a running animation");
       return;
    }
 
@@ -128,7 +129,7 @@ void QPropertyAnimation::setPropertyName(const QString &propertyName)
    Q_D(QPropertyAnimation);
 
    if (d->state != QAbstractAnimation::Stopped) {
-      qWarning("QPropertyAnimation::setPropertyName: Not allowed to change the property name of a running animation");
+      qWarning("QPropertyAnimation::setPropertyName() Unable to change the property name of a running animation");
       return;
    }
 
@@ -136,7 +137,6 @@ void QPropertyAnimation::setPropertyName(const QString &propertyName)
    d->updateMetaProperty();
 }
 
-// reimp
 bool QPropertyAnimation::event(QEvent *event)
 {
    return QVariantAnimation::event(event);
@@ -148,14 +148,13 @@ void QPropertyAnimation::updateCurrentValue(const QVariant &value)
    d->updateProperty(value);
 }
 
-// reimp
 void QPropertyAnimation::updateState(QAbstractAnimation::State newState, QAbstractAnimation::State oldState)
 {
    Q_D(QPropertyAnimation);
 
    if (! d->target && oldState == Stopped) {
-      qWarning("QPropertyAnimation::updateState (%s): Changing state of an animation without target",
-               d->propertyName.constData());
+      qWarning("QPropertyAnimation::updateState() Changing state of an animation without a target, %s",
+            d->propertyName.constData());
       return;
    }
 
@@ -186,16 +185,16 @@ void QPropertyAnimation::updateState(QAbstractAnimation::State newState, QAbstra
             // check if start and end values exist
             if (! startValue().isValid() && (d->direction == Backward || ! d->m_defaultValue.isValid())) {
 
-               qWarning("QPropertyAnimation::updateState (%s, %s, %s): Trying to start an animation, no start value available",
-                        csPrintable(d->propertyName), csPrintable(d->target.data()->metaObject()->className()),
-                        csPrintable(d->target.data()->objectName()));
+               qWarning("QPropertyAnimation::updateState() Trying to start an animation, no start value available (%s, %s, %s)",
+                     csPrintable(d->propertyName), csPrintable(d->target.lock()->metaObject()->className()),
+                     csPrintable(d->target.lock()->objectName()));
             }
 
             if (! endValue().isValid() && (d->direction == Forward || ! d->m_defaultValue.isValid())) {
 
-               qWarning("QPropertyAnimation::updateState (%s, %s, %s): Trying to start an animation, no end value available",
-                        csPrintable(d->propertyName), csPrintable(d->target.data()->metaObject()->className()),
-                        csPrintable(d->target.data()->objectName()));
+               qWarning("QPropertyAnimation::updateState() Trying to start an animation, no end value available (%s, %s, %s)",
+                     csPrintable(d->propertyName), csPrintable(d->target.lock()->metaObject()->className()),
+                     csPrintable(d->target.lock()->objectName()));
             }
          }
 

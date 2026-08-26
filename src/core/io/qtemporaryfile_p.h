@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,9 +24,9 @@
 #ifndef QTEMPORARYFILE_P_H
 #define QTEMPORARYFILE_P_H
 
-#include <qfsfileengine_p.h>
-#include <qfilesystemengine_p.h>
 #include <qfile_p.h>
+#include <qfilesystemengine_p.h>
+#include <qfsfileengine_p.h>
 
 class QTemporaryFilePrivate : public QFilePrivate
 {
@@ -34,7 +34,7 @@ class QTemporaryFilePrivate : public QFilePrivate
    QTemporaryFilePrivate();
    ~QTemporaryFilePrivate();
 
-   QAbstractFileEngine *engine() const;
+   QAbstractFileEngine *engine() const override;
    void resetFileEngine() const;
    bool autoRemove;
    QString templateName;
@@ -67,7 +67,7 @@ class QTemporaryFileEngine : public QFSFileEngine
 
    bool isReallyOpen();
    void setFileName(const QString &file) override;
-   void setFileTemplate(const QString &fileTemplate);
+   void setFileTemplate(const QString &fileName);
 
    bool open(QIODevice::OpenMode flags) override;
    bool remove() override;

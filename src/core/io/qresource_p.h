@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -74,10 +74,10 @@ class QResourceFileEngine : public QAbstractFileEngine
    uint ownerId(FileOwner) const override;
    QString owner(FileOwner) const override;
 
-   QDateTime fileTime(FileTime time) const override;
+   QDateTime fileTime(QFileDevice::FileTimeType) const override;
 
-   Iterator *beginEntryList(QDir::Filters filters, const QStringList &filterNames) override;
-   Iterator *endEntryList() override;
+   QAbstractFileEngineIterator *beginEntryList(QDir::Filters filters, const QStringList &filterNames) override;
+   QAbstractFileEngineIterator *endEntryList() override;
 
    bool extension(Extension extension, const ExtensionOption *option = nullptr, ExtensionReturn *output = nullptr) override;
    bool supportsExtension(Extension extension) const override;

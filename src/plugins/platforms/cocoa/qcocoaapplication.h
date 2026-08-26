@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,22 +29,23 @@
 ***********************************************************************/
 
 #include <qglobal.h>
+
 #include <qcore_mac_p.h>
 
 #import <AppKit/AppKit.h>
 
 @class QCocoaMenuLoader;
 
-@interface NSApplication (QT_MANGLE_NAMESPACE(QApplicationIntegration))
-- (void)QT_MANGLE_NAMESPACE(qt_setDockMenu): (NSMenu *)newMenu;
-- (QT_MANGLE_NAMESPACE(QCocoaMenuLoader) *)QT_MANGLE_NAMESPACE(qt_qcocoamenuLoader);
-- (int)QT_MANGLE_NAMESPACE(qt_validModesForFontPanel): (NSFontPanel *)fontPanel;
+@interface NSApplication (QApplicationIntegration)
+- (void) qt_setDockMenu: (NSMenu *)newMenu;
+- (QCocoaMenuLoader *)qt_qcocoamenuLoader;
+- (int) qt_validModesForFontPanel: (NSFontPanel *)fontPanel;
 
-- (void)QT_MANGLE_NAMESPACE(qt_sendPostedMessage): (NSEvent *)event;
-- (BOOL)QT_MANGLE_NAMESPACE(qt_filterEvent): (NSEvent *)event;
+- (void) qt_sendPostedMessage: (NSEvent *)event;
+- (BOOL) qt_filterEvent: (NSEvent *)event;
 @end
 
-@interface QT_MANGLE_NAMESPACE(QNSApplication) : NSApplication
+@interface QNSApplication : NSApplication
 {
 }
 @end

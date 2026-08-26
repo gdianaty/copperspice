@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,6 +22,7 @@
 ***********************************************************************/
 
 #include <databaseinfo.h>
+
 #include <driver.h>
 #include <ui4.h>
 #include <utils.h>
@@ -51,7 +52,7 @@ void DatabaseInfo::acceptWidget(DomWidget *node)
 
    DomProperty *db = properties.value("database", nullptr);
 
-   if (db && db->elementStringList()) {
+   if (db != nullptr && db->elementStringList()) {
       QStringList info = db->elementStringList()->elementString();
 
       QString connection = info.size() > 0 ? info.at(0) : QString();

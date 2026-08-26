@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,20 +29,20 @@
 
 #include <qnetwork_replyimpl_p.h>
 
+class QAbstractNetworkCache;
 class QAuthenticator;
+class QNetworkCacheMetaData;
 class QNetworkProxy;
 class QNetworkProxyQuery;
 class QNetworkRequest;
+class QNonContiguousByteDevice;
+class QSslConfiguration;
 class QStringList;
 class QUrl;
 class QUrlInfo;
-class QSslConfiguration;
 
 class QNetworkAccessManagerPrivate;
 class QNetworkReplyImplPrivate;
-class QAbstractNetworkCache;
-class QNetworkCacheMetaData;
-class QNonContiguousByteDevice;
 
 // Should support direct file upload from disk or download to disk.
 //

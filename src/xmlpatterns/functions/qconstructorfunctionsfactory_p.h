@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,9 +27,8 @@
 #include <qabstractfunctionfactory_p.h>
 #include <qschematypefactory_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class ConstructorFunctionsFactory : public AbstractFunctionFactory
 {
  public:
@@ -44,8 +43,7 @@ class ConstructorFunctionsFactory : public AbstractFunctionFactory
  private:
    const SchemaTypeFactory::Ptr m_typeFactory;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

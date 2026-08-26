@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,8 +26,6 @@
 #include "qevaluationcache_p.h"
 
 #include "quserfunctioncallsite_p.h"
-
-QT_BEGIN_NAMESPACE
 
 using namespace QPatternist;
 
@@ -209,8 +207,7 @@ void UserFunctionCallsite::setSource(const UserFunction::Ptr &userFunction,
       /* Note that we pass in cacheSlotOffset + i here instead of varDecls.at(i)->slot since
        * we want independent caches for each callsite. */
       m_operands[i] = Expression::Ptr(new EvaluationCache<false>(m_operands.at(i),
-                                      varDecls.at(i).data(),
-                                      cacheSlotOffset + i));
+            varDecls.at(i), cacheSlotOffset + i));
    }
 }
 
@@ -223,5 +220,3 @@ CallTargetDescription::Ptr UserFunctionCallsite::callTargetDescription() const
 {
    return m_functionDeclaration->signature();
 }
-
-QT_END_NAMESPACE

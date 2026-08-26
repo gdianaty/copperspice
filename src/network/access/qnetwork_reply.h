@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,16 +25,16 @@
 #define QNETWORK_REPLY_H
 
 #include <qiodevice.h>
+#include <qnetaccess_manager.h>
+#include <qnetwork_request.h>
 #include <qstring.h>
 #include <qvariant.h>
-#include <qnetwork_request.h>
-#include <qnetaccess_manager.h>
 
-class QUrl;
-class QVariant;
 class QAuthenticator;
 class QSslConfiguration;
 class QSslError;
+class QUrl;
+class QVariant;
 
 class QNetworkReplyPrivate;
 
@@ -45,6 +45,8 @@ class Q_NETWORK_EXPORT QNetworkReply : public QIODevice
    NET_CS_ENUM(NetworkError)
 
  public:
+   using RawHeaderPair = QPair<QByteArray, QByteArray>;
+
    enum NetworkError {
       NoError = 0,
 
@@ -92,9 +94,8 @@ class Q_NETWORK_EXPORT QNetworkReply : public QIODevice
 
    ~QNetworkReply();
 
-   // reimplemented from QIODevice
-   virtual void close() override;
-   virtual bool isSequential() const override;
+   void close() override;
+   bool isSequential() const override;
 
    // like QAbstractSocket:
    qint64 readBufferSize() const;
@@ -116,7 +117,6 @@ class Q_NETWORK_EXPORT QNetworkReply : public QIODevice
    QList<QByteArray> rawHeaderList() const;
    QByteArray rawHeader(const QByteArray &headerName) const;
 
-   typedef QPair<QByteArray, QByteArray> RawHeaderPair;
    const QList<RawHeaderPair> &rawHeaderPairs() const;
 
    // attributes
@@ -166,7 +166,7 @@ class Q_NETWORK_EXPORT QNetworkReply : public QIODevice
  protected:
    explicit QNetworkReply(QObject *parent = nullptr);
    QNetworkReply(QNetworkReplyPrivate &dd, QObject *parent);
-   virtual qint64 writeData(const char *data, qint64 len) override;
+   qint64 writeData(const char *data, qint64 len) override;
 
    void setOperation(QNetworkAccessManager::Operation operation);
    void setRequest(const QNetworkRequest &request);

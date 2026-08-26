@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,9 @@
 #ifndef QGenericNamespaceResolver_P_H
 #define QGenericNamespaceResolver_P_H
 
-#include <QHash>
-#include <qnamespaceresolver_p.h>
+#include <qhash.h>
 
-QT_BEGIN_NAMESPACE
+#include <qnamespaceresolver_p.h>
 
 namespace QPatternist {
 class GenericNamespaceResolver : public NamespaceResolver
@@ -38,36 +37,15 @@ class GenericNamespaceResolver : public NamespaceResolver
 
    QXmlName::NamespaceCode lookupNamespaceURI(const QXmlName::PrefixCode prefix) const override;
 
-   /**
-    * Returns a GenericNamespaceResolver containing the following bindings:
-    *
-    * - <tt>xml</tt> = <tt>http://www.w3.org/XML/1998/namespace</tt>
-    * - <tt>xs</tt> = <tt>http://www.w3.org/2001/XMLSchema</tt>
-    * - <tt>xsi</tt> = <tt>http://www.w3.org/2001/XMLSchema-instance</tt>
-    * - <tt>fn</tt> = <tt>http://www.w3.org/2005/xpath-functions</tt>
-    * - <tt>xdt</tt> = <tt>http://www.w3.org/2005/xpath-datatypes</tt>
-    * - no prefix = empty namespace
-    */
    static NamespaceResolver::Ptr defaultXQueryBindings();
-
-   /**
-    * Returns a GenericNamespaceResolver containing the following bindings:
-    *
-    * - <tt>xml</tt> = <tt>http://www.w3.org/XML/1998/namespace</tt>
-    * - no prefix = empty namespace
-    */
    static NamespaceResolver::Ptr defaultXSLTBindings();
 
    Bindings bindings() const override;
 
  private:
-   /**
-    * The key is the prefix, the value the namespace URI.
-    */
    Bindings m_bindings;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

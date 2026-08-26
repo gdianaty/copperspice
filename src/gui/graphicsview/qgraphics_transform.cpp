@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,6 +22,7 @@
 ***********************************************************************/
 
 #include <qgraphicstransform.h>
+
 #include <qdebug.h>
 #include <qmath.h>
 #include <qnumeric.h>
@@ -67,7 +68,6 @@ QGraphicsTransform::QGraphicsTransform(QObject *parent)
    d_ptr->q_ptr = this;
 }
 
-// internal
 QGraphicsTransform::QGraphicsTransform(QGraphicsTransformPrivate &dd, QObject *parent)
    : QObject(parent), d_ptr(&dd)
 {

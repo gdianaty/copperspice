@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2013 Klarälvdalens Datakonsult AB, a KDAB Group company
 * Copyright (c) 2015 The Qt Company Ltd.
@@ -44,14 +44,12 @@ struct QOpenGLVersionStatus
     };
 
     constexpr QOpenGLVersionStatus()
-        : version(0, 0),
-          status(InvalidStatus)
-    {}
+        : version(0, 0), status(InvalidStatus)
+    { }
 
     constexpr QOpenGLVersionStatus(int majorVersion, int minorVersion, QOpenGLVersionStatus::OpenGLStatus functionStatus)
-        : version(majorVersion, minorVersion),
-          status(functionStatus)
-    {}
+        : version(majorVersion, minorVersion), status(functionStatus)
+    { }
 
     QPair<int, int> version;
     OpenGLStatus status;
@@ -59,8 +57,7 @@ struct QOpenGLVersionStatus
 
 inline uint qHash(const QOpenGLVersionStatus &v, uint seed = 0)
 {
-    return qHash(static_cast<int>(v.status * 1000)
-               + v.version.first * 100 + v.version.second * 10, seed);
+    return qHash(static_cast<int>(v.status * 1000) + v.version.first * 100 + v.version.second * 10, seed);
 }
 
 constexpr inline bool operator==(const QOpenGLVersionStatus &lhs, const QOpenGLVersionStatus &rhs)
@@ -70,17 +67,17 @@ constexpr inline bool operator==(const QOpenGLVersionStatus &lhs, const QOpenGLV
 
 constexpr inline bool operator!=(const QOpenGLVersionStatus &lhs, const QOpenGLVersionStatus &rhs)
 {
-    return !operator==(lhs, rhs);
+    return ! operator==(lhs, rhs);
 }
 
 class QOpenGLVersionFunctionsBackend
 {
 public:
     QOpenGLVersionFunctionsBackend(QOpenGLContext *ctx)
-        : context(ctx)
-    {}
+        : m_context(ctx)
+    { }
 
-    QOpenGLContext *context;
+    QOpenGLContext *m_context;
     QAtomicInt refs;
 };
 
@@ -90,15 +87,14 @@ class QAbstractOpenGLFunctionsPrivate
 {
 public:
     QAbstractOpenGLFunctionsPrivate()
-        : owningContext(nullptr),
-          initialized(false)
-    {}
+        : owningContext(nullptr), initialized(false)
+    { }
 
-    static QOpenGLVersionFunctionsBackend *functionsBackend(QOpenGLContext *context,
-                                                            const QOpenGLVersionStatus &v);
-    static void insertFunctionsBackend(QOpenGLContext *context,
-                                       const QOpenGLVersionStatus &v,
-                                       QOpenGLVersionFunctionsBackend *backend);
+    static QOpenGLVersionFunctionsBackend *functionsBackend(QOpenGLContext *context, const QOpenGLVersionStatus &v);
+
+    static void insertFunctionsBackend(QOpenGLContext *context, const QOpenGLVersionStatus &v,
+          QOpenGLVersionFunctionsBackend *backend);
+
     static void removeFunctionsBackend(QOpenGLContext *context, const QOpenGLVersionStatus &v);
     static void insertExternalFunctions(QOpenGLContext *context, QAbstractOpenGLFunctions *f);
     static void removeExternalFunctions(QOpenGLContext *context, QAbstractOpenGLFunctions *f);

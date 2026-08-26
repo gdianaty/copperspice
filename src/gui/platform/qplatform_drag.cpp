@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,10 +23,11 @@
 
 #include <qplatform_drag.h>
 
-#include <qdnd_p.h>
-#include <qkeyevent.h>
-#include <qguiapplication.h>
+#include <qapplication.h>
 #include <qeventloop.h>
+#include <qkeyevent.h>
+
+#include <qdnd_p.h>
 
 #ifndef QT_NO_DRAGANDDROP
 

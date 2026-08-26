@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,6 +25,7 @@
 #define QNETWORKSESSION_P_H
 
 #include <qnetworksession.h>
+
 #include <qsharedpointer.h>
 
 #include <qnetworkconfiguration_p.h>
@@ -87,8 +88,8 @@ class Q_NETWORK_EXPORT QNetworkSessionPrivate : public QObject
    NET_CS_SIGNAL_1(Public, void error(QNetworkSession::SessionError error))
    NET_CS_SIGNAL_OVERLOAD(error, (QNetworkSession::SessionError), error)
 
-   NET_CS_SIGNAL_1(Public, void stateChanged(QNetworkSession::State state))
-   NET_CS_SIGNAL_2(stateChanged, state)
+   NET_CS_SIGNAL_1(Public, void stateChanged(QNetworkSession::State newState))
+   NET_CS_SIGNAL_2(stateChanged, newState)
 
    NET_CS_SIGNAL_1(Public, void closed())
    NET_CS_SIGNAL_2(closed)
@@ -103,11 +104,11 @@ class Q_NETWORK_EXPORT QNetworkSessionPrivate : public QObject
    NET_CS_SIGNAL_2(usagePoliciesChanged, data)
 
  protected:
-   inline QNetworkConfigurationPrivatePointer privateConfiguration(const QNetworkConfiguration &config) const {
+   QNetworkConfigurationPrivatePointer privateConfiguration(const QNetworkConfiguration &config) const {
       return config.d;
    }
 
-   inline void setPrivateConfiguration(QNetworkConfiguration &config, QNetworkConfigurationPrivatePointer ptr) const {
+   void setPrivateConfiguration(QNetworkConfiguration &config, QNetworkConfigurationPrivatePointer ptr) const {
       config.d = ptr;
    }
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,9 @@
 #ifndef QLocalNameTest_P_H
 #define QLocalNameTest_P_H
 
-#include <qabstractnodetest_p.h>
 #include <qcontainerfwd.h>
 
-QT_BEGIN_NAMESPACE
+#include <qabstractnodetest_p.h>
 
 namespace QPatternist {
 
@@ -38,9 +37,6 @@ class LocalNameTest : public AbstractNodeTest
 
    static ItemType::Ptr create(const ItemType::Ptr &primaryType, const QXmlName::LocalNameCode localName);
 
-   /**
-    * @note This function assumes that @p item is a QXmlNodeModelIndex.
-    */
    bool itemMatches(const Item &item) const override;
 
    QString displayName(const NamePool::Ptr &np) const override;
@@ -56,8 +52,7 @@ class LocalNameTest : public AbstractNodeTest
 
    const QXmlName::LocalNameCode m_ncName;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

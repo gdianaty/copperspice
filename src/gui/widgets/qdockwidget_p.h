@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,19 +24,20 @@
 #ifndef QDockWidget_P_H
 #define QDockWidget_P_H
 
-#include <qstyleoption.h>
-#include <qwidget_p.h>
 #include <qboxlayout.h>
 #include <qdockwidget.h>
+#include <qstyleoption.h>
+
+#include <qwidget_p.h>
 
 #ifndef QT_NO_DOCKWIDGET
 
-class QGridLayout;
-class QWidgetResizeHandler;
-class QRubberBand;
-class QDockWidgetTitleButton;
-class QSpacerItem;
 class QDockWidgetItem;
+class QDockWidgetTitleButton;
+class QGridLayout;
+class QRubberBand;
+class QSpacerItem;
+class QWidgetResizeHandler;
 
 class QDockWidgetPrivate : public QWidgetPrivate
 {
@@ -52,7 +53,7 @@ class QDockWidgetPrivate : public QWidgetPrivate
    };
 
  public:
-   inline QDockWidgetPrivate()
+   QDockWidgetPrivate()
       : QWidgetPrivate(), state(nullptr),
         features(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable),
         allowedAreas(Qt::AllDockWidgetAreas), resizer(nullptr)
@@ -123,7 +124,7 @@ class Q_GUI_EXPORT QDockWidgetLayout : public QLayout
    QLayoutItem *itemForRole(Role r) const;
 
    QRect titleArea() const {
-      return _titleArea;
+      return m_titleArea;
    }
 
    int minimumTitleWidth() const;
@@ -141,7 +142,7 @@ class Q_GUI_EXPORT QDockWidgetLayout : public QLayout
 
  private:
    QVector<QLayoutItem *> item_list;
-   QRect _titleArea;
+   QRect m_titleArea;
 };
 
 /* The size hints of a QDockWidget will depend on whether it is docked or not.

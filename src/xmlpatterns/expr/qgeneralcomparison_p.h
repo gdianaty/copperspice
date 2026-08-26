@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,12 +28,9 @@
 #include <qpaircontainer_p.h>
 #include <qcomparisonplatform_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
-class GeneralComparison : public PairContainer, public ComparisonPlatform<GeneralComparison,
-   true /* We want to report errors. */, AtomicComparator::AsGeneralComparison>
+class GeneralComparison : public PairContainer, public ComparisonPlatform<GeneralComparison, true, AtomicComparator::AsGeneralComparison>
 {
  public:
    GeneralComparison(const Expression::Ptr &op1,
@@ -49,23 +46,14 @@ class GeneralComparison : public PairContainer, public ComparisonPlatform<Genera
 
    ExpressionVisitorResult::Ptr accept(const ExpressionVisitor::Ptr &visitor) const override;
 
-   /**
-    * @returns always IDGeneralComparison
-    */
    ID id() const override;
 
    QList<QExplicitlySharedDataPointer<OptimizationPass> > optimizationPasses() const override;
 
-   /**
-    * @returns the operator that this GeneralComparison is using.
-    */
    AtomicComparator::Operator operatorID() const {
       return m_operator;
    }
 
-   /**
-    * Overridden to optimize case-insensitive compares.
-    */
    Expression::Ptr compress(const StaticContext::Ptr &context) override;
 
  private:
@@ -80,7 +68,5 @@ class GeneralComparison : public PairContainer, public ComparisonPlatform<Genera
    const bool m_isBackwardsCompat;
 };
 }
-
-QT_END_NAMESPACE
 
 #endif

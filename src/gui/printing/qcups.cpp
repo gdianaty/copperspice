@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -159,7 +159,7 @@ static inline QString bannerPageToString(const QCUPSSupport::BannerPage bannerPa
    // error, may want to throw
 
    return QString();
-};
+}
 
 void QCUPSSupport::setBannerPages(QPrinter *printer, const BannerPage startBannerPage, const BannerPage endBannerPage)
 {
@@ -167,7 +167,7 @@ void QCUPSSupport::setBannerPages(QPrinter *printer, const BannerPage startBanne
    const QString startBanner = bannerPageToString(startBannerPage);
    const QString endBanner   = bannerPageToString(endBannerPage);
 
-   setCupsOption(cupsOptions, "job-sheets", startBanner + QLatin1Char(',') + endBanner);
+   setCupsOption(cupsOptions, "job-sheets", startBanner + QChar(',') + endBanner);
    setCupsOptions(printer, cupsOptions);
 }
 

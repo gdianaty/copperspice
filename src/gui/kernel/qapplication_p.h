@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -93,7 +93,7 @@ class Q_GUI_EXPORT QApplicationPrivate : public QCoreApplicationPrivate
    Q_DECLARE_PUBLIC(QApplication)
 
  public:
-   QApplicationPrivate(int &argc, char **argv, int flags);
+   QApplicationPrivate(int &argc, char **argv);
    ~QApplicationPrivate();
 
    void createPlatformIntegration();
@@ -202,7 +202,7 @@ class Q_GUI_EXPORT QApplicationPrivate : public QCoreApplicationPrivate
 
    static void sendQWindowEventToQPlatformWindow(QWindow *window, QEvent *event);
 
-   static inline Qt::Alignment visualAlignment(Qt::LayoutDirection direction, Qt::Alignment alignment) {
+   static Qt::Alignment visualAlignment(Qt::LayoutDirection direction, Qt::Alignment alignment) {
       if (! (alignment & Qt::AlignHorizontal_Mask)) {
          alignment |= Qt::AlignLeft;
       }
@@ -391,7 +391,6 @@ class Q_GUI_EXPORT QApplicationPrivate : public QCoreApplicationPrivate
 #endif
 
    static int enabledAnimations;            // Combination of QPlatformTheme::UiEffect
-   static bool widgetCount;                  // Coupled with -widgetcount switch
 
    static void setSystemPalette(const QPalette &pal);
    static void setPalette_helper(const QPalette &palette, const QString &className, bool clearWidgetPaletteHash);

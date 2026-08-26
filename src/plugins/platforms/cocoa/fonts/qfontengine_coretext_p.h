@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,8 +24,8 @@
 #ifndef QFONTENGINE_CORETEXT_P_H
 #define QFONTENGINE_CORETEXT_P_H
 
-#include <qfontengine_p.h>
 #include <qcore_mac_p.h>
+#include <qfontengine_p.h>
 
 #include <ApplicationServices/ApplicationServices.h>
 

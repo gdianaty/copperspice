@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,16 +27,14 @@
 #define _CRT_RAND_S
 #endif
 
-#include <stdlib.h>
-
-#include <qhash.h>
-
 #ifdef truncate
 #undef truncate
 #endif
 
-#include <qbytearray.h>
+#include <qhash.h>
+
 #include <qbitarray.h>
+#include <qbytearray.h>
 #include <qcoreapplication.h>
 #include <qdatetime.h>
 #include <qglobal.h>
@@ -48,58 +46,9 @@
 #endif
 
 #include <limits.h>
+#include <stdlib.h>
 
 static std::atomic<uint> cs_seed_value{0};
-
-static inline uint hash(const uchar *p, int len, uint seed)
-{
-   uint h = seed;
-
-   for (int i = 0; i < len; ++i) {
-      h = 31 * h + p[i];
-   }
-
-   return h;
-}
-
-uint qHashBits(const void *p, size_t len, uint seed)
-{
-    return hash(static_cast<const uchar*>(p), int(len), seed);
-}
-
-uint qHash(const QByteArray &key, uint seed)
-{
-   return hash(reinterpret_cast<const uchar *>(key.constData()), key.size(), seed);
-}
-
-uint qHash(const QBitArray &bitArray, uint seed)
-{
-   int m = bitArray.d.size() - 1;
-   uint result = hash(reinterpret_cast<const uchar *>(bitArray.d.constData()), qMax(0, m), seed);
-
-   // deal with the last 0 to 7 bits manually, because we can't trust that
-   // the padding is initialized to 0 in bitArray.d
-
-   int n = bitArray.size();
-   if (n & 0x7) {
-      result = ((result << 4) + bitArray.d.at(m)) & ((1 << n) - 1);
-   }
-
-   return result;
-}
-
-uint cs_stable_hash(const QString &key)
-{
-   uint h = 0;
-
-   for (auto item : key) {
-      h  = (h << 4) + item.unicode();
-      h ^= (h & 0xf0000000) >> 23;
-      h &= 0x0fffffff;
-   }
-
-   return h;
-}
 
 static uint cs_create_seed()
 {
@@ -120,6 +69,7 @@ static uint cs_create_seed()
 
       qt_safe_close(randomfd);
    }
+
 #endif
 
    quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
@@ -161,4 +111,39 @@ uint cs_getHashSeed()
       // failed, someone else has filled in the value
       return expectedValue;
    }
+}
+
+static inline uint hash(const uchar *p, size_t len, uint seed)
+{
+   uint retval = seed;
+
+   for (size_t i = 0; i < len; ++i) {
+      retval = 31 * retval + p[i];
+   }
+
+   return retval;
+}
+
+uint qHashBits(const void *p, size_t len, uint seed)
+{
+   return hash(static_cast<const uchar *>(p), len, seed);
+}
+
+// qHash free functions
+uint qHash(const QByteArray &key, uint seed)
+{
+   return hash(reinterpret_cast<const uchar *>(key.constData()), key.size(), seed);
+}
+
+uint cs_stable_hash(const QString &key)
+{
+   uint h = 0;
+
+   for (auto item : key) {
+      h  = (h << 4) + item.unicode();
+      h ^= (h & 0xf0000000) >> 23;
+      h &= 0x0fffffff;
+   }
+
+   return h;
 }

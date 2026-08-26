@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,14 +23,14 @@
 
 #include <qtextdocumentwriter.h>
 
-#include <qfile.h>
 #include <qbytearray.h>
+#include <qdebug.h>
+#include <qfile.h>
 #include <qfileinfo.h>
 #include <qtextcodec.h>
-#include <qtextstream.h>
-#include <qdebug.h>
 #include <qtextdocument.h>
 #include <qtextdocumentfragment.h>
+#include <qtextstream.h>
 
 #include <qtextdocumentfragment_p.h>
 #include <qtextodfwriter_p.h>
@@ -46,6 +46,7 @@ class QTextDocumentWriterPrivate
    QByteArray format;
    QIODevice *device;
    bool deleteDevice;
+
 #ifndef QT_NO_TEXTCODEC
    QTextCodec *codec;
 #endif
@@ -62,20 +63,11 @@ QTextDocumentWriterPrivate::QTextDocumentWriterPrivate(QTextDocumentWriter *qq)
 {
 }
 
-/*!
-    Constructs an empty QTextDocumentWriter object. Before writing, you must
-    call setFormat() to set a document format, then setDevice() or
-    setFileName().
-*/
 QTextDocumentWriter::QTextDocumentWriter()
    : d(new QTextDocumentWriterPrivate(this))
 {
 }
 
-/*!
-    Constructs a QTextDocumentWriter object to write to the given \a device
-    in the document format specified by \a format.
-*/
 QTextDocumentWriter::QTextDocumentWriter(QIODevice *device, const QByteArray &format)
    : d(new QTextDocumentWriterPrivate(this))
 {
@@ -83,12 +75,6 @@ QTextDocumentWriter::QTextDocumentWriter(QIODevice *device, const QByteArray &fo
    d->format = format;
 }
 
-/*!
-    Constructs an QTextDocumentWriter object that will write to a file with
-    the name \a fileName, using the document format specified by \a format.
-    If \a format is not provided, QTextDocumentWriter will detect the document
-    format by inspecting the extension of \a fileName.
-*/
 QTextDocumentWriter::QTextDocumentWriter(const QString &fileName, const QByteArray &format)
    : d(new QTextDocumentWriterPrivate(this))
 {
@@ -98,9 +84,6 @@ QTextDocumentWriter::QTextDocumentWriter(const QString &fileName, const QByteArr
    d->format = format;
 }
 
-/*!
-    Destroys the QTextDocumentWriter object.
-*/
 QTextDocumentWriter::~QTextDocumentWriter()
 {
    if (d->deleteDevice) {
@@ -109,46 +92,16 @@ QTextDocumentWriter::~QTextDocumentWriter()
    delete d;
 }
 
-/*!
-    Sets the format used to write documents to the \a format specified.
-    \a format is a case insensitive text string. For example:
-
-    \snippet doc/src/snippets/code/src.gui.text.qtextdocumentwriter.cpp 0
-
-    You can call supportedDocumentFormats() for the full list of formats
-    QTextDocumentWriter supports.
-
-    \sa format()
-*/
 void QTextDocumentWriter::setFormat (const QByteArray &format)
 {
    d->format = format;
 }
 
-/*!
-    Returns the format used for writing documents.
-
-    \sa setFormat()
-*/
 QByteArray QTextDocumentWriter::format () const
 {
    return d->format;
 }
 
-/*!
-    Sets the writer's device to the \a device specified. If a device has
-    already been set, the old device is removed but otherwise left
-    unchanged.
-
-    If the device is not already open, QTextDocumentWriter will attempt to
-    open the device in \l QIODevice::WriteOnly mode by calling open().
-
-    \note This will not work for certain devices, such as QProcess,
-    QTcpSocket and QUdpSocket, where some configuration is required before
-    the device can be opened.
-
-    \sa device(), setFileName()
-*/
 void QTextDocumentWriter::setDevice (QIODevice *device)
 {
    if (d->device && d->deleteDevice) {
@@ -159,45 +112,23 @@ void QTextDocumentWriter::setDevice (QIODevice *device)
    d->deleteDevice = false;
 }
 
-/*!
-    Returns the device currently assigned, or 0 if no device has been
-    assigned.
-*/
 QIODevice *QTextDocumentWriter::device () const
 {
    return d->device;
 }
 
-/*!
-    Sets the name of the file to be written to \a fileName. Internally,
-    QTextDocumentWriter will create a QFile and open it in \l
-    QIODevice::WriteOnly mode, and use this file when writing the document.
-
-    \sa fileName(), setDevice()
-*/
 void QTextDocumentWriter::setFileName (const QString &fileName)
 {
    setDevice(new QFile(fileName));
    d->deleteDevice = true;
 }
 
-/*!
-    If the currently assigned device is a QFile, or if setFileName()
-    has been called, this function returns the name of the file
-    to be written to. In all other cases, it returns an empty string.
-
-    \sa setFileName(), setDevice()
-*/
 QString QTextDocumentWriter::fileName () const
 {
    QFile *file = qobject_cast<QFile *>(d->device);
    return file ? file->fileName() : QString();
 }
 
-/*!
-    Writes the given \a document to the assigned device or file and
-    returns true if successful; otherwise returns false.
-*/
 bool QTextDocumentWriter::write(const QTextDocument *document)
 {
    QByteArray suffix;
@@ -225,7 +156,7 @@ bool QTextDocumentWriter::write(const QTextDocument *document)
 #ifndef QT_NO_TEXTHTMLPARSER
    if (format == "html" || format == "htm") {
       if (!d->device->isWritable() && ! d->device->open(QIODevice::WriteOnly)) {
-         qWarning() << "QTextDocumentWriter::write: the device can not be opened for writing";
+         qWarning() << "QTextDocumentWriter::write() Device can not be opened for writing";
          return false;
       }
 
@@ -241,7 +172,7 @@ bool QTextDocumentWriter::write(const QTextDocument *document)
 #endif
    if (format == "txt" || format == "plaintext") {
       if (!d->device->isWritable() && ! d->device->open(QIODevice::WriteOnly)) {
-         qWarning() << "QTextDocumentWriter::write: the device can not be opened for writing";
+         qWarning() << "QTextDocumentWriter::write() Device can not be opened for writing";
          return false;
       }
 
@@ -260,10 +191,6 @@ bool QTextDocumentWriter::write(const QTextDocument *document)
    return false;
 }
 
-/*!
-    Writes the document fragment specified by \a fragment to the assigned device
-    or file and returns true if successful; otherwise returns false.
-*/
 bool QTextDocumentWriter::write(const QTextDocumentFragment &fragment)
 {
    if (fragment.d == nullptr) {
@@ -277,12 +204,6 @@ bool QTextDocumentWriter::write(const QTextDocumentFragment &fragment)
    return false;
 }
 
-/*!
-    Sets the codec for this stream to \a codec. The codec is used for
-    encoding any data that is written. By default, QTextDocumentWriter
-    uses UTF-8.
-*/
-
 #ifndef QT_NO_TEXTCODEC
 void QTextDocumentWriter::setCodec(QTextCodec *codec)
 {
@@ -295,9 +216,6 @@ void QTextDocumentWriter::setCodec(QTextCodec *codec)
 }
 #endif
 
-/*!
-    Returns the codec that is currently assigned to the writer.
-*/
 #ifndef QT_NO_TEXTCODEC
 QTextCodec *QTextDocumentWriter::codec() const
 {

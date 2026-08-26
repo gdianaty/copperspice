@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,6 +26,7 @@
 #include <qdatastream.h>
 #include <qdatetime.h>
 #include <qdebug.h>
+#include <qtimezone.h>
 #include <qvector.h>
 
 static QMap<QByteArray, QByteArray> createOidMap()
@@ -231,7 +232,7 @@ QDateTime QAsn1Element::toDateTime() const
                           QTime(mValue.mid(6, 2).toInt(),
                                 mValue.mid(8, 2).toInt(),
                                 mValue.mid(10, 2).toInt()),
-                          Qt::UTC);
+                          QTimeZone::utc());
 
       else if (mType == GeneralizedTimeType && mValue.size() == 15)
          return QDateTime(QDate(mValue.mid(0, 4).toInt(),
@@ -240,7 +241,7 @@ QDateTime QAsn1Element::toDateTime() const
                           QTime(mValue.mid(8, 2).toInt(),
                                 mValue.mid(10, 2).toInt(),
                                 mValue.mid(12, 2).toInt()),
-                          Qt::UTC);
+                          QTimeZone::utc());
    }
 
    return QDateTime();

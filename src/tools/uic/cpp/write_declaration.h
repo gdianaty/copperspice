@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,12 +21,12 @@
 *
 ***********************************************************************/
 
-#ifndef CPPWRITEDECLARATION_H
-#define CPPWRITEDECLARATION_H
+#ifndef WRITE_DECLARATION_H
+#define WRITE_DECLARATION_H
 
 #include <treewalker.h>
 
-#include <qtextstream.h>
+class QTextStream;
 
 class Driver;
 class Uic;
@@ -35,8 +35,9 @@ struct Option;
 
 namespace CPP {
 
-struct WriteDeclaration : public TreeWalker {
-   WriteDeclaration(Uic *uic, bool activateScripts);
+struct WriteDeclaration : public TreeWalker
+{
+   WriteDeclaration(Uic *uic);
 
    void acceptUI(DomUI *node) override;
    void acceptWidget(DomWidget *node) override;
@@ -50,10 +51,10 @@ struct WriteDeclaration : public TreeWalker {
    Uic *m_uic;
    Driver *m_driver;
    QTextStream &m_output;
+
    const Option &m_option;
-   const bool m_activateScripts;
 };
 
-} // namespace CPP
+}  // namespace
 
 #endif

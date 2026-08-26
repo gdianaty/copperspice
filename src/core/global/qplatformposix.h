@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -49,7 +49,7 @@
 
 #define QT_MMAP                 ::mmap64
 
-#else 
+#else
 
 #define QT_FPOS_T               fpos_t
 #define QT_OFF_T                long
@@ -127,10 +127,12 @@
 #define QT_DIRENT               struct dirent64
 #define QT_READDIR              ::readdir64
 #define QT_READDIR_R            ::readdir64_r
+
 #else
 #define QT_DIRENT               struct dirent
 #define QT_READDIR              ::readdir
 #define QT_READDIR_R            ::readdir_r
+
 #endif
 
 #define QT_SOCKLEN_T            socklen_t

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,19 +23,19 @@
 
 #include <qcocoamenu.h>
 
+#include <qcocoaapplication.h>
 #include <qcocoahelpers.h>
+#include <qcocoamenubar.h>
+#include <qcocoamenuloader.h>
+#include <qcocoawindow.h>
 #include <qdebug.h>
 #include <qmetaobject.h>
 #include <qvarlengtharray.h>
-#include <qcocoaapplication.h>
-#include <qcocoamenuloader.h>
-#include <qcocoamenubar.h>
-#include <qcocoawindow.h>
-
-#include <qthread_p.h>
-#include <qapplication_p.h>
 
 #import <qnsview.h>
+
+#include <qapplication_p.h>
+#include <qthread_p.h>
 
 NSString *qt_mac_removePrivateUnicode(NSString *string)
 {

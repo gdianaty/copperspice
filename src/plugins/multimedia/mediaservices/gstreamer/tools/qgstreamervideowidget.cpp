@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,7 +24,6 @@
 #include <qgstreamervideowidget_p.h>
 
 #include <qcoreevent.h>
-#include <qdebug.h>
 #include <qpainter.h>
 
 class QGstreamerVideoWidget : public QWidget
@@ -41,7 +40,7 @@ class QGstreamerVideoWidget : public QWidget
 
    virtual ~QGstreamerVideoWidget() {}
 
-   QSize sizeHint() const {
+   QSize sizeHint() const override {
       return m_nativeSize;
    }
 
@@ -64,7 +63,7 @@ class QGstreamerVideoWidget : public QWidget
    }
 
  protected:
-   void paintEvent(QPaintEvent *) {
+   void paintEvent(QPaintEvent *) override {
       paint_helper();
    }
 
@@ -255,5 +254,3 @@ void QGstreamerVideoWidgetControl::setSaturation(int saturation)
 {
    m_videoOverlay.setSaturation(saturation);
 }
-
-

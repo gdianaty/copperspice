@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -30,11 +30,11 @@
 
 #include <xcb/xcb.h>
 
+class QDBusMenuConnection;
 class QWidget;
-class QXcbScreen;
 class QXcbConnection;
 class QXcbNativeInterfaceHandler;
-class QDBusMenuConnection;
+class QXcbScreen;
 
 class Q_XCB_EXPORT QXcbNativeInterface : public QPlatformNativeInterface
 {

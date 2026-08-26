@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,12 +21,12 @@
 *
 ***********************************************************************/
 
-#include <qmap.h>
-#include <qtimer.h>
-#include <qmutex.h>
-#include <qlist.h>
 #include <qabstracteventdispatcher.h>
 #include <qcoreapplication.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qmutex.h>
+#include <qtimer.h>
 
 #include <qgstreamerbushelper_p.h>
 
@@ -142,22 +142,13 @@ QGstreamerBusHelper::QGstreamerBusHelper(GstBus *bus, QObject *parent)
 {
    d = new QGstreamerBusHelperPrivate(this, bus);
 
-#if GST_CHECK_VERSION(1,0,0)
    gst_bus_set_sync_handler(bus, (GstBusSyncHandler)syncGstBusFilter, d, nullptr);
-#else
-   gst_bus_set_sync_handler(bus, (GstBusSyncHandler)syncGstBusFilter, d);
-#endif
-
    gst_object_ref(GST_OBJECT(bus));
 }
 
 QGstreamerBusHelper::~QGstreamerBusHelper()
 {
-#if GST_CHECK_VERSION(1,0,0)
    gst_bus_set_sync_handler(d->bus(), nullptr, nullptr, nullptr);
-#else
-   gst_bus_set_sync_handler(d->bus(), nullptr, nullptr);
-#endif
    gst_object_unref(GST_OBJECT(d->bus()));
 }
 

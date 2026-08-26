@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,18 +26,18 @@
 #ifndef QT_NO_GRAPHICSVIEW
 
 #include <qgraphicsitem.h>
-#include <qtimeline.h>
+#include <qmatrix.h>
+#include <qpair.h>
 #include <qpoint.h>
 #include <qpointer.h>
-#include <qpair.h>
-#include <qmatrix.h>
+#include <qtimeline.h>
 
 #include <algorithm>
 
 static inline bool check_step_valid(qreal step, const char *method)
 {
    if (!(step >= 0 && step <= 1)) {
-      qWarning("QGraphicsItemAnimation::%s: invalid step = %f", method, step);
+      qWarning("QGraphicsItemAnimation::%s Invalid step value = %f", method, step);
       return false;
    }
    return true;
@@ -46,9 +46,26 @@ static inline bool check_step_valid(qreal step, const char *method)
 class QGraphicsItemAnimationPrivate
 {
  public:
-   inline QGraphicsItemAnimationPrivate()
-      : q(nullptr), timeLine(nullptr), item(nullptr), step(0) {
+   QGraphicsItemAnimationPrivate()
+      : q(nullptr), timeLine(nullptr), item(nullptr), m_step(0)
+   {
    }
+
+   struct Pair {
+      bool operator <(const Pair &other) const {
+         return step < other.step;
+      }
+
+      bool operator==(const Pair &other) const {
+         return step == other.step;
+      }
+
+      qreal step;
+      qreal value;
+   };
+
+   qreal linearValueForStep(qreal step, QVector<Pair> *source, qreal defaultValue = 0);
+   void insertUniquePair(qreal step, qreal value, QVector<Pair> *binList, const char *method);
 
    QGraphicsItemAnimation *q;
 
@@ -58,18 +75,7 @@ class QGraphicsItemAnimationPrivate
    QPointF startPos;
    QMatrix startMatrix;
 
-   qreal step;
-
-   struct Pair {
-      bool operator <(const Pair &other) const {
-         return step < other.step;
-      }
-      bool operator==(const Pair &other) const {
-         return step == other.step;
-      }
-      qreal step;
-      qreal value;
-   };
+   qreal m_step;
 
    QVector<Pair> xPosition;
    QVector<Pair> yPosition;
@@ -80,9 +86,6 @@ class QGraphicsItemAnimationPrivate
    QVector<Pair> horizontalShear;
    QVector<Pair> xTranslation;
    QVector<Pair> yTranslation;
-
-   qreal linearValueForStep(qreal step, QVector<Pair> *source, qreal defaultValue = 0);
-   void insertUniquePair(qreal step, qreal value, QVector<Pair> *binList, const char *method);
 };
 
 qreal QGraphicsItemAnimationPrivate::linearValueForStep(qreal step, QVector<Pair> *source, qreal defaultValue)
@@ -358,19 +361,15 @@ void QGraphicsItemAnimation::setStep(qreal step)
 
    beforeAnimationStep(step);
 
-   d->step = step;
+   d->m_step = step;
+
    if (d->item) {
       if (!d->xPosition.isEmpty() || !d->yPosition.isEmpty()) {
          d->item->setPos(posAt(step));
       }
 
-      if (!d->rotation.isEmpty()
-         || !d->verticalScale.isEmpty()
-         || !d->horizontalScale.isEmpty()
-         || !d->verticalShear.isEmpty()
-         || !d->horizontalShear.isEmpty()
-         || !d->xTranslation.isEmpty()
-         || !d->yTranslation.isEmpty()) {
+      if (! d->rotation.isEmpty() || ! d->verticalScale.isEmpty() || ! d->horizontalScale.isEmpty() || ! d->verticalShear.isEmpty()
+            || ! d->horizontalShear.isEmpty() || ! d->xTranslation.isEmpty() || ! d->yTranslation.isEmpty()) {
          d->item->setMatrix(d->startMatrix * matrixAt(step));
       }
    }

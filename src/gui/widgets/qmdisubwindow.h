@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -49,8 +49,8 @@ class Q_GUI_EXPORT QMdiSubWindow : public QWidget
 
  public:
    enum SubWindowOption {
-      AllowOutsideAreaHorizontally = 0x1,    // internal
-      AllowOutsideAreaVertically = 0x2,      // internal
+      AllowOutsideAreaHorizontally = 0x1,
+      AllowOutsideAreaVertically = 0x2,
       RubberBandResize = 0x4,
       RubberBandMove = 0x8
    };
@@ -69,8 +69,8 @@ class Q_GUI_EXPORT QMdiSubWindow : public QWidget
    void setWidget(QWidget *widget);
    QWidget *widget() const;
 
-   QWidget *maximizedButtonsWidget() const; // internal
-   QWidget *maximizedSystemMenuIconWidget() const; // internal
+   QWidget *maximizedButtonsWidget() const;
+   QWidget *maximizedSystemMenuIconWidget() const;
 
    bool isShaded() const;
 

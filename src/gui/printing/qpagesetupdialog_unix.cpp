@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,23 +21,24 @@
 *
 ***********************************************************************/
 
+#include <qpagesetupdialog_unix_p.h>
+
 #include <qpagesetupdialog.h>
 #include <qpagesetupdialog_p.h>
 
 #ifndef QT_NO_PRINTDIALOG
 
-#include <qpainter.h>
-#include <qprintdialog.h>
 #include <qdialogbuttonbox.h>
-#include <qplatform_printplugin.h>
+#include <qpainter.h>
 #include <qplatform_printersupport.h>
+#include <qplatform_printplugin.h>
+#include <qprintdialog.h>
 #include <qprinter.h>
 #include <ui_qpagesetupwidget.h>
 
-#include <qprinter_p.h>
-#include <qpagesetupdialog_unix_p.h>
-#include <qprintdevice_p.h>
 #include <qcups_p.h>
+#include <qprintdevice_p.h>
+#include <qprinter_p.h>
 
 // Disabled until we have support for papersources on unix
 // #define PSD_ENABLE_PAPERSOURCE
@@ -62,7 +63,9 @@ static const char *paperSourceNames[] = {
 
 struct PaperSourceNames {
    PaperSourceNames(const char *nam, QPrinter::PaperSource ps)
-      : paperSource(ps), name(nam) {}
+      : paperSource(ps), name(nam)
+   { }
+
    QPrinter::PaperSource paperSource;
    const char *name;
 };
@@ -140,12 +143,13 @@ class QPagePreview : public QWidget
          const int spacing = pageRect.width() * 0.1;
          const int textWidth = (marginRect.width() - (spacing * (m_pagePreviewColumns - 1))) / m_pagePreviewColumns;
          const int textHeight = (marginRect.height() - (spacing * (m_pagePreviewRows - 1))) / m_pagePreviewRows;
+
          for (int x = 0 ; x < m_pagePreviewColumns; ++x) {
             for (int y = 0 ; y < m_pagePreviewRows; ++y) {
                QRect textRect(marginRect.left() + x * (textWidth + spacing),
-                  marginRect.top() + y * (textHeight + spacing),
-                  textWidth, textHeight);
-               p.drawText(textRect, Qt::TextWordWrap | Qt::AlignVCenter, text);
+                     marginRect.top() + y * (textHeight + spacing), textWidth, textHeight);
+
+               p.drawText(textRect, cs_enum_cast(Qt::TextWordWrap) | cs_enum_cast(Qt::AlignVCenter), text);
             }
          }
       }
@@ -155,25 +159,28 @@ class QPagePreview : public QWidget
    QPageLayout m_pageLayout;
 
    // all these are in points
-   int m_pagePreviewColumns, m_pagePreviewRows;
+   int m_pagePreviewColumns;
+   int m_pagePreviewRows;
 };
-
 
 class QUnixPageSetupDialogPrivate : public QPageSetupDialogPrivate
 {
    Q_DECLARE_PUBLIC(QPageSetupDialog)
 
  public:
-   QUnixPageSetupDialogPrivate(QPrinter *printer);
+   QUnixPageSetupDialogPrivate(QPrinter *newPrinter);
    ~QUnixPageSetupDialogPrivate();
+
    void init();
 
    QPageSetupWidget *widget;
 };
 
-QUnixPageSetupDialogPrivate::QUnixPageSetupDialogPrivate(QPrinter *printer) : QPageSetupDialogPrivate(printer)
+QUnixPageSetupDialogPrivate::QUnixPageSetupDialogPrivate(QPrinter *newPrinter)
+   : QPageSetupDialogPrivate(newPrinter)
 {
 }
+
 QUnixPageSetupDialogPrivate::~QUnixPageSetupDialogPrivate()
 {
 }
@@ -185,8 +192,7 @@ void QUnixPageSetupDialogPrivate::init()
    widget = new QPageSetupWidget(q);
    widget->setPrinter(printer);
 
-   QDialogButtonBox *buttons = new QDialogButtonBox(
-      QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, q);
+   QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, q);
 
    QObject::connect(buttons, SIGNAL(accepted()), q, SLOT(accept()));
    QObject::connect(buttons, SIGNAL(rejected()), q, SLOT(reject()));
@@ -293,6 +299,7 @@ void QPageSetupWidget::initPagesPerSheet()
 
    // Set to QCUPSSupport::OnePagePerSheet
    m_ui.pagesPerSheetCombo->setCurrentIndex(0);
+
    // Set to QCUPSSupport::LeftToRightTopToBottom
    m_ui.pagesPerSheetLayoutCombo->setCurrentIndex(0);
 
@@ -311,11 +318,14 @@ void QPageSetupWidget::initPageSizes()
 
    if (m_outputFormat == QPrinter::NativeFormat && !m_printerName.isEmpty()) {
       QPlatformPrinterSupport *ps = QPlatformPrinterSupportPlugin::get();
+
       if (ps) {
          QPrintDevice printDevice = ps->createPrintDevice(m_printerName);
+
          for (const QPageSize &pageSize : printDevice.supportedPageSizes()) {
             m_ui.pageSizeCombo->addItem(pageSize.name(), QVariant::fromValue(pageSize.id()));
          }
+
          if (m_ui.pageSizeCombo->count() > 0 && printDevice.supportsCustomPageSizes()) {
             m_ui.pageSizeCombo->addItem(tr("Custom"), QVariant::fromValue(QPageSize::Custom));
             m_blockSignals = false;
@@ -355,6 +365,7 @@ void QPageSetupWidget::setPrinter(QPrinter *printer)
          m_pageLayout.setUnits(QPageSize::Unit::Inch);
       }
    }
+
    m_units = m_pageLayout.units();
    m_pagePreview->setPageLayout(m_pageLayout);
 
@@ -378,7 +389,6 @@ void QPageSetupWidget::updateWidget()
 
    QString suffix;
    switch (m_units) {
-
       case QPageSize::Unit::Millimeter:
          suffix = tr("mm");
          break;
@@ -469,11 +479,14 @@ void QPageSetupWidget::updateWidget()
 void QPageSetupWidget::setupPrinter() const
 {
    m_printer->setPageLayout(m_pageLayout);
-#if !defined(QT_NO_CUPS)
+
+#if ! defined(QT_NO_CUPS)
    QCUPSSupport::PagesPerSheet pagesPerSheet = m_ui.pagesPerSheetCombo->currentData()
       .value<QCUPSSupport::PagesPerSheet>();
+
    QCUPSSupport::PagesPerSheetLayout pagesPerSheetLayout = m_ui.pagesPerSheetLayoutCombo->currentData()
       .value<QCUPSSupport::PagesPerSheetLayout>();
+
    QCUPSSupport::setPagesPerSheetLayout(m_printer, pagesPerSheet, pagesPerSheetLayout);
 #endif
 
@@ -486,25 +499,27 @@ void QPageSetupWidget::setupPrinter() const
 // Updates size/preview after the combobox has been changed.
 void QPageSetupWidget::pageSizeChanged()
 {
-
    if (m_blockSignals) {
       return;
    }
 
    QPageSize::PageSizeId id = m_ui.pageSizeCombo->currentData().value<QPageSize::PageSizeId>();
+
    if (id != QPageSize::Custom) {
-
-
       m_pageLayout.setPageSize(QPageSize(id));
+
    } else {
       QSizeF customSize;
+
       if (m_pageLayout.orientation() == QPageLayout::Landscape) {
          customSize = QSizeF(m_ui.pageHeight->value(), m_ui.pageWidth->value());
       } else {
          customSize = QSizeF(m_ui.pageWidth->value(), m_ui.pageHeight->value());
       }
+
       m_pageLayout.setPageSize(QPageSize(customSize, QPageSize::Unit(m_units)));
    }
+
    m_pagePreview->setPageLayout(m_pageLayout);
    updateWidget();
 }
@@ -522,23 +537,28 @@ void QPageSetupWidget::pageOrientationChanged()
 
 void QPageSetupWidget::pagesPerSheetChanged()
 {
-#if !defined(QT_NO_CUPS)
+#if ! defined(QT_NO_CUPS)
    switch (m_ui.pagesPerSheetCombo->currentData().toInt()) {
       case QCUPSSupport::OnePagePerSheet:
          m_pagePreview->setPagePreviewLayout(1, 1);
          break;
+
       case QCUPSSupport::TwoPagesPerSheet:
          m_pagePreview->setPagePreviewLayout(1, 2);
          break;
+
       case QCUPSSupport::FourPagesPerSheet:
          m_pagePreview->setPagePreviewLayout(2, 2);
          break;
+
       case QCUPSSupport::SixPagesPerSheet:
          m_pagePreview->setPagePreviewLayout(3, 2);
          break;
+
       case QCUPSSupport::NinePagesPerSheet:
          m_pagePreview->setPagePreviewLayout(3, 3);
          break;
+
       case QCUPSSupport::SixteenPagesPerSheet:
          m_pagePreview->setPagePreviewLayout(4, 4);
          break;
@@ -562,6 +582,7 @@ void QPageSetupWidget::topMarginChanged(double newValue)
    if (m_blockSignals) {
       return;
    }
+
    m_pageLayout.setTopMargin(newValue);
    m_pagePreview->setPageLayout(m_pageLayout);
 }
@@ -571,6 +592,7 @@ void QPageSetupWidget::bottomMarginChanged(double newValue)
    if (m_blockSignals) {
       return;
    }
+
    m_pageLayout.setBottomMargin(newValue);
    m_pagePreview->setPageLayout(m_pageLayout);
 }
@@ -580,6 +602,7 @@ void QPageSetupWidget::leftMarginChanged(double newValue)
    if (m_blockSignals) {
       return;
    }
+
    m_pageLayout.setLeftMargin(newValue);
    m_pagePreview->setPageLayout(m_pageLayout);
 }
@@ -589,6 +612,7 @@ void QPageSetupWidget::rightMarginChanged(double newValue)
    if (m_blockSignals) {
       return;
    }
+
    m_pageLayout.setRightMargin(newValue);
    m_pagePreview->setPageLayout(m_pageLayout);
 }
@@ -616,12 +640,13 @@ int QPageSetupDialog::exec()
 {
    Q_D(QPageSetupDialog);
 
-   int ret = QDialog::exec();
-   if (ret == Accepted) {
+   int retval = QDialog::exec();
+
+   if (retval == Accepted) {
       static_cast <QUnixPageSetupDialogPrivate *>(d)->widget->setupPrinter();
    }
 
-   return ret;
+   return retval;
 }
 
 #endif // QT_NO_PRINTDIALOG

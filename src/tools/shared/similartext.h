@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,8 +24,8 @@
 #ifndef SIMILARTEXT_H
 #define SIMILARTEXT_H
 
-#include <qstring.h>
 #include <qlist.h>
+#include <qstring.h>
 
 class Translator;
 
@@ -66,12 +66,7 @@ struct CoMatrix {
       quint32 w[13];
    };
 };
-/**
- * This class is more efficient for searching through a large array of candidate strings, since we only
- * have to construct the CoMatrix for the \a stringToMatch once,
- * after that we just call getSimilarityScore(strCandidate).
- * \sa getSimilarityScore
- */
+
 class StringSimilarityMatcher
 {
  public:

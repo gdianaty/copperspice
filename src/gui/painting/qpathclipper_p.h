@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,11 @@
 #ifndef QPATHCLIPPER_P_H
 #define QPATHCLIPPER_P_H
 
-#include <qpainterpath.h>
 #include <qlist.h>
-#include <qbezier_p.h>
+#include <qpainterpath.h>
 #include <qvector.h>
+
+#include <qbezier_p.h>
 
 #include <stdio.h>
 

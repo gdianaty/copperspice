@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -34,12 +34,13 @@ class PatternFlag
  public:
    typedef QHash<QChar, PatternFlag> Hash;
 
-   inline PatternFlag() : flag(PatternPlatform::NoFlags) {
-   }
+   PatternFlag()
+      : flag(PatternPlatform::NoFlags)
+   { }
 
-   inline PatternFlag(const PatternPlatform::Flag opt, const QString &descr) : flag(opt),
-      description(descr) {
-   }
+   PatternFlag(const PatternPlatform::Flag opt, const QString &descr)
+      : flag(opt), description(descr)
+   { }
 
    PatternPlatform::Flag   flag;
    QString                 description;

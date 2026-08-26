@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,39 +25,38 @@
 
 #if ! defined(QT_NO_STYLE_WINDOWS) || defined(QT_PLUGIN)
 
-#include <qsystemlibrary_p.h>
 #include <qapplication.h>
 #include <qbitmap.h>
+#include <qdebug.h>
 #include <qdrawutil.h>
 #include <qevent.h>
+#include <qfile.h>
+#include <qlistview.h>
+#include <qmainwindow.h>
+#include <qmath.h>
 #include <qmenu.h>
 #include <qmenubar.h>
 #include <qpaintengine.h>
 #include <qpainter.h>
+#include <qpixmapcache.h>
 #include <qrubberband.h>
 #include <qstyleoption.h>
 #include <qtabbar.h>
-#include <qwidget.h>
-#include <qdebug.h>
-#include <qmainwindow.h>
-#include <qfile.h>
 #include <qtextstream.h>
-#include <qpixmapcache.h>
+#include <qwidget.h>
 #include <qwizard.h>
-#include <qlistview.h>
-#include <qmath.h>
 
+#include <qapplication_p.h>
+#include <qhighdpiscaling_p.h>
 #include <qmath_p.h>
 #include <qmenubar_p.h>
-#include <qscreen.h>
-#include <qwindow.h>
-#include <qplatform_theme.h>
 #include <qplatform_screen.h>
-#include <qguiapplication_p.h>
-#include <qhighdpiscaling_p.h>
-
-#include <qstylehelper_p.h>
+#include <qplatform_theme.h>
+#include <qscreen.h>
 #include <qstyleanimation_p.h>
+#include <qstylehelper_p.h>
+#include <qsystemlibrary_p.h>
+#include <qwindow.h>
 
 #if defined(Q_OS_WIN)
 #include <qt_windows.h>
@@ -99,9 +98,8 @@ QWindowsStylePrivate::QWindowsStylePrivate()
    : alt_down(false), menuBarTimer(0)
 {
 #if defined(Q_OS_WIN)
-   if ((QSysInfo::WindowsVersion >= QSysInfo::WV_VISTA
-         && (QSysInfo::WindowsVersion & QSysInfo::WV_NT_based))) {
-      QSystemLibrary shellLib(QLatin1String("shell32"));
+   if ((QSysInfo::WindowsVersion >= QSysInfo::WV_VISTA && (QSysInfo::WindowsVersion & QSysInfo::WV_NT_based))) {
+      QSystemLibrary shellLib("shell32");
       pSHGetStockIconInfo = (PtrSHGetStockIconInfo)shellLib.resolve("SHGetStockIconInfo");
    }
 #endif
@@ -120,10 +118,6 @@ bool QWindowsStylePrivate::hasSeenAlt(const QWidget *widget) const
    return seenAlt.contains(widget);
 }
 
-
-/*!
-    \reimp
-*/
 bool QWindowsStyle::eventFilter(QObject *o, QEvent *e)
 {
    // Records Alt and Focus events
@@ -131,8 +125,9 @@ bool QWindowsStyle::eventFilter(QObject *o, QEvent *e)
       return QObject::eventFilter(o, e);
    }
 
-   QWidget *widget = qobject_cast<QWidget *>(o);
    Q_D(QWindowsStyle);
+
+   QWidget *widget = qobject_cast<QWidget *>(o);
 
    switch (e->type()) {
       case QEvent::KeyPress:
@@ -211,7 +206,6 @@ static inline QRgb colorref2qrgb(COLORREF col)
 }
 #endif
 
-/*! \reimp */
 void QWindowsStyle::polish(QApplication *app)
 {
    QCommonStyle::polish(app);
@@ -546,7 +540,6 @@ QPixmap QWindowsStyle::standardPixmap(StandardPixmap standardPixmap, const QStyl
    return QCommonStyle::standardPixmap(standardPixmap, opt, widget);
 }
 
-/*! \reimp */
 int QWindowsStyle::styleHint(StyleHint hint, const QStyleOption *opt, const QWidget *widget,
    QStyleHintReturn *returnData) const
 {
@@ -567,6 +560,7 @@ int QWindowsStyle::styleHint(StyleHint hint, const QStyleOption *opt, const QWid
          ret = 1;
 
          break;
+
       case SH_ItemView_ShowDecorationSelected:
 #ifndef QT_NO_LISTVIEW
          if (qobject_cast<const QListView *>(widget)) {
@@ -574,9 +568,11 @@ int QWindowsStyle::styleHint(StyleHint hint, const QStyleOption *opt, const QWid
          }
 #endif
          break;
+
       case SH_ItemView_ChangeHighlightOnFocus:
          ret = 1;
          break;
+
       case SH_ToolBox_SelectedPageTitleBold:
          ret = 0;
          break;
@@ -590,6 +586,7 @@ int QWindowsStyle::styleHint(StyleHint hint, const QStyleOption *opt, const QWid
 
          // Do nothing if we always paint underlines
          Q_D(const QWindowsStyle);
+
          if (!ret && widget && d) {
 
 #ifndef QT_NO_MENUBAR
@@ -612,10 +609,11 @@ int QWindowsStyle::styleHint(StyleHint hint, const QStyleOption *opt, const QWid
                   ret = 1;
                }
          }
+
 #ifndef QT_NO_ACCESSIBILITY
-         if (!ret && opt && opt->type == QStyleOption::SO_MenuItem
-            && QStyleHelper::isInstanceOf(opt->styleObject, QAccessible::MenuItem)
-            && opt->styleObject->property("_q_showUnderlined").toBool()) {
+         if (! ret && opt && opt->m_styleType == QStyleOption::SO_MenuItem
+               && QStyleHelper::isInstanceOf(opt->styleObject, QAccessible::MenuItem)
+               && opt->styleObject->property("_q_showUnderlined").toBool()) {
             ret = 1;
          }
 #endif
@@ -660,12 +658,15 @@ int QWindowsStyle::styleHint(StyleHint hint, const QStyleOption *opt, const QWid
          ret = QWizard::ModernStyle;
          break;
 #endif
+
       case SH_ItemView_ArrowKeysNavigateIntoChildren:
          ret = true;
          break;
+
       case SH_DialogButtonBox_ButtonsHaveIcons:
          ret = 0;
          break;
+
       default:
          ret = QCommonStyle::styleHint(hint, opt, widget, returnData);
          break;
@@ -673,9 +674,9 @@ int QWindowsStyle::styleHint(StyleHint hint, const QStyleOption *opt, const QWid
    return ret;
 }
 
-/*! \reimp */
+
 void QWindowsStyle::drawPrimitive(PrimitiveElement pe, const QStyleOption *opt, QPainter *p,
-   const QWidget *w) const
+      const QWidget *w) const
 {
    // Used to restore across fallthrough cases. Currently only used in PE_IndicatorCheckBox
    bool doRestore = false;
@@ -699,6 +700,7 @@ void QWindowsStyle::drawPrimitive(PrimitiveElement pe, const QStyleOption *opt, 
                rect.bottomLeft().y() - margin,
                rect.topLeft().x() + offset + 1,
                rect.topLeft().y() + margin);
+
          } else {
             // draw vertical separator
 
@@ -1138,7 +1140,6 @@ void QWindowsStyle::drawPrimitive(PrimitiveElement pe, const QStyleOption *opt, 
    }
 }
 
-/*! \reimp */
 void QWindowsStyle::drawControl(ControlElement ce, const QStyleOption *opt, QPainter *p, const QWidget *widget) const
 {
    switch (ce) {
@@ -1206,31 +1207,33 @@ void QWindowsStyle::drawControl(ControlElement ce, const QStyleOption *opt, QPai
                return;
             }
 
-            QRect vCheckRect = visualRect(opt->direction, menuitem->rect, QRect(menuitem->rect.x(), menuitem->rect.y(), checkcol,
-                     menuitem->rect.height()));
-            if (!menuitem->icon.isNull() && checked) {
+            QRect vCheckRect = visualRect(opt->direction, menuitem->rect, QRect(menuitem->rect.x(), menuitem->rect.y(),
+                  checkcol, menuitem->rect.height()));
+
+            if (! menuitem->icon.isNull() && checked) {
                if (act) {
-                  qDrawShadePanel(p, vCheckRect,
-                     menuitem->palette, true, 1,
-                     &menuitem->palette.brush(QPalette::Button));
+                  qDrawShadePanel(p, vCheckRect, menuitem->palette, true, 1, &menuitem->palette.brush(QPalette::Button));
                } else {
-                  QBrush fill(menuitem->palette.light().color(), Qt::Dense4Pattern);
-                  qDrawShadePanel(p, vCheckRect, menuitem->palette, true, 1, &fill);
+                  QBrush styleFill(menuitem->palette.light().color(), Qt::Dense4Pattern);
+                  qDrawShadePanel(p, vCheckRect, menuitem->palette, true, 1, &styleFill);
                }
-            } else if (!act) {
+
+            } else if (! act) {
                p->fillRect(vCheckRect, menuitem->palette.brush(QPalette::Button));
             }
 
             // On Windows Style, if we have a checkable item and an icon we
             // draw the icon recessed to indicate an item is checked. If we
             // have no icon, we draw a checkmark instead.
-            if (!menuitem->icon.isNull()) {
+            if (! menuitem->icon.isNull()) {
                QIcon::Mode mode = dis ? QIcon::Disabled : QIcon::Normal;
-               if (act && !dis) {
+
+               if (act && ! dis) {
                   mode = QIcon::Active;
                }
 
                QPixmap pixmap;
+
                if (checked) {
                   pixmap = menuitem->icon.pixmap(proxy()->pixelMetric(PM_SmallIconSize, opt, widget), mode, QIcon::On);
                } else {
@@ -1239,17 +1242,22 @@ void QWindowsStyle::drawControl(ControlElement ce, const QStyleOption *opt, QPai
 
                const int pixw = pixmap.width() / pixmap.devicePixelRatio();
                const int pixh = pixmap.height() / pixmap.devicePixelRatio();
-               if (act && !dis && !checked)
+
+               if (act && ! dis && ! checked) {
                   qDrawShadePanel(p, vCheckRect,  menuitem->palette, false, 1,
                      &menuitem->palette.brush(QPalette::Button));
+               }
+
                QRect pmr(0, 0, pixw, pixh);
                pmr.moveCenter(vCheckRect.center());
                p->setPen(menuitem->palette.text().color());
                p->drawPixmap(pmr.topLeft(), pixmap);
+
             } else if (checked) {
                QStyleOptionMenuItem newMi = *menuitem;
                newMi.state = State_None;
-               if (!dis) {
+
+               if (! dis) {
                   newMi.state |= State_Enabled;
                }
 
@@ -1261,6 +1269,7 @@ void QWindowsStyle::drawControl(ControlElement ce, const QStyleOption *opt, QPai
                         menuitem->rect.y() + QWindowsStylePrivate::windowsItemFrame,
                         checkcol - 2 * QWindowsStylePrivate::windowsItemFrame,
                         menuitem->rect.height() - 2 * QWindowsStylePrivate::windowsItemFrame));
+
                proxy()->drawPrimitive(PE_IndicatorMenuCheckMark, &newMi, p, widget);
             }
             p->setPen(act ? menuitem->palette.highlightedText().color() : menuitem->palette.buttonText().color());
@@ -1273,21 +1282,28 @@ void QWindowsStyle::drawControl(ControlElement ce, const QStyleOption *opt, QPai
 
             int xm = int(QWindowsStylePrivate::windowsItemFrame) + checkcol + int(QWindowsStylePrivate::windowsItemHMargin);
             int xpos = menuitem->rect.x() + xm;
+
             QRect textRect(xpos, y + QWindowsStylePrivate::windowsItemVMargin,
                w - xm - QWindowsStylePrivate::windowsRightBorder - tab + 1, h - 2 * QWindowsStylePrivate::windowsItemVMargin);
+
             QRect vTextRect = visualRect(opt->direction, menuitem->rect, textRect);
             QString s = menuitem->text;
-            if (!s.isEmpty()) {                     // draw text
+
+            if (! s.isEmpty()) {                     // draw text
                p->save();
-               int t = s.indexOf(QLatin1Char('\t'));
+               int t = s.indexOf(QChar('\t'));
                int text_flags = Qt::AlignVCenter | Qt::TextShowMnemonic | Qt::TextDontClip | Qt::TextSingleLine;
+
                if (!proxy()->styleHint(SH_UnderlineShortcut, menuitem, widget)) {
                   text_flags |= Qt::TextHideMnemonic;
                }
+
                text_flags |= Qt::AlignLeft;
+
                if (t >= 0) {
                   QRect vShortcutRect = visualRect(opt->direction, menuitem->rect,
                         QRect(textRect.topRight(), QPoint(menuitem->rect.right(), textRect.bottom())));
+
                   if (dis && !act && proxy()->styleHint(SH_EtchDisabledText, opt, widget)) {
                      p->setPen(menuitem->palette.light().color());
                      p->drawText(vShortcutRect.adjusted(1, 1, 1, 1), text_flags, s.mid(t + 1));
@@ -1296,11 +1312,14 @@ void QWindowsStyle::drawControl(ControlElement ce, const QStyleOption *opt, QPai
                   p->drawText(vShortcutRect, text_flags, s.mid(t + 1));
                   s = s.left(t);
                }
+
                QFont font = menuitem->font;
                if (menuitem->menuItemType == QStyleOptionMenuItem::DefaultItem) {
                   font.setBold(true);
                }
+
                p->setFont(font);
+
                if (dis && !act && proxy()->styleHint(SH_EtchDisabledText, opt, widget)) {
                   p->setPen(menuitem->palette.light().color());
                   p->drawText(vTextRect.adjusted(1, 1, 1, 1), text_flags, s.left(t));
@@ -1309,18 +1328,21 @@ void QWindowsStyle::drawControl(ControlElement ce, const QStyleOption *opt, QPai
                p->drawText(vTextRect, text_flags, s.left(t));
                p->restore();
             }
+
             if (menuitem->menuItemType == QStyleOptionMenuItem::SubMenu) {// draw sub menu arrow
                int dim = (h - 2 * QWindowsStylePrivate::windowsItemFrame) / 2;
                PrimitiveElement arrow;
                arrow = (opt->direction == Qt::RightToLeft) ? PE_IndicatorArrowLeft : PE_IndicatorArrowRight;
-               xpos = x + w - QWindowsStylePrivate::windowsArrowHMargin - QWindowsStylePrivate::windowsItemFrame - dim;
+               xpos  = x + w - QWindowsStylePrivate::windowsArrowHMargin - QWindowsStylePrivate::windowsItemFrame - dim;
+
                QRect  vSubMenuRect = visualRect(opt->direction, menuitem->rect, QRect(xpos, y + h / 2 - dim / 2, dim, dim));
                QStyleOptionMenuItem newMI = *menuitem;
-               newMI.rect = vSubMenuRect;
+
+               newMI.rect  = vSubMenuRect;
                newMI.state = dis ? State_None : State_Enabled;
+
                if (act)
-                  newMI.palette.setColor(QPalette::ButtonText,
-                     newMI.palette.highlightedText().color());
+                  newMI.palette.setColor(QPalette::ButtonText, newMI.palette.highlightedText().color());
                proxy()->drawPrimitive(arrow, &newMI, p, widget);
             }
 
@@ -1334,8 +1356,10 @@ void QWindowsStyle::drawControl(ControlElement ce, const QStyleOption *opt, QPai
             bool active = mbi->state & State_Selected;
             bool hasFocus = mbi->state & State_HasFocus;
             bool down = mbi->state & State_Sunken;
+
             QStyleOptionMenuItem newMbi = *mbi;
             p->fillRect(mbi->rect, mbi->palette.brush(QPalette::Button));
+
             if (active || hasFocus) {
                QBrush b = mbi->palette.brush(QPalette::Button);
                if (active && down) {
@@ -1359,55 +1383,53 @@ void QWindowsStyle::drawControl(ControlElement ce, const QStyleOption *opt, QPai
       case CE_TabBarTabShape:
          if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab *>(opt)) {
             bool rtlHorTabs = (tab->direction == Qt::RightToLeft
-                  && (tab->shape == QTabBar::RoundedNorth
-                     || tab->shape == QTabBar::RoundedSouth));
+                  && (tab->shape == QTabBar::RoundedNorth || tab->shape == QTabBar::RoundedSouth));
+
             bool selected = tab->state & State_Selected;
-            bool lastTab = ((!rtlHorTabs && tab->position == QStyleOptionTab::End)
-                  || (rtlHorTabs
-                     && tab->position == QStyleOptionTab::Beginning));
-            bool firstTab = ((!rtlHorTabs
-                     && tab->position == QStyleOptionTab::Beginning)
-                  || (rtlHorTabs
-                     && tab->position == QStyleOptionTab::End));
+            bool lastTab = ((! rtlHorTabs && tab->position == QStyleOptionTab::End)
+                  || (rtlHorTabs && tab->position == QStyleOptionTab::Beginning));
+
+            bool firstTab = ((! rtlHorTabs && tab->position == QStyleOptionTab::Beginning)
+                  || (rtlHorTabs && tab->position == QStyleOptionTab::End));
+
             bool onlyOne = tab->position == QStyleOptionTab::OnlyOneTab;
-            bool previousSelected =
-               ((!rtlHorTabs
-                     && tab->selectedPosition == QStyleOptionTab::PreviousIsSelected)
-                  || (rtlHorTabs
-                     && tab->selectedPosition == QStyleOptionTab::NextIsSelected));
-            bool nextSelected =
-               ((!rtlHorTabs
-                     && tab->selectedPosition == QStyleOptionTab::NextIsSelected)
-                  || (rtlHorTabs
-                     && tab->selectedPosition
-                     == QStyleOptionTab::PreviousIsSelected));
+
+            bool previousSelected = ((! rtlHorTabs && tab->selectedPosition == QStyleOptionTab::PreviousIsSelected)
+                  || (rtlHorTabs && tab->selectedPosition == QStyleOptionTab::NextIsSelected));
+
+            bool nextSelected = ((! rtlHorTabs && tab->selectedPosition == QStyleOptionTab::NextIsSelected)
+                  || (rtlHorTabs && tab->selectedPosition == QStyleOptionTab::PreviousIsSelected));
+
             int tabBarAlignment = proxy()->styleHint(SH_TabBar_Alignment, tab, widget);
-            bool leftAligned = (!rtlHorTabs && tabBarAlignment == Qt::AlignLeft)
-               || (rtlHorTabs
+
+            bool leftAligned = (! rtlHorTabs && tabBarAlignment == Qt::AlignLeft) || (rtlHorTabs
                   && tabBarAlignment == Qt::AlignRight);
 
             bool rightAligned = (!rtlHorTabs && tabBarAlignment == Qt::AlignRight)
-               || (rtlHorTabs
-                  && tabBarAlignment == Qt::AlignLeft);
+                  || (rtlHorTabs && tabBarAlignment == Qt::AlignLeft);
 
-            QColor light = tab->palette.light().color();
-            QColor dark = tab->palette.dark().color();
+            QColor light  = tab->palette.light().color();
+            QColor dark   = tab->palette.dark().color();
             QColor shadow = tab->palette.shadow().color();
+
             int borderThinkness = proxy()->pixelMetric(PM_TabBarBaseOverlap, tab, widget);
             if (selected) {
                borderThinkness /= 2;
             }
+
             QRect r2(opt->rect);
             int x1 = r2.left();
             int x2 = r2.right();
             int y1 = r2.top();
             int y2 = r2.bottom();
+
             switch (tab->shape) {
                default:
                   QCommonStyle::drawControl(ce, tab, p, widget);
                   break;
+
                case QTabBar::RoundedNorth: {
-                  if (!selected) {
+                  if (! selected) {
                      y1 += 2;
                      x1 += onlyOne || firstTab ? borderThinkness : 0;
                      x2 -= onlyOne || lastTab ? borderThinkness : 0;
@@ -1822,9 +1844,10 @@ void QWindowsStyle::drawControl(ControlElement ce, const QStyleOption *opt, QPai
 
             // Correct the highlight color if it is the same as the background
             if (pal2.highlight() == pal2.background())
-               pal2.setColor(QPalette::Highlight, pb->palette.color(QPalette::Active,
-                     QPalette::Highlight));
+               pal2.setColor(QPalette::Highlight, pb->palette.color(QPalette::Active, QPalette::Highlight));
+
             bool reverse = ((!vertical && (pb->direction == Qt::RightToLeft)) || vertical);
+
             if (inverted) {
                reverse = !reverse;
             }
@@ -1833,7 +1856,6 @@ void QWindowsStyle::drawControl(ControlElement ce, const QStyleOption *opt, QPai
             Q_D(const QWindowsStyle);
 
             if (pb->minimum == 0 && pb->maximum == 0) {
-               Q_D(const QWindowsStyle);
                const int unit_width = proxy()->pixelMetric(PM_ProgressBarChunkWidth, pb, widget);
                QStyleOptionProgressBar pbBits = *pb;
                Q_ASSERT(unit_width > 0);
@@ -1850,19 +1872,20 @@ void QWindowsStyle::drawControl(ControlElement ce, const QStyleOption *opt, QPai
                   d->startAnimation(new QProgressStyleAnimation(d->animationFps, opt->styleObject));
                }
 
-               int chunksInRow = 5;
-               int myY = pbBits.rect.y();
-               int myHeight = pbBits.rect.height();
+               int chunksInRow  = 5;
+               int myY          = pbBits.rect.y();
+               int myHeight     = pbBits.rect.height();
                int chunksToDraw = chunksInRow;
 
                if (step > chunkCount - 5) {
                   chunksToDraw = (chunkCount - step);
                }
+
                p->save();
                p->setClipRect(m.mapRect(QRectF(rect)).toRect());
 
                int x0 = reverse ? rect.left() + rect.width() - unit_width * (step) - unit_width  : rect.left() + unit_width * step;
-               int x = 0;
+               int x  = 0;
 
                for (int i = 0; i < chunksToDraw ; ++i) {
                   pbBits.rect.setRect(x0 + x, myY, unit_width, myHeight);
@@ -1870,19 +1893,24 @@ void QWindowsStyle::drawControl(ControlElement ce, const QStyleOption *opt, QPai
                   proxy()->drawPrimitive(PE_IndicatorProgressChunk, &pbBits, p, widget);
                   x += reverse ? -unit_width : unit_width;
                }
-               //Draw wrap-around chunks
+
+               // Draw wrap-around chunks
                if ( step > chunkCount - 5) {
                   x0 = reverse ? rect.left() + rect.width() - unit_width : rect.left() ;
-                  x = 0;
-                  int chunksToDraw = step - (chunkCount - chunksInRow);
-                  for (int i = 0; i < chunksToDraw ; ++i) {
+                  x  = 0;
+
+                  int chunksToDraw2 = step - (chunkCount - chunksInRow);
+
+                  for (int i = 0; i < chunksToDraw2 ; ++i) {
                      pbBits.rect.setRect(x0 + x, myY, unit_width, myHeight);
                      pbBits.rect = m.mapRect(QRectF(pbBits.rect)).toRect();
+
                      proxy()->drawPrimitive(PE_IndicatorProgressChunk, &pbBits, p, widget);
                      x += reverse ? -unit_width : unit_width;
                   }
                }
                p->restore(); //restore state
+
             } else {
                d->stopAnimation(opt->styleObject);
                QCommonStyle::drawControl(ce, opt, p, widget);
@@ -1989,10 +2017,10 @@ void QWindowsStyle::drawControl(ControlElement ce, const QStyleOption *opt, QPai
    }
 }
 
-/*! \reimp */
 QRect QWindowsStyle::subElementRect(SubElement sr, const QStyleOption *opt, const QWidget *w) const
 {
    QRect r;
+
    switch (sr) {
       case SE_SliderFocusRect:
       case SE_ToolBoxTabContents:
@@ -2029,11 +2057,11 @@ QRect QWindowsStyle::subElementRect(SubElement sr, const QStyleOption *opt, cons
    return r;
 }
 
-/*! \reimp */
 void QWindowsStyle::drawComplexControl(ComplexControl cc, const QStyleOptionComplex *opt,
-   QPainter *p, const QWidget *widget) const
+      QPainter *p, const QWidget *widget) const
 {
    switch (cc) {
+
 #ifndef QT_NO_SLIDER
       case CC_Slider:
          if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider *>(opt)) {
@@ -2444,9 +2472,8 @@ void QWindowsStyle::drawComplexControl(ComplexControl cc, const QStyleOptionComp
    }
 }
 
-/*! \reimp */
 QSize QWindowsStyle::sizeFromContents(ContentsType ct, const QStyleOption *opt,
-   const QSize &csz, const QWidget *widget) const
+      const QSize &csz, const QWidget *widget) const
 {
    QSize sz(csz);
 
@@ -2468,6 +2495,7 @@ QSize QWindowsStyle::sizeFromContents(ContentsType ct, const QStyleOption *opt,
             if (w < minwidth + defwidth && !btn->text.isEmpty()) {
                w = minwidth + defwidth;
             }
+
             if (h < minheight + defwidth) {
                h = minheight + defwidth;
             }
@@ -2484,6 +2512,7 @@ QSize QWindowsStyle::sizeFromContents(ContentsType ct, const QStyleOption *opt,
 
             if (mi->menuItemType == QStyleOptionMenuItem::Separator) {
                sz = QSize(10, QWindowsStylePrivate::windowsSepHeight);
+
             } else if (mi->icon.isNull()) {
                sz.setHeight(sz.height() - 2);
                w -= 6;
@@ -2491,23 +2520,27 @@ QSize QWindowsStyle::sizeFromContents(ContentsType ct, const QStyleOption *opt,
 
             if (mi->menuItemType != QStyleOptionMenuItem::Separator && !mi->icon.isNull()) {
                int iconExtent = proxy()->pixelMetric(PM_SmallIconSize, opt, widget);
-               sz.setHeight(qMax(sz.height(),
-                     mi->icon.actualSize(QSize(iconExtent, iconExtent)).height()
-                     + 2 * QWindowsStylePrivate::windowsItemFrame));
+
+               sz.setHeight(qMax(sz.height(), mi->icon.actualSize(
+                     QSize(iconExtent, iconExtent)).height() + 2 * QWindowsStylePrivate::windowsItemFrame));
             }
+
             int maxpmw = mi->maxIconWidth;
             int tabSpacing = 20;
 
-            if (mi->text.contains(QLatin1Char('\t'))) {
+            if (mi->text.contains(QChar('\t'))) {
                w += tabSpacing;
+
             } else if (mi->menuItemType == QStyleOptionMenuItem::SubMenu) {
                w += 2 * QWindowsStylePrivate::windowsArrowHMargin;
+
             } else if (mi->menuItemType == QStyleOptionMenuItem::DefaultItem) {
                // adjust the font and add the difference in size.
                // it would be better if the font could be adjusted in the initStyleOption qmenu func!!
                QFontMetrics fm(mi->font);
                QFont fontBold = mi->font;
                fontBold.setBold(true);
+
                QFontMetrics fmBold(fontBold);
                w += fmBold.width(mi->text) - fm.width(mi->text);
             }
@@ -2522,7 +2555,7 @@ QSize QWindowsStyle::sizeFromContents(ContentsType ct, const QStyleOption *opt,
 
 #ifndef QT_NO_MENUBAR
       case CT_MenuBarItem:
-         if (!sz.isEmpty()) {
+         if (! sz.isEmpty()) {
             sz += QSize(QWindowsStylePrivate::windowsItemHMargin * 4, QWindowsStylePrivate::windowsItemVMargin * 2);
          }
          break;
@@ -2541,9 +2574,7 @@ QSize QWindowsStyle::sizeFromContents(ContentsType ct, const QStyleOption *opt,
    return sz;
 }
 
-
-QIcon QWindowsStyle::standardIcon(StandardPixmap standardIcon, const QStyleOption *option,
-   const QWidget *widget) const
+QIcon QWindowsStyle::standardIcon(StandardPixmap standardIcon, const QStyleOption *option, const QWidget *widget) const
 {
    return QCommonStyle::standardIcon(standardIcon, option, widget);
 }

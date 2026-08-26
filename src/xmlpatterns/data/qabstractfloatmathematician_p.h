@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -31,17 +31,15 @@
 #include <qpatternistlocale_p.h>
 #include <qsourcelocationreflection_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 template <const bool isDouble>
 class AbstractFloatMathematician : public AtomicMathematician, public DelegatingSourceLocationReflection
 {
  public:
-
-   inline AbstractFloatMathematician(const SourceLocationReflection *const r) : DelegatingSourceLocationReflection(r) {
-   }
+   AbstractFloatMathematician(const SourceLocationReflection *const r)
+      : DelegatingSourceLocationReflection(r)
+   { }
 
    Item calculate(const Item &o1, const Operator op, const Item &o2,
                           const QExplicitlySharedDataPointer<DynamicContext> &context) const override;
@@ -49,17 +47,9 @@ class AbstractFloatMathematician : public AtomicMathematician, public Delegating
 
 #include "qabstractfloatmathematician.cpp"
 
-/**
- * An instantiation of AbstractFloatMathematician that handles @c xs:double.
- */
-typedef AbstractFloatMathematician<true> DoubleMathematician;
-
-/**
- * An instantiation of AbstractFloatMathematician that handles @c xs:float.
- */
+typedef AbstractFloatMathematician<true>  DoubleMathematician;
 typedef AbstractFloatMathematician<false> FloatMathematician;
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,9 +26,8 @@
 
 #include <qschematype_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class AtomicType;
 
 class AnyType : public SchemaType
@@ -40,63 +39,26 @@ class AnyType : public SchemaType
 
    virtual ~AnyType();
 
-   virtual QXmlName name(const NamePool::Ptr &np) const override;
+   QXmlName name(const NamePool::Ptr &np) const override;
 
-   /**
-    * @returns always "xs:anyType"
-    */
-   virtual QString displayName(const NamePool::Ptr &np) const override;
+   QString displayName(const NamePool::Ptr &np) const override;
+   bool isAbstract() const override;
 
-   /**
-    * @returns always @c false
-    */
-   virtual bool isAbstract() const override;
+   SchemaType::Ptr wxsSuperType() const override;
+   bool wxsTypeMatches(const SchemaType::Ptr &other) const override;
 
-   /**
-    * @returns @c null, since <tt>xs:anyType</tt> has no base type, it is the ur-type.
-    *
-    * @returns always @c null
-    */
-   virtual SchemaType::Ptr wxsSuperType() const override;
+   TypeCategory category() const override;
 
-   /**
-    * @returns @c true only if @p other is xsAnyType.
-    */
-   virtual bool wxsTypeMatches(const SchemaType::Ptr &other) const override;
+   DerivationMethod derivationMethod() const override;
+   DerivationConstraints derivationConstraints() const override;
 
-   /**
-    * <tt>xs:anyType</tt> is the "ur-type" and special. Therefore, this function
-    * returns SchemaType::None.
-    *
-    * @returns SchemaType::None
-    */
-   virtual TypeCategory category() const override;
-
-   /**
-    * @returns always NoDerivation.
-    */
-   virtual DerivationMethod derivationMethod() const override;
-
-   /**
-    * @returns an empty set of derivation constraint flags.
-    */
-   virtual DerivationConstraints derivationConstraints() const override;
-
-   /**
-    * Always returns @c true.
-    */
-   virtual bool isComplexType() const override;
+   bool isComplexType() const override;
 
  protected:
-   /**
-    * @short This constructor is protected, because this
-    * class must be sub-classed.
-    */
-   inline AnyType() {
+   AnyType() {
    }
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

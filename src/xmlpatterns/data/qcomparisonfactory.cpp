@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,23 +28,13 @@
 
 #include "qcomparisonfactory_p.h"
 
-QT_BEGIN_NAMESPACE
-
 using namespace QPatternist;
 
-/**
- * @short Helper class for ComparisonFactory::fromLexical() which exposes
- * CastingPlatform appropriately.
- *
- * @relates ComparisonFactory
- */
-class PerformComparison : public ComparisonPlatform<PerformComparison, true>
-   , public SourceLocationReflection
+class PerformComparison : public ComparisonPlatform<PerformComparison, true>, public SourceLocationReflection
 {
  public:
    PerformComparison(const SourceLocationReflection *const sourceLocationReflection,
-                     const AtomicComparator::Operator op) : m_sourceReflection(sourceLocationReflection)
-      , m_operator(op) {
+         const AtomicComparator::Operator op) : m_sourceReflection(sourceLocationReflection), m_operator(op) {
       Q_ASSERT(m_sourceReflection);
    }
 
@@ -54,15 +44,6 @@ class PerformComparison : public ComparisonPlatform<PerformComparison, true>
                    const ReportContext::Ptr &context) {
       const ItemType::Ptr asItemType((AtomicType::Ptr(type)));
 
-      /* One area where the Query Transform world differs from the Schema
-       * world is that @c xs:duration is not considedered comparable, because
-       * it's according to Schema is partially comparable. This means
-       * ComparisonPlatform::fetchComparator() flags it as impossible, and
-       * hence we need to override that.
-       *
-       * SchemaType::wxsTypeMatches() will return true for sub-types of @c
-       * xs:duration as well, but that's ok since AbstractDurationComparator
-       * works for them too. */
       if (BuiltinTypes::xsDuration->wxsTypeMatches(type)) {
          prepareComparison(AtomicComparator::Ptr(new AbstractDurationComparator()));
       } else if (BuiltinTypes::xsGYear->wxsTypeMatches(type) ||
@@ -131,5 +112,3 @@ bool ComparisonFactory::constructAndCompare(const DerivedString<TypeString>::Ptr
 
    return compare(value1, op, value2, type, context, sourceLocationReflection);
 }
-
-QT_END_NAMESPACE

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,12 @@
 #ifndef QNETWORKINTERFACE_P_H
 #define QNETWORKINTERFACE_P_H
 
+#include <qabstractsocket.h>
 #include <qatomic.h>
+#include <qhostaddress.h>
 #include <qlist.h>
 #include <qreadwritelock.h>
 #include <qstring.h>
-#include <qhostaddress.h>
-#include <qabstractsocket.h>
 
 #include <qhostaddress_p.h>
 

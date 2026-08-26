@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,8 +24,9 @@
 #ifndef QFRAME_P_H
 #define QFRAME_P_H
 
-#include <qwidget_p.h>
 #include <qframe.h>
+
+#include <qwidget_p.h>
 
 class QFramePrivate : public QWidgetPrivate
 {
@@ -35,19 +36,21 @@ class QFramePrivate : public QWidgetPrivate
    QFramePrivate();
    ~QFramePrivate();
 
-   void        updateFrameWidth();
-   void        updateStyledFrameWidths();
+   void updateFrameWidth();
+   void updateStyledFrameWidths();
 
-   QRect       frect;
-   int         frameStyle;
-   short       lineWidth;
-   short       midLineWidth;
-   short       frameWidth;
-   short       leftFrameWidth, rightFrameWidth;
-   short       topFrameWidth, bottomFrameWidth;
+   QRect frect;
+   int frameStyle;
+   short lineWidth;
+   short midLineWidth;
+   short frameWidth;
+
+   short leftFrameWidth;
+   short rightFrameWidth;
+   short topFrameWidth;
+   short bottomFrameWidth;
 
    inline void init();
-
 };
 
 #endif // QFRAME_P_H

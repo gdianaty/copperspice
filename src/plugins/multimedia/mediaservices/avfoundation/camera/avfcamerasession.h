@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,8 +24,8 @@
 #ifndef AVFCAMERASESSION_H
 #define AVFCAMERASESSION_H
 
-#include <qmutex.h>
 #include <qcamera.h>
+#include <qmutex.h>
 #include <qvideoframe.h>
 
 #import <AVFoundation/AVFoundation.h>
@@ -91,8 +91,10 @@ class AVFCameraSession : public QObject
 
    CS_SLOT_1(Public, void processRuntimeError())
    CS_SLOT_2(processRuntimeError)
+
    CS_SLOT_1(Public, void processSessionStarted())
    CS_SLOT_2(processSessionStarted)
+
    CS_SLOT_1(Public, void processSessionStopped())
    CS_SLOT_2(processSessionStopped)
 
@@ -104,6 +106,7 @@ class AVFCameraSession : public QObject
 
    CS_SIGNAL_1(Public, void readyToConfigureConnections())
    CS_SIGNAL_2(readyToConfigureConnections)
+
    CS_SIGNAL_1(Public, void stateChanged(QCamera::State newState))
    CS_SIGNAL_2(stateChanged, newState)
 
@@ -112,6 +115,7 @@ class AVFCameraSession : public QObject
 
    CS_SIGNAL_1(Public, void newViewfinderFrame(const QVideoFrame &frame))
    CS_SIGNAL_2(newViewfinderFrame, frame)
+
    CS_SIGNAL_1(Public, void error(int error, const QString &errorString))
    CS_SIGNAL_2(error, error, errorString)
 

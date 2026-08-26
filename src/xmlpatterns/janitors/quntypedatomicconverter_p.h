@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,11 +24,9 @@
 #ifndef QUntypedAtomicConverter_P_H
 #define QUntypedAtomicConverter_P_H
 
+#include <qcastingplatform_p.h>
 #include <qitem_p.h>
 #include <qsinglecontainer_p.h>
-#include <qcastingplatform_p.h>
-
-QT_BEGIN_NAMESPACE
 
 namespace QPatternist {
 
@@ -36,7 +34,7 @@ class UntypedAtomicConverter : public SingleContainer, public CastingPlatform<Un
 {
  public:
    UntypedAtomicConverter(const Expression::Ptr &operand, const ItemType::Ptr &reqType,
-                  const ReportContext::ErrorCode code = ReportContext::FORG0001);
+         const ReportContext::ErrorCode code = ReportContext::FORG0001);
 
    Item evaluateSingleton(const DynamicContext::Ptr &) const override;
    Item::Iterator::Ptr evaluateSequence(const DynamicContext::Ptr &) const override;
@@ -46,9 +44,6 @@ class UntypedAtomicConverter : public SingleContainer, public CastingPlatform<Un
 
    ExpressionVisitorResult::Ptr accept(const ExpressionVisitor::Ptr &visitor) const override;
 
-   /**
-    * Overridden to call CastingPlatform::typeCheck()
-    */
    Expression::Ptr typeCheck(const StaticContext::Ptr &context, const SequenceType::Ptr &reqType) override;
 
    inline Item mapToItem(const Item &item, const DynamicContext::Ptr &context) const;
@@ -68,8 +63,7 @@ Item UntypedAtomicConverter::mapToItem(const Item &item, const DynamicContext::P
 {
    return cast(item, context);
 }
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,8 +25,6 @@
 
 #include "qgmonthday_p.h"
 
-QT_BEGIN_NAMESPACE
-
 using namespace QPatternist;
 
 GMonthDay::GMonthDay(const QDateTime &dateTime) : AbstractDateTime(dateTime)
@@ -35,16 +33,16 @@ GMonthDay::GMonthDay(const QDateTime &dateTime) : AbstractDateTime(dateTime)
 
 GMonthDay::Ptr GMonthDay::fromLexical(const QString &lexical)
 {
-   static const CaptureTable captureTable( // STATIC DATA
-      /* The extra paranthesis is a build fix for GCC 3.3. */
-      (QRegularExpression(QLatin1String(
+   static const CaptureTable captureTable(
+
+      QRegularExpression(
                   "^\\s*"                             /* Any preceding whitespace. */
                   "--"                                /* Delimiter. */
                   "(\\d{2})"                          /* The month part. */
                   "-"                                 /* Delimiter. */
                   "(\\d{2})"                          /* The day part. */
                   "(?:(\\+|-)(\\d{2}):(\\d{2})|(Z))?" /* The zone offset, "+08:24". */
-                  "\\s*$"                             /* Any terminating whitespace. */))),
+                  "\\s*$"                             /* Any terminating whitespace. */),
       /*zoneOffsetSignP*/         3,
       /*zoneOffsetHourP*/         4,
       /*zoneOffsetMinuteP*/       5,
@@ -76,5 +74,3 @@ ItemType::Ptr GMonthDay::type() const
 {
    return BuiltinTypes::xsGMonthDay;
 }
-
-QT_END_NAMESPACE

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,11 +22,12 @@
 ***********************************************************************/
 
 #include <camera_recorder.h>
+
+#include <camera_audioencoder.h>
+#include <camera_container.h>
 #include <camera_control.h>
 #include <camera_resourcepolicy.h>
-#include <camera_audioencoder.h>
 #include <camera_videoencoder.h>
-#include <camera_container.h>
 #include <qdebug.h>
 
 CameraBinRecorder::CameraBinRecorder(CameraBinSession *session)

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -60,7 +60,7 @@ TEST_CASE("QChar u_constructor", "[qchar]")
    REQUIRE(u'c' != ch);
 }
 
-TEST_CASE("QChar U_constructor", "[qchar]")
+TEST_CASE("QChar u32_constructor", "[qchar]")
 {
    QChar ch = U'b';
 
@@ -74,6 +74,22 @@ TEST_CASE("QChar U_constructor", "[qchar]")
    REQUIRE(U'c' != ch);
 }
 
+TEST_CASE("QChar copy_assign", "[qchar]")
+{
+   QChar data_a('W');
+   QChar data_b(data_a);
+
+   REQUIRE(data_a == data_b);
+   REQUIRE(data_b == QChar('W'));
+
+   //
+   QChar data_c;
+   data_c = data_a;
+
+   REQUIRE(data_a == data_c);
+   REQUIRE(data_c == QChar('W'));
+}
+
 TEST_CASE("QChar empty", "[qchar]")
 {
    QChar ch;
@@ -85,24 +101,51 @@ TEST_CASE("QChar is_methods", "[qchar]")
 {
    QChar ch = 'B';
 
-   REQUIRE(! ch.isDigit());
-   REQUIRE(! ch.isLower());
-   REQUIRE(! ch.isNumber());
+   REQUIRE(ch.isDigit() == false);
+   REQUIRE(ch.isLower() == false);
+   REQUIRE(ch.isNumber() == false);
 
-   REQUIRE(ch.isLetter());
-   REQUIRE(ch.isLetterOrNumber());
-   REQUIRE(ch.isPrint());
-   REQUIRE(ch.isUpper());
+   REQUIRE(ch.isHex() == true );
+   REQUIRE(ch.isLetter() == true);
+   REQUIRE(ch.isLetterOrNumber() == true);
+   REQUIRE(ch.isPrint() == true);
+   REQUIRE(ch.isUpper() == true);
 
    ch = '7';
 
-   REQUIRE(ch.isDigit());
-   REQUIRE(! ch.isLower());
-   REQUIRE(ch.isNumber());
+   REQUIRE(ch.isDigit() == true);
+   REQUIRE(ch.isLower() == false);
+   REQUIRE(ch.isNumber() == true);
 
-   REQUIRE(! ch.isLetter());
-   REQUIRE(ch.isLetterOrNumber());
-   REQUIRE(ch.isPrint());
-   REQUIRE(! ch.isUpper());
+   REQUIRE(ch.isHex() == true);
+   REQUIRE(ch.isLetter() == false);
+   REQUIRE(ch.isLetterOrNumber() == true);
+   REQUIRE(ch.isPrint() == true);
+   REQUIRE(ch.isUpper() == false);
+
+   ch = '!';
+
+   REQUIRE(ch.isDigit() == false);
+   REQUIRE(ch.isLower() == false);
+   REQUIRE(ch.isNumber() == false);
+
+   REQUIRE(ch.isHex() == false);
+   REQUIRE(ch.isLetter() == false);
+   REQUIRE(ch.isLetterOrNumber() == false);
+   REQUIRE(ch.isPrint() == true);
+   REQUIRE(ch.isUpper() == false);
 }
 
+TEST_CASE("QChar move_assign", "[qchar]")
+{
+   QChar data_a('W');
+   QChar data_b(std::move(data_a));
+
+   REQUIRE(data_b == QChar('W'));
+
+   //
+   QChar data_c;
+   data_c = std::move(data_b);
+
+   REQUIRE(data_c == QChar('W'));
+}

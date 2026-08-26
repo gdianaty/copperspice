@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,16 +28,16 @@
 
 #ifndef QT_NO_LINEEDIT
 
-#include <qlineedit.h>
-#include <qtextlayout.h>
-#include <qstyleoption.h>
-#include <qpointer.h>
 #include <qclipboard.h>
-#include <qinputmethod.h>
-#include <qpoint.h>
 #include <qcompleter.h>
-#include <qthread.h>
+#include <qinputmethod.h>
+#include <qlineedit.h>
 #include <qplatformdefs.h>
+#include <qpoint.h>
+#include <qpointer.h>
+#include <qstyleoption.h>
+#include <qtextlayout.h>
+#include <qthread.h>
 
 #include <qinputcontrol_p.h>
 #include <qtextengine_p.h>
@@ -369,8 +369,9 @@ class Q_GUI_EXPORT QLineControl : public QInputControl
 
       if (m_maskData) {
          mask = m_inputMask;
-         if (m_blank != QLatin1Char(' ')) {
-            mask += QLatin1Char(';');
+
+         if (m_blank != QChar(' ')) {
+            mask += QChar(';');
             mask += m_blank;
          }
       }
@@ -536,7 +537,7 @@ class Q_GUI_EXPORT QLineControl : public QInputControl
 #endif
 
  protected:
-   virtual void timerEvent(QTimerEvent *event) override;
+   void timerEvent(QTimerEvent *event) override;
 
  private:
    void init(const QString &txt);
@@ -548,7 +549,7 @@ class Q_GUI_EXPORT QLineControl : public QInputControl
    void internalDelete(bool wasBackspace = false);
    void internalRemove(int pos);
 
-   inline void internalDeselect() {
+   void internalDeselect() {
       m_selDirty |= (m_selend > m_selstart);
       m_selstart = m_selend = 0;
    }
@@ -617,7 +618,10 @@ class Q_GUI_EXPORT QLineControl : public QInputControl
    enum CommandType { Separator, Insert, Remove, Delete, RemoveSelection, DeleteSelection, SetSelection };
    struct Command {
 
-      inline Command(CommandType t, int p, QChar c, int ss, int se) : type(t), uc(c), pos(p), selStart(ss), selEnd(se) {}
+      Command(CommandType t, int p, QChar c, int ss, int se)
+         : type(t), uc(c), pos(p), selStart(ss), selEnd(se)
+      { }
+
       uint type : 4;
       QChar uc;
       int pos, selStart, selEnd;
@@ -627,7 +631,7 @@ class Q_GUI_EXPORT QLineControl : public QInputControl
    QVector<Command> m_history;
    void addCommand(const Command &cmd);
 
-   inline void separate() {
+   void separate() {
       m_separator = true;
    }
 

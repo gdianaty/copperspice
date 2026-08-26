@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,18 +24,19 @@
 #ifndef QTEXTEDIT_P_H
 #define QTEXTEDIT_P_H
 
-#include <qabstractscrollarea_p.h>
-#include <qtextdocumentfragment.h>
-#include <qscrollbar.h>
-#include <qtextcursor.h>
-#include <qtextformat.h>
-#include <qmenu.h>
-#include <qabstracttextdocumentlayout.h>
-#include <qbasictimer.h>
-#include <qurl.h>
-#include <qtextcontrol_p.h>
 #include <qtextedit.h>
 
+#include <qabstracttextdocumentlayout.h>
+#include <qbasictimer.h>
+#include <qmenu.h>
+#include <qscrollbar.h>
+#include <qtextcursor.h>
+#include <qtextdocumentfragment.h>
+#include <qtextformat.h>
+#include <qurl.h>
+
+#include <qabstractscrollarea_p.h>
+#include <qtextcontrol_p.h>
 
 #ifndef QT_NO_TEXTEDIT
 
@@ -52,7 +53,7 @@ class QTextEditPrivate : public QAbstractScrollAreaPrivate
    void paint(QPainter *p, QPaintEvent *e);
    void _q_repaintContents(const QRectF &contentsRect);
 
-   inline QPoint mapToContents(const QPoint &point) const {
+   QPoint mapToContents(const QPoint &point) const {
       return QPoint(point.x() + horizontalOffset(), point.y() + verticalOffset());
    }
 
@@ -63,15 +64,15 @@ class QTextEditPrivate : public QAbstractScrollAreaPrivate
    void createAutoBulletList();
    void pageUpDown(QTextCursor::MoveOperation op, QTextCursor::MoveMode moveMode);
 
-   inline int horizontalOffset() const {
+   int horizontalOffset() const {
       return q_func()->isRightToLeft() ? (hbar->maximum() - hbar->value()) : hbar->value();
    }
 
-   inline int verticalOffset() const {
+   int verticalOffset() const {
       return vbar->value();
    }
 
-   inline void sendControlEvent(QEvent *e) {
+   void sendControlEvent(QEvent *e) {
       control->processEvent(e, QPointF(horizontalOffset(), verticalOffset()), viewport);
    }
 
@@ -103,11 +104,11 @@ class QTextEditPrivate : public QAbstractScrollAreaPrivate
    uint inDrag : 1;
    uint clickCausedFocus : 1;
 
-   // Qt3 compatibility, only used in setText
    Qt::TextFormat textFormat;
    QString anchorToScrollToWhenVisible;
 
    QString placeholderText;
+
 #ifdef QT_KEYPAD_NAVIGATION
    QBasicTimer deleteAllTimer;
 #endif
@@ -115,6 +116,5 @@ class QTextEditPrivate : public QAbstractScrollAreaPrivate
 };
 
 #endif // QT_NO_TEXTEDIT
-
 
 #endif // QTEXTEDIT_P_H

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,9 +23,9 @@
 
 #include <qxcb_gl_integrationfactory.h>
 
-#include <qxcb_gl_integrationplugin.h>
 #include <qapplication.h>
 #include <qdir.h>
+#include <qxcb_gl_integrationplugin.h>
 
 #include <qfactoryloader_p.h>
 
@@ -37,7 +37,7 @@ static QFactoryLoader *loader()
 
 static QFactoryLoader *directLoader()
 {
-   static QFactoryLoader retval(QXcbGlIntegrationInterface_ID, "", Qt::CaseInsensitive);
+   static QFactoryLoader retval(QXcbGlIntegrationInterface_ID, QString(), Qt::CaseInsensitive);
    return &retval;
 }
 
@@ -62,13 +62,13 @@ QXcbGlIntegration *QXcbGlIntegrationFactory::create(const QString &platform, con
    if (! pluginPath.isEmpty()) {
       QCoreApplication::addLibraryPath(pluginPath);
 
-      if (QXcbGlIntegration *ret = loadIntegration(directLoader(), platform)) {
-         return ret;
+      if (QXcbGlIntegration *retval = loadIntegration(directLoader(), platform)) {
+         return retval;
       }
    }
 
-   if (QXcbGlIntegration *ret = loadIntegration(loader(), platform)) {
-      return ret;
+   if (QXcbGlIntegration *retval = loadIntegration(loader(), platform)) {
+      return retval;
    }
 
    return nullptr;
@@ -83,7 +83,7 @@ QStringList QXcbGlIntegrationFactory::keys(const QString &pluginPath)
       list = directLoader()->keySet().toList();
 
       if (! list.isEmpty()) {
-         const QString postFix = QString(" (from ") + QDir::toNativeSeparators(pluginPath) + ')';
+         const QString postFix = " (from " + QDir::toNativeSeparators(pluginPath) + ')';
 
          for (auto &item : list) {
             item.append(postFix);

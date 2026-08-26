@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,11 +24,13 @@
 #ifndef QCOMMONSTYLE_P_H
 #define QCOMMONSTYLE_P_H
 
-#include <qalgorithms.h>
 #include <qcommonstyle.h>
+
+#include <qalgorithms.h>
+#include <qstyleoption.h>
+
 #include <qstyle_p.h>
 #include <qstyleanimation_p.h>
-#include <qstyleoption.h>
 
 class QStringList;
 
@@ -59,12 +61,9 @@ class QCommonStylePrivate : public QStylePrivate
 #ifndef QT_NO_ITEMVIEWS
    void viewItemDrawText(QPainter *painter, const QStyleOptionViewItem *option, const QRect &rect) const;
    void viewItemLayout(const QStyleOptionViewItem *option,  QRect *checkRect,
-      QRect *pixmapRect, QRect *textRect, bool sizehint) const;
+         QRect *pixmapRect, QRect *textRect, bool sizehint) const;
 
    QSize viewItemSize(const QStyleOptionViewItem *option, int role) const;
-
-   mutable QRect decorationRect, displayRect, checkRect;
-   mutable QStyleOptionViewItem *cachedOption;
 
    bool isViewItemCached(const QStyleOptionViewItem &option) const {
       return cachedOption && (option.widget == cachedOption->widget
@@ -82,14 +81,17 @@ class QCommonStylePrivate : public QStylePrivate
             && option.font == cachedOption->font
             && option.viewItemPosition == cachedOption->viewItemPosition);
    }
+
+   mutable QRect decorationRect;
+   mutable QRect displayRect;
+   mutable QRect m_commonStyleCheckRect;
+
+   mutable QStyleOptionViewItem *cachedOption;
 #endif
-   mutable QIcon tabBarcloseButtonIcon;
 
 #ifndef QT_NO_TABBAR
    void tabLayout(const QStyleOptionTab *option, const QWidget *widget, QRect *textRect, QRect *pixmapRect) const;
 #endif
-
-   int animationFps;
 
 #ifndef QT_NO_ANIMATION
    void _q_removeAnimation(QObject *obj);
@@ -102,8 +104,12 @@ class QCommonStylePrivate : public QStylePrivate
 
  private:
    mutable QHash<const QObject *, QStyleAnimation *> animations;
+
 #endif
 
+ public:
+   mutable QIcon tabBarcloseButtonIcon;
+   int animationFps;
 };
 
 #endif

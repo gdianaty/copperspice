@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,14 +29,14 @@
 #ifndef QT_NO_SVGRENDERER
 
 #include <qobject.h>
-#include <qsize.h>
 #include <qrect.h>
+#include <qscopedpointer.h>
+#include <qsize.h>
 #include <qxmlstream.h>
-#include <QScopedPointer>
 
-class QSvgRendererPrivate;
-class QPainter;
 class QByteArray;
+class QPainter;
+class QSvgRendererPrivate;
 
 class Q_SVG_EXPORT QSvgRenderer : public QObject
 {

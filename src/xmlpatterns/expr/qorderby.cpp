@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -30,10 +30,7 @@
 #include "qreturnorderby_p.h"
 #include "qsorttuple_p.h"
 #include "qsequencemappingiterator_p.h"
-
 #include "qorderby_p.h"
-
-QT_BEGIN_NAMESPACE
 
 using namespace QPatternist;
 
@@ -61,21 +58,20 @@ template<>
 class less<Item::List>
 {
  private:
-
-   static inline bool isNaN(const Item &i) {
-      return BuiltinTypes::xsDouble->xdtTypeMatches(i.type()) &&
-             i.as<Numeric>()->isNaN();
+   static bool isNaN(const Item &i) {
+      return BuiltinTypes::xsDouble->xdtTypeMatches(i.type()) && i.as<Numeric>()->isNaN();
    }
 
  public:
-   inline less(const OrderBy::OrderSpec::Vector &orderspecs, const DynamicContext::Ptr &context)
-      : m_orderSpecs(orderspecs), m_context(context) {
+   less(const OrderBy::OrderSpec::Vector &orderspecs, const DynamicContext::Ptr &context)
+      : m_orderSpecs(orderspecs), m_context(context)
+   {
 
       Q_ASSERT(!m_orderSpecs.isEmpty());
       Q_ASSERT(context);
    }
 
-   inline bool operator()(const Item &item1, const Item &item2) const {
+   bool operator()(const Item &item1, const Item &item2) const {
       const SortTuple *const s1 = item1.as<SortTuple>();
       const SortTuple *const s2 = item2.as<SortTuple>();
 
@@ -223,5 +219,3 @@ OrderBy::accept(const ExpressionVisitor::Ptr &visitor) const
 {
    return visitor->visit(this);
 }
-
-QT_END_NAMESPACE

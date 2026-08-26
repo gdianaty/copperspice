@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,8 +26,6 @@
 
 #include <qdelegatingstaticcontext_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class StaticNamespaceContext : public DelegatingStaticContext
@@ -35,16 +33,12 @@ class StaticNamespaceContext : public DelegatingStaticContext
  public:
    StaticNamespaceContext(const NamespaceResolver::Ptr &resolver, const StaticContext::Ptr &context);
 
-   /**
-    * @returns the resolver passed in the constructor.
-    */
    NamespaceResolver::Ptr namespaceBindings() const override;
 
  private:
    const NamespaceResolver::Ptr m_namespaceBindings;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

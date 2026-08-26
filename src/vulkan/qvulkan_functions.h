@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,6 +27,15 @@
 #include <qglobal.h>
 
 #include <vulkan/vulkan.hpp>
+
+namespace vk_cs
+{
+   using namespace vk;
+
+#if (VK_VERSION_1_3 && VK_HEADER_VERSION >= 300) || (VK_VERSION_1_4)
+   using namespace vk::detail;
+#endif
+}
 
 class Q_VULKAN_EXPORT QVulkanFunctions
 {
@@ -67,9 +76,9 @@ class Q_VULKAN_EXPORT QVulkanFunctions
       uint32_t *pPropertyCount, VkSparseImageFormatProperties *pProperties);
 
  private:
-   QVulkanFunctions(vk::Instance instance, vk::DispatchLoaderDynamic dld);
+   QVulkanFunctions(vk::Instance instance, vk_cs::DispatchLoaderDynamic dld);
 
-   vk::DispatchLoaderDynamic m_dld;
+   vk_cs::DispatchLoaderDynamic m_dld;
 
    friend class QVulkanInstance;
 };

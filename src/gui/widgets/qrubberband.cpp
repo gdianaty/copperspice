@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,17 +21,18 @@
 *
 ***********************************************************************/
 
+#include <qrubberband.h>
+
 #include <qbitmap.h>
 #include <qevent.h>
 #include <qstylepainter.h>
-#include <qrubberband.h>
 #include <qtimer.h>
 
 #ifndef QT_NO_RUBBERBAND
 
+#include <qdebug.h>
 #include <qstyle.h>
 #include <qstyleoption.h>
-#include <qdebug.h>
 
 #include <qwidget_p.h>
 
@@ -49,13 +50,6 @@ class QRubberBandPrivate : public QWidgetPrivate
    void updateMask();
 };
 
-/*!
-    Initialize \a option with the values from this QRubberBand. This method
-    is useful for subclasses when they need a QStyleOptionRubberBand, but don't want
-    to fill in all the information themselves.
-
-    \sa QStyleOption::initFrom()
-*/
 void QRubberBand::initStyleOption(QStyleOptionRubberBand *option) const
 {
    if (!option) {
@@ -70,8 +64,6 @@ void QRubberBand::initStyleOption(QStyleOptionRubberBand *option) const
    option->opaque = windowFlags() & RUBBERBAND_WINDOW_TYPE;
 #endif
 }
-
-
 
 QRubberBand::QRubberBand(Shape s, QWidget *p)
    : QWidget(*new QRubberBandPrivate, p, (p  && p->windowType() != Qt::Desktop) ? Qt::Widget : RUBBERBAND_WINDOW_TYPE)
@@ -97,13 +89,15 @@ QRubberBand::Shape QRubberBand::shape() const
    return d->shape;
 }
 
-
 void QRubberBandPrivate::updateMask()
 {
    Q_Q(QRubberBand);
+
    QStyleHintReturnMask mask;
    QStyleOptionRubberBand opt;
+
    q->initStyleOption(&opt);
+
    if (q->style()->styleHint(QStyle::SH_RubberBand_Mask, &opt, q, &mask)) {
       q->setMask(mask.region);
    } else {
@@ -111,9 +105,6 @@ void QRubberBandPrivate::updateMask()
    }
 }
 
-/*!
-    \reimp
-*/
 void QRubberBand::paintEvent(QPaintEvent *)
 {
    QStylePainter painter(this);
@@ -122,9 +113,6 @@ void QRubberBand::paintEvent(QPaintEvent *)
    painter.drawControl(QStyle::CE_RubberBand, option);
 }
 
-/*!
-    \reimp
-*/
 void QRubberBand::changeEvent(QEvent *e)
 {
    QWidget::changeEvent(e);
@@ -136,6 +124,7 @@ void QRubberBand::changeEvent(QEvent *e)
             setWindowFlags(windowFlags() | RUBBERBAND_WINDOW_TYPE);
          }
          break;
+
       default:
          break;
    }
@@ -145,33 +134,23 @@ void QRubberBand::changeEvent(QEvent *e)
    }
 }
 
-/*!
-    \reimp
-*/
 void QRubberBand::showEvent(QShowEvent *e)
 {
    raise();
    e->ignore();
 }
 
-/*!
-    \reimp
-*/
 void QRubberBand::resizeEvent(QResizeEvent *)
 {
    Q_D(QRubberBand);
    d->updateMask();
 }
 
-/*!
-    \reimp
-*/
 void QRubberBand::moveEvent(QMoveEvent *)
 {
    Q_D(QRubberBand);
    d->updateMask();
 }
-
 
 void QRubberBand::setGeometry(const QRect &geom)
 {

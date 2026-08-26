@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,12 +25,14 @@
 
 #ifndef QT_NO_PRINTER
 
-#include <qdebug.h>
 #include <qpaintengine_alpha_p.h>
+
+#include <qdebug.h>
+#include <qpicture.h>
+
+#include <qfont_p.h>
 #include <qpainter_p.h>
 #include <qpicture_p.h>
-#include <qfont_p.h>
-#include <qpicture.h>
 
 QAlphaPaintEngine::QAlphaPaintEngine(QAlphaPaintEnginePrivate &data, PaintEngineFeatures devcaps)
    : QPaintEngine(data, devcaps)
@@ -394,7 +396,7 @@ QRectF QAlphaPaintEnginePrivate::addPenWidth(const QPainterPath &path)
       return (path.controlPointRect() * m_transform).boundingRect();
    }
 
-   bool cosmetic = qt_pen_is_cosmetic(m_pen, q->state->renderHints());
+   bool cosmetic = qt_pen_is_cosmetic(m_pen, q->m_engineState->renderHints());
 
    if (cosmetic) {
       tmp = path * m_transform;

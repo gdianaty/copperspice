@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,10 @@
 #ifndef QCUPS_P_H
 #define QCUPS_P_H
 
+#include <qdatetime.h>
+#include <qprinter.h>
 #include <qstring.h>
 #include <qstringlist.h>
-#include <qprinter.h>
-#include <qdatetime.h>
 
 #ifndef QT_NO_CUPS
 

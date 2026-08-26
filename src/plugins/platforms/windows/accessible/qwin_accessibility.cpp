@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -165,10 +165,6 @@ QWindow *QWindowsAccessibility::windowHelper(const QAccessibleInterface *iface)
     return window;
 }
 
-/*!
-  \internal
-  helper to wrap a QAccessibleInterface inside a IAccessible*
-*/
 IAccessible *QWindowsAccessibility::wrap(QAccessibleInterface *acc)
 {
     if (! acc)
@@ -189,7 +185,7 @@ IAccessible *QWindowsAccessibility::wrap(QAccessibleInterface *acc)
 bool QWindowsAccessibility::handleAccessibleObjectFromWindowRequest(HWND hwnd, WPARAM wParam, LPARAM lParam, LRESULT *lResult)
 {
     if (static_cast<long>(lParam) == static_cast<long>(UiaRootObjectId)) {
-        /* For UI Automation */
+        // For UI Automation
 
     } else if (DWORD(lParam) == DWORD(OBJID_CLIENT)) {
         // Start handling accessibility internally

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,10 +22,10 @@
 ***********************************************************************/
 
 #include <qpaintengine_blitter_p.h>
+
 #include <qblittable_p.h>
 #include <qpaintengine_raster_p.h>
 #include <qpainter_p.h>
-
 #include <qpixmap_blitter_p.h>
 
 #ifndef QT_NO_BLITTABLE
@@ -78,15 +78,15 @@ class CapabilitiesToStateMask
       }
    }
 
-   inline bool canBlitterFillRect() const {
+   bool canBlitterFillRect() const {
       return checkStateAgainstMask(capabillitiesState, fillRectMask);
    }
 
-   inline bool canBlitterAlphaFillRect() const {
+   bool canBlitterAlphaFillRect() const {
       return checkStateAgainstMask(capabillitiesState, alphaFillRectMask);
    }
 
-   inline bool canBlitterDrawRectMask() const {
+   bool canBlitterDrawRectMask() const {
       return checkStateAgainstMask(capabillitiesState, drawRectMask);
    }
 
@@ -134,17 +134,17 @@ class CapabilitiesToStateMask
       }
       return true;
    }
-   inline void updateState(uint mask, bool on) {
+
+   void updateState(uint mask, bool on) {
       updateStateBits(&capabillitiesState, mask, on);
    }
 
  private:
-
-   static inline void updateStateBits(uint *state, uint mask, bool on) {
+   static void updateStateBits(uint *state, uint mask, bool on) {
       *state = on ? (*state | mask) : (*state & ~mask);
    }
 
-   static inline bool checkStateAgainstMask(uint state, uint mask) {
+   static bool checkStateAgainstMask(uint state, uint mask) {
       return !state || (state & mask && !(state & ~mask));
    }
 
@@ -242,12 +242,8 @@ class QBlitterPaintEnginePrivate : public QRasterPaintEnginePrivate
 
  public:
    QBlitterPaintEnginePrivate(QBlittablePlatformPixmap *p)
-      : QRasterPaintEnginePrivate()
-      , pmData(p)
-      , caps(pmData->blittable()->capabilities())
-      , hasXForm(false)
-
-   {}
+      : QRasterPaintEnginePrivate(), pmData(p), caps(pmData->blittable()->capabilities()), hasXForm(false)
+   { }
 
    void lock();
    void unlock();
@@ -270,8 +266,8 @@ class QBlitterPaintEnginePrivate : public QRasterPaintEnginePrivate
 
 inline void QBlitterPaintEnginePrivate::lock()
 {
-   if (!pmData->blittable()->isLocked()) {
-      rasterBuffer->prepare(pmData->buffer());
+   if (! pmData->blittable()->isLocked()) {
+      m_rasterBuffer->prepare(pmData->buffer());
    }
 }
 
@@ -363,6 +359,7 @@ void QBlitterPaintEnginePrivate::fillRect(const QRectF &rect, const QColor &colo
    if (clipData) {
       if (clipData->hasRectClip) {
          unlock();
+
          if (alpha) {
             pmData->blittable()->alphaFillRect(targetRect & clipData->clipRect, color, q->state()->compositionMode());
          } else {
@@ -377,6 +374,7 @@ void QBlitterPaintEnginePrivate::fillRect(const QRectF &rect, const QColor &colo
 
             if (! intersectRect.isEmpty()) {
                unlock();
+
                if (alpha) {
                   pmData->blittable()->alphaFillRect(intersectRect, color, q->state()->compositionMode());
                } else {
@@ -388,8 +386,8 @@ void QBlitterPaintEnginePrivate::fillRect(const QRectF &rect, const QColor &colo
 
    } else {
       if (targetRect.x() >= 0 && targetRect.y() >= 0
-         && targetRect.width() <= q->paintDevice()->width()
-         && targetRect.height() <= q->paintDevice()->height()) {
+            && targetRect.width() <= q->paintDevice()->width()
+            && targetRect.height() <= q->paintDevice()->height()) {
          unlock();
 
          if (alpha) {
@@ -399,12 +397,13 @@ void QBlitterPaintEnginePrivate::fillRect(const QRectF &rect, const QColor &colo
          }
 
       } else {
-         QRectF deviceRect(0, 0, q->paintDevice()->width(), q->paintDevice()->height());
+         QRectF deviceRectF(0, 0, q->paintDevice()->width(), q->paintDevice()->height());
          unlock();
+
          if (alpha) {
-            pmData->blittable()->alphaFillRect(deviceRect & targetRect, color, q->state()->compositionMode());
+            pmData->blittable()->alphaFillRect(deviceRectF & targetRect, color, q->state()->compositionMode());
          } else {
-            pmData->blittable()->fillRect(deviceRect & targetRect, color);
+            pmData->blittable()->fillRect(deviceRectF & targetRect, color);
          }
       }
    }
@@ -414,6 +413,7 @@ void QBlitterPaintEnginePrivate::clipAndDrawPixmap(const QRectF &clip, const QRe
    const QRectF &sr, bool opacity)
 {
    Q_Q(QBlitterPaintEngine);
+
    QRectF intersectedRect = clip.intersected(target);
 
    if (intersectedRect.isEmpty()) {
@@ -421,6 +421,7 @@ void QBlitterPaintEnginePrivate::clipAndDrawPixmap(const QRectF &clip, const QRe
    }
 
    QRectF source = sr;
+
    if (intersectedRect.size() != target.size()) {
       if (sr.size() == target.size()) {
          // no resize
@@ -840,7 +841,7 @@ void QBlitterPaintEngine::drawStaticTextItem(QStaticTextItem *sti)
 
 #ifdef QT_BLITTER_RASTEROVERLAY
    //#### d->pmData->markRasterOverlay(sti);
-   qWarning("not implemented: markRasterOverlay for QStaticTextItem");
+   qWarning("QBlitterPaintEngine::drawStaticTextItem() Unable to draw a QStaticTextItem");
 #endif
 }
 

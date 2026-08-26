@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,35 +22,37 @@
 ***********************************************************************/
 
 #include <qmainwindow.h>
+
 #include <qmainwindowlayout_p.h>
 
 #ifndef QT_NO_MAINWINDOW
 
-#include <qdockwidget.h>
-#include <qtoolbar.h>
 #include <qapplication.h>
-#include <qmenubar.h>
-#include <qstatusbar.h>
-#include <qevent.h>
-#include <qstyle.h>
 #include <qdebug.h>
+#include <qdockwidget.h>
+#include <qevent.h>
+#include <qmenubar.h>
 #include <qpainter.h>
-#include <qwidget_p.h>
-#include <qtoolbar_p.h>
-#include <qwidgetanimator_p.h>
+#include <qstatusbar.h>
+#include <qstyle.h>
+#include <qtoolbar.h>
 
-// #define QT_EXPERIMENTAL_CLIENT_DECORATIONS
+#include <qtoolbar_p.h>
+#include <qwidget_p.h>
+#include <qwidgetanimator_p.h>
 
 #ifdef Q_OS_DARWIN
 #include <qplatform_nativeinterface.h>
 #endif
+
+// #define QT_EXPERIMENTAL_CLIENT_DECORATIONS
 
 class QMainWindowPrivate : public QWidgetPrivate
 {
    Q_DECLARE_PUBLIC(QMainWindow)
 
  public:
-   inline QMainWindowPrivate()
+   QMainWindowPrivate()
       : layout(nullptr), explicitIconSize(false), toolButtonStyle(Qt::ToolButtonIconOnly)
 
 #ifdef Q_OS_DARWIN
@@ -84,7 +86,7 @@ class QMainWindowPrivate : public QWidgetPrivate
    uint cursorAdjusted : 1;
 #endif
 
-   static inline QMainWindowLayout *mainWindowLayout(const QMainWindow *mainWindow) {
+   static QMainWindowLayout *mainWindowLayout(const QMainWindow *mainWindow) {
       return mainWindow ? mainWindow->d_func()->layout : static_cast<QMainWindowLayout *>(nullptr);
    }
 };
@@ -786,9 +788,9 @@ QCursor QMainWindowPrivate::separatorCursor(const QList<int> &path) const
       }
    }
 
-   // no, it's a splitter inside a dock area, separating two dock widgets
+   // it is a splitter inside a dock area, separating two dock widgets
 
-   return info->o == Qt::Horizontal
+   return info->m_dockAreaOrientation == Qt::Horizontal
       ? Qt::SplitHCursor : Qt::SplitVCursor;
 }
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,10 +23,7 @@
 
 #include <avfvideowidgetcontrol.h>
 #include <avfvideowidget.h>
-
-#ifdef QT_DEBUG_AVF
-#include <QDebug>
-#endif
+#include <qdebug.h>
 
 #import <AVFoundation/AVFoundation.h>
 
@@ -43,20 +40,16 @@ AVFVideoWidgetControl::AVFVideoWidgetControl(QObject *parent)
 
 AVFVideoWidgetControl::~AVFVideoWidgetControl()
 {
-#ifdef QT_DEBUG_AVF
-   qDebug() << Q_FUNC_INFO;
-#endif
    delete m_videoWidget;
 }
 
 void AVFVideoWidgetControl::setLayer(void *playerLayer)
 {
-#ifdef QT_DEBUG_AVF
+#if defined(CS_SHOW_DEBUG_PLUGINS_AVF)
    qDebug() << Q_FUNC_INFO << playerLayer;
 #endif
 
    m_videoWidget->setPlayerLayer((AVPlayerLayer *)playerLayer);
-
 }
 
 QWidget *AVFVideoWidgetControl::videoWidget()

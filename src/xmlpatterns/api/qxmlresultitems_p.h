@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,17 +24,15 @@
 #ifndef QXMLRESULTITEMS_P_H
 #define QXMLRESULTITEMS_P_H
 
-#include "qcommonvalues_p.h"
-#include "qdynamiccontext_p.h"
-#include "qitem_p.h"
-
-QT_BEGIN_NAMESPACE
+#include <qcommonvalues_p.h>
+#include <qdynamiccontext_p.h>
+#include <qitem_p.h>
 
 class QXmlResultItemsPrivate
 {
  public:
-   inline QXmlResultItemsPrivate() : iterator(QPatternist::CommonValues::emptyIterator)
-      , hasError(false) {
+   QXmlResultItemsPrivate()
+      : iterator(QPatternist::CommonValues::emptyIterator), hasError(false) {
    }
 
    void setDynamicContext(const QPatternist::DynamicContext::Ptr &context) {
@@ -46,13 +44,8 @@ class QXmlResultItemsPrivate
    bool hasError;
 
  private:
-   /**
-    * We never use it. We only keep a ref to it such that it doesn't get
-    * de-allocated.
-    */
-   QPatternist::DynamicContext::Ptr    m_context;
+   QPatternist::DynamicContext::Ptr m_context;
 };
 
-QT_END_NAMESPACE
 #endif
 

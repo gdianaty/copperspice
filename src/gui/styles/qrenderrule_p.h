@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,17 +24,20 @@
 #ifndef QRENDERRULE_P_H
 #define QRENDERRULE_P_H
 
-#include <qcssparser_p.h>
 #include <qpainter.h>
 #include <qrect.h>
-#include <qsize.h>
 #include <qsharedpointer.h>
+#include <qsize.h>
 #include <qvector.h>
 #include <qwidget.h>
 
-struct QStyleSheetBorderImageData : public QSharedData {
+#include <qcssparser_p.h>
+
+struct QStyleSheetBorderImageData : public QSharedData
+{
    QStyleSheetBorderImageData()
-      : horizStretch(QCss::TileMode_Unknown), vertStretch(QCss::TileMode_Unknown) {
+      : horizStretch(QCss::TileMode_Unknown), vertStretch(QCss::TileMode_Unknown)
+   {
       for (int i = 0; i < 4; i++) {
          cuts[i] = -1;
       }
@@ -48,7 +51,7 @@ struct QStyleSheetBorderImageData : public QSharedData {
 
 struct QStyleSheetBackgroundData : public QSharedData {
    QStyleSheetBackgroundData(const QBrush &b, const QPixmap &p, QCss::Repeat r,
-      Qt::Alignment a, QCss::Origin o, QCss::Attachment t, QCss::Origin c)
+         Qt::Alignment a, QCss::Origin o, QCss::Attachment t, QCss::Origin c)
       : brush(b), pixmap(p), repeat(r), position(a), origin(o), attachment(t), clip(c) { }
 
    bool isTransparent() const {
@@ -204,9 +207,17 @@ struct QStyleSheetImageData : public QSharedData {
 class QRenderRule
 {
  public:
+   enum RenderArea {
+      Margin  = 1,
+      Border  = 2,
+      Padding = 4,
+      All     = Margin | Border | Padding
+   };
+
    QRenderRule()
-      : features(0), hasFont(false), pal(nullptr), b(nullptr), bg(nullptr), bd(nullptr),
-        ou(nullptr), geo(nullptr), p(nullptr), img(nullptr), clipset(0)
+      : clipset(0), features(0), hasFont(false),
+        m_renderPalette(nullptr), m_renderBox(nullptr), m_renderBg(nullptr), m_renderBorder(nullptr),
+        m_renderOutline(nullptr), m_renderGeometry(nullptr), m_renderPos(nullptr), m_renderImage(nullptr)
    {
    }
 
@@ -217,7 +228,6 @@ class QRenderRule
    QRect paddingRect(const QRect &r) const;
    QRect contentsRect(const QRect &r) const;
 
-   enum { Margin = 1, Border = 2, Padding = 4, All = Margin | Border | Padding };
    QRect boxRect(const QRect &r, int flags = All) const;
    QSize boxSize(const QSize &s, int flags = All) const;
    QRect originRect(const QRect &rect, QCss::Origin origin) const;
@@ -235,96 +245,102 @@ class QRenderRule
    void configurePalette(QPalette *p, QPalette::ColorRole fr, QPalette::ColorRole br);
 
    const QStyleSheetPaletteData *palette() const {
-      return pal;
+      return m_renderPalette;
    }
 
    const QStyleSheetBoxData *box() const {
-      return b;
+      return m_renderBox;
    }
 
    const QStyleSheetBackgroundData *background() const {
-      return bg;
+      return m_renderBg;
    }
 
    const QStyleSheetBorderData *border() const {
-      return bd;
+      return m_renderBorder;
    }
 
    const QStyleSheetOutlineData *outline() const {
-      return ou;
+      return m_renderOutline;
    }
 
    const QStyleSheetGeometryData *geometry() const {
-      return geo;
+      return m_renderGeometry;
    }
 
    const QStyleSheetPositionData *position() const {
-      return p;
+      return m_renderPos;
    }
 
    bool hasPalette() const {
-      return pal != nullptr;
+      return m_renderPalette != nullptr;
    }
 
    bool hasBackground() const {
-      return bg != nullptr && (! bg->pixmap.isNull() || bg->brush.style() != Qt::NoBrush);
+      return m_renderBg != nullptr && (! m_renderBg->pixmap.isNull() || m_renderBg->brush.style() != Qt::NoBrush);
    }
 
    bool hasGradientBackground() const {
-      return bg && bg->brush.style() >= Qt::LinearGradientPattern && bg->brush.style() <= Qt::ConicalGradientPattern;
+      return m_renderBg && m_renderBg->brush.style() >= Qt::LinearGradientPattern &&
+            m_renderBg->brush.style() <= Qt::ConicalGradientPattern;
    }
 
    bool hasNativeBorder() const {
-      return bd == nullptr || (! bd->hasBorderImage() && bd->styles[0] == QCss::BorderStyle_Native);
+      return m_renderBorder == nullptr ||
+            (! m_renderBorder->hasBorderImage() && m_renderBorder->styles[0] == QCss::BorderStyle_Native);
    }
 
    bool hasNativeOutline() const {
-      return (ou == nullptr || (! ou->hasBorderImage() && ou->styles[0] == QCss::BorderStyle_Native));
+      return (m_renderOutline == nullptr ||
+            (! m_renderOutline->hasBorderImage() && m_renderOutline->styles[0] == QCss::BorderStyle_Native));
    }
 
    bool baseStyleCanDraw() const {
-      if (! hasBackground() || (background()->brush.style() == Qt::NoBrush && bg->pixmap.isNull())) {
+      if (! hasBackground() || (background()->brush.style() == Qt::NoBrush && m_renderBg->pixmap.isNull())) {
          return true;
       }
 
-      if (bg && ! bg->pixmap.isNull()) {
+      if (m_renderBg && ! m_renderBg->pixmap.isNull()) {
          return false;
       }
 
       if (hasGradientBackground()) {
          return features & QCss::StyleFeature_BackgroundGradient;
       }
+
       return features & QCss::StyleFeature_BackgroundColor;
    }
 
    bool hasBox() const {
-      return b != nullptr;
+      return m_renderBox != nullptr;
    }
+
    bool hasBorder() const {
-      return bd !=nullptr;
+      return m_renderBorder !=nullptr;
    }
+
    bool hasOutline() const {
-      return ou != nullptr;
+      return m_renderOutline != nullptr;
    }
 
    bool hasPosition() const {
-      return p != nullptr;
+      return m_renderPos != nullptr;
    }
 
    bool hasGeometry() const {
-      return geo != nullptr;
+      return m_renderGeometry != nullptr;
    }
 
    bool hasDrawable() const {
-      return !hasNativeBorder() || hasBackground() || hasImage();
+      return ! hasNativeBorder() || hasBackground() || hasImage();
    }
 
    bool hasImage() const {
-      return img != nullptr;
+      return m_renderImage != nullptr;
    }
 
    QSize minimumContentsSize() const {
-      return geo ? QSize(geo->minWidth, geo->minHeight) : QSize(0, 0);
+      return m_renderGeometry ? QSize(m_renderGeometry->minWidth, m_renderGeometry->minHeight) : QSize(0, 0);
    }
 
    QSize minimumSize() const {
@@ -332,22 +348,27 @@ class QRenderRule
    }
 
    QSize contentsSize() const {
-      return geo ? QSize(geo->width, geo->height) : ((img && img->size.isValid()) ? img->size : QSize());
+      return m_renderGeometry ? QSize(m_renderGeometry->width, m_renderGeometry->height) :
+            ((m_renderImage && m_renderImage->size.isValid()) ? m_renderImage->size : QSize());
    }
 
    QSize contentsSize(const QSize &sz) const {
       QSize csz = contentsSize();
+
       if (csz.width() == -1) {
          csz.setWidth(sz.width());
       }
+
       if (csz.height() == -1) {
          csz.setHeight(sz.height());
       }
+
       return csz;
    }
 
    bool hasContentsSize() const {
-      return (geo && (geo->width != -1 || geo->height != -1)) || (img && img->size.isValid());
+      return (m_renderGeometry && (m_renderGeometry->width != -1 ||
+            m_renderGeometry->height != -1)) || (m_renderImage && m_renderImage->size.isValid());
    }
 
    QSize size() const {
@@ -359,23 +380,30 @@ class QRenderRule
    }
 
    QSize adjustSize(const QSize &sz) {
-      if (!geo) {
+      if (! m_renderGeometry) {
          return sz;
       }
+
       QSize csz = contentsSize();
+
       if (csz.width() == -1) {
          csz.setWidth(sz.width());
       }
+
       if (csz.height() == -1) {
          csz.setHeight(sz.height());
       }
-      if (geo->maxWidth != -1 && csz.width() > geo->maxWidth) {
-         csz.setWidth(geo->maxWidth);
+
+      if (m_renderGeometry->maxWidth != -1 && csz.width() > m_renderGeometry->maxWidth) {
+         csz.setWidth(m_renderGeometry->maxWidth);
       }
-      if (geo->maxHeight != -1 && csz.height() > geo->maxHeight) {
-         csz.setHeight(geo->maxHeight);
+
+      if (m_renderGeometry->maxHeight != -1 && csz.height() > m_renderGeometry->maxHeight) {
+         csz.setHeight(m_renderGeometry->maxHeight);
       }
-      csz = csz.expandedTo(QSize(geo->minWidth, geo->minHeight));
+
+      csz = csz.expandedTo(QSize(m_renderGeometry->minWidth, m_renderGeometry->minHeight));
+
       return csz;
    }
 
@@ -391,23 +419,24 @@ class QRenderRule
    void setClip(QPainter *p, const QRect &rect);
    void unsetClip(QPainter *);
 
+   int clipset;
    int features;
+
+   bool hasFont;
+
    QBrush defaultBackground;
    QFont font;
-   bool hasFont;
+   QPainterPath clipPath;
 
    QHash<QString, QVariant> styleHints;
 
-   QSharedDataPointer<QStyleSheetPaletteData> pal;
-   QSharedDataPointer<QStyleSheetBoxData> b;
-   QSharedDataPointer<QStyleSheetBackgroundData> bg;
-   QSharedDataPointer<QStyleSheetBorderData> bd;
-   QSharedDataPointer<QStyleSheetOutlineData> ou;
-   QSharedDataPointer<QStyleSheetGeometryData> geo;
-   QSharedDataPointer<QStyleSheetPositionData> p;
-   QSharedDataPointer<QStyleSheetImageData> img;
-
-   int clipset;
-   QPainterPath clipPath;
+   QSharedDataPointer<QStyleSheetPaletteData> m_renderPalette;
+   QSharedDataPointer<QStyleSheetBoxData> m_renderBox;
+   QSharedDataPointer<QStyleSheetBackgroundData> m_renderBg;
+   QSharedDataPointer<QStyleSheetBorderData> m_renderBorder;
+   QSharedDataPointer<QStyleSheetOutlineData> m_renderOutline;
+   QSharedDataPointer<QStyleSheetGeometryData> m_renderGeometry;
+   QSharedDataPointer<QStyleSheetPositionData> m_renderPos;
+   QSharedDataPointer<QStyleSheetImageData> m_renderImage;
 };
 #endif

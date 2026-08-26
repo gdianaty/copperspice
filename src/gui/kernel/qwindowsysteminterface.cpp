@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,19 +22,19 @@
 ***********************************************************************/
 
 #include <qwindowsysteminterface.h>
+#include <qwindowsysteminterface_p.h>
 
 #include <qabstracteventdispatcher.h>
 #include <qdebug.h>
-#include <qscopedvaluerollback.h>
 #include <qplatform_drag.h>
 #include <qplatform_integration.h>
 #include <qplatform_window.h>
+#include <qscopedvaluerollback.h>
 
-#include <qwindowsysteminterface_p.h>
-#include <qguiapplication_p.h>
+#include <qapplication_p.h>
 #include <qevent_p.h>
-#include <qtouchdevice_p.h>
 #include <qhighdpiscaling_p.h>
+#include <qtouchdevice_p.h>
 
 QElapsedTimer QWindowSystemInterfacePrivate::eventTime;
 bool QWindowSystemInterfacePrivate::synchronousWindowSystemEvents = false;
@@ -325,8 +325,8 @@ void QWindowSystemInterface::handleWheelEvent(QWindow *tlw, ulong timestamp, con
 }
 
 QWindowSystemInterfacePrivate::ExposeEvent::ExposeEvent(QWindow *exposed, const QRegion &region)
-   : WindowSystemEvent(Expose), exposed(exposed),
-     isExposed(exposed && exposed->handle() ? exposed->handle()->isExposed() : false), region(region)
+   : WindowSystemEvent(Expose), m_exposed(exposed), m_exposeRegion(region),
+     isExposed(exposed && exposed->handle() ? exposed->handle()->isExposed() : false)
 {
 }
 
@@ -345,9 +345,9 @@ QWindowSystemInterfacePrivate::WindowSystemEvent *QWindowSystemInterfacePrivate:
    return windowSystemEventQueue.takeFirstNonUserInputOrReturnNull();
 }
 
-QWindowSystemInterfacePrivate::WindowSystemEvent *QWindowSystemInterfacePrivate::peekWindowSystemEvent(EventType t)
+QWindowSystemInterfacePrivate::WindowSystemEvent *QWindowSystemInterfacePrivate::peekWindowSystemEvent(EventType eventType)
 {
-   return windowSystemEventQueue.peekAtFirstOfType(t);
+   return windowSystemEventQueue.peekAtFirstOfType(eventType);
 }
 
 void QWindowSystemInterfacePrivate::removeWindowSystemEvent(WindowSystemEvent *event)
@@ -355,9 +355,9 @@ void QWindowSystemInterfacePrivate::removeWindowSystemEvent(WindowSystemEvent *e
    windowSystemEventQueue.remove(event);
 }
 
-void QWindowSystemInterfacePrivate::postWindowSystemEvent(WindowSystemEvent *ev)
+void QWindowSystemInterfacePrivate::postWindowSystemEvent(WindowSystemEvent *event)
 {
-   windowSystemEventQueue.append(ev);
+   windowSystemEventQueue.append(event);
    QAbstractEventDispatcher *dispatcher = QGuiApplicationPrivate::cs_internal_core_dispatcher();
 
    if (dispatcher) {
@@ -365,29 +365,32 @@ void QWindowSystemInterfacePrivate::postWindowSystemEvent(WindowSystemEvent *ev)
    }
 }
 
-bool QWindowSystemInterfacePrivate::handleWindowSystemEvent(QWindowSystemInterfacePrivate::WindowSystemEvent *ev)
+bool QWindowSystemInterfacePrivate::handleWindowSystemEvent(QWindowSystemInterfacePrivate::WindowSystemEvent *event)
 {
    bool accepted = true;
 
    if (synchronousWindowSystemEvents) {
       if (QThread::currentThread() == QGuiApplication::instance()->thread()) {
          // Process the event immediately on the current thread and return the accepted state.
-         QGuiApplicationPrivate::processWindowSystemEvent(ev);
-         accepted = ev->eventAccepted;
-         delete ev;
+         QGuiApplicationPrivate::processWindowSystemEvent(event);
+
+         accepted = event->eventAccepted;
+         delete event;
 
       } else {
-         // Post the event on the Qt main thread queue and flush the queue.
+         // Post the event on the main thread queue and flush the queue.
          // This will wake up the Gui thread which will process the event.
          // Return the accepted state for the last event on the queue,
-         // which is the event posted by this function.
-         postWindowSystemEvent(ev);
+         // which is the event posted by this method.
+
+         postWindowSystemEvent(event);
          accepted = QWindowSystemInterface::flushWindowSystemEvents();
       }
 
    } else {
-      postWindowSystemEvent(ev);
+      postWindowSystemEvent(event);
    }
+
    return accepted;
 }
 
@@ -583,9 +586,8 @@ bool QWindowSystemInterface::flushWindowSystemEvents(QEventLoop::ProcessEventsFl
    }
 
    if (! QGuiApplication::instance()) {
-      qWarning().nospace()
-            << "QWindowSystemInterface::flushWindowSystemEvents() invoked after "
-               "QGuiApplication destruction, discarding " << count << " events.";
+      qWarning("QWindowSystemInterface::flushWindowSystemEvents() Unable to call this method after "
+         "QApplication has been closed");
 
       QWindowSystemInterfacePrivate::windowSystemEventQueue.clear();
       return false;
@@ -614,7 +616,7 @@ bool QWindowSystemInterface::sendWindowSystemEvents(QEventLoop::ProcessEventsFla
             QWindowSystemInterfacePrivate::getNonUserInputWindowSystemEvent() :
             QWindowSystemInterfacePrivate::getWindowSystemEvent();
 
-      if (!event) {
+      if (! event) {
          break;
       }
 
@@ -624,7 +626,7 @@ bool QWindowSystemInterface::sendWindowSystemEvents(QEventLoop::ProcessEventsFla
          }
 
       } else {
-         nevents++;
+         ++nevents;
          QGuiApplicationPrivate::processWindowSystemEvent(event);
       }
 
@@ -713,7 +715,7 @@ void QWindowSystemInterface::handleTabletEvent(QWindow *w, const QPointF &local,
 {
    ulong time = QWindowSystemInterfacePrivate::eventTime.elapsed();
    handleTabletEvent(w, time, local, global, device, pointerType, buttons, pressure,
-      xTilt, yTilt, tangentialPressure, rotation, z, uid, modifiers);
+         xTilt, yTilt, tangentialPressure, rotation, z, uid, modifiers);
 }
 
 void QWindowSystemInterface::handleTabletEvent(QWindow *w, ulong timestamp, bool down, const QPointF &local, const QPointF &global,
@@ -721,7 +723,7 @@ void QWindowSystemInterface::handleTabletEvent(QWindow *w, ulong timestamp, bool
       int z, qint64 uid, Qt::KeyboardModifiers modifiers)
 {
    handleTabletEvent(w, timestamp, local, global, device, pointerType, (down ? Qt::LeftButton : Qt::NoButton), pressure,
-      xTilt, yTilt, tangentialPressure, rotation, z, uid, modifiers);
+         xTilt, yTilt, tangentialPressure, rotation, z, uid, modifiers);
 }
 
 void QWindowSystemInterface::handleTabletEvent(QWindow *w, bool down, const QPointF &local, const QPointF &global,
@@ -729,7 +731,7 @@ void QWindowSystemInterface::handleTabletEvent(QWindow *w, bool down, const QPoi
       int z, qint64 uid, Qt::KeyboardModifiers modifiers)
 {
    handleTabletEvent(w, local, global, device, pointerType, (down ? Qt::LeftButton : Qt::NoButton), pressure,
-      xTilt, yTilt, tangentialPressure, rotation, z, uid, modifiers);
+         xTilt, yTilt, tangentialPressure, rotation, z, uid, modifiers);
 }
 
 void QWindowSystemInterface::handleTabletEnterProximityEvent(ulong timestamp, int device, int pointerType, qint64 uid)
@@ -813,11 +815,11 @@ void QWindowSystemInterface::handleEnterWhatsThisEvent()
 {
    QWindowSystemInterfacePrivate::WindowSystemEvent *e =
       new QWindowSystemInterfacePrivate::WindowSystemEvent(QWindowSystemInterfacePrivate::EnterWhatsThisMode);
+
    QWindowSystemInterfacePrivate::handleWindowSystemEvent(e);
 }
 #endif
 
-#ifndef QT_NO_DEBUG_STREAM
 Q_GUI_EXPORT QDebug operator<<(QDebug dbg, const QWindowSystemInterface::TouchPoint &p)
 {
    QDebugStateSaver saver(dbg);
@@ -827,7 +829,6 @@ Q_GUI_EXPORT QDebug operator<<(QDebug dbg, const QWindowSystemInterface::TouchPo
 
    return dbg;
 }
-#endif
 
 QWindowSystemEventHandler::~QWindowSystemEventHandler()
 {
@@ -843,7 +844,7 @@ bool QWindowSystemEventHandler::sendEvent(QWindowSystemInterfacePrivate::WindowS
 QWindowSystemInterfacePrivate::WheelEvent::WheelEvent(QWindow *w, ulong time, const QPointF &local, const QPointF &global,
       QPoint pixelD, QPoint angleD, Qt::KeyboardModifiers mods, Qt::ScrollPhase phase, Qt::MouseEventSource src)
    : InputEvent(w, time, Wheel, mods), pixelDelta(pixelD), angleDelta(angleD), localPos(local), globalPos(global),
-     phase(! QGuiApplicationPrivate::scrollNoPhaseAllowed && phase == Qt::NoScrollPhase ? Qt::ScrollUpdate : phase),
+     m_phaseValue(! QGuiApplicationPrivate::scrollNoPhaseAllowed && phase == Qt::NoScrollPhase ? Qt::ScrollUpdate : phase),
      source(src)
 {
 }

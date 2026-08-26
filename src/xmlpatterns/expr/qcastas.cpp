@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -37,13 +37,10 @@
 
 #include "qcastas_p.h"
 
-QT_BEGIN_NAMESPACE
-
 using namespace QPatternist;
 
-CastAs::CastAs(const Expression::Ptr &source,
-               const SequenceType::Ptr &tType) : SingleContainer(source),
-   m_targetType(tType)
+CastAs::CastAs(const Expression::Ptr &source, const SequenceType::Ptr &tType)
+   : SingleContainer(source), m_targetType(tType)
 {
    Q_ASSERT(source);
    Q_ASSERT(tType);
@@ -181,4 +178,3 @@ ExpressionVisitorResult::Ptr CastAs::accept(const ExpressionVisitor::Ptr &visito
    return visitor->visit(this);
 }
 
-QT_END_NAMESPACE

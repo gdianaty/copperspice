@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,9 +26,8 @@
 
 #include <qatomictype_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class NumericType : public AtomicType
 {
  public:
@@ -37,96 +36,34 @@ class NumericType : public AtomicType
    bool itemMatches(const Item &item) const override;
    bool xdtTypeMatches(const ItemType::Ptr &other) const override;
 
-   /**
-    * @returns always "numeric". That is, no namespace prefix
-    */
    QString displayName(const NamePool::Ptr &np) const override;
 
-   /**
-    * @returns always @c true
-    */
    bool isAbstract() const override;
-
-   /**
-    * @returns always @c false
-    */
    bool isNodeType() const override;
-
-   /**
-    * @returns always @c true
-    */
    bool isAtomicType() const override;
 
-   /**
-    * @returns always xs:anyAtomicType
-    */
    SchemaType::Ptr wxsSuperType() const override;
-
-   /**
-    * @returns always xs:anyAtomicType
-    */
    ItemType::Ptr xdtSuperType() const override;
 
-   /**
-    * @returns @c null. It makes no sense to atomize the abstract type @c fs:numeric.
-    */
    ItemType::Ptr atomizedType() const override;
 
-   /**
-    * NumericType cannot be visited. This function is only implemented
-    * to satisfy the abstract super class's interface.
-    *
-    * @returns always a @c null pointer
-    */
    AtomicTypeVisitorResult::Ptr accept(const AtomicTypeVisitor::Ptr &visitor,
          const SourceLocationReflection *const) const override;
 
-   /**
-    * NumericType cannot be visited. This function is only implemented
-    * to satisfy the abstract super class's interface.
-    *
-    * @returns always a @c null pointer
-    */
    AtomicTypeVisitorResult::Ptr accept(const ParameterizedAtomicTypeVisitor::Ptr &visitor,
-                  const qint16 op, const SourceLocationReflection *const) const override;
+         const qint16 op, const SourceLocationReflection *const) const override;
 
-   /**
-    * The type @c fs:numeric is an abstract type which therefore
-    * cannot be involved in comparisons. Hence, this function returns
-    * @c null. This function is only implemented to satisfy the abstract
-    * super class's interface.
-    *
-    * @returns always a @c null pointer
-    */
    AtomicComparatorLocator::Ptr comparatorLocator() const override;
 
-   /**
-    * The type @c fs:numeric is an abstract type which therefore
-    * cannot be involved in arithmetics. Hence, this function returns
-    * @c null. This function is only implemented to satisfy the abstract
-    * super class's interface.
-    *
-    * @returns always a @c null pointer
-    */
    AtomicMathematicianLocator::Ptr mathematicianLocator() const override;
 
-
-   /**
-    * The type @c fs:numeric is an abstract type which therefore
-    * cannot be involved in casting. Hence, this function returns
-    * @c null. This function is only implemented to satisfy the abstract
-    * super class's interface.
-    *
-    * @returns always a @c null pointer
-    */
    AtomicCasterLocator::Ptr casterLocator() const override;
 
  protected:
    friend class BuiltinTypes;
    NumericType();
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

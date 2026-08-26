@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -105,10 +105,35 @@ void Ginger::bags(int value) const
 
 TEST_CASE("QObject children", "[qobject]")
 {
-   Ginger obj;
+   Ginger *objA = new Ginger();
 
-   REQUIRE(obj.children().isEmpty() == true);
-   REQUIRE(obj.parent() == nullptr);
+   REQUIRE(objA->children().isEmpty() == true);
+   REQUIRE(objA->parent() == nullptr);
+
+   Ginger *objB = new Ginger;
+   objB->setParent(objA);
+   objB->setObjectName("B");
+
+   Ginger *objC = new Ginger;
+   objC->setParent(objA);
+
+   REQUIRE(objA->children().size() == 2);
+   REQUIRE(objB->parent() == objA);
+
+   QList<QObject *> list = objA->children();
+   REQUIRE(list[0] == objB);
+   REQUIRE(list[1] == objC);
+
+   QObject *tmp = objA->findChild<QObject *>("B");
+   REQUIRE(tmp == objB);
+
+   Ginger *objD = new Ginger;
+   objD->setObjectName("D");
+
+   list = objA->findChildren<QObject *>("D");
+   REQUIRE(list.isEmpty() == true);
+
+   delete objA;
 }
 
 TEST_CASE("QObject connect", "[qobject]")
@@ -127,48 +152,7 @@ TEST_CASE("QObject connect", "[qobject]")
    REQUIRE(obj.m_titleB == "New Title");
 }
 
-TEST_CASE("QObject inherits", "[qobject]")
-{
-   Ginger obj;
-
-   REQUIRE(obj.inherits("QObject") == true);
-   REQUIRE(obj.inherits("Ginger") == true);
-   REQUIRE(obj.inherits("QFile") == false);
-
-   REQUIRE(obj.isWidgetType() == false);
-   REQUIRE(obj.isWindowType() == false);
-}
-
-TEST_CASE("QObject object_name", "[qobject]")
-{
-   Ginger obj;
-
-   REQUIRE(obj.objectName().isEmpty() == true);
-
-   obj.setObjectName("SomeObject");
-   REQUIRE(obj.objectName() == "SomeObject");
-
-   REQUIRE(obj.property<QString>("objectName") == "SomeObject");
-}
-
-TEST_CASE("QObject property", "[qobject]")
-{
-   Ginger obj;
-
-   REQUIRE(obj.dynamicPropertyNames().isEmpty() == true);
-
-   obj.setProperty("newProperty", QVariant(17));
-
-   REQUIRE(obj.property<int>("newProperty") == 17);
-
-   {
-      QList<QString> list = obj.dynamicPropertyNames();
-      REQUIRE(list.size() == 1);
-      REQUIRE(list.contains("newProperty") == true);
-   }
-}
-
-TEST_CASE("QObject method_overload", "[qobject]")
+TEST_CASE("QObject connect_overload", "[qobject]")
 {
    Ginger obj;
 
@@ -217,4 +201,45 @@ TEST_CASE("QObject method_overload", "[qobject]")
 
    obj.cargo();
    REQUIRE(obj.m_bags == -1);
+}
+
+TEST_CASE("QObject inherits", "[qobject]")
+{
+   Ginger obj;
+
+   REQUIRE(obj.inherits("QObject") == true);
+   REQUIRE(obj.inherits("Ginger") == true);
+   REQUIRE(obj.inherits("QFile") == false);
+
+   REQUIRE(obj.isWidgetType() == false);
+   REQUIRE(obj.isWindowType() == false);
+}
+
+TEST_CASE("QObject objectName", "[qobject]")
+{
+   Ginger obj;
+
+   REQUIRE(obj.objectName().isEmpty() == true);
+
+   obj.setObjectName("SomeObject");
+   REQUIRE(obj.objectName() == "SomeObject");
+
+   REQUIRE(obj.property<QString>("objectName") == "SomeObject");
+}
+
+TEST_CASE("QObject property", "[qobject]")
+{
+   Ginger obj;
+
+   REQUIRE(obj.dynamicPropertyNames().isEmpty() == true);
+
+   obj.setProperty("newProperty", QVariant(17));
+
+   REQUIRE(obj.property<int>("newProperty") == 17);
+
+   {
+      QList<QString> list = obj.dynamicPropertyNames();
+      REQUIRE(list.size() == 1);
+      REQUIRE(list.contains("newProperty") == true);
+   }
 }

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -31,49 +31,35 @@
 
 #include <qglobal.h>
 
-#ifdef _MSC_VER
-#include <basetsd.h>
-typedef SSIZE_T ssize_t;
-#endif
+#include <stdint.h>
+#include <inttypes.h>
 
 /* Signed 16-bit type */
-#define TIFF_INT16_T qint16
+#define TIFF_INT16_T int16_t
 
 /* Signed 32-bit type */
-#define TIFF_INT32_T qint32
+#define TIFF_INT32_T int32_t
 
 /* Signed 64-bit type */
-#define TIFF_INT64_T qint64
+#define TIFF_INT64_T long long
 
 /* Signed 8-bit type */
-#define TIFF_INT8_T qint8
+#define TIFF_INT8_T int8_t
 
 /* Unsigned 16-bit type */
-#define TIFF_UINT16_T quint16
+#define TIFF_UINT16_T uint16_t
 
 /* Unsigned 32-bit type */
-#define TIFF_UINT32_T quint32
+#define TIFF_UINT32_T uint32_t
 
 /* Unsigned 64-bit type */
-#define TIFF_UINT64_T quint64
+#define TIFF_UINT64_T unsigned long long
 
 /* Unsigned 8-bit type */
-#define TIFF_UINT8_T quint8
+#define TIFF_UINT8_T uint8_t
 
 /* Signed size type */
-#define TIFF_SSIZE_T ssize_t
-
-/* Pointer difference type */
-#define TIFF_PTRDIFF_T ptrdiff_t
-
-/* Define to 1 if the system has the type `int16'. */
-/* #undef HAVE_INT16 */
-
-/* Define to 1 if the system has the type `int32'. */
-/* #undef HAVE_INT32 */
-
-/* Define to 1 if the system has the type `int8'. */
-/* #undef HAVE_INT8 */
+#define TIFF_SSIZE_T intptr_t
 
 /* Compatibility stuff. */
 

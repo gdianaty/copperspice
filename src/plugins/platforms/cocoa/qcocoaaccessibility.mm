@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,9 +21,11 @@
 *
 ***********************************************************************/
 
-#include "qcocoaaccessibility.h"
-#include "qcocoaaccessibilityelement.h"
+#include <qcocoaaccessibility.h>
+
 #include <qaccessible.h>
+#include <qcocoaaccessibilityelement.h>
+
 #include <qcore_mac_p.h>
 
 #ifndef QT_NO_ACCESSIBILITY
@@ -260,7 +262,6 @@ bool shouldBeIgnored(QAccessibleInterface *interface)
 NSArray *unignoredChildren(QAccessibleInterface *interface)
 {
    int numKids = interface->childCount();
-   // qDebug() << "Children for: " << axid << iface << " are: " << numKids;
 
    NSMutableArray *kids = [NSMutableArray arrayWithCapacity: numKids];
    for (int i = 0; i < numKids; ++i) {
@@ -270,7 +271,6 @@ NSArray *unignoredChildren(QAccessibleInterface *interface)
       }
 
       QAccessible::Id childId = QAccessible::uniqueId(child);
-      //qDebug() << "    kid: " << childId << child;
 
       QMacAccessibilityElement *element = [QMacAccessibilityElement elementWithId: childId];
       if (element) {

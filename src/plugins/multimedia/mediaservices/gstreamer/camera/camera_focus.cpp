@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -31,17 +31,9 @@
 
 #include <gst/interfaces/photography.h>
 
-#if !GST_CHECK_VERSION(1,0,0)
-typedef GstFocusMode GstPhotographyFocusMode;
-#endif
-
-//#define CAMERABIN_DEBUG 1
-
 CameraBinFocus::CameraBinFocus(CameraBinSession *session)
    : QCameraFocusControl(session),
-#if GST_CHECK_VERSION(1,0,0)
      QGstreamerBufferProbe(ProbeBuffers),
-#endif
      m_session(session),
      m_cameraStatus(QCamera::UnloadedStatus),
      m_focusMode(QCameraFocus::AutoFocus),
@@ -129,7 +121,6 @@ void CameraBinFocus::setFocusPointMode(QCameraFocus::FocusPointMode mode)
       return;
    }
 
-#if GST_CHECK_VERSION(1,0,0)
    if (m_focusPointMode == QCameraFocus::FocusPointFaceDetection) {
       g_object_set (G_OBJECT(source), "detect-faces", FALSE, NULL);
 
@@ -144,7 +135,6 @@ void CameraBinFocus::setFocusPointMode(QCameraFocus::FocusPointMode mode)
       QMutexLocker locker(&m_mutex);
       m_faces.clear();
    }
-#endif
 
    if (m_focusPointMode != QCameraFocus::FocusPointAuto) {
       resetFocusPoint();
@@ -154,7 +144,7 @@ void CameraBinFocus::setFocusPointMode(QCameraFocus::FocusPointMode mode)
       case QCameraFocus::FocusPointAuto:
       case QCameraFocus::FocusPointCustom:
          break;
-#if GST_CHECK_VERSION(1,0,0)
+
       case QCameraFocus::FocusPointFaceDetection:
          if (g_object_class_find_property(G_OBJECT_GET_CLASS(source), "detect-faces")) {
             if (GstPad *pad = gst_element_get_static_pad(source, "vfsrc")) {
@@ -164,7 +154,7 @@ void CameraBinFocus::setFocusPointMode(QCameraFocus::FocusPointMode mode)
             }
          }
          return;
-#endif
+
       default:
          return;
    }
@@ -182,13 +172,13 @@ bool CameraBinFocus::isFocusPointModeSupported(QCameraFocus::FocusPointMode mode
       case QCameraFocus::FocusPointAuto:
       case QCameraFocus::FocusPointCustom:
          return true;
-#if GST_CHECK_VERSION(1,0,0)
+
       case QCameraFocus::FocusPointFaceDetection:
          if (GstElement *source = m_session->cameraSource()) {
             return g_object_class_find_property(G_OBJECT_GET_CLASS(source), "detect-faces");
          }
          return false;
-#endif
+
       default:
          return false;
    }
@@ -230,7 +220,6 @@ QCameraFocusZoneList CameraBinFocus::focusZones() const
    if (m_focusPointMode != QCameraFocus::FocusPointFaceDetection) {
       zones.append(QCameraFocusZone(m_focusRect, m_focusZoneStatus));
 
-#if GST_CHECK_VERSION(1,0,0)
    } else {
 
       for (const QRect &face: m_faceFocusRects) {
@@ -242,8 +231,6 @@ QCameraFocusZoneList CameraBinFocus::focusZones() const
 
          zones.append(QCameraFocusZone(normalizedRect, m_focusZoneStatus));
       }
-#endif
-
    }
 
    return zones;
@@ -287,11 +274,8 @@ void CameraBinFocus::handleFocusMessage(GstMessage *gm)
 
 void CameraBinFocus::_q_setFocusStatus(QCamera::LockStatus status, QCamera::LockChangeReason reason)
 {
-#ifdef CAMERABIN_DEBUG
-   qDebug() << Q_FUNC_INFO << "Current:"
-            << m_focusStatus
-            << "New:"
-            << status << reason;
+#if defined(CS_SHOW_DEBUG_PLUGINS_GSTREAMER)
+   qDebug() << "CameraBinFocus::setFocusStatus() Current:" << m_focusStatus << "New:" << status << reason;
 #endif
 
    if (m_focusStatus != status) {
@@ -306,12 +290,10 @@ void CameraBinFocus::_q_setFocusStatus(QCamera::LockStatus status, QCamera::Lock
          emit focusZonesChanged();
       }
 
-#if GST_CHECK_VERSION(1,0,0)
       if (m_focusPointMode == QCameraFocus::FocusPointFaceDetection
             && m_focusStatus == QCamera::Unlocked) {
          _q_updateFaces();
       }
-#endif
 
       emit _q_focusStatusChanged(m_focusStatus, reason);
    }
@@ -454,8 +436,6 @@ void CameraBinFocus::updateRegionOfInterest(const QVector<QRect> &rectangles)
    gst_element_send_event(cameraSource, event);
 }
 
-#if GST_CHECK_VERSION(1,0,0)
-
 void CameraBinFocus::_q_updateFaces()
 {
    if (m_focusPointMode != QCameraFocus::FocusPointFaceDetection
@@ -523,6 +503,3 @@ bool CameraBinFocus::probeBuffer(GstBuffer *buffer)
 
    return true;
 }
-
-#endif
-

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,15 +23,15 @@
 
 #include <qpaintengineex_p.h>
 
-#include <qvarlengtharray.h>
 #include <qdebug.h>
+#include <qvarlengtharray.h>
 
-#include <qpainter_p.h>
-#include <qstroker_p.h>
 #include <qbezier_p.h>
-#include <qpainterpath_p.h>
 #include <qfontengine_p.h>
+#include <qpainter_p.h>
+#include <qpainterpath_p.h>
 #include <qstatictext_p.h>
+#include <qstroker_p.h>
 
 #if ! defined(QT_MAX_CACHED_GLYPH_SIZE)
 #  define QT_MAX_CACHED_GLYPH_SIZE 64
@@ -367,7 +367,7 @@ Q_GUI_EXPORT extern bool qt_scaleForTransform(const QTransform &transform, qreal
 
 void QPaintEngineEx::stroke(const QVectorPath &path, const QPen &pen)
 {
-#ifdef QT_DEBUG_DRAW
+#if defined(CS_SHOW_DEBUG_GUI_PAINTING)
    qDebug() << "QPaintEngineEx::stroke()" << pen;
 #endif
 
@@ -560,21 +560,21 @@ void QPaintEngineEx::stroke(const QVectorPath &path, const QPen &pen)
             }
 
          } else {
-            QPointF p = ((const QPointF *)points)[0] * state()->matrix;
-            d->activeStroker->moveTo(p.x(), p.y());
+            QPointF p1 = ((const QPointF *)points)[0] * state()->matrix;
+            d->activeStroker->moveTo(p1.x(), p1.y());
             points += 2;
 
             while (points < lastPoint) {
-               QPointF p = ((const QPointF *)points)[0] * state()->matrix;
-               d->activeStroker->lineTo(p.x(), p.y());
+               QPointF p2 = ((const QPointF *)points)[0] * state()->matrix;
+               d->activeStroker->lineTo(p2.x(), p2.y());
                points += 2;
             }
 
             if (path.hasImplicitClose()) {
-               d->activeStroker->lineTo(p.x(), p.y());
+               d->activeStroker->lineTo(p1.x(), p1.y());
             }
-
          }
+
          d->activeStroker->end();
       }
 
@@ -984,7 +984,7 @@ void QPaintEngineEx::drawTiledPixmap(const QRectF &r, const QPixmap &pixmap, con
 }
 
 void QPaintEngineEx::drawPixmapFragments(const QPainter::PixmapFragment *fragments, int fragmentCount,
-   const QPixmap &pixmap, QPainter::PixmapFragmentHints /*hints*/)
+      const QPixmap &pixmap, QPainter::PixmapFragmentHints)
 {
    if (pixmap.isNull()) {
       return;
@@ -1017,7 +1017,7 @@ void QPaintEngineEx::drawPixmapFragments(const QPainter::PixmapFragment *fragmen
 
 void QPaintEngineEx::setState(QPainterState *s)
 {
-   QPaintEngine::state = s;
+   m_engineState = s;
 }
 
 void QPaintEngineEx::updateState(const QPaintEngineState &)
@@ -1094,9 +1094,9 @@ void QPaintEngineEx::drawStaticTextItem(QStaticTextItem *staticTextItem)
       QPainterState *s = state();
       QPainter::RenderHints oldHints = s->renderHints;
       bool changedHints = false;
-      if (bool(oldHints & QPainter::TextAntialiasing)
-         && !bool(fontEngine->fontDef.styleStrategy & QFont::NoAntialias)
-         && !bool(oldHints & QPainter::Antialiasing)) {
+
+      if (bool(oldHints & QPainter::TextAntialiasing) && ! bool(fontEngine->m_fontDef.styleStrategy & QFont::NoAntialias)
+            && ! bool(oldHints & QPainter::Antialiasing)) {
          s->renderHints |= QPainter::Antialiasing;
          renderHintsChanged();
          changedHints = true;
@@ -1122,7 +1122,7 @@ bool QPaintEngineEx::shouldDrawCachedGlyphs(QFontEngine *fontEngine, const QTran
       return true;
    }
 
-   qreal pixelSize = fontEngine->fontDef.pixelSize;
-   return (pixelSize * pixelSize * qAbs(m.determinant())) <
-      QT_MAX_CACHED_GLYPH_SIZE * QT_MAX_CACHED_GLYPH_SIZE;
+   qreal pixelSize = fontEngine->m_fontDef.pixelSize;
+
+   return (pixelSize * pixelSize * qAbs(m.determinant())) < QT_MAX_CACHED_GLYPH_SIZE * QT_MAX_CACHED_GLYPH_SIZE;
 }

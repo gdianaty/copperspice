@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,10 +22,11 @@
 ***********************************************************************/
 
 #include <qtiffhandler_p.h>
-#include <qvariant.h>
+
 #include <qdebug.h>
-#include <qimage.h>
 #include <qglobal.h>
+#include <qimage.h>
+#include <qvariant.h>
 
 #include <stdlib.h>
 
@@ -142,7 +143,7 @@ bool QTiffHandler::canRead()
 bool QTiffHandler::canRead(QIODevice *device)
 {
    if (! device) {
-      qWarning("QTiffHandler::canRead() called with no device");
+      qWarning("QTiffHandler::canRead() No device");
       return false;
    }
 
@@ -587,8 +588,9 @@ bool QTiffHandler::write(const QImage &image)
 
          int chunkStart = y;
          int chunkEnd = y + chunk.height();
+
          while (y < chunkEnd) {
-            if (QSysInfo::ByteOrder == QSysInfo::LittleEndian) {
+            if constexpr (QSysInfo::ByteOrder == QSysInfo::LittleEndian) {
                convert32BitOrder(chunk.scanLine(y - chunkStart), width);
             } else {
                convert32BitOrderBigEndian(chunk.scanLine(y - chunkStart), width);

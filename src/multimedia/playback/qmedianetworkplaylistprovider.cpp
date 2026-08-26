@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,11 +21,12 @@
 *
 ***********************************************************************/
 
+#include <qmedianetworkplaylistprovider_p.h>
+
 #include <qmediacontent.h>
 
-#include <qmedianetworkplaylistprovider_p.h>
-#include <qmediaplaylistprovider_p.h>
 #include <qmediaobject_p.h>
+#include <qmediaplaylistprovider_p.h>
 
 class QMediaNetworkPlaylistProviderPrivate: public QMediaPlaylistProviderPrivate
 {
@@ -164,7 +165,6 @@ bool QMediaNetworkPlaylistProvider::addMedia(const QList<QMediaContent> &items)
    return true;
 }
 
-
 bool QMediaNetworkPlaylistProvider::insertMedia(int pos, const QMediaContent &content)
 {
    Q_D(QMediaNetworkPlaylistProvider);
@@ -224,6 +224,7 @@ bool QMediaNetworkPlaylistProvider::removeMedia(int pos)
 bool QMediaNetworkPlaylistProvider::clear()
 {
    Q_D(QMediaNetworkPlaylistProvider);
+
    if (!d->resources.isEmpty()) {
       int lastPos = mediaCount() - 1;
       emit mediaAboutToBeRemoved(0, lastPos);
@@ -237,6 +238,7 @@ bool QMediaNetworkPlaylistProvider::clear()
 void QMediaNetworkPlaylistProvider::shuffle()
 {
    Q_D(QMediaNetworkPlaylistProvider);
+
    if (!d->resources.isEmpty()) {
       QList<QMediaContent> resources;
 
@@ -247,7 +249,6 @@ void QMediaNetworkPlaylistProvider::shuffle()
       d->resources = resources;
       emit mediaChanged(0, mediaCount() - 1);
    }
-
 }
 
 void QMediaNetworkPlaylistProvider::_q_handleParserError(QPlaylistFileParser::ParserError error, const QString &errorMsg)

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,13 @@
 #ifndef QDeduplicateIterator_P_H
 #define QDeduplicateIterator_P_H
 
-#include <QList>
+#include <qlist.h>
+
 #include <qexpression_p.h>
 #include <qitem_p.h>
 #include <qatomiccomparator_p.h>
 #include <qcomparisonplatform_p.h>
 #include <qsourcelocationreflection_p.h>
-
-QT_BEGIN_NAMESPACE
 
 namespace QPatternist {
 
@@ -45,17 +44,9 @@ class DeduplicateIterator : public ListIterator<Item>
    xsInteger count() override;
 
  private:
-   /**
-    * m_position in ListIteratorPlatform is the position that we
-    * show to the outside through position) but do not correspond
-    * to the position in m_list, since we skip entries in that one.
-    *
-    * However, this guy, m_listPos, is the position into m_list.
-    */
    int m_listPos;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

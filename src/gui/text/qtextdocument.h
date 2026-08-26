@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,33 +24,34 @@
 #ifndef QTEXTDOCUMENT_H
 #define QTEXTDOCUMENT_H
 
-#include <qobject.h>
-#include <qsize.h>
-#include <qrect.h>
+#include <qcontainerfwd.h>
 #include <qfont.h>
+#include <qobject.h>
+#include <qrect.h>
+#include <qscopedpointer.h>
+#include <qsize.h>
 #include <qtextcursor.h>
 #include <qurl.h>
 #include <qvariant.h>
-#include <qcontainerfwd.h>
-#include <QScopedPointer>
 
-class QTextFormatCollection;
-class QTextListFormat;
-class QRect;
-class QPainter;
-class QPagedPaintDevice;
 class QAbstractTextDocumentLayout;
+class QPagedPaintDevice;
+class QPainter;
 class QPoint;
-class QTextObject;
-class QTextFormat;
-class QTextFrame;
+class QRect;
+class QRectF;
 class QTextBlock;
 class QTextCodec;
-class QTextDocumentPrivate;
-class QVariant;
-class QRectF;
-class QTextOption;
 class QTextCursor;
+class QTextFormat;
+class QTextFormatCollection;
+class QTextFrame;
+class QTextListFormat;
+class QTextObject;
+class QTextOption;
+class QVariant;
+
+class QTextDocumentPrivate;
 
 namespace CsText {
 

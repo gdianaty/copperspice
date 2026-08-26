@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,24 +25,27 @@
 #define QTOOLBAR_P_H
 
 #include <qtoolbar.h>
+
 #include <qaction.h>
-#include <qwidget_p.h>
 #include <qbasictimer.h>
+#include <qlayoutitem.h>
+
+#include <qwidget_p.h>
 
 #ifndef QT_NO_TOOLBAR
 
-class QToolBarLayout;
 class QTimer;
+class QToolBarLayout;
 
 class QToolBarPrivate : public QWidgetPrivate
 {
    Q_DECLARE_PUBLIC(QToolBar)
 
  public:
-   inline QToolBarPrivate()
+   QToolBarPrivate()
       : explicitIconSize(false), explicitToolButtonStyle(false), movable(true), floatable(true),
         allowedAreas(Qt::AllToolBarAreas), orientation(Qt::Horizontal),
-        toolButtonStyle(Qt::ToolButtonIconOnly), layout(nullptr), state(nullptr)
+        toolButtonStyle(Qt::ToolButtonIconOnly), m_toolbarLayout(nullptr), state(nullptr)
 #ifdef Q_OS_DARWIN
       , macWindowDragging(false)
 #endif
@@ -66,7 +69,7 @@ class QToolBarPrivate : public QWidgetPrivate
 
    QAction *toggleViewAction;
 
-   QToolBarLayout *layout;
+   QToolBarLayout *m_toolbarLayout;
 
    struct DragState {
       QPoint pressPos;

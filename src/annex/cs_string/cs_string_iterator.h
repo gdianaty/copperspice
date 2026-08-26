@@ -1,12 +1,12 @@
 /***********************************************************************
 *
-* Copyright (c) 2017-2023 Barbara Geller
-* Copyright (c) 2017-2023 Ansel Sermersheim
+* Copyright (c) 2017-2026 Barbara Geller
+* Copyright (c) 2017-2026 Ansel Sermersheim
 *
 * This file is part of CsString.
 *
-* CsString is free software, released under the BSD 2-Clause license.
-* For license details refer to LICENSE provided with this project.
+* CsString is free software which is released under the BSD 2-Clause license.
+* For license details refer to the LICENSE provided with this project.
 *
 * CsString is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,10 +19,11 @@
 #ifndef LIB_CS_STRING_ITERATOR_H
 #define LIB_CS_STRING_ITERATOR_H
 
+#include <cs_char.h>
+
+#include <compare>
 #include <cstddef>
 #include <vector>
-
-#include <cs_char.h>
 
 namespace CsString {
 
@@ -61,13 +62,23 @@ class CsStringIterator
 
       CsChar operator[](size_type n) const;
 
-      // comparisons
-      bool operator!=(const CsStringIterator &other) const;
-      bool operator==(const CsStringIterator &other) const;
-      bool operator<(const CsStringIterator &other) const;
-      bool operator<=(const CsStringIterator &other) const;
-      bool operator>(const CsStringIterator &other) const;
-      bool operator>=(const CsStringIterator &other) const;
+      std::strong_ordering operator<=>(const CsStringIterator &other) const {
+
+         if (m_iter < other.m_iter) {
+            return std::strong_ordering::less;
+
+         } else if (m_iter > other.m_iter) {
+            return std::strong_ordering::greater;
+
+         } else {
+            return std::strong_ordering::equal;
+
+         }
+      }
+
+      bool operator==(const CsStringIterator &other) const {
+         return m_iter == other.m_iter;
+      }
 
       // math
       CsStringIterator &operator+=(size_type n);
@@ -83,6 +94,8 @@ class CsStringIterator
       CsStringIterator operator--(int);
 
       typename std::pair<v_iter, v_iter> codePointRange() const;
+
+      CsStringIterator advance_storage(size_type n) const;
       v_iter codePointBegin() const;
       v_iter codePointEnd() const;
 
@@ -110,43 +123,6 @@ CsChar CsStringIterator<E,A>:: operator[](size_type n) const
 {
    // calls operator+()
    return *(*this + n);
-}
-
-// comparisons
-template <typename E, typename A>
-bool CsStringIterator <E,A>::operator!=(const CsStringIterator &other) const
-{
-   return m_iter != other.m_iter;
-}
-
-template <typename E, typename A>
-bool CsStringIterator <E,A>::operator==(const CsStringIterator &other) const
-{
-   return m_iter == other.m_iter;
-}
-
-template <typename E, typename A>
-bool CsStringIterator <E,A>::operator<(const CsStringIterator &other) const
-{
-   return m_iter < other.m_iter;
-}
-
-template <typename E, typename A>
-bool CsStringIterator <E,A>::operator<=(const CsStringIterator &other) const
-{
-   return m_iter <= other.m_iter;
-}
-
-template <typename E, typename A>
-bool CsStringIterator <E,A>::operator>(const CsStringIterator &other) const
-{
-   return m_iter > other.m_iter;
-}
-
-template <typename E, typename A>
-bool CsStringIterator <E,A>::operator>=(const CsStringIterator &other) const
-{
-   return m_iter >= other.m_iter;
 }
 
 // math
@@ -236,6 +212,13 @@ template <typename E, typename A>
 auto CsStringIterator<E,A>::codePointRange() const -> typename std::pair<v_iter, v_iter>
 {
    return std::make_pair(m_iter, m_iter + E::walk(1, m_iter));
+}
+
+template <typename E, typename A>
+CsStringIterator<E,A> CsStringIterator<E,A>::advance_storage(size_type n) const
+{
+   CsStringIterator retval = CsStringIterator(m_iter + n);
+   return retval;
 }
 
 template <typename E, typename A>

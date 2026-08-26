@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,17 +24,16 @@
 #ifndef QSVGSTYLE_P_H
 #define QSVGSTYLE_P_H
 
-#include <qpainter.h>
+#include <qbrush.h>
+#include <qcolor.h>
+#include <qdebug.h>
+#include <qfont.h>
+#include <qmatrix.h>
 #include <qpainter.h>
 #include <qpen.h>
-#include <qbrush.h>
-#include <qmatrix.h>
-#include <qcolor.h>
-#include <qfont.h>
-#include <qdebug.h>
 
-class QSvgNode;
 class QSvgFont;
+class QSvgNode;
 class QSvgTinyDocument;
 
 template <class T> class QSvgRefCounter
@@ -86,10 +85,11 @@ template <class T> class QSvgRefCounter
       }
    }
 
-   inline T *operator->() const {
+   T *operator->() const {
       return t;
    }
-   inline operator T *() const {
+
+   operator T *() const {
       return t;
    }
 
@@ -107,12 +107,10 @@ class QSvgRefCounted
    virtual ~QSvgRefCounted() {}
    void ref() {
       ++_ref;
-      //        qDebug() << this << ": adding ref, now " << _ref;
    }
+
    void deref() {
-      //        qDebug() << this << ": removing ref, now " << _ref;
       if (!--_ref) {
-         //            qDebug("     deleting");
          delete this;
       }
    }

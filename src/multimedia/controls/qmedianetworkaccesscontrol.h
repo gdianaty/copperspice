@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,11 +24,10 @@
 #ifndef QMEDIANETWORKACCESSCONTROL_H
 #define QMEDIANETWORKACCESSCONTROL_H
 
-#include <qmediacontrol.h>
-
 #include <qlist.h>
-#include <qstring.h>
+#include <qmediacontrol.h>
 #include <qnetworkconfiguration.h>
+#include <qstring.h>
 
 class Q_MULTIMEDIA_EXPORT QMediaNetworkAccessControl : public QMediaControl
 {

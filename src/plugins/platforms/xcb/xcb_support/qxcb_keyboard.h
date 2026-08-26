@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,14 +27,14 @@
 #include <qevent.h>
 #include <qxcb_object.h>
 
+class QWindow;
+
 #include <xcb/xcb_keysyms.h>
 #include <xkbcommon/xkbcommon.h>
 
 #ifndef QT_NO_XKB
 #include <xkbcommon/xkbcommon-x11.h>
 #endif
-
-class QWindow;
 
 class QXcbKeyboard : public QXcbObject
 {
@@ -55,9 +55,8 @@ class QXcbKeyboard : public QXcbObject
    void updateXKBMods();
    quint32 xkbModMask(quint16 state);
    void updateXKBStateFromCore(quint16 state);
-#ifdef XCB_USE_XINPUT22
    void updateXKBStateFromXI(void *modInfo, void *groupInfo);
-#endif
+
 #ifndef QT_NO_XKB
    // when XKEYBOARD is present on the X server
    int coreDeviceId() const {

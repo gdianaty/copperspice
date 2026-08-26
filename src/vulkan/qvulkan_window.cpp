@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,10 @@
 #include <qvulkan_window.h>
 
 #include <qmatrix4x4.h>
+#include <qplatform_screen.h>
+#include <qplatform_window.h>
 #include <qvulkan_device_functions.h>
 #include <qvulkan_functions.h>
-#include <qplatform_window.h>
-#include <qplatform_screen.h>
 
 #if defined(Q_OS_UNIX)
 #include <xcb/xcb.h>
@@ -75,7 +75,7 @@ QVector<T> filter_sort_queues(QVector<T> data, Flags f)
    return retval;
 }
 
-};
+}
 
 QVulkanWindow::QVulkanWindow(QWindow *parent)
    : QWindow(parent), m_isValid(false), m_concurrentFrameCount(MAX_CONCURRENT_FRAME_COUNT), m_currentFrame(0),
@@ -268,11 +268,11 @@ bool QVulkanWindow::initialize()
    return true;
 }
 
-std::pair<vk::UniqueHandle<vk::Device, vk::DispatchLoaderDynamic>, QVector<vk::Queue>>
-QVulkanWindow::createLogicalDevice(std::pair<const vk::QueueFamilyProperties &, uint32_t> deviceProperties, QStringList extensions)
+std::pair<vk::UniqueHandle<vk::Device, vk_cs::DispatchLoaderDynamic>, QVector<vk::Queue>>
+   QVulkanWindow::createLogicalDevice(std::pair<const vk::QueueFamilyProperties &, uint32_t> deviceProperties, QStringList extensions)
 {
    auto instance = vulkanInstance();
-   vk::UniqueHandle<vk::Device, vk::DispatchLoaderDynamic> device;
+   vk::UniqueHandle<vk::Device, vk_cs::DispatchLoaderDynamic> device;
 
    auto &physicalDevice   = m_physicalDevices[m_physicalDeviceIndex];
    auto &[properties, id] = deviceProperties;
@@ -411,7 +411,7 @@ bool QVulkanWindow::populatePhysicalDevices() const
    }
 
    for (auto &item : devices) {
-      properties.append(item.getProperties(instance->dispatchLoader()));
+      properties.append(VkPhysicalDeviceProperties(item.getProperties(instance->dispatchLoader())));
    }
 
    m_physicalDevices = devices;

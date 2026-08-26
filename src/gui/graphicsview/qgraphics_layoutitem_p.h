@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,14 +28,21 @@
 #include <qsizepolicy.h>
 
 class QGraphicsLayoutItem;
+
 class QGraphicsLayoutItemPrivate
 {
    Q_DECLARE_PUBLIC(QGraphicsLayoutItem)
 
  public:
-   virtual ~QGraphicsLayoutItemPrivate();
+   enum SizeComponent {
+      Width,
+      Height
+   };
 
    QGraphicsLayoutItemPrivate(QGraphicsLayoutItem *parent, bool isLayout);
+
+   virtual ~QGraphicsLayoutItemPrivate();
+
    static QGraphicsLayoutItemPrivate *get(QGraphicsLayoutItem *q) {
       return q->d_func();
    }
@@ -49,14 +56,14 @@ class QGraphicsLayoutItemPrivate
    QGraphicsItem *parentItem() const;
    void ensureUserSizeHints();
    void setSize(Qt::SizeHint which, const QSizeF &size);
-   enum SizeComponent { Width, Height };
+
    void setSizeComponent(Qt::SizeHint which, SizeComponent component, qreal value);
 
    bool hasHeightForWidth() const;
    bool hasWidthForHeight() const;
 
    QSizePolicy sizePolicy;
-   QGraphicsLayoutItem *parent;
+   QGraphicsLayoutItem *m_layoutItemParent;
 
    QSizeF *userSizeHints;
    mutable QSizeF cachedSizeHints[Qt::NSizeHints];
@@ -69,7 +76,7 @@ class QGraphicsLayoutItemPrivate
    quint32 ownedByLayout : 1;
 
    QGraphicsLayoutItem *q_ptr;
-   QRectF geom;
+   QRectF m_layoutItemRect;
    QGraphicsItem *graphicsItem;
 };
 

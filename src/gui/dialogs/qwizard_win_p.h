@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,14 +27,15 @@
 #ifndef QT_NO_WIZARD
 #ifndef QT_NO_STYLE_WINDOWSVISTA
 
-#include <qt_windows.h>
-#include <qobject.h>
-#include <qwidget.h>
 #include <qabstractbutton.h>
-#include <qwidget_p.h>
+#include <qobject.h>
+#include <qt_windows.h>
+#include <qwidget.h>
+
 #include <qstylehelper_p.h>
+#include <qwidget_p.h>
 
-
+class QWizard;
 
 class QVistaBackButton : public QAbstractButton
 {
@@ -42,7 +43,8 @@ class QVistaBackButton : public QAbstractButton
    QVistaBackButton(QWidget *widget);
 
    QSize sizeHint() const override;
-   inline QSize minimumSizeHint() const override {
+
+   QSize minimumSizeHint() const override {
       return sizeHint();
    }
 
@@ -51,14 +53,23 @@ class QVistaBackButton : public QAbstractButton
    void paintEvent(QPaintEvent *event) override;
 };
 
-class QWizard;
-
 class QVistaHelper : public QObject
 {
  public:
+   enum TitleBarChangeType {
+      NormalTitleBar,
+      ExtendedTitleBar
+   };
+
+   enum VistaState {
+      VistaAero,
+      VistaBasic,
+      Classic,
+      Dirty
+   };
+
    QVistaHelper(QWizard *wizard);
    ~QVistaHelper();
-   enum TitleBarChangeType { NormalTitleBar, ExtendedTitleBar };
 
    void updateCustomMargins(bool vistaMargins);
    bool setDWMTitleBar(TitleBarChangeType type);
@@ -69,18 +80,19 @@ class QVistaHelper : public QObject
    void paintEvent(QPaintEvent *event);
 
    QVistaBackButton *backButton() const {
-      return backButton_;
+      return m_backButton;
    }
 
    void disconnectBackButton();
+
    void hideBackButton() {
-      if (backButton_) {
-         backButton_->hide();
+      if (m_backButton != nullptr) {
+         m_backButton->hide();
       }
    }
 
    QColor basicWindowFrameColor();
-   enum VistaState { VistaAero, VistaBasic, Classic, Dirty };
+
    static VistaState vistaState();
 
    static int titleBarSize() {
@@ -98,7 +110,14 @@ class QVistaHelper : public QObject
 
    static int topOffset();
    static HDC backingStoreDC(const QWidget *wizard, QPoint *offset);
+
  private:
+   enum Changes {
+      resizeTop,
+      movePosition,
+      noChange
+   };
+
    HWND wizardHWND() const;
    bool drawTitleText(QPainter *painter, const QString &text, const QRect &rect, HDC hdc);
    static bool drawBlackRect(const QRect &rect, HDC hdc);
@@ -122,7 +141,7 @@ class QVistaHelper : public QObject
    static int glowSize();
 
    int leftMargin() {
-      return backButton_->isVisible() ? backButtonSize() + iconSpacing : 0;
+      return m_backButton->isVisible() ? backButtonSize() + iconSpacing : 0;
    }
 
    int titleOffset();
@@ -141,22 +160,23 @@ class QVistaHelper : public QObject
    static VistaState cachedVistaState;
    static bool isCompositionEnabled();
    static bool isThemeActive();
-   enum Changes { resizeTop, movePosition, noChange } change;
+
+   Changes change;
    QPoint pressedPos;
    bool pressed;
    QRect rtTop;
    QRect rtTitle;
-   QWizard *wizard;
-   QVistaBackButton *backButton_;
+
+   QWizard *m_vistaWizard;
+   QVistaBackButton *m_backButton;
 
    int titleBarOffset;  // Extra spacing above the text
-   int iconSpacing;    // Space between button and icon
-   int textSpacing;    // Space between icon and text
+   int iconSpacing;     // Space between button and icon
+   int textSpacing;     // Space between icon and text
    static int m_devicePixelRatio;
 };
 
-
-
 #endif // QT_NO_STYLE_WINDOWSVISTA
 #endif // QT_NO_WIZARD
+
 #endif

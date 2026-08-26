@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,11 +24,11 @@
 #ifndef QMaintainingReader_P_H
 #define QMaintainingReader_P_H
 
-#include <QSet>
-#include <QSourceLocation>
-#include <QStack>
-#include <QStringList>
-#include <QXmlStreamReader>
+#include <qset.h>
+#include <qsourcelocation.h>
+#include <qstack.h>
+#include <qstringlist.h>
+#include <qxmlstreamreader.h>
 
 #include <qxpathhelper_p.h>
 #include <qxslttokenlookup_p.h>

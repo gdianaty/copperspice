@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -37,13 +37,10 @@
 
 #define QAPP_CHECK(functionName) \
     if (! qApp) { \
-        qWarning("QAction: Initialize QApplication before calling '" functionName "'."); \
+        qWarning("QAction::%s() QApplication must be created before calling this method", functionName ); \
         return; \
     }
 
-/*
-  internal: guesses a descriptive text from a text suited for a menu entry
- */
 static QString qt_strippedText(QString s)
 {
    s.remove("...");
@@ -205,7 +202,6 @@ QAction::QAction(QObject *parent)
    }
 }
 
-
 QAction::QAction(const QString &text, QObject *parent)
    : QObject(parent), d_ptr(new QActionPrivate)
 {
@@ -218,7 +214,6 @@ QAction::QAction(const QString &text, QObject *parent)
       d->group->addAction(this);
    }
 }
-
 
 QAction::QAction(const QIcon &icon, const QString &text, QObject *parent)
    : QObject(parent), d_ptr(new QActionPrivate)
@@ -234,9 +229,6 @@ QAction::QAction(const QIcon &icon, const QString &text, QObject *parent)
    }
 }
 
-/*!
-    \internal
-*/
 QAction::QAction(QActionPrivate &dd, QObject *parent)
    : QObject(parent), d_ptr(&dd)
 {
@@ -249,9 +241,6 @@ QAction::QAction(QActionPrivate &dd, QObject *parent)
    }
 }
 
-/*!
-    Returns the parent widget.
-*/
 QWidget *QAction::parentWidget() const
 {
    QObject *ret = parent();
@@ -268,7 +257,6 @@ QList<QWidget *> QAction::associatedWidgets() const
 }
 
 #ifndef QT_NO_GRAPHICSVIEW
-
 QList<QGraphicsWidget *> QAction::associatedGraphicsWidgets() const
 {
    Q_D(const QAction);
@@ -316,13 +304,11 @@ void QAction::setShortcuts(const QList<QKeySequence> &shortcuts)
    d->sendDataChanged();
 }
 
-
 void QAction::setShortcuts(QKeySequence::StandardKey key)
 {
    QList <QKeySequence> list = QKeySequence::keyBindings(key);
    setShortcuts(list);
 }
-
 
 QKeySequence QAction::shortcut() const
 {
@@ -330,34 +316,32 @@ QKeySequence QAction::shortcut() const
    return d->shortcut;
 }
 
-
 QList<QKeySequence> QAction::shortcuts() const
 {
    Q_D(const QAction);
    QList <QKeySequence> shortcuts;
+
    if (!d->shortcut.isEmpty()) {
       shortcuts << d->shortcut;
    }
+
    if (!d->alternateShortcuts.isEmpty()) {
       shortcuts << d->alternateShortcuts;
    }
+
    return shortcuts;
 }
 
-/*!
-    \property QAction::shortcutContext
-    \brief the context for the action's shortcut
-
-    Valid values for this property can be found in \l Qt::ShortcutContext.
-    The default value is Qt::WindowShortcut.
-*/
 void QAction::setShortcutContext(Qt::ShortcutContext context)
 {
    Q_D(QAction);
+
    if (d->shortcutContext == context) {
       return;
    }
+
    QAPP_CHECK("setShortcutContext");
+
    d->shortcutContext = context;
    d->redoGrab(qApp->d_func()->shortcutMap);
    d->redoGrabAlternate(qApp->d_func()->shortcutMap);
@@ -370,23 +354,16 @@ Qt::ShortcutContext QAction::shortcutContext() const
    return d->shortcutContext;
 }
 
-/*!
-    \property QAction::autoRepeat
-    \brief whether the action can auto repeat
-    \since 4.2
-
-    If true, the action will auto repeat when the keyboard shortcut
-    combination is held down, provided that keyboard auto repeat is
-    enabled on the system.
-    The default value is true.
-*/
 void QAction::setAutoRepeat(bool on)
 {
    Q_D(QAction);
+
    if (d->autorepeat == on) {
       return;
    }
+
    QAPP_CHECK("setAutoRepeat");
+
    d->autorepeat = on;
    d->redoGrab(qApp->d_func()->shortcutMap);
    d->redoGrabAlternate(qApp->d_func()->shortcutMap);
@@ -400,10 +377,10 @@ bool QAction::autoRepeat() const
 }
 #endif // QT_NO_SHORTCUT
 
-
 void QAction::setFont(const QFont &font)
 {
    Q_D(QAction);
+
    if (d->font == font) {
       return;
    }
@@ -419,9 +396,6 @@ QFont QAction::font() const
    return d->font;
 }
 
-/*!
-    Destroys the object and frees allocated resources.
-*/
 QAction::~QAction()
 {
    Q_D(QAction);
@@ -429,12 +403,14 @@ QAction::~QAction()
       QWidget *w = d->widgets.at(i);
       w->removeAction(this);
    }
+
 #ifndef QT_NO_GRAPHICSVIEW
    for (int i = d->graphicsWidgets.size() - 1; i >= 0; --i) {
       QGraphicsWidget *w = d->graphicsWidgets.at(i);
       w->removeAction(this);
    }
 #endif
+
    if (d->group) {
       d->group->removeAction(this);
    }
@@ -450,17 +426,10 @@ QAction::~QAction()
 #endif
 }
 
-/*!
-  Sets this action group to \a group. The action will be automatically
-  added to the group's list of actions.
-
-  Actions within the group will be mutually exclusive.
-
-  \sa QActionGroup, QAction::actionGroup()
-*/
 void QAction::setActionGroup(QActionGroup *group)
 {
    Q_D(QAction);
+
    if (group == d->group) {
       return;
    }
@@ -468,7 +437,9 @@ void QAction::setActionGroup(QActionGroup *group)
    if (d->group) {
       d->group->removeAction(this);
    }
+
    d->group = group;
+
    if (group) {
       group->addAction(this);
    }
@@ -494,16 +465,12 @@ QIcon QAction::icon() const
 }
 
 #ifndef QT_NO_MENU
-
 QMenu *QAction::menu() const
 {
    Q_D(const QAction);
    return d->menu;
 }
 
-/*!
-    Sets the menu contained by this action to the specified \a menu.
-*/
 void QAction::setMenu(QMenu *menu)
 {
    Q_D(QAction);
@@ -516,20 +483,12 @@ void QAction::setMenu(QMenu *menu)
    }
    d->sendDataChanged();
 }
-#endif // QT_NO_MENU
+#endif
 
-/*!
-  If \a b is true then this action will be considered a separator.
-
-  How a separator is represented depends on the widget it is inserted
-  into. Under most circumstances the text, submenu, and icon will be
-  ignored for separator actions.
-
-  \sa QAction::isSeparator()
-*/
 void QAction::setSeparator(bool b)
 {
    Q_D(QAction);
+
    if (d->separator == b) {
       return;
    }
@@ -538,30 +497,12 @@ void QAction::setSeparator(bool b)
    d->sendDataChanged();
 }
 
-/*!
-  Returns true if this action is a separator action; otherwise it
-  returns false.
-
-  \sa QAction::setSeparator()
-*/
 bool QAction::isSeparator() const
 {
    Q_D(const QAction);
    return d->separator;
 }
 
-/*!
-    \property QAction::text
-    \brief the action's descriptive text
-
-    If the action is added to a menu, the menu option will consist of
-    the icon (if there is one), the text, and the shortcut (if there
-    is one). If the text is not explicitly set in the constructor, or
-    by using setText(), the action's description icon text will be
-    used as text. There is no default text.
-
-    \sa iconText
-*/
 void QAction::setText(const QString &text)
 {
    Q_D(QAction);
@@ -576,14 +517,16 @@ void QAction::setText(const QString &text)
 QString QAction::text() const
 {
    Q_D(const QAction);
+
    QString s = d->text;
+
    if (s.isEmpty()) {
       s = d->iconText;
-      s.replace(QLatin1Char('&'), QLatin1String("&&"));
+      s.replace(QChar('&'), QString("&&"));
    }
+
    return s;
 }
-
 
 void QAction::setIconText(const QString &text)
 {
@@ -605,17 +548,6 @@ QString QAction::iconText() const
    return d->iconText;
 }
 
-/*!
-    \property QAction::toolTip
-    \brief the action's tooltip
-
-    This text is used for the tooltip. If no tooltip is specified,
-    the action's text is used.
-
-    By default, this property contains the action's text.
-
-    \sa setStatusTip() setShortcut()
-*/
 void QAction::setToolTip(const QString &tooltip)
 {
    Q_D(QAction);
@@ -639,17 +571,6 @@ QString QAction::toolTip() const
    return d->tooltip;
 }
 
-/*!
-    \property QAction::statusTip
-    \brief the action's status tip
-
-    The status tip is displayed on all status bars provided by the
-    action's top-level parent widget.
-
-    By default, this property contains an empty string.
-
-    \sa setToolTip() showStatusText()
-*/
 void QAction::setStatusTip(const QString &statustip)
 {
    Q_D(QAction);
@@ -684,7 +605,6 @@ QString QAction::whatsThis() const
    return d->whatsthis;
 }
 
-
 void QAction::setPriority(Priority priority)
 {
    Q_D(QAction);
@@ -702,10 +622,10 @@ QAction::Priority QAction::priority() const
    return d->priority;
 }
 
-
 void QAction::setCheckable(bool b)
 {
    Q_D(QAction);
+
    if (d->checkable == b) {
       return;
    }
@@ -727,18 +647,10 @@ void QAction::toggle()
    setChecked(!d->checked);
 }
 
-/*!
-    \property QAction::checked
-    \brief whether the action is checked.
-
-    Only checkable actions can be checked.  By default, this is false
-    (the action is unchecked).
-
-    \sa checkable
-*/
 void QAction::setChecked(bool b)
 {
    Q_D(QAction);
+
    if (!d->checkable || d->checked == b) {
       return;
    }
@@ -746,6 +658,7 @@ void QAction::setChecked(bool b)
    QPointer<QAction> guard(this);
    d->checked = b;
    d->sendDataChanged();
+
    if (guard) {
       emit toggled(b);
    }
@@ -769,9 +682,11 @@ void QAction::setEnabled(bool b)
    }
    QAPP_CHECK("setEnabled");
    d->enabled = b;
+
 #ifndef QT_NO_SHORTCUT
    d->setShortcutEnabled(b, qApp->d_func()->shortcutMap);
 #endif
+
    d->sendDataChanged();
 }
 
@@ -781,19 +696,6 @@ bool QAction::isEnabled() const
    return d->enabled;
 }
 
-/*!
-    \property QAction::visible
-    \brief whether the action can be seen (e.g. in menus and toolbars)
-
-    If \e visible is true the action can be seen (e.g. in menus and
-    toolbars) and chosen by the user; if \e visible is false the
-    action cannot be seen or chosen by the user.
-
-    Actions which are not visible are \e not grayed out; they do not
-    appear at all.
-
-    By default, this property is true (actions are visible).
-*/
 void QAction::setVisible(bool b)
 {
    Q_D(QAction);
@@ -803,13 +705,14 @@ void QAction::setVisible(bool b)
    QAPP_CHECK("setVisible");
    d->forceInvisible = !b;
    d->visible = b;
-   d->enabled = b && !d->forceDisabled && (!d->group || d->group->isEnabled()) ;
+   d->enabled = b && !d->forceDisabled && (!d->group || d->group->isEnabled());
+
 #ifndef QT_NO_SHORTCUT
    d->setShortcutEnabled(d->enabled, qApp->d_func()->shortcutMap);
 #endif
+
    d->sendDataChanged();
 }
-
 
 bool QAction::isVisible() const
 {
@@ -817,9 +720,6 @@ bool QAction::isVisible() const
    return d->visible;
 }
 
-/*!
-  \reimp
-*/
 bool QAction::event(QEvent *e)
 {
 #ifndef QT_NO_SHORTCUT
@@ -830,7 +730,7 @@ bool QAction::event(QEvent *e)
          "QAction::event", "Received shortcut event from incorrect shortcut");
 
       if (se->isAmbiguous()) {
-         qWarning("QAction::eventFilter: Ambiguous shortcut overload: %s",
+         qWarning("QAction::event() Current shortcut is an ambiguous overload: %s",
             se->key().toString(QKeySequence::NativeText).toLatin1().constData());
 
       } else {
@@ -839,16 +739,11 @@ bool QAction::event(QEvent *e)
 
       return true;
    }
-
 #endif
+
    return QObject::event(e);
 }
 
-/*!
-  Returns the user data as set in QAction::setData.
-
-  \sa setData()
-*/
 QVariant QAction::data() const
 {
    Q_D(const QAction);
@@ -872,7 +767,8 @@ void QAction::activate(ActionEvent event)
    Q_D(QAction);
 
    if (event == Trigger) {
-      QPointer<QObject> guard = this;
+      QPointer<QObject> guard = QPointer<QObject>(this);
+
       if (d->checkable) {
          // the checked action of an exclusive group cannot be  unchecked
          if (d->checked && (d->group && d->group->isExclusive()
@@ -934,32 +830,36 @@ bool QAction::isIconVisibleInMenu() const
    return d->iconVisibleInMenu;
 }
 
-
 Q_GUI_EXPORT QDebug operator<<(QDebug d, const QAction *action)
 {
    QDebugStateSaver saver(d);
    d.nospace();
    d << "QAction(" << static_cast<const void *>(action);
+
    if (action) {
       d << " text=" << action->text();
       if (!action->toolTip().isEmpty()) {
          d << " toolTip=" << action->toolTip();
       }
+
       if (action->isCheckable()) {
          d << " checked=" << action->isChecked();
       }
       if (!action->shortcut().isEmpty()) {
          d << " shortcut=" << action->shortcut();
       }
+
       d << " menuRole=";
       QtDebugUtils::formatQEnum(d, action->menuRole());
       d << " visible=" << action->isVisible();
    } else {
+
       d << '0';
    }
+
    d << ')';
+
    return d;
 }
-
 
 #endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -45,10 +45,11 @@ class Q_GUI_EXPORT QGraphicsLinearLayout : public QGraphicsLayout
    void setOrientation(Qt::Orientation orientation);
    Qt::Orientation orientation() const;
 
-   inline void addItem(QGraphicsLayoutItem *item) {
+   void addItem(QGraphicsLayoutItem *item) {
       insertItem(-1, item);
    }
-   inline void addStretch(int stretch = 1) {
+
+   void addStretch(int stretch = 1) {
       insertStretch(-1, stretch);
    }
 

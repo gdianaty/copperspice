@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,8 +26,6 @@
 
 #include <qemptycontainer_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 class ExternalVariableReference : public EmptyContainer
 {
@@ -40,19 +38,15 @@ class ExternalVariableReference : public EmptyContainer
 
    SequenceType::Ptr staticType() const override;
 
-   /**
-    * @returns always DisableElimination
-    */
    Expression::Properties properties() const override;
 
    ExpressionVisitorResult::Ptr accept(const ExpressionVisitor::Ptr &visitor) const override;
 
  private:
-   const QXmlName             m_name;
+   const QXmlName m_name;
    const SequenceType::Ptr m_seqType;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

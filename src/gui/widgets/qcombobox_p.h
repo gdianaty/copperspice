@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,23 +27,23 @@
 #include <qcombobox.h>
 
 #ifndef QT_NO_COMBOBOX
+
 #include <qabstractslider.h>
 #include <qapplication.h>
+#include <qcompleter.h>
+#include <qdebug.h>
+#include <qevent.h>
 #include <qitemdelegate.h>
-#include <qstandarditemmodel.h>
 #include <qlineedit.h>
 #include <qlistview.h>
 #include <qpainter.h>
+#include <qpair.h>
+#include <qpointer.h>
+#include <qstandarditemmodel.h>
 #include <qstyle.h>
 #include <qstyleoption.h>
-
-#include <qpair.h>
 #include <qtimer.h>
 #include <qwidget_p.h>
-#include <qpointer.h>
-#include <qcompleter.h>
-#include <qevent.h>
-#include <qdebug.h>
 
 #include <limits.h>
 
@@ -121,11 +121,11 @@ class QComboBoxPrivateScroller : public QWidget
    GUI_CS_SIGNAL_2(doScroll, action)
 
  protected:
-   inline void stopTimer() {
+   void stopTimer() {
       timer.stop();
    }
 
-   inline void startTimer() {
+   void startTimer() {
       timer.start(100, this);
       fast = false;
    }
@@ -280,16 +280,17 @@ class QComboBoxDelegate : public QItemDelegate
    QComboBoxDelegate(QObject *parent, QComboBox *cmb) : QItemDelegate(parent), mCombo(cmb) {}
 
    static bool isSeparator(const QModelIndex &index) {
-      return index.data(Qt::AccessibleDescriptionRole).toString() == QLatin1String("separator");
+      return index.data(Qt::AccessibleDescriptionRole).toString() == "separator";
    }
 
    static void setSeparator(QAbstractItemModel *model, const QModelIndex &index) {
       model->setData(index, QString::fromLatin1("separator"), Qt::AccessibleDescriptionRole);
 
-      if (QStandardItemModel *m = qobject_cast<QStandardItemModel *>(model))
+      if (QStandardItemModel *m = qobject_cast<QStandardItemModel *>(model)) {
          if (QStandardItem *item = m->itemFromIndex(index)) {
             item->setFlags(item->flags() & ~(Qt::ItemIsSelectable | Qt::ItemIsEnabled));
          }
+      }
    }
 
  protected:

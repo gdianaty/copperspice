@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,17 +24,15 @@
 #ifndef QSTYLE_P_H
 #define QSTYLE_P_H
 
+#include <qapplication.h>
 #include <qstyle.h>
-#include <qguiapplication.h>
-
-class QStyle;
 
 class QStylePrivate
 {
    Q_DECLARE_PUBLIC(QStyle)
 
  public:
-   inline QStylePrivate()
+   QStylePrivate()
       : layoutSpacingIndex(-1), proxyStyle(nullptr)
    {
    }
@@ -65,8 +63,9 @@ inline QPixmap styleCachePixmap(const QSize &size)
 
    return cachePixmap;
 }
+
 #define BEGIN_STYLE_PIXMAPCACHE(a) \
-    QRect rect = option->rect; \
+    QRect newRect = option->rect; \
     QPixmap internalPixmapCache; \
     QImage imageCache; \
     QPainter *p = painter; \
@@ -78,7 +77,7 @@ inline QPixmap styleCachePixmap(const QSize &size)
         painter->drawPixmap(option->rect.topLeft(), internalPixmapCache); \
     } else { \
         if (doPixmapCache) { \
-            rect.setRect(0, 0, option->rect.width(), option->rect.height()); \
+            newRect.setRect(0, 0, option->rect.width(), option->rect.height()); \
             imageCache = styleCacheImage(option->rect.size()); \
             imageCache.fill(0); \
             p = new QPainter(&imageCache); \

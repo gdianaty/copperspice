@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,15 +24,15 @@
 #ifndef QPOLYGON_H
 #define QPOLYGON_H
 
-#include <qvector.h>
 #include <qpoint.h>
 #include <qrect.h>
+#include <qvector.h>
 
 class QMatrix;
-class QTransform;
 class QRect;
-class QVariant;
 class QRectF;
+class QTransform;
+class QVariant;
 
 class Q_GUI_EXPORT QPolygon : public QVector<QPoint>
 {

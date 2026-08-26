@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,41 +27,20 @@
 #include <qitem_p.h>
 #include <qreportcontext_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class ValidationError : public AtomicValue
 {
  public:
    typedef QExplicitlySharedDataPointer<ValidationError> Ptr;
 
    static AtomicValue::Ptr createError(const QString &description = QString(),
-                                       const ReportContext::ErrorCode = ReportContext::FORG0001);
+         const ReportContext::ErrorCode = ReportContext::FORG0001);
 
-   /**
-    * A human readable, translated message describing the error.
-    */
    QString message() const;
-
-   /**
-    * @returns always @c true
-    */
    bool hasError() const override;
-
-   /**
-    * Always results in an assert crash.
-    */
    ItemType::Ptr type() const override;
-
-   /**
-    * Always results in an assert crash.
-    */
    QString stringValue() const override;
-
-   /**
-    * @returns the error code this ValidationError represents. Typically, this
-    * is ReportContext::FORG0001.
-    */
    ReportContext::ErrorCode errorCode() const;
 
  protected:
@@ -70,8 +49,7 @@ class ValidationError : public AtomicValue
    const QString m_message;
    const ReportContext::ErrorCode  m_code;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

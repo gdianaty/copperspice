@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,10 +23,10 @@
 
 #include <qplatform_graphicsbuffer.h>
 
+#include <qdebug.h>
+#include <qopengl.h>
 #include <qopenglcontext.h>
 #include <qopenglfunctions.h>
-#include <qopengl.h>
-#include <qdebug.h>
 
 QPlatformGraphicsBuffer::QPlatformGraphicsBuffer(const QSize &size, const QPixelFormat &format)
    : m_size(size), m_format(format)

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,17 +24,31 @@
 #ifndef QAUDIO_H
 #define QAUDIO_H
 
-#include <qmultimedia.h>
 #include <qglobal.h>
+#include <qmultimedia.h>
 #include <qstring.h>
 
 namespace QAudio {
 
-enum Error { NoError, OpenError, IOError, UnderrunError, FatalError };
+enum Error {
+   NoError,
+   OpenError,
+   IOError,
+   UnderrunError,
+   FatalError
+};
 
-enum State { ActiveState, SuspendedState, StoppedState, IdleState };
+enum State {
+   ActiveState,
+   SuspendedState,
+   StoppedState,
+   IdleState
+};
 
-enum Mode  { AudioInput, AudioOutput };
+enum Mode  {
+   AudioInput,
+   AudioOutput
+};
 
 enum Role {
    UnknownRole,

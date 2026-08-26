@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,20 +22,22 @@
 ***********************************************************************/
 
 #include <qcocoamimetypes.h>
-#include <qmacmime_p.h>
+
 #include <qcocoahelpers.h>
+
+#include <qmacmime_p.h>
 
 class QMacPasteboardMimeTraditionalMacPlainText : public QMacInternalPasteboardMime
 {
  public:
    QMacPasteboardMimeTraditionalMacPlainText() : QMacInternalPasteboardMime(MIME_ALL) { }
-   QString convertorName();
+   QString convertorName() override;
 
-   QString flavorFor(const QString &mime);
-   QString mimeFor(QString flav);
-   bool canConvert(const QString &mime, QString flav);
-   QVariant convertToMime(const QString &mime, QList<QByteArray> data, QString flav);
-   QList<QByteArray> convertFromMime(const QString &mime, QVariant data, QString flav);
+   QString flavorFor(const QString &mime) override;
+   QString mimeFor(QString flav) override;
+   bool canConvert(const QString &mime, QString flav) override;
+   QVariant convertToMime(const QString &mime, QList<QByteArray> data, QString flav) override;
+   QList<QByteArray> convertFromMime(const QString &mime, QVariant data, QString flav) override;
 };
 
 QString QMacPasteboardMimeTraditionalMacPlainText::convertorName()
@@ -104,13 +106,13 @@ class QMacPasteboardMimeTiff : public QMacInternalPasteboardMime
 {
  public:
    QMacPasteboardMimeTiff() : QMacInternalPasteboardMime(MIME_ALL) { }
-   QString convertorName();
+   QString convertorName() override;
 
-   QString flavorFor(const QString &mime);
-   QString mimeFor(QString flav);
-   bool canConvert(const QString &mime, QString flav);
-   QVariant convertToMime(const QString &mime, QList<QByteArray> data, QString flav);
-   QList<QByteArray> convertFromMime(const QString &mime, QVariant data, QString flav);
+   QString flavorFor(const QString &mime) override;
+   QString mimeFor(QString flav) override;
+   bool canConvert(const QString &mime, QString flav) override;
+   QVariant convertToMime(const QString &mime, QList<QByteArray> data, QString flav) override;
+   QList<QByteArray> convertFromMime(const QString &mime, QVariant data, QString flav) override;
 };
 
 QString QMacPasteboardMimeTiff::convertorName()

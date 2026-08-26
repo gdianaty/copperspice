@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,17 +27,17 @@
 
 #include <qtextodfwriter_p.h>
 
-#include <QDebug>
-#include <QImageWriter>
-#include <QTextListFormat>
-#include <QTextList>
-#include <QBuffer>
-#include <QUrl>
+#include <qbuffer.h>
+#include <qdebug.h>
+#include <qimagewriter.h>
+#include <qtextlist.h>
+#include <qtextlistformat.h>
+#include <qurl.h>
 
-#include <qtextdocument_p.h>
-#include <qtexttable.h>
 #include <qtextcursor.h>
+#include <qtextdocument_p.h>
 #include <qtextimagehandler_p.h>
+#include <qtexttable.h>
 #include <qzipwriter_p.h>
 
 // Convert pixels to postscript point units
@@ -518,7 +518,7 @@ void QTextOdfWriter::writeBlockFormat(QXmlStreamWriter &writer, QTextBlockFormat
       } else if (alignment == Qt::AlignJustify) {
          value = QString::fromLatin1("justify");
       } else {
-         qWarning() << "QTextOdfWriter: unsupported paragraph alignment; " << format.alignment();
+         qWarning() << "QTextOdfWriter::writeBlockFormat() Unsupported paragraph alignment: " << format.alignment();
       }
 
       if (! value.isEmpty()) {
@@ -932,7 +932,7 @@ bool QTextOdfWriter::writeAll()
    }
 
    if (! m_device->isWritable() && ! m_device->open(QIODevice::WriteOnly)) {
-      qWarning() << "QTextOdfWriter::writeAll: the device can not be opened for writing";
+      qWarning() << "QTextOdfWriter::writeAll() Device can not be opened for writing";
       return false;
    }
 

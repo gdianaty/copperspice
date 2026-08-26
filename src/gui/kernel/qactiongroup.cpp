@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -202,10 +202,6 @@ bool QActionGroup::isEnabled() const
    return d->enabled;
 }
 
-/*!
-  Returns the currently checked action in the group, or 0 if none
-  are checked.
-*/
 QAction *QActionGroup::checkedAction() const
 {
    Q_D(const QActionGroup);

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,15 @@
 #ifndef QGRAPHICSLAYOUTITEM_H
 #define QGRAPHICSLAYOUTITEM_H
 
+#include <qevent.h>
 #include <qscopedpointer.h>
 #include <qsizepolicy.h>
-#include <qevent.h>
 
 #if ! defined(QT_NO_GRAPHICSVIEW)
 
-class QGraphicsLayoutItemPrivate;
 class QGraphicsItem;
+
+class QGraphicsLayoutItemPrivate;
 
 class Q_GUI_EXPORT QGraphicsLayoutItem
 {
@@ -82,7 +83,7 @@ class Q_GUI_EXPORT QGraphicsLayoutItem
    void setParentLayoutItem(QGraphicsLayoutItem *parent);
 
    bool isLayout() const;
-   // ###Qt5/Make automatic reparenting work regardless of item/object/widget type.
+   // TODO: Make automatic reparenting work regardless of item/object/widget type.
    QGraphicsItem *graphicsItem() const;
    bool ownedByLayout() const;
 

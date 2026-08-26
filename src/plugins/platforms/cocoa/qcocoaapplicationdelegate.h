@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,10 +28,11 @@
 * Refer to APPLE_LICENSE.TXT (in this directory) for license terms
 ***********************************************************************/
 
-#import <Cocoa/Cocoa.h>
-
 #include <qglobal.h>
+
 #include <qcore_mac_p.h>
+
+#import <Cocoa/Cocoa.h>
 
 @class QCocoaMenuLoader;
 
@@ -44,10 +45,10 @@
    bool inLaunch;
 }
 
-+ (QT_MANGLE_NAMESPACE(QCocoaApplicationDelegate) *)sharedDelegate;
++ (QCocoaApplicationDelegate *)sharedDelegate;
 - (void)setDockMenu: (NSMenu *)newMenu;
-- (void)setMenuLoader: (QT_MANGLE_NAMESPACE(QCocoaMenuLoader) *)menuLoader;
-- (QT_MANGLE_NAMESPACE(QCocoaMenuLoader) *)menuLoader;
+- (void)setMenuLoader: (QCocoaMenuLoader *)menuLoader;
+- (QCocoaMenuLoader *)menuLoader;
 - (void)setReflectionDelegate: (NSObject <NSApplicationDelegate> *)oldDelegate;
 - (void)getUrl: (NSAppleEventDescriptor *)event withReplyEvent: (NSAppleEventDescriptor *)replyEvent;
 - (void) removeAppleEventHandlers;

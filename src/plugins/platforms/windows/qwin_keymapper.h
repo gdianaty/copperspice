@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,13 @@
 #ifndef QWINDOWSKEYMAPPER_H
 #define QWINDOWSKEYMAPPER_H
 
-#include <qwin_additional.h>
 #include <qlocale.h>
+#include <qwin_additional.h>
 
 class QKeyEvent;
 class QWindow;
 
 /*
-    \internal
     A Windows KeyboardLayoutItem has 8 possible states:
         1. Unmodified
         2. Shift
@@ -44,10 +43,10 @@ class QWindow;
 */
 struct KeyboardLayoutItem {
    uint dirty : 1;
-   uint exists : 1; // whether this item has been initialized (by updatePossibleKeyCodes)
+   uint exists : 1;                      // whether this item has been initialized (by updatePossibleKeyCodes)
    quint8 deadkeys;
    static const size_t NumQtKeys = 9;
-   quint32 qtKey[NumQtKeys]; // Can by any Qt::Key_<foo>, or unicode character
+   quint32 qtKey[NumQtKeys];             // Can by any Qt::Key_<foo>, or unicode character
 };
 
 class QWindowsKeyMapper

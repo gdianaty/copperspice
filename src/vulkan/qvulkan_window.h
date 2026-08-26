@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,9 +24,9 @@
 #ifndef QVULKAN_WINDOW_H
 #define QVULKAN_WINDOW_H
 
-#include <qwindow.h>
 #include <qvulkan_instance.h>
 #include <qvulkan_window_renderer.h>
+#include <qwindow.h>
 
 #include <vulkan/vulkan.hpp>
 
@@ -92,8 +92,8 @@ class Q_VULKAN_EXPORT QVulkanWindow: public QWindow
    QSize swapChainImageSize() const;
    VkImageView swapChainImageView(int idx) const;
 
-   bool event(QEvent *event);
-   void exposeEvent(QExposeEvent *event);
+   bool event(QEvent *event) override;
+   void exposeEvent(QExposeEvent *event) override;
 
  private:
    struct FrameData {
@@ -108,7 +108,7 @@ class Q_VULKAN_EXPORT QVulkanWindow: public QWindow
       std::optional<QDynamicUniqueHandle<vk::CommandBuffer>> commandBuffer;
    };
 
-   std::pair<vk::UniqueHandle<vk::Device, vk::DispatchLoaderDynamic>, QVector<vk::Queue>>
+   std::pair<vk::UniqueHandle<vk::Device, vk_cs::DispatchLoaderDynamic>, QVector<vk::Queue>>
       createLogicalDevice(std::pair<const vk::QueueFamilyProperties &, uint32_t> deviceProperties, QStringList extensions);
 
    void startFrame();
@@ -116,7 +116,11 @@ class Q_VULKAN_EXPORT QVulkanWindow: public QWindow
    bool handleDeviceLost();
 
    bool initialize();
-   std::pair<QDynamicUniqueHandle<vk::Image>, QDynamicUniqueHandle<vk::DeviceMemory>> createTransientImage(vk::ImageCreateFlags imageFlags, vk::ImageUsageFlags usageFlags, vk::Format imageFormat, uint32_t imageWidth, uint32_t imageHeight);
+
+   std::pair<QDynamicUniqueHandle<vk::Image>, QDynamicUniqueHandle<vk::DeviceMemory>> createTransientImage(
+      vk::ImageCreateFlags imageFlags, vk::ImageUsageFlags usageFlags, vk::Format imageFormat, uint32_t imageWidth,
+      uint32_t imageHeight);
+
    bool createSurface() const;
    bool populatePhysicalDevices() const;
    bool populateRenderPass() const;
@@ -134,15 +138,15 @@ class Q_VULKAN_EXPORT QVulkanWindow: public QWindow
    QSize m_swapChainImageSize;
 
    bool m_singleDevice;
-   vk::UniqueHandle<vk::Device, vk::DispatchLoaderDynamic> m_graphicsDevice;
-   vk::UniqueHandle<vk::Device, vk::DispatchLoaderDynamic> m_transferDevice;
+   vk::UniqueHandle<vk::Device, vk_cs::DispatchLoaderDynamic> m_graphicsDevice;
+   vk::UniqueHandle<vk::Device, vk_cs::DispatchLoaderDynamic> m_transferDevice;
    QVector<vk::Queue> m_graphicsQueues;
    QVector<vk::Queue> m_transferQueues;
    uint32_t m_graphicsCommandQueueFamily;
    uint32_t m_transferCommandQueueFamily;
    VulkanFlags m_vulkanFlags;
-   mutable vk::UniqueHandle<vk::RenderPass, vk::DispatchLoaderDynamic> m_renderPass;
-   vk::UniqueHandle<vk::CommandPool, vk::DispatchLoaderDynamic> m_graphicsPool;
+   mutable vk::UniqueHandle<vk::RenderPass, vk_cs::DispatchLoaderDynamic> m_renderPass;
+   vk::UniqueHandle<vk::CommandPool, vk_cs::DispatchLoaderDynamic> m_graphicsPool;
 
    vk::Image m_currentImage;
 

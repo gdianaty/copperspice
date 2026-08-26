@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,6 +22,7 @@
 ***********************************************************************/
 
 #include <qpaintdevice.h>
+
 #include <qdebug.h>
 
 QPaintDevice::QPaintDevice()
@@ -33,7 +34,7 @@ QPaintDevice::QPaintDevice()
 QPaintDevice::~QPaintDevice()
 {
    if (paintingActive()) {
-      qWarning("QPaintDevice: Can not destroy paint device which is being painted");
+      qWarning("QPaintDevice::~QPaintDevice() Unable to destroy a paint device while it is being painted");
    }
 }
 
@@ -41,17 +42,11 @@ void QPaintDevice::initPainter(QPainter *) const
 {
 }
 
-/*!
-    \internal
-*/
 QPaintDevice *QPaintDevice::redirected(QPoint *) const
 {
    return nullptr;
 }
 
-/*!
-    \internal
-*/
 QPainter *QPaintDevice::sharedPainter() const
 {
    return nullptr;
@@ -64,25 +59,33 @@ Q_GUI_EXPORT int qt_paint_device_metric(const QPaintDevice *device, QPaintDevice
 
 int QPaintDevice::metric(PaintDeviceMetric m) const
 {
-   // Fallback: A subclass has not implemented PdmDevicePixelRatioScaled but might
-   // have implemented PdmDevicePixelRatio.
+   // Fallback: subclass has not implemented
+   // PdmDevicePixelRatioScaled but might have implemented PdmDevicePixelRatio
+
    if (m == PdmDevicePixelRatioScaled) {
       return this->metric(PdmDevicePixelRatio) * devicePixelRatioFScale();
    }
 
-   qWarning("QPaintDevice::metrics: Device has no metric information");
+   qWarning("QPaintDevice::metric() Device has no metric information");
 
    if (m == PdmDpiX) {
       return 72;
+
    } else if (m == PdmDpiY) {
       return 72;
+
    } else if (m == PdmNumColors) {
-      // FIXME: does this need to be a real value?
+      // does this need to be a real value?
       return 256;
+
    } else if (m == PdmDevicePixelRatio) {
       return 1;
+
    } else {
-      qDebug("Unrecognised metric %d!", m);
+
+#if defined(CS_SHOW_DEBUG_GUI_PAINTING)
+      qDebug("Unrecognised metric %d", m);
+#endif
       return 0;
    }
 }

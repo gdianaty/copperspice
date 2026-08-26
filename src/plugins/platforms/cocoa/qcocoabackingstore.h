@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,11 @@
 #ifndef QBACKINGSTORE_COCOA_H
 #define QBACKINGSTORE_COCOA_H
 
-#include <Cocoa/Cocoa.h>
-
-#include "qcocoawindow.h"
-#include "qnsview.h"
-
+#include <qcocoawindow.h>
+#include <qnsview.h>
 #include <qplatform_backingstore.h>
+
+#include <Cocoa/Cocoa.h>
 
 class QCocoaBackingStore : public QPlatformBackingStore
 {

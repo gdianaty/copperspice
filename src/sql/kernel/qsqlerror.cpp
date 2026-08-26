@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,6 +22,7 @@
 ***********************************************************************/
 
 #include <qsqlerror.h>
+
 #include <qdebug.h>
 
 QDebug operator<<(QDebug dbg, const QSqlError &s)
@@ -41,6 +42,7 @@ class QSqlErrorPrivate
    QSqlError::ErrorType errorType;
    QString errorCode;
 };
+
 QSqlError::QSqlError(const QString &driverText, const QString &databaseText,
    ErrorType type, const QString &code)
 {
@@ -52,19 +54,12 @@ QSqlError::QSqlError(const QString &driverText, const QString &databaseText,
    d->errorCode = code;
 }
 
-/*!
-    Creates a copy of \a other.
-*/
 QSqlError::QSqlError(const QSqlError &other)
 {
    d = new QSqlErrorPrivate;
 
    *d = *other.d;
 }
-
-/*!
-    Assigns the \a other error's values to this error.
-*/
 
 QSqlError &QSqlError::operator=(const QSqlError &other)
 {
@@ -73,62 +68,35 @@ QSqlError &QSqlError::operator=(const QSqlError &other)
    return *this;
 }
 
-/*!
-    Compare the \a other error's values to this error and returns true, if it equal.
-*/
-
 bool QSqlError::operator==(const QSqlError &other) const
 {
    return (d->errorType == other.d->errorType);
 }
-
-
-/*!
-    Compare the \a other error's values to this error and returns true if it is not equal.
-*/
 
 bool QSqlError::operator!=(const QSqlError &other) const
 {
    return (d->errorType != other.d->errorType);
 }
 
-
-/*!
-    Destroys the object and frees any allocated resources.
-*/
-
 QSqlError::~QSqlError()
 {
    delete d;
 }
 
-/*!
-    Returns the text of the error as reported by the driver. This may
-    contain database-specific descriptions. It may also be empty.
-
-    \sa setDriverText() databaseText() text()
-*/
 QString QSqlError::driverText() const
 {
    return d->driverError;
 }
-
-
-
 
 QString QSqlError::databaseText() const
 {
    return d->databaseError;
 }
 
-
-
 QSqlError::ErrorType QSqlError::type() const
 {
    return d->errorType;
 }
-
-
 
 QString QSqlError::nativeErrorCode() const
 {

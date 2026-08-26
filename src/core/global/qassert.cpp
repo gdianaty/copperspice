@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -31,5 +31,5 @@ void qt_assert(const char *assertion, const char *file, int line)
 
 void qt_assert_x(const char *where, const char *what, const char *file, int line)
 {
-   qFatal("ASSERT failure in %s: \"%s\", file %s, line %d", where, what, file, line);
+   qFatal("ASSERT failure in %s \n\"%s\", file %s, line %d", where, what, file, line);
 }

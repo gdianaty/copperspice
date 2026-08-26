@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,33 +22,31 @@
 ***********************************************************************/
 
 #include <qpaintengine_mac_p.h>
-#include <qprintengine_mac_p.h>
 
 #include <qbitmap.h>
+#include <qcocoahelpers.h>
+#include <qcoreapplication.h>
+#include <qdebug.h>
+#include <qmath.h>
 #include <qpaintdevice.h>
 #include <qpainterpath.h>
 #include <qpixmapcache.h>
-#include <qpaintengine_raster_p.h>
+#include <qplatform_pixmap.h>
 #include <qprinter.h>
 #include <qstack.h>
 #include <qtextcodec.h>
-#include <qwidget.h>
 #include <qvarlengtharray.h>
-#include <qdebug.h>
-#include <qcoreapplication.h>
-#include <qmath.h>
-
-#include <qplatform_pixmap.h>
+#include <qwidget.h>
 
 #include <qfont_p.h>
-#include <qfontengine_p.h>
 #include <qfontengine_coretext_p.h>
+#include <qfontengine_p.h>
 #include <qnumeric_p.h>
+#include <qpaintengine_raster_p.h>
 #include <qpainter_p.h>
 #include <qpainterpath_p.h>
+#include <qprintengine_mac_p.h>
 #include <qtextengine_p.h>
-
-#include <qcocoahelpers.h>
 
 #include <string.h>
 
@@ -560,10 +558,6 @@ static void qt_mac_dispose_pattern(void *info)
    delete pat;
 }
 
-/*****************************************************************************
-  QCoreGraphicsPaintEngine member functions
- *****************************************************************************/
-
 static inline QPaintEngine::PaintEngineFeatures qt_mac_cg_features()
 {
    return QPaintEngine::PaintEngineFeatures(QPaintEngine::AllFeatures & ~QPaintEngine::PaintOutsidePaintEvent
@@ -888,7 +882,7 @@ void QCoreGraphicsPaintEngine::drawPath(const QPainterPath &p)
    Q_D(QCoreGraphicsPaintEngine);
    Q_ASSERT(isActive());
 
-   if (state->compositionMode() == QPainter::CompositionMode_Destination) {
+   if (m_engineState->compositionMode() == QPainter::CompositionMode_Destination) {
       return;
    }
 
@@ -909,7 +903,7 @@ void QCoreGraphicsPaintEngine::drawRects(const QRectF *rects, int rectCount)
    Q_D(QCoreGraphicsPaintEngine);
    Q_ASSERT(isActive());
 
-   if (state->compositionMode() == QPainter::CompositionMode_Destination) {
+   if (m_engineState->compositionMode() == QPainter::CompositionMode_Destination) {
       return;
    }
 
@@ -928,7 +922,7 @@ void QCoreGraphicsPaintEngine::drawPoints(const QPointF *points, int pointCount)
    Q_D(QCoreGraphicsPaintEngine);
    Q_ASSERT(isActive());
 
-   if (state->compositionMode() == QPainter::CompositionMode_Destination) {
+   if (m_engineState->compositionMode() == QPainter::CompositionMode_Destination) {
       return;
    }
 
@@ -944,7 +938,7 @@ void QCoreGraphicsPaintEngine::drawPoints(const QPointF *points, int pointCount)
    }
 
    bool doRestore = false;
-   if (d->cosmeticPen == QCoreGraphicsPaintEnginePrivate::CosmeticNone && !(state->renderHints() & QPainter::Antialiasing)) {
+   if (d->cosmeticPen == QCoreGraphicsPaintEnginePrivate::CosmeticNone && ! (m_engineState->renderHints() & QPainter::Antialiasing)) {
       //we don't want adjusted pens for point rendering
       doRestore = true;
       d->saveGraphicsState();
@@ -965,7 +959,7 @@ void QCoreGraphicsPaintEngine::drawEllipse(const QRectF &r)
    Q_D(QCoreGraphicsPaintEngine);
    Q_ASSERT(isActive());
 
-   if (state->compositionMode() == QPainter::CompositionMode_Destination) {
+   if (m_engineState->compositionMode() == QPainter::CompositionMode_Destination) {
       return;
    }
 
@@ -983,7 +977,7 @@ void QCoreGraphicsPaintEngine::drawPolygon(const QPointF *points, int pointCount
    Q_D(QCoreGraphicsPaintEngine);
    Q_ASSERT(isActive());
 
-   if (state->compositionMode() == QPainter::CompositionMode_Destination) {
+   if (m_engineState->compositionMode() == QPainter::CompositionMode_Destination) {
       return;
    }
 
@@ -1012,7 +1006,7 @@ void QCoreGraphicsPaintEngine::drawLines(const QLineF *lines, int lineCount)
    Q_D(QCoreGraphicsPaintEngine);
    Q_ASSERT(isActive());
 
-   if (state->compositionMode() == QPainter::CompositionMode_Destination) {
+   if (m_engineState->compositionMode() == QPainter::CompositionMode_Destination) {
       return;
    }
 
@@ -1032,7 +1026,7 @@ void QCoreGraphicsPaintEngine::drawPixmap(const QRectF &r, const QPixmap &pm, co
    Q_D(QCoreGraphicsPaintEngine);
    Q_ASSERT(isActive());
 
-   if (state->compositionMode() == QPainter::CompositionMode_Destination) {
+   if (m_engineState->compositionMode() == QPainter::CompositionMode_Destination) {
       return;
    }
 
@@ -1072,7 +1066,7 @@ void QCoreGraphicsPaintEngine::drawImage(const QRectF &r, const QImage &img, con
    (void) flags;
    Q_ASSERT(isActive());
 
-   if (img.isNull() || state->compositionMode() == QPainter::CompositionMode_Destination) {
+   if (img.isNull() || m_engineState->compositionMode() == QPainter::CompositionMode_Destination) {
       return;
    }
 
@@ -1103,7 +1097,7 @@ void QCoreGraphicsPaintEngine::drawTiledPixmap(const QRectF &r, const QPixmap &p
    Q_D(QCoreGraphicsPaintEngine);
    Q_ASSERT(isActive());
 
-   if (state->compositionMode() == QPainter::CompositionMode_Destination) {
+   if (m_engineState->compositionMode() == QPainter::CompositionMode_Destination) {
       return;
    }
 
@@ -1155,7 +1149,7 @@ void QCoreGraphicsPaintEngine::drawTextItem(const QPointF &pos, const QTextItem 
       return;
    }
 
-   if (state->compositionMode() == QPainter::CompositionMode_Destination) {
+   if (m_engineState->compositionMode() == QPainter::CompositionMode_Destination) {
       return;
    }
 
@@ -1169,17 +1163,19 @@ void QCoreGraphicsPaintEngine::drawTextItem(const QPointF &pos, const QTextItem 
 
    Q_ASSERT(type() == QPaintEngine::CoreGraphics);
 
-   QFontEngine *fe = ti.fontEngine;
+   QFontEngine *fe = ti.m_textItemFontEngine;
 
-   const bool textAA = ((state->renderHints() & QPainter::TextAntialiasing)
-         && (fe->fontDef.pointSize > QCoreTextFontEngine::antialiasingThreshold)
-         && !(fe->fontDef.styleStrategy & QFont::NoAntialias));
-   const bool lineAA = state->renderHints() & QPainter::Antialiasing;
+   const bool textAA = ((m_engineState->renderHints() & QPainter::TextAntialiasing)
+         && (fe->m_fontDef.pointSize > QCoreTextFontEngine::antialiasingThreshold)
+         && ! (fe->m_fontDef.styleStrategy & QFont::NoAntialias));
+
+   const bool lineAA = m_engineState->renderHints() & QPainter::Antialiasing;
+
    if (textAA != lineAA) {
       CGContextSetShouldAntialias(d->hd, textAA);
    }
 
-   const bool smoothing = textAA && !(fe->fontDef.styleStrategy & QFont::NoSubpixelAntialias);
+   const bool smoothing = textAA && !(fe->m_fontDef.styleStrategy & QFont::NoSubpixelAntialias);
    if (d->disabledSmoothFonts == smoothing) {
       CGContextSetShouldSmoothFonts(d->hd, smoothing);
    }
@@ -1346,7 +1342,7 @@ float QCoreGraphicsPaintEnginePrivate::adjustPenWidth(float penWidth)
 {
    Q_Q(QCoreGraphicsPaintEngine);
    float ret = penWidth;
-   if (!complexXForm && !(q->state->renderHints() & QPainter::Antialiasing)) {
+   if (!complexXForm && !(q->m_engineState->renderHints() & QPainter::Antialiasing)) {
       if (penWidth < 2) {
          ret = 1;
       } else if (penWidth < 3) {
@@ -1598,7 +1594,11 @@ void qt_mac_cg_transform_path_apply(void *info, const CGPathElement *element)
          break;
 
       default:
-         qDebug() << "Unhandled path transform type: " << element->type;
+#if defined(CS_SHOW_DEBUG_PLATFORM)
+         qDebug() << "qt_mac_cg_transform_path_apply() Unhandled path transform type =" << element->type;
+#endif
+
+         break;
    }
 }
 
@@ -1650,7 +1650,7 @@ void QCoreGraphicsPaintEnginePrivate::drawPath(uchar ops, CGMutablePathRef path)
 
    // Avoid saving and restoring the context if we can.
    const bool needContextSave = (cosmeticPen != QCoreGraphicsPaintEnginePrivate::CosmeticNone ||
-         !(q->state->renderHints() & QPainter::Antialiasing));
+         !(q->m_engineState->renderHints() & QPainter::Antialiasing));
    if (ops & CGStroke) {
       if (needContextSave) {
          saveGraphicsState();
@@ -1661,7 +1661,7 @@ void QCoreGraphicsPaintEnginePrivate::drawPath(uchar ops, CGMutablePathRef path)
       // to make sure that primitives painted at pixel borders
       // fills the right pixel. This is needed since the y xais
       // in the Quartz coordinate system is inverted compared to Qt.
-      if (!(q->state->renderHints() & QPainter::Antialiasing)) {
+      if (!(q->m_engineState->renderHints() & QPainter::Antialiasing)) {
          if (current.pen.style() == Qt::SolidLine || current.pen.width() >= 3) {
             CGContextTranslateCTM(hd, double(pixelSize.x()) * 0.25, double(pixelSize.y()) * 0.25);
          } else {
@@ -1671,7 +1671,7 @@ void QCoreGraphicsPaintEnginePrivate::drawPath(uchar ops, CGMutablePathRef path)
 
       if (cosmeticPen != QCoreGraphicsPaintEnginePrivate::CosmeticNone) {
          // If antialiazing is enabled, use the cosmetic pen size directly.
-         if (q->state->renderHints() & QPainter::Antialiasing) {
+         if (q->m_engineState->renderHints() & QPainter::Antialiasing) {
             CGContextSetLineWidth(hd,  cosmeticPenSize);
          } else if (current.pen.widthF() <= 1) {
             CGContextSetLineWidth(hd, cosmeticPenSize * 0.9f);

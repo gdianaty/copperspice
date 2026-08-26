@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,9 +24,9 @@
 #ifndef QCOCOAINPUTCONTEXT_H
 #define QCOCOAINPUTCONTEXT_H
 
+#include <qlocale.h>
 #include <qplatform_inputcontext.h>
-#include <QLocale>
-#include <QPointer>
+#include <qpointer.h>
 
 class QCocoaInputContext : public QPlatformInputContext
 {

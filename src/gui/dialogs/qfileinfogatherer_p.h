@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,40 +24,46 @@
 #ifndef QFILEINFOGATHERER_P_H
 #define QFILEINFOGATHERER_P_H
 
-#include <qthread.h>
-#include <qmutex.h>
-#include <qwaitcondition.h>
-#include <qfilesystemwatcher.h>
-#include <qfileiconprovider.h>
-
-#include <qpair.h>
-#include <qstack.h>
 #include <qdatetime.h>
 #include <qdir.h>
 #include <qelapsedtimer.h>
+#include <qfileiconprovider.h>
+#include <qfilesystemwatcher.h>
+#include <qmutex.h>
+#include <qpair.h>
+#include <qstack.h>
+#include <qthread.h>
+#include <qwaitcondition.h>
 
 #include <qfilesystemengine_p.h>
-
 
 class QFileIconProvider;
 
 class QExtendedInformation
 {
  public:
-   enum Type { Dir, File, System };
+   enum Type {
+      Dir,
+      File,
+      System
+   };
 
-   QExtendedInformation() {}
-   QExtendedInformation(const QFileInfo &info) : mFileInfo(info) {}
+   QExtendedInformation()
+   { }
 
-   inline bool isDir() {
+   QExtendedInformation(const QFileInfo &info)
+      : mFileInfo(info)
+   { }
+
+   bool isDir() {
       return type() == Dir;
    }
 
-   inline bool isFile() {
+   bool isFile() {
       return type() == File;
    }
 
-   inline bool isSystem() {
+   bool isSystem() {
       return type() == System;
    }
 
@@ -71,7 +77,7 @@ class QExtendedInformation
    }
 #endif
 
-   QFile::Permissions permissions() const {
+   QFileDevice::Permissions permissions() const {
       return mFileInfo.permissions();
    }
 
@@ -147,8 +153,8 @@ class QFileInfoGatherer : public QThread
    GUI_CS_SIGNAL_1(Public, void nameResolved(const QString &fileName, const QString &resolvedName))
    GUI_CS_SIGNAL_2(nameResolved, fileName, resolvedName)
 
-   GUI_CS_SIGNAL_1(Public, void directoryLoaded(const QString &path))
-   GUI_CS_SIGNAL_2(directoryLoaded, path)
+   GUI_CS_SIGNAL_1(Public, void directoryLoaded(const QString &newPath))
+   GUI_CS_SIGNAL_2(directoryLoaded, newPath)
 
    explicit QFileInfoGatherer(QObject *parent = nullptr);
    ~QFileInfoGatherer();
@@ -185,8 +191,8 @@ class QFileInfoGatherer : public QThread
    QWaitCondition condition;
    QAtomicInt abort;
 
-   QStack<QString> path;
-   QStack<QStringList> files;
+   QStack<QString> m_infoPath;
+   QStack<QStringList> m_infoFiles;
 
 #ifndef QT_NO_FILESYSTEMWATCHER
    QFileSystemWatcher *watcher;

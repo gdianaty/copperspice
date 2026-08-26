@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,12 @@
 #ifndef QElementConstructor_P_H
 #define QElementConstructor_P_H
 
-#include <QUrl>
+#include <qurl.h>
+
 #include <qpaircontainer_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class ElementConstructor : public PairContainer
 {
  public:
@@ -39,11 +39,6 @@ class ElementConstructor : public PairContainer
    void evaluateToSequenceReceiver(const DynamicContext::Ptr &context) const override;
 
    SequenceType::Ptr staticType() const override;
-
-   /**
-    * The first operand must be exactly one @c xs:QName, and the second
-    * argument can be zero or more items.
-    */
    SequenceType::List expectedOperandTypes() const override;
 
    ExpressionVisitorResult::Ptr accept(const ExpressionVisitor::Ptr &visitor) const override;
@@ -54,8 +49,7 @@ class ElementConstructor : public PairContainer
    QUrl m_staticBaseURI;
    const bool m_isXSLT;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

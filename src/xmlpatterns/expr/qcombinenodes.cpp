@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,10 +28,7 @@
 #include "qitemmappingiterator_p.h"
 #include "qnodesort_p.h"
 #include "qunioniterator_p.h"
-
 #include "qcombinenodes_p.h"
-
-QT_BEGIN_NAMESPACE
 
 using namespace QPatternist;
 
@@ -146,5 +143,3 @@ Expression::ID CombineNodes::id() const
 {
    return IDCombineNodes;
 }
-
-QT_END_NAMESPACE

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,11 +24,10 @@
 #ifndef QAtomicTypeDispatch_P_H
 #define QAtomicTypeDispatch_P_H
 
-#include <QSharedData>
-
-QT_BEGIN_NAMESPACE
+#include <qshareddata.h>
 
 namespace QPatternist {
+
 class AnyAtomicType;
 class AnyURIType;
 class Base64BinaryType;
@@ -49,9 +48,9 @@ class HexBinaryType;
 class IntegerType;
 class NOTATIONType;
 class QNameType;
+class SchemaTimeType;
 class SourceLocationReflection;
 class StringType;
-class SchemaTimeType;
 class UntypedAtomicType;
 class YearMonthDurationType;
 
@@ -208,8 +207,7 @@ class ParameterizedAtomicTypeVisitor : public QSharedData
    virtual AtomicTypeVisitorResult::Ptr visit(const YearMonthDurationType *, const qint16 param,
          const SourceLocationReflection *const reflection) const = 0;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

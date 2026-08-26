@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,13 +22,14 @@
 ***********************************************************************/
 
 #include <qplatform_integrationfactory_p.h>
-#include <qplatform_integrationplugin.h>
-#include <qfactoryloader_p.h>
-#include <qmutex.h>
-#include <qdir.h>
 
-#include <qguiapplication.h>
+#include <qapplication.h>
 #include <qdebug.h>
+#include <qdir.h>
+#include <qmutex.h>
+#include <qplatform_integrationplugin.h>
+
+#include <qfactoryloader_p.h>
 
 static QFactoryLoader *loader()
 {

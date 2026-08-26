@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,9 +26,8 @@
 
 #include <qemptycontainer_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class NamespaceConstructor : public EmptyContainer
 {
  public:
@@ -36,18 +35,7 @@ class NamespaceConstructor : public EmptyContainer
 
    void evaluateToSequenceReceiver(const DynamicContext::Ptr &context) const override;
 
-   /**
-    * @returns a list containing one CommonSequenceTypes::ExactlyOneString instance.
-    */
    SequenceType::List expectedOperandTypes() const override;
-
-   /**
-    * The static type is exactly one attribute node. It's unclear what
-    * affects the static type has, but specifying anything else could lead
-    * to complications wrt. node order, XQTY0024. Of course, it's not
-    * conceptually correct, since a namespace node isn't an attribute
-    * node.
-    */
    SequenceType::Ptr staticType() const override;
 
    ExpressionVisitorResult::Ptr accept(const ExpressionVisitor::Ptr &visitor) const override;
@@ -62,8 +50,7 @@ class NamespaceConstructor : public EmptyContainer
  private:
    const QXmlName m_binding;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

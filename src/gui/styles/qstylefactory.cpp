@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,11 +22,17 @@
 ***********************************************************************/
 
 #include <qstylefactory.h>
-#include <qstyleplugin.h>
-#include <qfactoryloader_p.h>
-#include <qmutex.h>
+
 #include <qapplication.h>
+#include <qmutex.h>
+#include <qstyleplugin.h>
+
+#include <qfactoryloader_p.h>
 #include <qwindows_style_p.h>
+
+#if ! defined(QT_NO_STYLE_MAC) && defined(Q_OS_DARWIN)
+#include <qmacstyle.h>
+#endif
 
 #ifndef QT_NO_STYLE_FUSION
 #include <qfusionstyle_p.h>
@@ -42,10 +48,6 @@
 
 #ifndef QT_NO_STYLE_WINDOWSVISTA
 #include <qwindows_vistastyle_p.h>
-#endif
-
-#if !defined(QT_NO_STYLE_MAC) && defined(Q_OS_DARWIN)
-#include <qmacstyle.h>
 #endif
 
 static QFactoryLoader *loader()

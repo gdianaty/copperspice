@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,19 +25,19 @@
 
 #ifndef QT_NO_SIZEGRIP
 
+#include <qabstractscrollarea.h>
 #include <qapplication.h>
+#include <qdebug.h>
+#include <qdesktopwidget.h>
 #include <qevent.h>
+#include <qlayout.h>
 #include <qpainter.h>
-#include <qwindow.h>
 #include <qplatform_window.h>
 #include <qstyle.h>
 #include <qstyleoption.h>
-#include <qlayout.h>
-#include <qdebug.h>
-#include <QDesktopWidget>
+#include <qwindow.h>
 
 #include <qwidget_p.h>
-#include <qabstractscrollarea.h>
 
 static QWidget *qt_sizegrip_topLevelWidget(QWidget *w)
 {
@@ -64,11 +64,12 @@ class QSizeGripPrivate : public QWidgetPrivate
    bool gotMousePress;
    QPointer<QWidget> tlw;
    Qt::Corner corner() const;
-   inline bool atBottom() const {
+
+   bool atBottom() const {
       return m_corner == Qt::BottomRightCorner || m_corner == Qt::BottomLeftCorner;
    }
 
-   inline bool atLeft() const {
+   bool atLeft() const {
       return m_corner == Qt::BottomLeftCorner || m_corner == Qt::TopLeftCorner;
    }
 
@@ -334,7 +335,7 @@ void QSizeGrip::mouseReleaseEvent(QMouseEvent *mouseEvent)
    }
 }
 
-void QSizeGrip::moveEvent(QMoveEvent * /*moveEvent*/)
+void QSizeGrip::moveEvent(QMoveEvent *)
 {
    Q_D(QSizeGrip);
    // We're inside a resize operation; no update necessary.

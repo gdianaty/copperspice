@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -37,11 +37,7 @@
 
 class CameraBinSession;
 
-class CameraBinFocus
-   : public QCameraFocusControl
-#if GST_CHECK_VERSION(1,0,0)
-   , QGstreamerBufferProbe
-#endif
+class CameraBinFocus : public QCameraFocusControl, QGstreamerBufferProbe
 {
    CS_OBJECT(CameraBinFocus)
 
@@ -66,43 +62,27 @@ class CameraBinFocus
       return m_focusStatus;
    }
 
- public:
    CS_SIGNAL_1(Public, void _q_focusStatusChanged(QCamera::LockStatus status, QCamera::LockChangeReason reason))
    CS_SIGNAL_2(_q_focusStatusChanged, status, reason)
 
- public :
    CS_SLOT_1(Public, void _q_startFocusing())
    CS_SLOT_2(_q_startFocusing)
+
    CS_SLOT_1(Public, void _q_stopFocusing())
    CS_SLOT_2(_q_stopFocusing)
 
    CS_SLOT_1(Public, void setViewfinderResolution(const QSize &resolution))
    CS_SLOT_2(setViewfinderResolution)
 
-#if GST_CHECK_VERSION(1,0,0)
  protected:
    void timerEvent(QTimerEvent *event);
-#endif
-
- private :
-   CS_SLOT_1(Private, void _q_setFocusStatus(QCamera::LockStatus status, QCamera::LockChangeReason reason))
-   CS_SLOT_2(_q_setFocusStatus)
-   CS_SLOT_1(Private, void _q_handleCameraStatusChange(QCamera::Status status))
-   CS_SLOT_2(_q_handleCameraStatusChange)
-
-#if GST_CHECK_VERSION(1,0,0)
-   CS_SLOT_1(Private, void _q_updateFaces())
-   CS_SLOT_2(_q_updateFaces)
-#endif
 
  private:
    void resetFocusPoint();
    void updateRegionOfInterest(const QRectF &rectangle);
    void updateRegionOfInterest(const QVector<QRect> &rectangles);
 
-#if GST_CHECK_VERSION(1,0,0)
    bool probeBuffer(GstBuffer *buffer);
-#endif
 
    CameraBinSession *m_session;
    QCamera::Status m_cameraStatus;
@@ -117,6 +97,15 @@ class CameraBinFocus
    QVector<QRect> m_faceFocusRects;
    QBasicTimer m_faceResetTimer;
    mutable QMutex m_mutex;
+
+   CS_SLOT_1(Private, void _q_setFocusStatus(QCamera::LockStatus status, QCamera::LockChangeReason reason))
+   CS_SLOT_2(_q_setFocusStatus)
+
+   CS_SLOT_1(Private, void _q_handleCameraStatusChange(QCamera::Status status))
+   CS_SLOT_2(_q_handleCameraStatusChange)
+
+   CS_SLOT_1(Private, void _q_updateFaces())
+   CS_SLOT_2(_q_updateFaces)
 };
 
 #endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,14 +23,14 @@
 
 #include <Cocoa/Cocoa.h>
 
-#include <qprintdialog.h>
-#include <qabstractprintdialog_p.h>
-
-#include <qcore_mac_p.h>
-#include <qapplication_p.h>
-#include <qprinter.h>
-#include <qprintengine.h>
 #include <qplatform_printdevice.h>
+#include <qprintdialog.h>
+#include <qprintengine.h>
+#include <qprinter.h>
+
+#include <qabstractprintdialog_p.h>
+#include <qapplication_p.h>
+#include <qcore_mac_p.h>
 
 #ifndef QT_NO_PRINTDIALOG
 
@@ -48,12 +48,13 @@ class QPrintDialogPrivate : public QAbstractPrintDialogPrivate
    void openCocoaPrintPanel(Qt::WindowModality modality);
    void closeCocoaPrintPanel();
 
-   inline QPrintDialog *printDialog() { return q_func(); }
+   QPrintDialog *printDialog() {
+      return q_func();
+   }
 
    NSPrintInfo *printInfo;
    NSPrintPanel *printPanel;
 };
-
 
 @class QCocoaPrintPanelDelegate;
 
@@ -143,11 +144,12 @@ class QPrintDialogPrivate : public QAbstractPrintDialogPrivate
 
         if (ppdKey.isEmpty()) {
             // Is using a custom page size as defined in the Print Dialog custom settings using mm or inches.
-            // We can't ask PMPaper what those units actually are, we can only get the point size which may return
+            // We can not ask PMPaper what those units actually are, we can only get the point size which may return
             // slightly wrong results due to rounding.
-            // Testing shows if using metric/mm then is rounded mm, if imperial/inch is rounded to 2 decimal places
-            // Even if we pass in our own custom size in mm with decimal places, the dialog will still round it!
-            // Suspect internal storage is in rounded mm?
+
+            // Testing shows using metric/mm is rounded to mm when imperial/inch is rounded to 2 decimal places
+            // if we pass a custom size with decimal places the dialog will still round it.
+            // usually the storage is rounded to the nearest mm
 
             if (QLocale().measurementSystem() == QLocale::MetricSystem) {
                 QSizeF sizef = QSizeF(width, height) / qt_pointMultiplier(QPageSize::Unit::Millimeter);
@@ -304,9 +306,6 @@ int QPrintDialog::exec()
    return result();
 }
 
-/*!
-    \reimp
-*/
 void QPrintDialog::setVisible(bool visible)
 {
    Q_D(QPrintDialog);

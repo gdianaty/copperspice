@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,8 +26,6 @@
 
 #include <qxsdschema_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class XsdSchemaMerger : public QSharedData
@@ -35,14 +33,8 @@ class XsdSchemaMerger : public QSharedData
  public:
    typedef QExplicitlySharedDataPointer<XsdSchemaMerger> Ptr;
 
-   /**
-    * Creates a new schema merger object that merges @p schema with @p otherSchema.
-    */
    XsdSchemaMerger(const XsdSchema::Ptr &schema, const XsdSchema::Ptr &otherSchema);
 
-   /**
-    * Returns the merged schema.
-    */
    XsdSchema::Ptr mergedSchema() const;
 
  private:
@@ -50,8 +42,7 @@ class XsdSchemaMerger : public QSharedData
 
    XsdSchema::Ptr m_mergedSchema;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

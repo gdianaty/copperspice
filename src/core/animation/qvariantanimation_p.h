@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,11 +21,12 @@
 *
 ***********************************************************************/
 
-#ifndef QVariantAnimation_P_H
-#define QVariantAnimation_P_H
+#ifndef QVARIANTANIMATION_P_H
+#define QVARIANTANIMATION_P_H
+
+#include <qvariantanimation.h>
 
 #include <qeasingcurve.h>
-#include <qvariantanimation.h>
 #include <qvector.h>
 
 #include <qabstractanimation_p.h>

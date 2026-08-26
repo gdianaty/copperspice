@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,19 +25,20 @@
 #define QMEDIAPLAYLIST_P_H
 
 #include <qmediaplaylist.h>
+
+#include <qdebug.h>
 #include <qmediaplayer.h>
 #include <qmediaplayercontrol.h>
-#include <qdebug.h>
 
-#include <qmediaplaylistcontrol_p.h>
 #include <qmedianetworkplaylistprovider_p.h>
 #include <qmediaobject_p.h>
+#include <qmediaplaylistcontrol_p.h>
 
+class QMediaPlayerControl;
 class QMediaPlaylistControl;
 class QMediaPlaylistProvider;
 class QMediaPlaylistReader;
 class QMediaPlaylistWriter;
-class QMediaPlayerControl;
 
 class QMediaPlaylistPrivate
 {

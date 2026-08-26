@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,6 +22,7 @@
 ***********************************************************************/
 
 #include <qplatformdefs.h>
+
 #include <qfilesystemiterator_p.h>
 
 #ifndef QT_NO_FILESYSTEMITERATOR
@@ -39,8 +40,8 @@ QFileSystemIterator::QFileSystemIterator(const QFileSystemEntry &entry, QDir::Fi
 
    if ((dir = ::opendir(nativePath.constData())) == nullptr) {
       lastError = errno;
-   } else {
 
+   } else {
       if (! nativePath.endsWith('/')) {
          nativePath.append('/');
       }
@@ -65,10 +66,12 @@ bool QFileSystemIterator::advance(QFileSystemEntry &fileEntry, QFileSystemMetaDa
    if (dirEntry) {
       fileEntry = QFileSystemEntry(nativePath + QByteArray(dirEntry->d_name), QFileSystemEntry::FromNativePath());
       metaData.fillFromDirEnt(*dirEntry);
+
       return true;
    }
 
    lastError = errno;
+
    return false;
 }
 

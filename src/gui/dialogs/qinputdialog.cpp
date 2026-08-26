@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,16 +28,16 @@
 #include <qapplication.h>
 #include <qcombobox.h>
 #include <qdialogbuttonbox.h>
+#include <qevent.h>
 #include <qlabel.h>
 #include <qlayout.h>
 #include <qlineedit.h>
-#include <qplaintextedit.h>
 #include <qlistwidget.h>
+#include <qplaintextedit.h>
 #include <qpushbutton.h>
 #include <qspinbox.h>
 #include <qstackedlayout.h>
 #include <qvalidator.h>
-#include <qevent.h>
 
 #include <qdialog_p.h>
 
@@ -91,12 +91,6 @@ static QString signalForMember(const QString &member)
    return QString("accepted()");
 }
 
-/*
-    These internal classes add extra validation to QSpinBox and QDoubleSpinBox by emitting
-    textChanged(bool) after events that may potentially change the visible text. Return or
-    Enter key presses are not propagated if the visible text is invalid. Instead, the visible
-    text is modified to the last valid value.
-*/
 class QInputDialogSpinBox : public QSpinBox
 {
    GUI_CS_OBJECT(QInputDialogSpinBox)
@@ -582,13 +576,6 @@ QInputDialog::InputMode QInputDialog::inputMode() const
    return TextInput;
 }
 
-/*!
-    \since 4.5
-
-    \property QInputDialog::labelText
-
-    \brief the text to for the label to describe what needs to be input
-*/
 void QInputDialog::setLabelText(const QString &text)
 {
    Q_D(QInputDialog);
@@ -606,7 +593,6 @@ QString QInputDialog::labelText() const
    return d->label->text();
 }
 
-
 void QInputDialog::setOption(InputDialogOption option, bool on)
 {
    Q_D(QInputDialog);
@@ -615,27 +601,12 @@ void QInputDialog::setOption(InputDialogOption option, bool on)
    }
 }
 
-/*!
-    Returns true if the given \a option is enabled; otherwise, returns
-    false.
-
-    \sa options, setOption()
-*/
 bool QInputDialog::testOption(InputDialogOption option) const
 {
    Q_D(const QInputDialog);
    return (d->opts & option) != 0;
 }
 
-/*!
-    \property QInputDialog::options
-    \brief the various options that affect the look and feel of the dialog
-    \since 4.5
-
-    By default, all options are disabled.
-
-    \sa setOption(), testOption()
-*/
 void QInputDialog::setOptions(InputDialogOptions options)
 {
    Q_D(QInputDialog);
@@ -820,14 +791,6 @@ void QInputDialog::setIntRange(int min, int max)
    d->intSpinBox->setRange(min, max);
 }
 
-/*!
-    \property QInputDialog::intStep
-    \since 4.5
-    \brief the step by which the integer value is increased and decreased
-
-    This property is only relevant when the input dialog is used in
-    IntInput mode.
-*/
 void QInputDialog::setIntStep(int step)
 {
    Q_D(QInputDialog);
@@ -845,7 +808,6 @@ int QInputDialog::intStep() const
    }
 }
 
-
 void QInputDialog::setDoubleValue(double value)
 {
    Q_D(QInputDialog);
@@ -862,7 +824,6 @@ double QInputDialog::doubleValue() const
       return 0.0;
    }
 }
-
 
 void QInputDialog::setDoubleMinimum(double min)
 {
@@ -966,9 +927,6 @@ void QInputDialog::open(QObject *receiver, const QString &member)
    QDialog::open();
 }
 
-/*!
-    \reimp
-*/
 QSize QInputDialog::minimumSizeHint() const
 {
    Q_D(const QInputDialog);
@@ -976,9 +934,6 @@ QSize QInputDialog::minimumSizeHint() const
    return QDialog::minimumSizeHint();
 }
 
-/*!
-    \reimp
-*/
 QSize QInputDialog::sizeHint() const
 {
    Q_D(const QInputDialog);
@@ -986,9 +941,6 @@ QSize QInputDialog::sizeHint() const
    return QDialog::sizeHint();
 }
 
-/*!
-    \reimp
-*/
 void QInputDialog::setVisible(bool visible)
 {
    Q_D(const QInputDialog);

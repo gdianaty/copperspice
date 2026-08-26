@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,10 +25,12 @@
 #define QTEXTCURSOR_P_H
 
 #include <qtextcursor.h>
+
 #include <qtextdocument.h>
+#include <qtextobject.h>
+
 #include <qtextdocument_p.h>
 #include <qtextformat_p.h>
-#include <qtextobject.h>
 
 class QTextCursorPrivate : public QSharedData
 {
@@ -45,26 +47,29 @@ class QTextCursorPrivate : public QSharedData
    void remove();
    void clearCells(QTextTable *table, int startRow, int startCol, int numRows, int numCols,
       QTextUndoCommand::Operation op);
-   inline bool setPosition(int newPosition) {
+
+   bool setPosition(int newPosition) {
       Q_ASSERT(newPosition >= 0 && newPosition < priv->length());
       bool moved = position != newPosition;
+
       if (moved) {
          position = newPosition;
          currentCharFormat = -1;
       }
       return moved;
    }
+
    void setX();
    bool canDelete(int pos) const;
 
    void insertBlock(const QTextBlockFormat &format, const QTextCharFormat &charFormat);
    bool movePosition(QTextCursor::MoveOperation op, QTextCursor::MoveMode mode = QTextCursor::MoveAnchor);
 
-   inline QTextBlock block() const {
+   QTextBlock block() const {
       return QTextBlock(priv, priv->blockMap().findNode(position));
    }
 
-   inline QTextBlockFormat blockFormat() const {
+   QTextBlockFormat blockFormat() const {
       return block().blockFormat();
    }
 

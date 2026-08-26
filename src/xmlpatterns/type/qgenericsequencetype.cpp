@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,17 +21,14 @@
 *
 ***********************************************************************/
 
-#include <QString>
+#include <qstring.h>
 
-#include "qgenericsequencetype_p.h"
-
-QT_BEGIN_NAMESPACE
+#include <qgenericsequencetype_p.h>
 
 using namespace QPatternist;
 
-GenericSequenceType::GenericSequenceType(const ItemType::Ptr &iType,
-      const Cardinality &card) : m_itemType(iType),
-   m_cardinality(card)
+GenericSequenceType::GenericSequenceType(const ItemType::Ptr &iType, const Cardinality &card)
+   : m_itemType(iType), m_cardinality(card)
 {
    Q_ASSERT(m_itemType);
 }
@@ -50,5 +47,3 @@ ItemType::Ptr GenericSequenceType::itemType() const
 {
    return m_itemType;
 }
-
-QT_END_NAMESPACE

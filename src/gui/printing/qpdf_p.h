@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -45,7 +45,7 @@ namespace QPdf {
 
     class ByteStream
     {
-    public:
+     public:
         // fileBacking means that ByteStream will buffer the contents on disk
         // if the size exceeds a certain threshold. In this case, if a byte
         // array was passed in, its contents may no longer correspond to the
@@ -70,8 +70,13 @@ namespace QPdf {
         QIODevice *stream();
         void clear();
 
-        static inline int maxMemorySize() { return 100000000; }
-        static inline int chunkSize()     { return 10000000; }
+        static int maxMemorySize() {
+           return 100000000;
+        }
+
+        static int chunkSize()     {
+           return 10000000;
+        }
 
     protected:
         void constructor_helper(QIODevice *dev);
@@ -81,7 +86,7 @@ namespace QPdf {
         void prepareBuffer();
 
         QIODevice *dev;
-        QByteArray ba;
+        QByteArray m_pdfByteArray;
         bool fileBackingEnabled;
         bool fileBackingActive;
         bool handleDirty;
@@ -154,7 +159,6 @@ public:
     void setResolution(int resolution);
     int resolution() const;
 
-    // reimplementations QPaintEngine
     bool begin(QPaintDevice *pdev) override;
     bool end() override;
 
@@ -177,7 +181,6 @@ public:
 
     int metric(QPaintDevice::PaintDeviceMetric metricType) const;
     Type type() const override;
-    // end reimplementations QPaintEngine
 
     // Printer stuff
     bool newPage();
@@ -206,7 +209,9 @@ public:
     QPdfEnginePrivate();
     ~QPdfEnginePrivate();
 
-    inline uint requestObject() { return currentObject++; }
+    uint requestObject() {
+       return currentObject++;
+    }
 
     void writeHeader();
     void writeTail();
@@ -279,13 +284,17 @@ private:
     void printString(const QString &string);
     void xprintf(const char* fmt, ...);
 
-    inline void write(const QByteArray &data) {
+    void write(const QByteArray &data) {
         stream->writeRawData(data.constData(), data.size());
         streampos += data.size();
     }
 
     int writeCompressed(const char *src, int len);
-    inline int writeCompressed(const QByteArray &data) { return writeCompressed(data.constData(), data.length()); }
+
+    int writeCompressed(const QByteArray &data) {
+       return writeCompressed(data.constData(), data.length());
+    }
+
     int writeCompressed(QIODevice *dev);
 
     // various PDF objects

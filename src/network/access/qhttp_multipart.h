@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,13 +25,14 @@
 #define QHTTP_MULTIPART_H
 
 #include <qbytearray.h>
-#include <qshareddatapointer.h>
 #include <qnetwork_request.h>
 #include <qscopedpointer.h>
+#include <qshareddatapointer.h>
 
-class QHttpPartPrivate;
 class QHttpMultiPart;
+
 class QHttpMultiPartPrivate;
+class QHttpPartPrivate;
 
 class Q_NETWORK_EXPORT QHttpPart
 {
@@ -48,7 +49,7 @@ class Q_NETWORK_EXPORT QHttpPart
    QHttpPart &operator=(const QHttpPart &other);
    bool operator==(const QHttpPart &other) const;
 
-   inline bool operator!=(const QHttpPart &other) const {
+   bool operator!=(const QHttpPart &other) const {
       return !operator==(other);
    }
 

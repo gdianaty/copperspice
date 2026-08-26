@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,8 +29,9 @@
 #include <qshareddata.h>
 
 class QDir;
-class QDirIteratorPrivate;
 class QDateTime;
+
+class QDirIteratorPrivate;
 class QFileInfoPrivate;
 
 class Q_CORE_EXPORT QFileInfo
@@ -48,14 +49,14 @@ class Q_CORE_EXPORT QFileInfo
 
    QFileInfo &operator=(const QFileInfo &fileinfo);
 
-   inline QFileInfo &operator=(QFileInfo && other) {
+   QFileInfo &operator=(QFileInfo && other) {
       qSwap(d_ptr, other.d_ptr);
       return *this;
    }
 
    bool operator==(const QFileInfo &fileinfo) const;
 
-   inline bool operator!=(const QFileInfo &fileinfo) const {
+   bool operator!=(const QFileInfo &fileinfo) const {
       return !(operator==(fileinfo));
    }
 
@@ -89,9 +90,10 @@ class Q_CORE_EXPORT QFileInfo
    bool isNativePath() const;
 
    bool isRelative() const;
-   inline bool isAbsolute() const {
+   bool isAbsolute() const {
       return !isRelative();
    }
+
    bool makeAbsolute();
 
    bool isFile() const;
@@ -101,7 +103,7 @@ class Q_CORE_EXPORT QFileInfo
    bool isBundle() const;
 
    QString readLink() const;
-   inline QString symLinkTarget() const {
+   QString symLinkTarget() const {
       return readLink();
    }
 
@@ -110,8 +112,8 @@ class Q_CORE_EXPORT QFileInfo
    QString group() const;
    uint groupId() const;
 
-   bool permission(QFile::Permissions permissions) const;
-   QFile::Permissions permissions() const;
+   bool permission(QFileDevice::Permissions permissions) const;
+   QFileDevice::Permissions permissions() const;
 
    qint64 size() const;
 
@@ -130,12 +132,12 @@ class Q_CORE_EXPORT QFileInfo
  private:
    friend class QDirIteratorPrivate;
 
-   inline QFileInfoPrivate *d_func() {
+   QFileInfoPrivate *d_func() {
       detach();
       return const_cast<QFileInfoPrivate *>(d_ptr.constData());
    }
 
-   inline const QFileInfoPrivate *d_func() const {
+   const QFileInfoPrivate *d_func() const {
       return d_ptr.constData();
    }
 };

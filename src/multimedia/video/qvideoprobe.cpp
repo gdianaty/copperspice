@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,11 +23,11 @@
 
 #include <qvideoprobe.h>
 
-#include <qsharedpointer.h>
-#include <qpointer.h>
-#include <qmediavideoprobecontrol.h>
-#include <qmediaservice.h>
 #include <qmediarecorder.h>
+#include <qmediaservice.h>
+#include <qmediavideoprobecontrol.h>
+#include <qpointer.h>
+#include <qsharedpointer.h>
 
 class QVideoProbePrivate {
   public:

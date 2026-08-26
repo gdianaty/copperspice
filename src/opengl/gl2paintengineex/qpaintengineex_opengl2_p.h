@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,13 +27,13 @@
 #include <qdebug.h>
 #include <qvector.h>
 
-#include <qpaintengineex_p.h>
-#include <qglengineshadermanager_p.h>
-#include <qgl2pexvertexarray_p.h>
-#include <qglpaintdevice_p.h>
 #include <qfontengine_p.h>
-#include <qtriangulatingstroker_p.h>
+#include <qgl2pexvertexarray_p.h>
+#include <qglengineshadermanager_p.h>
+#include <qglpaintdevice_p.h>
 #include <qopengl_extensions_p.h>
+#include <qpaintengineex_p.h>
+#include <qtriangulatingstroker_p.h>
 
 enum EngineMode {
    ImageDrawingMode,
@@ -211,7 +211,7 @@ class QGL2PaintEngineExPrivate : public QPaintEngineExPrivate, protected QOpenGL
    bool prepareForCachedGlyphDraw(const QFontEngineGlyphCache &cache);
 
    inline void useSimpleShader();
-   inline GLuint location(const QGLEngineShaderManager::Uniform uniform) {
+   GLuint location(const QGLEngineShaderManager::Uniform uniform) {
       return shaderManager->getUniformLocation(uniform);
    }
 

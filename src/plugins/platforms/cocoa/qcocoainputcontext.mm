@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,16 +21,16 @@
 *
 ***********************************************************************/
 
-#include <qnsview.h>
 #include <qcocoainputcontext.h>
+
+#include <qapplication.h>
 #include <qcocoanativeinterface.h>
 #include <qcocoawindow.h>
+#include <qnsview.h>
+#include <qrect.h>
+#include <qwindow.h>
 
 #include <Carbon/Carbon.h>
-
-#include <QRect>
-#include <QApplication>
-#include <QWindow>
 
 QCocoaInputContext::QCocoaInputContext()
    : QPlatformInputContext(), mWindow(QApplication::focusWindow())

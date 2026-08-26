@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,8 +24,8 @@
 #ifndef QNETWORK_ACCESS_FTPBACKEND_P_H
 #define QNETWORK_ACCESS_FTPBACKEND_P_H
 
-#include <qnetwork_request.h>
 #include <qnetwork_reply.h>
+#include <qnetwork_request.h>
 #include <qpointer.h>
 
 #include <qftp_p.h>
@@ -34,8 +34,8 @@
 
 #ifndef QT_NO_FTP
 
-class QNetworkAccessFtpIODevice;
 class QNetworkAccessCachedFtpConnection;
+class QNetworkAccessFtpIODevice;
 
 class QNetworkAccessFtpBackend: public QNetworkAccessBackend
 {

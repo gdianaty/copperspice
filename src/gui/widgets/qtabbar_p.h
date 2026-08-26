@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,11 +25,13 @@
 #define QTABBAR_P_H
 
 #include <qtabbar.h>
-#include <qwidget_p.h>
+
+#include <qdebug.h>
 #include <qicon.h>
 #include <qtoolbutton.h>
-#include <qdebug.h>
 #include <qvariantanimation.h>
+
+#include <qwidget_p.h>
 
 #ifndef QT_NO_TABBAR
 
@@ -167,7 +169,7 @@ class QTabBarPrivate  : public QWidgetPrivate
 
    int indexAtPos(const QPoint &p) const;
 
-   inline bool isAnimated() const {
+   bool isAnimated() const {
       Q_Q(const QTabBar);
       return q->style()->styleHint(QStyle::SH_Widget_Animate, nullptr, q);
    }

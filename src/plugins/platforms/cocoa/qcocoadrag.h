@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,12 @@
 #ifndef QCOCOADRAG_H
 #define QCOCOADRAG_H
 
-#include <Cocoa/Cocoa.h>
-
 #include <qplatform_drag.h>
 
-#include <qsimpledrag_p.h>
 #include <qdnd_p.h>
+#include <qsimpledrag_p.h>
+
+#include <Cocoa/Cocoa.h>
 
 class QCocoaDrag : public QPlatformDrag
 {
@@ -43,10 +43,9 @@ class QCocoaDrag : public QPlatformDrag
    Qt::DropAction defaultAction(Qt::DropActions possibleActions,
       Qt::KeyboardModifiers modifiers) const override;
 
-   /**
-   * to meet NSView dragImage:at guarantees, we need to record the original
-   * event and view when handling an event in QNSView
-   */
+   // to meet NSView dragImage:at guarantees, record the original
+   // event and view when handling an event in QNSView
+
    void setLastMouseEvent(NSEvent *event, NSView *view);
 
    void setAcceptedAction(Qt::DropAction act);
@@ -69,10 +68,9 @@ class QCocoaDropData : public QInternalMimeData
    CFStringRef dropPasteboard;
 
  protected:
-   bool hasFormat_sys(const QString &mimeType) const;
-   QStringList formats_sys() const;
-   QVariant retrieveData_sys(const QString &mimeType, QVariant::Type type) const;
-
+   bool hasFormat_sys(const QString &mimeType) const override;
+   QStringList formats_sys() const override;
+   QVariant retrieveData_sys(const QString &mimeType, QVariant::Type type) const override;
 };
 
 #endif

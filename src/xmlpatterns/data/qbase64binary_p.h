@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,8 +26,6 @@
 
 #include <qitem_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class Base64Binary : public AtomicValue
@@ -37,11 +35,7 @@ class Base64Binary : public AtomicValue
 
    typedef AtomicValue::Ptr Ptr;
 
-   /**
-    * Creates an instance representing @p value.
-    */
    static AtomicValue::Ptr fromLexical(const QString &value);
-
    static Base64Binary::Ptr fromValue(const QByteArray &data);
 
    QString stringValue() const override;
@@ -57,23 +51,10 @@ class Base64Binary : public AtomicValue
    const QByteArray m_value;
 
  private:
-   /**
-    * @short Assumes @p in is a lexical representation of @c xs:base64Binary, and
-    * converts it to the binary data set in @p out.
-    *
-    * If @p instr is invalid Base64 content, @p ok is set to
-    * false, and the returned QByteArray has an undefined value.
-    *
-    *  We cannot use QByteArray::fromBase64() because it doesn't do the
-    *  necessary validation that we need to properly implement W3C XML
-    *  Schema's xs:base64Binary type.
-    */
    static void base64Decode(const QByteArray &in, QByteArray &out, bool &ok);
-
    static const char Base64DecMap[128];
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

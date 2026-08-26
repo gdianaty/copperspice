@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,9 +24,7 @@
 #ifndef QXmlPatternIstcli_P_H
 #define QXmlPatternIstcli_P_H
 
-#include <QCoreApplication>
-
-QT_BEGIN_NAMESPACE
+#include <qcoreapplication.h>
 
 class QXmlPatternistCLI
 {
@@ -39,7 +37,5 @@ class QXmlPatternistCLI
    QXmlPatternistCLI(const QXmlPatternistCLI &) = delete;
    QXmlPatternistCLI &operator=(const QXmlPatternistCLI &) = delete;
 };
-
-QT_END_NAMESPACE
 
 #endif

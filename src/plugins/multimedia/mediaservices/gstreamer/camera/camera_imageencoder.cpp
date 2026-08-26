@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,7 +23,6 @@
 
 #include <camera_imageencoder.h>
 #include <camera_session.h>
-#include <qdebug.h>
 
 CameraBinImageEncoder::CameraBinImageEncoder(CameraBinSession *session)
    : QImageEncoderControl(session), m_session(session)
@@ -67,4 +66,3 @@ void CameraBinImageEncoder::setImageSettings(const QImageEncoderSettings &settin
    m_settings = settings;
    emit settingsChanged();
 }
-

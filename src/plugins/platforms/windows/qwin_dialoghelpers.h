@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,14 @@
 #ifndef QWINDOWSDIALOGHELPER_H
 #define QWINDOWSDIALOGHELPER_H
 
-#include <qwin_additional.h>
 #include <qplatform_dialoghelper.h>
 #include <qplatform_theme.h>
-#include <qstringlist.h>
 #include <qsharedpointer.h>
+#include <qstringlist.h>
+#include <qwin_additional.h>
 
-class QFileDialog;
 class QDialog;
+class QFileDialog;
 class QThread;
 class QWindowsNativeDialogBase;
 

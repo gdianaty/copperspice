@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -36,7 +36,7 @@ TEST_CASE("QMargins constructor", "[qmargins]")
 {
    QMargins data(5, 10, 100, 200);
 
-   REQUIRE(! data.isNull());
+   REQUIRE(data.isNull() == false);
 
    REQUIRE(data.left()   == 5);
    REQUIRE(data.top()    == 10);
@@ -45,14 +45,30 @@ TEST_CASE("QMargins constructor", "[qmargins]")
    REQUIRE(data.bottom() == 200);
 }
 
-TEST_CASE("QMargin is_null", "[qmargins]")
+TEST_CASE("QMargins copy_assign", "[qmargins]")
+{
+   QMargins data_a(25, 14, 100, 50);
+   QMargins data_b(data_a);
+
+   REQUIRE(data_a == data_b);
+   REQUIRE(data_b == QMargins{25, 14, 100, 50});
+
+   //
+   QMargins data_c;
+   data_c = data_a;
+
+   REQUIRE(data_a == data_c);
+   REQUIRE(data_c == QMargins{25, 14, 100, 50});
+}
+
+TEST_CASE("QMargins is_null", "[qmargins]")
 {
    QMargins data;
 
-   REQUIRE(data.isNull());
+   REQUIRE(data.isNull() == true);
 }
 
-TEST_CASE("QMargin operators", "[qmargins]")
+TEST_CASE("QMargins math", "[qmargins]")
 {
    QMargins data1(25, 14, 100, 50);
    QMargins data2(2, 3, 4, 5);
@@ -134,7 +150,21 @@ TEST_CASE("QMargin operators", "[qmargins]")
    }
 }
 
-TEST_CASE("QMargin set", "[qmargins]")
+TEST_CASE("QMargins move_assign", "[qmargins]")
+{
+   QMargins data_a(25, 14, 100, 50);
+   QMargins data_b(std::move(data_a));
+
+   REQUIRE(data_b == QMargins{25, 14, 100, 50});
+
+   //
+   QMargins data_c;
+   data_c = std::move(data_b);
+
+   REQUIRE(data_c == QMargins{25, 14, 100, 50});
+}
+
+TEST_CASE("QMargins set", "[qmargins]")
 {
    QMargins data;
 

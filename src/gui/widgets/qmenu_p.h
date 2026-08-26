@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,27 +24,27 @@
 #ifndef QMENU_P_H
 #define QMENU_P_H
 
-#include <qmenubar.h>
-#include <qstyleoption.h>
-#include <qdatetime.h>
-#include <qmap.h>
-#include <qhash.h>
 #include <qbasictimer.h>
-#include <qwidget_p.h>
-
+#include <qdatetime.h>
+#include <qhash.h>
+#include <qmap.h>
+#include <qmenubar.h>
 #include <qplatform_menu.h>
+#include <qstyleoption.h>
+
+#include <qwidget_p.h>
 
 #ifndef QT_NO_MENU
 
-class QTornOffMenu;
 class QEventLoop;
+class QTornOffMenu;
 
 template <typename T>
 class QSetValueOnDestroy
 {
  public:
-   QSetValueOnDestroy(T &toSet, T value)
-      : toSet(toSet), value(value)
+   QSetValueOnDestroy(T &newToSet, T newValue)
+      : toSet(newToSet), value(newValue)
    {
    }
 
@@ -61,9 +61,9 @@ class QMenuSloppyState
 {
  public:
    QMenuSloppyState()
-      : m_menu(nullptr), m_enabled(false), m_uni_directional(false), m_select_other_actions(false)
-      , m_first_mouse(true), m_init_guard(false), m_uni_dir_discarded_count(0), m_uni_dir_fail_at_count(0)
-      , m_timeout(0), m_reset_action(nullptr), m_origin_action(nullptr), m_parent(nullptr)
+      : m_menu(nullptr), m_enabled(false), m_uni_directional(false), m_select_other_actions(false),
+      m_first_mouse(true), m_init_guard(false), m_uni_dir_discarded_count(0), m_uni_dir_fail_at_count(0),
+      m_timeout(0), m_reset_action(nullptr), m_origin_action(nullptr), m_parent(nullptr)
    {
    }
 
@@ -330,8 +330,8 @@ class QMenuPrivate : public QWidgetPrivate
       {
       }
 
-      void initialize(QMenu *parent) {
-         this->parent = parent;
+      void initialize(QMenu *newParent) {
+         this->parent = newParent;
       }
 
       void start(int timeout, QAction *toStartAction) {

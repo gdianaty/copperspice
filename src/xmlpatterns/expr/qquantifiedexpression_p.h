@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,9 +26,8 @@
 
 #include <qpaircontainer_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class QuantifiedExpression : public PairContainer
 {
  public:
@@ -48,12 +47,6 @@ class QuantifiedExpression : public PairContainer
 
    Operator operatorID() const;
 
-   /**
-    * Determines the string representation for a quantification operator.
-    *
-    * @return "some" if @p quantifier is Some, or "every" if @p quantifier
-    * is Every
-    */
    static QString displayName(const Operator quantifier);
 
    ExpressionVisitorResult::Ptr accept(const ExpressionVisitor::Ptr &visitor) const override;
@@ -66,7 +59,5 @@ class QuantifiedExpression : public PairContainer
    const Operator m_quantifier;
 };
 }
-
-QT_END_NAMESPACE
 
 #endif

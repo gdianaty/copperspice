@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,12 +21,10 @@
 *
 ***********************************************************************/
 
-#include "qxsdschema_p.h"
+#include <qxsdschema_p.h>
 
-#include <QReadLocker>
-#include <QWriteLocker>
-
-QT_BEGIN_NAMESPACE
+#include <qreadlocker.h>
+#include <qwritelocker.h>
 
 using namespace QPatternist;
 
@@ -253,5 +251,3 @@ XsdIdentityConstraint::List XsdSchema::identityConstraints() const
 
    return m_identityConstraints.values();
 }
-
-QT_END_NAMESPACE

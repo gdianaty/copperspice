@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,9 +24,9 @@
 #ifndef QTABLEWIDGET_P_H
 #define QTABLEWIDGET_P_H
 
+#include <qabstractitemmodel.h>
 #include <qheaderview.h>
 #include <qtablewidget.h>
-#include <qabstractitemmodel.h>
 
 #include <qabstractitemmodel_p.h>
 #include <qtableview_p.h>
@@ -48,7 +48,7 @@ class QTableWidgetMimeData : public QMimeData
 class QTableModelLessThan
 {
  public:
-   inline bool operator()(QTableWidgetItem *i1, QTableWidgetItem *i2) const {
+   bool operator()(QTableWidgetItem *i1, QTableWidgetItem *i2) const {
       return (*i1 < *i2);
    }
 };
@@ -56,7 +56,7 @@ class QTableModelLessThan
 class QTableModelGreaterThan
 {
  public:
-   inline bool operator()(QTableWidgetItem *i1, QTableWidgetItem *i2) const {
+   bool operator()(QTableWidgetItem *i1, QTableWidgetItem *i2) const {
       return (*i2 < *i1);
    }
 };
@@ -128,7 +128,7 @@ class QTableModel : public QAbstractTableModel
       const QVector<QTableWidgetItem *>::iterator &end, Qt::SortOrder order, QTableWidgetItem *item);
 
    bool isValid(const QModelIndex &index) const;
-   inline long tableIndex(int row, int column) const {
+   long tableIndex(int row, int column) const {
       return (row * horizontalHeaderItems.count()) + column;
    }
 
@@ -167,7 +167,7 @@ class QTableWidgetPrivate : public QTableViewPrivate
  public:
    QTableWidgetPrivate() : QTableViewPrivate() {}
 
-   inline QTableModel *tableModel() const {
+   QTableModel *tableModel() const {
       return qobject_cast<QTableModel *>(model);
    }
    void setup();

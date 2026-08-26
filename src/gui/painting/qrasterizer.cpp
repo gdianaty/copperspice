@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -766,26 +766,28 @@ void QRasterizer::rasterizeLine(const QPointF &a, const QPointF &b, qreal width,
    QPointF offs = QPointF(qAbs(b.y() - a.y()), qAbs(b.x() - a.x())) * width * 0.5;
    const QRectF clip(d->clipRect.topLeft() - offs, d->clipRect.bottomRight() + QPoint(1, 1) + offs);
 
-   if (!clip.contains(pa) || !clip.contains(pb)) {
+   if (! clip.contains(pa) || ! clip.contains(pb)) {
       qreal t1 = 0;
       qreal t2 = 1;
 
-      const qreal o[2] = { pa.x(), pa.y() };
-      const qreal d[2] = { pb.x() - pa.x(), pb.y() - pa.y() };
+      const qreal origin[2] = { pa.x(), pa.y() };
+      const qreal depth[2]  = { pb.x() - pa.x(), pb.y() - pa.y() };
 
-      const qreal low[2] = { clip.left(), clip.top() };
+      const qreal low[2]  = { clip.left(),  clip.top() };
       const qreal high[2] = { clip.right(), clip.bottom() };
 
       for (int i = 0; i < 2; ++i) {
-         if (d[i] == 0) {
-            if (o[i] <= low[i] || o[i] >= high[i]) {
+         if (depth[i] == 0) {
+            if (origin[i] <= low[i] || origin[i] >= high[i]) {
                return;
             }
+
             continue;
          }
-         const qreal d_inv = 1 / d[i];
-         qreal t_low = (low[i] - o[i]) * d_inv;
-         qreal t_high = (high[i] - o[i]) * d_inv;
+
+         const qreal d_inv = 1 / depth[i];
+         qreal t_low  = (low[i]  - origin[i]) * d_inv;
+         qreal t_high = (high[i] - origin[i]) * d_inv;
 
          if (t_low > t_high) {
             qSwap(t_low, t_high);
@@ -811,7 +813,7 @@ void QRasterizer::rasterizeLine(const QPointF &a, const QPointF &b, qreal width,
       pb = npb;
    }
 
-   if (!d->antialiased && d->legacyRounding) {
+   if (! d->antialiased && d->legacyRounding) {
       pa.rx() += (COORD_OFFSET - COORD_ROUNDING) / 64.;
       pa.ry() += (COORD_OFFSET - COORD_ROUNDING) / 64.;
       pb.rx() += (COORD_OFFSET - COORD_ROUNDING) / 64.;
@@ -820,19 +822,19 @@ void QRasterizer::rasterizeLine(const QPointF &a, const QPointF &b, qreal width,
 
    {
       // old delta
-      const QPointF d0 = a - b;
-      const qreal w0 = d0.x() * d0.x() + d0.y() * d0.y();
+      const QPointF pointOld = a - b;
+      const qreal widthOld   = pointOld.x() * pointOld.x() + pointOld.y() * pointOld.y();
 
       // new delta
-      const QPointF d = pa - pb;
-      const qreal w = d.x() * d.x() + d.y() * d.y();
+      const QPointF pointNew = pa - pb;
+      const qreal widthNew   = pointNew.x() * pointNew.x() + pointNew.y() * pointNew.y();
 
-      if (w == 0) {
+      if (widthNew == 0) {
          return;
       }
 
       // adjust width which is given relative to |b - a|
-      width *= sqrt(w0 / w);
+      width *= sqrt(widthOld / widthNew);
    }
 
    QSpanBuffer buffer(d->blend, d->data, d->clipRect);

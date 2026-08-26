@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2013 Klarälvdalens Datakonsult AB, a KDAB Group company
 * Copyright (c) 2015 The Qt Company Ltd.
@@ -25,16 +25,16 @@
 #include <qopengl_version_functions_p.h>
 
 #if ! defined(QT_OPENGL_ES_2)
-#include "qopenglfunctions_3_1.h"
-#include "qopenglfunctions_3_0.h"
-#include "qopenglfunctions_2_1.h"
-#include "qopenglfunctions_2_0.h"
-#include "qopenglfunctions_1_5.h"
-#include "qopenglfunctions_1_4.h"
-#include "qopenglfunctions_1_3.h"
-#include "qopenglfunctions_1_2.h"
-#include "qopenglfunctions_1_1.h"
-#include "qopenglfunctions_1_0.h"
+#include <qopenglfunctions_1_0.h>
+#include <qopenglfunctions_1_1.h>
+#include <qopenglfunctions_1_2.h>
+#include <qopenglfunctions_1_3.h>
+#include <qopenglfunctions_1_4.h>
+#include <qopenglfunctions_1_5.h>
+#include <qopenglfunctions_2_0.h>
+#include <qopenglfunctions_2_1.h>
+#include <qopenglfunctions_3_0.h>
+#include <qopenglfunctions_3_1.h>
 #endif
 
 QAbstractOpenGLFunctions *QOpenGLVersionFunctionsFactory::createNoProfile(const int major, const int minor)

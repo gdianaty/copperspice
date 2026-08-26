@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,15 @@
 #ifndef QMATH_P_H
 #define QMATH_P_H
 
-#include <math.h>
 #include <qmath.h>
+
+#include <math.h>
 
 static constexpr const qreal Q_PI   = qreal(M_PI);
 static constexpr const qreal Q_2PI  = qreal(M_PI * 2);
 static constexpr const qreal Q_PI2  = qreal(M_PI / 2);
 
-static const qreal Q_MM_PER_INCH = 25.4;
+static constexpr const qreal Q_MM_PER_INCH = 25.4;
 
 inline int qIntSqrtInt(int v)
 {

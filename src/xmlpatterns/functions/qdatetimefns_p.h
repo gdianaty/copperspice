@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,6 +24,8 @@
 #ifndef QDateTimeFNs_P_H
 #define QDateTimeFNs_P_H
 
+#include <qtimezone.h>
+
 #include <qatomiccomparator_p.h>
 #include <qcommonvalues_p.h>
 #include <qschemadatetime_p.h>
@@ -32,18 +34,12 @@
 #include <qinteger_p.h>
 #include <qfunctioncall_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 template<typename TSubClass>
 class ExtractFromDurationFN : public FunctionCall
 {
  public:
-   /**
-    * Takes care of the argument handling, and, if applicable,
-    * calls extract() with the value of the operand.
-    */
    Item evaluateSingleton(const DynamicContext::Ptr &context) const override;
 };
 
@@ -60,13 +56,11 @@ class MonthsFromDurationFN : public ExtractFromDurationFN<MonthsFromDurationFN>
    inline Item extract(const AbstractDuration *const duration) const;
 };
 
-
 class DaysFromDurationFN : public ExtractFromDurationFN<DaysFromDurationFN>
 {
  public:
    inline Item extract(const AbstractDuration *const duration) const;
 };
-
 
 class HoursFromDurationFN : public ExtractFromDurationFN<HoursFromDurationFN>
 {
@@ -74,13 +68,11 @@ class HoursFromDurationFN : public ExtractFromDurationFN<HoursFromDurationFN>
    inline Item extract(const AbstractDuration *const duration) const;
 };
 
-
 class MinutesFromDurationFN : public ExtractFromDurationFN<MinutesFromDurationFN>
 {
  public:
    inline Item extract(const AbstractDuration *const duration) const;
 };
-
 
 class SecondsFromDurationFN : public ExtractFromDurationFN<SecondsFromDurationFN>
 {
@@ -88,18 +80,12 @@ class SecondsFromDurationFN : public ExtractFromDurationFN<SecondsFromDurationFN
    inline Item extract(const AbstractDuration *const duration) const;
 };
 
-
 template<typename TSubClass>
 class ExtractFromDateTimeFN : public FunctionCall
 {
  public:
-   /**
-    * Takes care of the argument handling, and, if applicable,
-    * calls extract() with the value of the operand.
-    */
    Item evaluateSingleton(const DynamicContext::Ptr &context) const override;
 };
-
 
 class YearFromAbstractDateTimeFN : public ExtractFromDateTimeFN<YearFromAbstractDateTimeFN>
 {
@@ -107,13 +93,11 @@ class YearFromAbstractDateTimeFN : public ExtractFromDateTimeFN<YearFromAbstract
    inline Item extract(const QDateTime &dt) const;
 };
 
-
 class DayFromAbstractDateTimeFN : public ExtractFromDateTimeFN<DayFromAbstractDateTimeFN>
 {
  public:
    inline Item extract(const QDateTime &dt) const;
 };
-
 
 class HoursFromAbstractDateTimeFN : public ExtractFromDateTimeFN<HoursFromAbstractDateTimeFN>
 {
@@ -127,20 +111,17 @@ class MinutesFromAbstractDateTimeFN : public ExtractFromDateTimeFN<MinutesFromAb
    inline Item extract(const QDateTime &dt) const;
 };
 
-
 class SecondsFromAbstractDateTimeFN : public ExtractFromDateTimeFN<SecondsFromAbstractDateTimeFN>
 {
  public:
    inline Item extract(const QDateTime &dt) const;
 };
 
-
 class TimezoneFromAbstractDateTimeFN : public ExtractFromDateTimeFN<TimezoneFromAbstractDateTimeFN>
 {
  public:
    inline Item extract(const QDateTime &dt) const;
 };
-
 
 class MonthFromAbstractDateTimeFN : public ExtractFromDateTimeFN<MonthFromAbstractDateTimeFN>
 {
@@ -151,8 +132,5 @@ class MonthFromAbstractDateTimeFN : public ExtractFromDateTimeFN<MonthFromAbstra
 #include "qdatetimefns.cpp"
 
 }
-
-QT_END_NAMESPACE
-
 
 #endif

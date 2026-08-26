@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -51,8 +51,44 @@ TEST_CASE("QFlatMap contains", "[qflatmap]")
                                   { 3, "pear"},
                                   { 4, "grapefruit"} };
 
-   REQUIRE(map.contains(2));
-   REQUIRE(! map.contains(9));
+   REQUIRE(map.contains(2) == true);
+   REQUIRE(map.contains(9) == false);
+}
+
+TEST_CASE("QFlatMap copy_assign", "[qflatmap]")
+{
+   QFlatMap<int, QString> map_a = { { 1, "watermelon"},
+                                    { 2, "apple"},
+                                    { 3, "pear"},
+                                    { 4, "grapefruit"} };
+
+   QFlatMap<int, QString> map_b(map_a);
+
+   REQUIRE(map_a.size() == 4);
+   REQUIRE(map_b.size() == 4);
+
+   REQUIRE(map_a.value(1) == "watermelon");
+   REQUIRE(map_a.value(4) == "grapefruit");
+
+   REQUIRE(map_b.value(1) == "watermelon");
+   REQUIRE(map_b.value(4) == "grapefruit");
+
+   REQUIRE(map_a == map_b);
+
+   //
+   QFlatMap<int, QString> map_c;
+   map_c = map_a;
+
+   REQUIRE(map_a.size() == 4);
+   REQUIRE(map_c.size() == 4);
+
+   REQUIRE(map_a.value(1) == "watermelon");
+   REQUIRE(map_a.value(4) == "grapefruit");
+
+   REQUIRE(map_c.value(1) == "watermelon");
+   REQUIRE(map_c.value(4) == "grapefruit");
+
+   REQUIRE(map_a == map_c);
 }
 
 TEST_CASE("QFlatMap count", "[qflatmap]")
@@ -63,14 +99,14 @@ TEST_CASE("QFlatMap count", "[qflatmap]")
                                   { 4, "grapefruit"} };
 
    REQUIRE(map.count() == 4);
-   REQUIRE(map.size() == 4);
+   REQUIRE(map.size()  == 4);
 }
 
 TEST_CASE("QFlatMap empty", "[qflatmap]")
 {
    QFlatMap<int, QString> map;
 
-   REQUIRE(map.isEmpty());
+   REQUIRE(map.isEmpty() == true);
 }
 
 TEST_CASE("QFlatMap erase", "[qflatmap]")
@@ -80,19 +116,37 @@ TEST_CASE("QFlatMap erase", "[qflatmap]")
                                   { 3, "pear"},
                                   { 4, "grapefruit"} };
 
-   auto iter = map.find(2);
-   map.erase(iter);
+   SECTION ("iterator") {
+      auto iter = map.find(2);
+      map.erase(iter);
 
-   REQUIRE(map.value(2) == "");
+      REQUIRE(map.value(2) == "");
 
-   REQUIRE(map.value(1) == "watermelon");
-   REQUIRE(map.value(3) == "pear");
-   REQUIRE(map.value(4) == "grapefruit");
+      REQUIRE(map.value(1) == "watermelon");
+      REQUIRE(map.value(3) == "pear");
+      REQUIRE(map.value(4) == "grapefruit");
 
-   REQUIRE(map.size() == 3);
+      REQUIRE(map.size() == 3);
+   }
+
+   SECTION ("key") {
+      auto count = map.erase(2);
+
+      REQUIRE(map.value(2) == "");
+      REQUIRE(count == 1);
+
+      REQUIRE(map.value(1) == "watermelon");
+      REQUIRE(map.value(3) == "pear");
+      REQUIRE(map.value(4) == "grapefruit");
+
+      REQUIRE(map.size() == 3);
+
+      count = map.erase(2);
+      REQUIRE(count == 0);
+   }
 }
 
-TEST_CASE("QFlatMap equality", "[qflatmap]")
+TEST_CASE("QFlatMap comparison", "[qflatmap]")
 {
    QFlatMap<int, QString> map1 = { { 1, "watermelon"},
                                    { 2, "apple"},
@@ -141,7 +195,7 @@ TEST_CASE("QFlatMap first", "[qflatmap]")
    REQUIRE(map.first() == "watermelon");
 }
 
-TEST_CASE("QFlatMap insert", "[qflatmap]")
+TEST_CASE("QFlatMap insert_copy", "[qflatmap]")
 {
    QFlatMap<int, QString> map = { { 1, "watermelon"},
                                   { 2, "apple"},
@@ -152,6 +206,19 @@ TEST_CASE("QFlatMap insert", "[qflatmap]")
 
    REQUIRE(map.value(6) == "mango");
    REQUIRE(map.size() == 5);
+}
+
+TEST_CASE("QFlatMap insert_move", "[qflatmap]")
+{
+   QFlatMap<int, QUniquePointer<QString> > map;
+
+   map.insert(1, QMakeUnique<QString>("watermelon"));
+   map.insert(2, QMakeUnique<QString>("apple"));
+   map.insert(3, QMakeUnique<QString>("pear"));
+   map.insert(4, QMakeUnique<QString>("grapefruit"));
+
+   REQUIRE(*(map[3]) == "pear");
+   REQUIRE(map.size() == 4);
 }
 
 TEST_CASE("QFlatMap insert_hint", "[qflatmap]")
@@ -172,7 +239,7 @@ TEST_CASE("QFlatMap insert_hint", "[qflatmap]")
 
    //
    iter = map.upperBound(4);
-   map.insert( iter, 4, "peach" );
+   map.insert(iter, 4, "peach");
 
    REQUIRE(map[4] == "peach");
 }
@@ -186,6 +253,30 @@ TEST_CASE("QFlatMap last", "[qflatmap]")
 
    REQUIRE(map.lastKey() == 4);
    REQUIRE(map.last() == "grapefruit");
+}
+
+TEST_CASE("QFlatMap move_assign", "[qflatmap]")
+{
+   QFlatMap<int, QString> map_a = { { 1, "watermelon"},
+                                    { 2, "apple"},
+                                    { 3, "pear"},
+                                    { 4, "grapefruit"} };
+
+   QFlatMap<int, QString> map_b(std::move(map_a));
+
+   REQUIRE(map_b.size() == 4);
+
+   REQUIRE(map_b.value(1) == "watermelon");
+   REQUIRE(map_b.value(4) == "grapefruit");
+
+   //
+   QFlatMap<int, QString> map_c;
+   map_c = std::move(map_b);
+
+   REQUIRE(map_c.size() == 4);
+
+   REQUIRE(map_c.value(1) == "watermelon");
+   REQUIRE(map_c.value(4) == "grapefruit");
 }
 
 TEST_CASE("QFlatMap remove", "[qflatmap]")
@@ -220,6 +311,6 @@ TEST_CASE("QFlatMap swap", "[qflatmap]")
    map1.swap(map2);
 
    REQUIRE(map1.value(2) == ("orange"));
-   REQUIRE(map2.contains(4));
+   REQUIRE(map2.contains(4) == true);
 }
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,11 +23,11 @@
 
 #include <qpolygon.h>
 
-#include <qrect.h>
 #include <qdatastream.h>
-#include <qmatrix.h>
 #include <qdebug.h>
+#include <qmatrix.h>
 #include <qpainterpath.h>
+#include <qrect.h>
 #include <qvariant.h>
 
 #include <qpainterpath_p.h>
@@ -83,11 +83,6 @@ QPolygon::QPolygon(const QRect &rectangle, bool closed)
       *this << QPoint(rectangle.left(), rectangle.top());
    }
 }
-
-/*!
-    // internal (cs)
-    Equivalent to setPoints(nPoints, points)
-*/
 
 QPolygon::QPolygon(int pointCount, const int *pointPtr)
 {
@@ -159,7 +154,6 @@ void QPolygon::setPoints(int nPoints, int firstx, int firsty, ...)
    va_end(ap);
 }
 
-// internal (cs)
 void QPolygon::putPoints(int index, int nPoints, const int *points)
 {
    if (index + nPoints > size()) {

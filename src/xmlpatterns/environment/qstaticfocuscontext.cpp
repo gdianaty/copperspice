@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,13 +23,10 @@
 
 #include "qstaticfocuscontext_p.h"
 
-QT_BEGIN_NAMESPACE
-
 using namespace QPatternist;
 
-StaticFocusContext::StaticFocusContext(const ItemType::Ptr &t,
-                                       const StaticContext::Ptr &context) : DelegatingStaticContext(context)
-   , m_contextItemType(t)
+StaticFocusContext::StaticFocusContext(const ItemType::Ptr &t, const StaticContext::Ptr &context)
+   : DelegatingStaticContext(context), m_contextItemType(t)
 {
 }
 
@@ -37,5 +34,3 @@ ItemType::Ptr StaticFocusContext::contextItemType() const
 {
    return m_contextItemType;
 }
-
-QT_END_NAMESPACE

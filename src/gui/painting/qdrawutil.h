@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,16 +24,17 @@
 #ifndef QDRAWUTIL_H
 #define QDRAWUTIL_H
 
-#include <qnamespace.h>
 #include <qmargins.h>
+#include <qnamespace.h>
+
 #include <qpixmap.h>
 
-class QPainter;
+class QBrush;
+class QColor;
 class QColorGroup;
+class QPainter;
 class QPalette;
 class QPoint;
-class QColor;
-class QBrush;
 class QRect;
 
 // Standard shade drawing
@@ -77,12 +78,12 @@ Q_GUI_EXPORT void qDrawPlainRect(QPainter *painter, const QRect &rect, const QCo
    int lineWidth = 1, const QBrush *fill = nullptr);
 
 struct QTileRules {
-   inline QTileRules(Qt::TileRule horizontalRule, Qt::TileRule verticalRule)
+   QTileRules(Qt::TileRule horizontalRule, Qt::TileRule verticalRule)
       : horizontal(horizontalRule), vertical(verticalRule)
    {
    }
 
-   inline QTileRules(Qt::TileRule rule = Qt::StretchTile)
+   QTileRules(Qt::TileRule rule = Qt::StretchTile)
       : horizontal(rule), vertical(rule)
    {
    }
@@ -91,8 +92,6 @@ struct QTileRules {
    Qt::TileRule vertical;
 };
 
-
-// For internal use only
 namespace QDrawBorderPixmap {
 
 enum DrawingHint {

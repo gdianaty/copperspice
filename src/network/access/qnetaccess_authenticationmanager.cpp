@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,14 +23,14 @@
 
 #include <qnetaccess_authenticationmanager_p.h>
 
-#include <qsslerror.h>
 #include <qauthenticator.h>
 #include <qbuffer.h>
 #include <qmutex.h>
+#include <qnetaccess_manager.h>
+#include <qsslerror.h>
 #include <qurl.h>
 #include <qvector.h>
 
-#include <qnetaccess_manager.h>
 #include <qnetaccess_manager_p.h>
 
 #include <algorithm>
@@ -93,16 +93,16 @@ static QByteArray proxyAuthenticationKey(const QNetworkProxy &proxy, const QStri
 
    switch (proxy.type()) {
       case QNetworkProxy::Socks5Proxy:
-         key.setScheme(QLatin1String("proxy-socks5"));
+         key.setScheme("proxy-socks5");
          break;
 
       case QNetworkProxy::HttpProxy:
       case QNetworkProxy::HttpCachingProxy:
-         key.setScheme(QLatin1String("proxy-http"));
+         key.setScheme("proxy-http");
          break;
 
       case QNetworkProxy::FtpCachingProxy:
-         key.setScheme(QLatin1String("proxy-ftp"));
+         key.setScheme("proxy-ftp");
          break;
 
       case QNetworkProxy::DefaultProxy:
@@ -258,19 +258,7 @@ void QNetworkAccessAuthenticationManager::cacheCredentials(const QUrl &url,
    } while (true);
 }
 
-/*!
-    Fetch the credential data from the credential cache.
-
-    If auth is 0 (as it is when called from createRequest()), this will try to
-    look up with an empty realm. That fails in most cases for HTTP (because the
-    realm is seldom empty for HTTP challenges). In any case, QHttpNetworkConnection
-    never sends the credentials on the first attempt: it needs to find out what
-    authentication methods the server supports.
-
-    For FTP, realm is always empty.
-*/
-QNetworkAuthenticationCredential
-QNetworkAccessAuthenticationManager::fetchCachedCredentials(const QUrl &url,
+QNetworkAuthenticationCredential QNetworkAccessAuthenticationManager::fetchCachedCredentials(const QUrl &url,
       const QAuthenticator *authentication)
 {
    if (!url.password().isEmpty()) {

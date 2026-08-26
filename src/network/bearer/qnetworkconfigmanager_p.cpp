@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -83,7 +83,7 @@ void QNetworkConfigurationManagerPrivate::cleanup()
 
 QNetworkConfiguration QNetworkConfigurationManagerPrivate::defaultConfiguration() const
 {
-   QRecursiveMutexLocker locker(&mutex);
+   QRecursiveMutexLocker locker1(&mutex);
 
    for (QBearerEngine *engine : sessionEngines) {
       QNetworkConfigurationPrivatePointer ptr = engine->defaultConfiguration();
@@ -104,7 +104,7 @@ QNetworkConfiguration QNetworkConfigurationManagerPrivate::defaultConfiguration(
       QHash<QString, QNetworkConfigurationPrivatePointer>::iterator it;
       QHash<QString, QNetworkConfigurationPrivatePointer>::iterator end;
 
-      QRecursiveMutexLocker locker(&engine->mutex);
+      QRecursiveMutexLocker locker2(&engine->mutex);
 
       for (it = engine->snapConfigurations.begin(),
             end = engine->snapConfigurations.end(); it != end; ++it) {
@@ -148,7 +148,7 @@ QNetworkConfiguration QNetworkConfigurationManagerPrivate::defaultConfiguration(
       QHash<QString, QNetworkConfigurationPrivatePointer>::iterator it;
       QHash<QString, QNetworkConfigurationPrivatePointer>::iterator end;
 
-      QRecursiveMutexLocker locker(&engine->mutex);
+      QRecursiveMutexLocker locker3(&engine->mutex);
 
       for (it = engine->accessPointConfigurations.begin(),
             end = engine->accessPointConfigurations.end(); it != end; ++it) {
@@ -208,13 +208,13 @@ QList<QNetworkConfiguration> QNetworkConfigurationManagerPrivate::allConfigurati
 {
    QList<QNetworkConfiguration> result;
 
-   QRecursiveMutexLocker locker(&mutex);
+   QRecursiveMutexLocker locker1(&mutex);
 
    for (QBearerEngine *engine : sessionEngines) {
       QHash<QString, QNetworkConfigurationPrivatePointer>::iterator it;
       QHash<QString, QNetworkConfigurationPrivatePointer>::iterator end;
 
-      QRecursiveMutexLocker locker(&engine->mutex);
+      QRecursiveMutexLocker locker2(&engine->mutex);
 
       //find all InternetAccessPoints
       for (it = engine->accessPointConfigurations.begin(),
@@ -252,10 +252,10 @@ QNetworkConfiguration QNetworkConfigurationManagerPrivate::configurationFromIden
 {
    QNetworkConfiguration item;
 
-   QRecursiveMutexLocker locker(&mutex);
+   QRecursiveMutexLocker locker1(&mutex);
 
    for (QBearerEngine *engine : sessionEngines) {
-      QRecursiveMutexLocker locker(&engine->mutex);
+      QRecursiveMutexLocker locker2(&engine->mutex);
 
       if (engine->accessPointConfigurations.contains(identifier)) {
          item.d = engine->accessPointConfigurations[identifier];
@@ -396,22 +396,22 @@ void QNetworkConfigurationManagerPrivate::updateConfigurations()
 
             engine->moveToThread(bearerThread);
 
-            connect(engine, SIGNAL(updateCompleted()),
-                    this, SLOT(updateConfigurations()), Qt::QueuedConnection);
+            connect(engine, &QBearerEngine::updateCompleted,
+                    this, &QNetworkConfigurationManagerPrivate::updateConfigurations, Qt::QueuedConnection);
 
-            connect(engine, SIGNAL(configurationAdded(QNetworkConfigurationPrivatePointer)),
-                    this, SLOT(configurationAdded(QNetworkConfigurationPrivatePointer)), Qt::QueuedConnection);
+            connect(engine, &QBearerEngine::configurationAdded,
+                    this, cs_mp_cast<QNetworkConfigurationPrivatePointer>(&QNetworkConfigurationManagerPrivate::configurationAdded), Qt::QueuedConnection);
 
-            connect(engine, SIGNAL(configurationRemoved(QNetworkConfigurationPrivatePointer)),
-                    this, SLOT(configurationRemoved(QNetworkConfigurationPrivatePointer)), Qt::QueuedConnection);
+            connect(engine, &QBearerEngine::configurationRemoved,
+                    this, cs_mp_cast<QNetworkConfigurationPrivatePointer>(&QNetworkConfigurationManagerPrivate::configurationRemoved), Qt::QueuedConnection);
 
-            connect(engine, SIGNAL(configurationChanged(QNetworkConfigurationPrivatePointer)),
-                    this, SLOT(configurationChanged(QNetworkConfigurationPrivatePointer)), Qt::QueuedConnection);
+            connect(engine, &QBearerEngine::configurationChanged,
+                    this, cs_mp_cast<QNetworkConfigurationPrivatePointer>(&QNetworkConfigurationManagerPrivate::configurationChanged), Qt::QueuedConnection);
          }
       }
 
       if (generic) {
-         if ( !envOK || skipGeneric <= 0) {
+         if (! envOK || skipGeneric <= 0) {
             sessionEngines.append(generic);
          } else {
             delete generic;
@@ -421,7 +421,7 @@ void QNetworkConfigurationManagerPrivate::updateConfigurations()
 
    QBearerEngine *engine = dynamic_cast<QBearerEngine *>(sender());
 
-   if (engine && !updatingEngines.isEmpty()) {
+   if (engine && ! updatingEngines.isEmpty()) {
       updatingEngines.remove(engine);
    }
 
@@ -444,8 +444,8 @@ void QNetworkConfigurationManagerPrivate::updateConfigurations()
       QList<QBearerEngine *> enginesToInitialize = sessionEngines;
       locker.unlock();
 
-      for (QBearerEngine *engine : enginesToInitialize) {
-         QMetaObject::invokeMethod(engine, "initialize", Qt::BlockingQueuedConnection);
+      for (QBearerEngine *item : enginesToInitialize) {
+         QMetaObject::invokeMethod(item, "initialize", Qt::BlockingQueuedConnection);
       }
    }
 }
@@ -478,8 +478,9 @@ void QNetworkConfigurationManagerPrivate::startPolling()
 {
    QRecursiveMutexLocker locker(&mutex);
 
-   if (!pollTimer) {
+   if (! pollTimer) {
       pollTimer = new QTimer(this);
+
       bool ok;
       int interval = qgetenv("QT_BEARER_POLL_TIMEOUT").toInt(&ok);
 
@@ -489,7 +490,7 @@ void QNetworkConfigurationManagerPrivate::startPolling()
 
       pollTimer->setInterval(interval);
       pollTimer->setSingleShot(true);
-      connect(pollTimer, SIGNAL(timeout()), this, SLOT(pollEngines()));
+      connect(pollTimer, &QTimer::timeout, this, &QNetworkConfigurationManagerPrivate::pollEngines);
    }
 
    if (pollTimer->isActive()) {

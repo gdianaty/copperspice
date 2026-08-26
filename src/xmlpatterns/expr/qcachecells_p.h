@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -34,13 +34,15 @@ class ItemCacheCell
  public:
    typedef QList<ItemCacheCell> List;
    typedef QVector<ItemCacheCell> Vector;
+
    enum CacheState {
       Full,
       Empty
    };
 
-   inline ItemCacheCell() : cacheState(Empty) {
-   }
+   ItemCacheCell()
+      : cacheState(Empty)
+   { }
 
    Item        cachedItem;
    CacheState  cacheState;
@@ -58,9 +60,9 @@ class ItemSequenceCacheCell
       PartiallyPopulated
    };
 
-   inline ItemSequenceCacheCell() : cacheState(Empty)
-      , inUse(false) {
-   }
+   ItemSequenceCacheCell()
+      : cacheState(Empty), inUse(false)
+   { }
 
    Item::List          cachedItems;
    Item::Iterator::Ptr sourceIterator;

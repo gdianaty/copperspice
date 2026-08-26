@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,6 +25,7 @@
 
 #ifndef QT_NO_TOOLBOX
 
+#include <qabstractbutton.h>
 #include <qapplication.h>
 #include <qeventloop.h>
 #include <qlayout.h>
@@ -34,7 +35,6 @@
 #include <qstyle.h>
 #include <qstyleoption.h>
 #include <qtooltip.h>
-#include <qabstractbutton.h>
 
 #include <qframe_p.h>
 
@@ -50,12 +50,12 @@ class QToolBoxButton : public QAbstractButton
       setFocusPolicy(Qt::NoFocus);
    }
 
-   inline void setSelected(bool b) {
+   void setSelected(bool b) {
       selected = b;
       update();
    }
 
-   inline void setIndex(int newIndex) {
+   void setIndex(int newIndex) {
       indexInPage = newIndex;
    }
 
@@ -75,41 +75,45 @@ class QToolBoxButton : public QAbstractButton
 class QToolBoxPrivate : public QFramePrivate
 {
    Q_DECLARE_PUBLIC(QToolBox)
+
  public:
    struct Page {
       QToolBoxButton *button;
       QScrollArea *sv;
       QWidget *widget;
 
-      inline void setText(const QString &text) {
+      void setText(const QString &text) {
          button->setText(text);
       }
-      inline void setIcon(const QIcon &is) {
+      void setIcon(const QIcon &is) {
          button->setIcon(is);
       }
 
 #ifndef QT_NO_TOOLTIP
-      inline void setToolTip(const QString &tip) {
+      void setToolTip(const QString &tip) {
          button->setToolTip(tip);
       }
-      inline QString toolTip() const {
+
+      QString toolTip() const {
          return button->toolTip();
       }
 #endif
-      inline QString text() const {
+
+      QString text() const {
          return button->text();
       }
-      inline QIcon icon() const {
+
+      QIcon icon() const {
          return button->icon();
       }
 
-      inline bool operator==(const Page &other) const {
+      bool operator==(const Page &other) const {
          return widget == other.widget;
       }
    };
    typedef QList<Page> PageList;
 
-   inline QToolBoxPrivate()
+   QToolBoxPrivate()
       : currentPage(nullptr) {
    }
 
@@ -284,7 +288,7 @@ int QToolBox::insertItem(int index, QWidget *widget, const QIcon &icon, const QS
    QToolBoxPrivate::Page c;
    c.widget = widget;
    c.button = new QToolBoxButton(this);
-   c.button->setObjectName(QLatin1String("qt_toolbox_toolboxbutton"));
+   c.button->setObjectName("qt_toolbox_toolboxbutton");
 
    connect(c.button, &QToolBoxButton::clicked, this, &QToolBox::_q_buttonClicked);
 
@@ -416,7 +420,7 @@ void QToolBox::removeItem(int index)
 
       w->setParent(this);
 
-      // destroy internal data
+      // destroy class data
       d->_q_widgetDestroyed(w);
       itemRemoved(index);
    }

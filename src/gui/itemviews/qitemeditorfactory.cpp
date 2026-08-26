@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -142,7 +142,8 @@ void QItemEditorFactory::registerEditor(QVariant::Type type, QItemEditorCreatorB
 class QDefaultItemEditorFactory : public QItemEditorFactory
 {
  public:
-   inline QDefaultItemEditorFactory() {}
+   QDefaultItemEditorFactory()
+   { }
 
    QWidget *createEditor(QVariant::Type type, QWidget *parent) const override;
    QString valuePropertyName(QVariant::Type) const override;
@@ -267,7 +268,8 @@ QString QDefaultItemEditorFactory::valuePropertyName(QVariant::Type type) const
 static QItemEditorFactory *q_default_factory = nullptr;
 
 struct QDefaultFactoryCleaner {
-   inline QDefaultFactoryCleaner() {}
+   QDefaultFactoryCleaner() {
+   }
 
    ~QDefaultFactoryCleaner() {
       delete q_default_factory;

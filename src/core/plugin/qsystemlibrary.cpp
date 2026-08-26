@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,10 +23,10 @@
 
 #include <qsystemlibrary_p.h>
 
-#include <qvarlengtharray.h>
+#include <qfileinfo.h>
 #include <qstringlist.h>
 #include <qstringparser.h>
-#include <qfileinfo.h>
+#include <qvarlengtharray.h>
 
 extern QString qAppFileName();
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,16 +24,17 @@
 #ifndef QITEMSELECTIONMODEL_H
 #define QITEMSELECTIONMODEL_H
 
+#include <qabstractitemmodel.h>
+#include <qlist.h>
+#include <qscopedpointer.h>
 #include <qset.h>
 #include <qvector.h>
-#include <qlist.h>
-#include <qabstractitemmodel.h>
-#include <qscopedpointer.h>
 
 #ifndef QT_NO_ITEMVIEWS
 
 class QItemSelection;
 class QItemSelectionModel;
+
 class QItemSelectionModelPrivate;
 
 CS_DECLARE_METATYPE(QItemSelection)
@@ -41,7 +42,7 @@ CS_DECLARE_METATYPE(QItemSelection)
 class Q_GUI_EXPORT QItemSelectionRange
 {
  public:
-   inline QItemSelectionRange()
+   QItemSelectionRange()
       : tl(), br()
    { }
 
@@ -51,11 +52,11 @@ class Q_GUI_EXPORT QItemSelectionRange
    QItemSelectionRange &operator=(const QItemSelectionRange &other) = default;
    QItemSelectionRange &operator=(QItemSelectionRange &&other) = default;
 
-   inline QItemSelectionRange(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+   QItemSelectionRange(const QModelIndex &topLeft, const QModelIndex &bottomRight)
       : tl(topLeft), br(bottomRight)
    { }
 
-   explicit inline QItemSelectionRange(const QModelIndex &index)
+   explicit QItemSelectionRange(const QModelIndex &index)
       : tl(index), br(index)
    { }
 
@@ -155,7 +156,7 @@ class Q_GUI_EXPORT QItemSelectionRange
       return tl.model() < other.tl.model();
    }
 
-   inline bool isValid() const {
+   bool isValid() const {
       return (tl.isValid() && br.isValid() && tl.parent() == br.parent()
             && top() <= bottom() && left() <= right());
    }

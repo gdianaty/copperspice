@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,11 +24,11 @@
 #ifndef QPAINTERVIDEOSURFACE_P_H
 #define QPAINTERVIDEOSURFACE_P_H
 
-#include <qsize.h>
+#include <qabstractvideosurface.h>
 #include <qimage.h>
 #include <qmatrix4x4.h>
 #include <qpaintengine.h>
-#include <qabstractvideosurface.h>
+#include <qsize.h>
 #include <qvideoframe.h>
 
 class QGLContext;

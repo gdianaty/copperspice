@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,8 +25,10 @@
 #define QSTATICTEXT_P_H
 
 #include <qstatictext.h>
-#include <qtextureglyphcache_p.h>
+
 #include <qcolor.h>
+
+#include <qtextureglyphcache_p.h>
 
 class QStaticText;
 
@@ -113,15 +115,15 @@ class Q_GUI_EXPORT QStaticTextItem
    int numGlyphs;                               // 4 bytes per item
    QFont font;                                  // 8 bytes per item
    QColor color;                                // 10 bytes per item
-   char useBackendOptimizations : 1;            // 1 byte per item
-   char userDataNeedsUpdate : 1;
-   char usesRawFont : 1;
+
+   uint8_t useBackendOptimizations : 1;         // 1 byte per item
+   uint8_t userDataNeedsUpdate : 1;
+   uint8_t usesRawFont : 1;
 
  private:
    // Needs special handling in setters, so private to avoid abuse
    QFontEngine *m_fontEngine;                     // 4 bytes per item
    QStaticTextUserData *m_userData;               // 8 bytes per item
-
 };
 
 class QStaticTextPrivate

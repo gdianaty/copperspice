@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,29 +23,29 @@
 
 #include <qaccessiblewidget_common_p.h>
 
+#include <qabstractbutton.h>
+#include <qabstractitemview.h>
 #include <qabstracttextdocumentlayout.h>
 #include <qapplication.h>
-#include <qclipboard.h>
-#include <qtextedit.h>
-#include <qtextdocument.h>
-#include <qtextobject.h>
-#include <qplaintextedit.h>
-#include <qtextboundaryfinder.h>
-#include <qscrollbar.h>
 #include <qapplication.h>
-#include <qstackedwidget.h>
-#include <qtoolbox.h>
+#include <qcalendarwidget.h>
+#include <qclipboard.h>
+#include <qdialogbuttonbox.h>
+#include <qdockwidget.h>
+#include <qfocusframe.h>
+#include <qmainwindow.h>
 #include <qmdiarea.h>
 #include <qmdisubwindow.h>
-#include <qdialogbuttonbox.h>
+#include <qplaintextedit.h>
 #include <qrubberband.h>
+#include <qscrollbar.h>
+#include <qstackedwidget.h>
+#include <qtextboundaryfinder.h>
 #include <qtextbrowser.h>
-#include <qcalendarwidget.h>
-#include <qabstractitemview.h>
-#include <qdockwidget.h>
-#include <qmainwindow.h>
-#include <qabstractbutton.h>
-#include <qfocusframe.h>
+#include <qtextdocument.h>
+#include <qtextedit.h>
+#include <qtextobject.h>
+#include <qtoolbox.h>
 
 #include <qdockwidget_p.h>
 #include <qtextedit_p.h>
@@ -270,9 +270,9 @@ void QAccessibleTextEdit::scrollToSubstring(int startIndex, int endIndex)
    r.setBottomRight(edit->cursorRect(cursor).bottomRight());
    r.moveTo(r.x() + edit->horizontalScrollBar()->value(), r.y() + edit->verticalScrollBar()->value());
 
-   // E V I L, but ensureVisible is not public
+   // ensureVisible is not public
    if (! QMetaObject::invokeMethod(edit, "_q_ensureVisible", Q_ARG(const QRectF &, r))) {
-      qWarning("AccessibleTextEdit::scrollToSubstring failed");
+      qWarning("QAccessibleTextEdit::scrollToSubstring() Process failed");
    }
 }
 
@@ -874,8 +874,8 @@ QString QAccessibleTextWidget::attributes(int offset, int *startOffset, int *end
          break;
 
       default:
-         qWarning() << "Unknown QTextCharFormat::UnderlineStyle value " << underlineStyle <<
-            " could not be translated to IAccessible2 value";
+         qWarning() << "QAccessibleTextWidget::attributes() Unknown QTextCharFormat::UnderlineStyle value "
+                    << underlineStyle << " could not be translated to IAccessible2 value";
          break;
    }
 

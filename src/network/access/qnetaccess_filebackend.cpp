@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,11 @@
 #include <qnetaccess_filebackend_p.h>
 
 #include <qcoreapplication.h>
-#include <qfileinfo.h>
 #include <qdir.h>
-#include <qnoncontiguousbytedevice_p.h>
+#include <qfileinfo.h>
 #include <qstring.h>
+
+#include <qnoncontiguousbytedevice_p.h>
 #include <qurlinfo_p.h>
 
 QStringList QNetworkAccessFileBackendFactory::supportedSchemes() const
@@ -111,8 +112,8 @@ void QNetworkAccessFileBackend::open()
 
    QString fileName = url.toLocalFile();
    if (fileName.isEmpty()) {
-      if (url.scheme() == QLatin1String("qrc")) {
-         fileName = QLatin1Char(':') + url.path();
+      if (url.scheme() == "qrc") {
+         fileName = QChar(':') + url.path();
       } else {
          fileName = url.toString(QUrl::RemoveAuthority | QUrl::RemoveFragment | QUrl::RemoveQuery);
       }

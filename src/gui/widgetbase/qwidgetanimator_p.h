@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,14 @@
 #ifndef QWIDGETANIMATOR_P_H
 #define QWIDGETANIMATOR_P_H
 
-#include <qobject.h>
 #include <qhash.h>
+#include <qobject.h>
 #include <qpointer.h>
 
-class QWidget;
 class QMainWindowLayout;
 class QPropertyAnimation;
 class QRect;
+class QWidget;
 
 class QWidgetAnimator : public QObject
 {

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,15 +21,17 @@
 *
 ***********************************************************************/
 
-#include <qlocalserver.h>
-#include <qlocalserver_p.h>
-#include <qlocalsocket.h>
-#include <qsystemerror_p.h>
-#include <qstring.h>
 #include <qdebug.h>
+#include <qlocalserver.h>
+#include <qlocalsocket.h>
+#include <qscopedarraypointer.h>
+#include <qstring.h>
 
-#include <aclapi.h>
+#include <qlocalserver_p.h>
+#include <qsystemerror_p.h>
+
 #include <accctrl.h>
+#include <aclapi.h>
 #include <sddl.h>
 
 // The buffer size need to be 0 otherwise data could be
@@ -59,13 +61,14 @@ bool QLocalServerPrivate::addListener()
    // create security descriptor if access options were specified
    if ((socketOptions & QLocalServer::WorldAccessOption)) {
       pSD.reset(new SECURITY_DESCRIPTOR);
-      if (!InitializeSecurityDescriptor(pSD.data(), SECURITY_DESCRIPTOR_REVISION)) {
-         setError(QLatin1String("QLocalServerPrivate::addListener"));
+
+      if (! InitializeSecurityDescriptor(pSD.data(), SECURITY_DESCRIPTOR_REVISION)) {
+         setError("QLocalServerPrivate::addListener");
          return false;
       }
 
       HANDLE hToken = nullptr;
-      if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
+      if (! OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
          return false;
       }
 
@@ -75,8 +78,9 @@ bool QLocalServerPrivate::addListener()
       PTOKEN_USER pTokenUser = (PTOKEN_USER)tokenUserBuffer.data();
 
       if (!GetTokenInformation(hToken, TokenUser, pTokenUser, dwBufferSize, &dwBufferSize)) {
-         setError(QLatin1String("QLocalServerPrivate::addListener"));
+         setError("QLocalServerPrivate::addListener");
          CloseHandle(hToken);
+
          return false;
       }
 
@@ -85,37 +89,44 @@ bool QLocalServerPrivate::addListener()
       tokenGroupBuffer.fill(0, dwBufferSize);
       PTOKEN_PRIMARY_GROUP pTokenGroup = (PTOKEN_PRIMARY_GROUP)tokenGroupBuffer.data();
 
-      if (!GetTokenInformation(hToken, TokenPrimaryGroup, pTokenGroup, dwBufferSize, &dwBufferSize)) {
-         setError(QLatin1String("QLocalServerPrivate::addListener"));
+      if (! GetTokenInformation(hToken, TokenPrimaryGroup, pTokenGroup, dwBufferSize, &dwBufferSize)) {
+         setError("QLocalServerPrivate::addListener");
          CloseHandle(hToken);
          return false;
       }
+
       CloseHandle(hToken);
 
-#ifdef QLOCALSERVER_DEBUG
+#if defined(CS_SHOW_DEBUG_NETWORK)
       DWORD groupNameSize;
       DWORD domainNameSize;
       SID_NAME_USE groupNameUse;
       LPWSTR groupNameSid;
 
-      LookupAccountSid(0, pTokenGroup->PrimaryGroup, 0, &groupNameSize, 0, &domainNameSize, &groupNameUse);
-      QScopedPointer<wchar_t, QScopedPointerArrayDeleter<wchar_t>> groupName(new wchar_t[groupNameSize]);
-      QScopedPointer<wchar_t, QScopedPointerArrayDeleter<wchar_t>> domainName(new wchar_t[domainNameSize]);
+      LookupAccountSid(nullptr, pTokenGroup->PrimaryGroup, nullptr, &groupNameSize, nullptr, &domainNameSize, &groupNameUse);
 
-      if (LookupAccountSid(0, pTokenGroup->PrimaryGroup, groupName.data(), &groupNameSize, domainName.data(), &domainNameSize, &groupNameUse)) {
-         qDebug() << "primary group" << QString::fromWCharArray(domainName.data()) << "\\" << QString::fromWCharArray(groupName.data()) << "type=" << groupNameUse;
+      std::wstring groupName(groupNameSize, L'0');
+      std::wstring domainName(domainNameSize, L'0');
+
+      if (LookupAccountSid(nullptr, pTokenGroup->PrimaryGroup, groupName.data(), &groupNameSize, domainName.data(),
+            &domainNameSize, &groupNameUse)) {
+
+         qDebug() << "primary group" << QString::fromStdWString(domainName) << "\\"
+               << QString::fromStdWString(groupName) << "type=" << groupNameUse;
       }
+
       if (ConvertSidToStringSid(pTokenGroup->PrimaryGroup, &groupNameSid)) {
-         qDebug() << "primary group SID" << QString::fromWCharArray(groupNameSid) << "valid" << IsValidSid(pTokenGroup->PrimaryGroup);
+         qDebug() << "primary group SID" << QString::fromStdWString(std::wstring(groupNameSid)) << "valid"
+               << IsValidSid(pTokenGroup->PrimaryGroup);
+
          LocalFree(groupNameSid);
       }
 #endif
 
       SID_IDENTIFIER_AUTHORITY WorldAuth = { SECURITY_WORLD_SID_AUTHORITY };
-      if (!AllocateAndInitializeSid(&WorldAuth, 1, SECURITY_WORLD_RID,
-                                    0, 0, 0, 0, 0, 0, 0,
-                                    &worldSID)) {
-         setError(QLatin1String("QLocalServerPrivate::addListener"));
+
+      if (! AllocateAndInitializeSid(&WorldAuth, 1, SECURITY_WORLD_RID, 0, 0, 0, 0, 0, 0, 0, &worldSID)) {
+         setError("QLocalServerPrivate::addListener");
          return false;
       }
 
@@ -127,36 +138,42 @@ bool QLocalServerPrivate::addListener()
       aclBuffer.fill(0, aclSize);
       PACL acl = (PACL)aclBuffer.data();
       InitializeAcl(acl, aclSize, ACL_REVISION_DS);
+
       if (socketOptions & QLocalServer::UserAccessOption) {
-         if (!AddAccessAllowedAce(acl, ACL_REVISION, FILE_ALL_ACCESS, pTokenUser->User.Sid)) {
-            setError(QLatin1String("QLocalServerPrivate::addListener"));
+         if (! AddAccessAllowedAce(acl, ACL_REVISION, FILE_ALL_ACCESS, pTokenUser->User.Sid)) {
+            setError("QLocalServerPrivate::addListener");
             FreeSid(worldSID);
+
             return false;
          }
       }
       if (socketOptions & QLocalServer::GroupAccessOption) {
          if (!AddAccessAllowedAce(acl, ACL_REVISION, FILE_ALL_ACCESS, pTokenGroup->PrimaryGroup)) {
-            setError(QLatin1String("QLocalServerPrivate::addListener"));
+            setError("QLocalServerPrivate::addListener");
             FreeSid(worldSID);
             return false;
          }
       }
       if (socketOptions & QLocalServer::OtherAccessOption) {
          if (!AddAccessAllowedAce(acl, ACL_REVISION, FILE_ALL_ACCESS, worldSID)) {
-            setError(QLatin1String("QLocalServerPrivate::addListener"));
+            setError("QLocalServerPrivate::addListener");
             FreeSid(worldSID);
             return false;
          }
       }
+
       SetSecurityDescriptorOwner(pSD.data(), pTokenUser->User.Sid, FALSE);
       SetSecurityDescriptorGroup(pSD.data(), pTokenGroup->PrimaryGroup, FALSE);
+
       if (!SetSecurityDescriptorDacl(pSD.data(), TRUE, acl, FALSE)) {
-         setError(QLatin1String("QLocalServerPrivate::addListener"));
+         setError("QLocalServerPrivate::addListener");
          FreeSid(worldSID);
          return false;
       }
+
       sa.lpSecurityDescriptor = pSD.data();
    }
+
    listener.handle = CreateNamedPipe(fullServerName.toStdWString().c_str(), PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
                         PIPE_TYPE_BYTE |          // byte type pipe
                         PIPE_READMODE_BYTE |      // byte-read mode
@@ -168,8 +185,9 @@ bool QLocalServerPrivate::addListener()
                         &sa);
 
    if (listener.handle == INVALID_HANDLE_VALUE) {
-      setError(QLatin1String("QLocalServerPrivate::addListener"));
+      setError("QLocalServerPrivate::addListener");
       listeners.removeLast();
+
       return false;
    }
 
@@ -190,7 +208,7 @@ bool QLocalServerPrivate::addListener()
 
          default:
             CloseHandle(listener.handle);
-            setError(QLatin1String("QLocalServerPrivate::addListener"));
+            setError("QLocalServerPrivate::addListener");
             listeners.removeLast();
             return false;
       }
@@ -222,7 +240,7 @@ bool QLocalServerPrivate::listen(const QString &name)
 {
    Q_Q(QLocalServer);
 
-   QString pipePath = QLatin1String("\\\\.\\pipe\\");
+   QString pipePath = QString("\\\\.\\pipe\\");
 
    if (name.startsWith(pipePath)) {
       fullServerName = name;
@@ -235,7 +253,8 @@ bool QLocalServerPrivate::listen(const QString &name)
    // cheap compared to waiting for N additional events in each iteration of the main loop.
    eventHandle = CreateEvent(nullptr, TRUE, FALSE, nullptr);
    connectionEventNotifier = new QWinEventNotifier(eventHandle, q);
-   q->connect(connectionEventNotifier, SIGNAL(activated(HANDLE)), q, SLOT(_q_onNewConnection()));
+
+   q->connect(connectionEventNotifier, &QWinEventNotifier::activated, q, &QLocalServer::_q_onNewConnection);
 
    for (int i = 0; i < SYSTEM_MAX_PENDING_SOCKETS; ++i) {
       if (! addListener()) {
@@ -248,7 +267,7 @@ bool QLocalServerPrivate::listen(const QString &name)
 }
 
 bool QLocalServerPrivate::listen(qintptr) {
-   qWarning("QLocalServer::listen(qintptr) is not supported on Windows");
+   qWarning("QLocalServer::listen() Not supported on Windows");
    return false;
 }
 
@@ -286,7 +305,7 @@ void QLocalServerPrivate::_q_onNewConnection() {
          } else {
             if (GetLastError() != ERROR_IO_INCOMPLETE) {
                q->close();
-               setError(QLatin1String("QLocalServerPrivate::_q_onNewConnection"));
+               setError("QLocalServerPrivate::_q_onNewConnection");
                return;
             }
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,8 +24,8 @@
 #ifndef QPLATFORM_SHAREDGRAPHICSCACHE_H
 #define QPLATFORM_SHAREDGRAPHICSCACHE_H
 
-#include <qobject.h>
 #include <qimage.h>
+#include <qobject.h>
 
 class Q_GUI_EXPORT QPlatformSharedGraphicsCache: public QObject
 {

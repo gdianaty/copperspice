@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,7 +22,9 @@
 ***********************************************************************/
 
 #include <translator.h>
+
 #include <similartext.h>
+
 #include <qdebug.h>
 #include <qdir.h>
 #include <qfile.h>
@@ -319,10 +321,10 @@ bool Translator::load(const QString &filename, ConversionData &cd, const QString
 
    QString fmt = guessFormat(filename, format);
 
-   for (const FileFormat &format : registeredFileFormats()) {
-      if (fmt == format.extension) {
-         if (format.loader) {
-            return (*format.loader)(*this, file, cd);
+   for (const FileFormat &item : registeredFileFormats()) {
+      if (fmt == item.extension) {
+         if (item.loader) {
+            return (*item.loader)(*this, file, cd);
          }
 
          cd.appendError(QString("No loader for format %1 found").formatArg(fmt));
@@ -362,10 +364,10 @@ bool Translator::save(const QString &filename, ConversionData &cd, const QString
    QString fmt = guessFormat(filename, format);
    cd.m_targetDir = QFileInfo(filename).absoluteDir();
 
-   for (const FileFormat &format : registeredFileFormats()) {
-      if (fmt == format.extension) {
-         if (format.saver) {
-            return (*format.saver)(*this, file, cd);
+   for (const FileFormat &item : registeredFileFormats()) {
+      if (fmt == item.extension) {
+         if (item.saver) {
+            return (*item.saver)(*this, file, cd);
          }
 
          cd.appendError(QString("Unable to save %1 files").formatArg(fmt));

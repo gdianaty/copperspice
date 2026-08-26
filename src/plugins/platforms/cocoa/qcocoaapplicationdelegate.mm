@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,17 +28,20 @@
 * Refer to APPLE_LICENSE.TXT (in this directory) for license terms
 ***********************************************************************/
 
-#import "qcocoaapplicationdelegate.h"
-#import "qnswindowdelegate.h"
-#import "qcocoamenuloader.h"
-#include "qcocoaintegration.h"
+#import <qcocoaapplicationdelegate.h>
+
+#import <qcocoamenuloader.h>
+#import <qnswindowdelegate.h>
+
+#include <qapplication.h>
+#include <qcocoaintegration.h>
+#include <qdebug.h>
 #include <qevent.h>
 #include <qurl.h>
-#include <qdebug.h>
-#include <qapplication.h>
-#include <qapplication_p.h>
-#include "qt_mac_p.h"
 #include <qwindowsysteminterface.h>
+
+#include <qapplication_p.h>
+#include <qt_mac_p.h>
 
 static QCocoaApplicationDelegate *sharedCocoaApplicationDelegate = nil;
 
@@ -364,7 +367,7 @@ static void cleanupCocoaApplicationDelegate()
       app that has no windows opened would need the event be to delivered even if it was already
       active in order to create a new window as per OS X conventions.
     */
-   QWindowSystemInterface::handleApplicationStateChanged(Qt::ApplicationActive, true /*forcePropagate*/);
+   QWindowSystemInterface::handleApplicationStateChanged(Qt::ApplicationActive, true);
 
    return YES;
 }

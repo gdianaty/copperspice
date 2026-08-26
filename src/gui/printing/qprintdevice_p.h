@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,17 +24,17 @@
 #ifndef QPRINTDEVICE_H
 #define QPRINTDEVICE_H
 
-#include <qprint_p.h>
-
-#include <qsharedpointer.h>
 #include <qpagelayout.h>
+#include <qsharedpointer.h>
+
+#include <qprint_p.h>
 
 #ifndef QT_NO_PRINTER
 
-class QPlatformPrintDevice;
+class QDebug;
 class QMarginsF;
 class QMimeType;
-class QDebug;
+class QPlatformPrintDevice;
 
 class Q_GUI_EXPORT QPrintDevice
 {

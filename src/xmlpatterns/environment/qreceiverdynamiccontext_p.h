@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,26 +26,19 @@
 
 #include <qdelegatingdynamiccontext_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class ReceiverDynamicContext : public DelegatingDynamicContext
 {
  public:
-   /**
-    * Construct a ReceiverDynamicContext and passes @p prevContext to its super class. This
-    * constructor is typically used when the super class is DelegatingDynamicContext.
-    */
-   ReceiverDynamicContext(const DynamicContext::Ptr &prevContext,
-                          QAbstractXmlReceiver *const receiver);
+   ReceiverDynamicContext(const DynamicContext::Ptr &prevContext, QAbstractXmlReceiver *const receiver);
 
    QAbstractXmlReceiver *outputReceiver() const override;
 
  private:
    QAbstractXmlReceiver *const m_receiver;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

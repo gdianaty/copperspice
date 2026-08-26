@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,34 +22,39 @@
 ***********************************************************************/
 
 #include <qcameraimageprocessing.h>
-#include <qmediaobject_p.h>
 
 #include <qcameracontrol.h>
 #include <qcameraexposurecontrol.h>
 #include <qcamerafocuscontrol.h>
+#include <qcameraimagecapturecontrol.h>
+#include <qcameraimageprocessingcontrol.h>
 #include <qdebug.h>
 #include <qmediarecordercontrol.h>
-#include <qcameraimageprocessingcontrol.h>
-#include <qcameraimagecapturecontrol.h>
 #include <qvideodeviceselectorcontrol.h>
+
+#include <qmediaobject_p.h>
 
 class QCameraImageProcessingFakeControl : public QCameraImageProcessingControl
 {
  public:
    QCameraImageProcessingFakeControl(QObject *parent)
-      : QCameraImageProcessingControl(parent) {
+      : QCameraImageProcessingControl(parent)
+   { }
+
+   bool isParameterSupported(ProcessingParameter) const override {
+      return false;
    }
 
-   bool isParameterSupported(ProcessingParameter) const {
+   bool isParameterValueSupported(ProcessingParameter, const QVariant &) const override {
       return false;
    }
-   bool isParameterValueSupported(ProcessingParameter, const QVariant &) const {
-      return false;
-   }
-   QVariant parameter(ProcessingParameter) const {
+
+   QVariant parameter(ProcessingParameter) const override {
       return QVariant();
    }
-   void setParameter(ProcessingParameter, const QVariant &) {}
+
+   void setParameter(ProcessingParameter, const QVariant &) override {
+   }
 };
 
 class QCameraImageProcessingPrivate : public QMediaObjectPrivate
@@ -70,9 +75,9 @@ void QCameraImageProcessingPrivate::initControls()
 {
    imageControl = nullptr;
 
-   QMediaService *service = camera->service();
-   if (service) {
-      imageControl = dynamic_cast<QCameraImageProcessingControl *>(service->requestControl(QCameraImageProcessingControl_iid));
+   QMediaService *newService = camera->service();
+   if (newService) {
+      imageControl = dynamic_cast<QCameraImageProcessingControl *>(newService->requestControl(QCameraImageProcessingControl_iid));
    }
 
    available = (imageControl != nullptr);
@@ -178,21 +183,21 @@ void QCameraImageProcessing::setDenoisingLevel(qreal level)
 QCameraImageProcessing::ColorFilter QCameraImageProcessing::colorFilter() const
 {
    return d_func()->imageControl->parameter(QCameraImageProcessingControl::ColorFilter)
-          .value<QCameraImageProcessing::ColorFilter>();
+         .value<QCameraImageProcessing::ColorFilter>();
 }
 
 void QCameraImageProcessing::setColorFilter(QCameraImageProcessing::ColorFilter filter)
 {
    d_func()->imageControl->setParameter(
-      QCameraImageProcessingControl::ColorFilter,
-      QVariant::fromValue<QCameraImageProcessing::ColorFilter>(filter));
+         QCameraImageProcessingControl::ColorFilter,
+         QVariant::fromValue<QCameraImageProcessing::ColorFilter>(filter));
 }
 
 bool QCameraImageProcessing::isColorFilterSupported(QCameraImageProcessing::ColorFilter filter) const
 {
    return d_func()->imageControl->isParameterValueSupported(
-             QCameraImageProcessingControl::ColorFilter,
-             QVariant::fromValue<QCameraImageProcessing::ColorFilter>(filter));
+         QCameraImageProcessingControl::ColorFilter,
+         QVariant::fromValue<QCameraImageProcessing::ColorFilter>(filter));
 
 }
 

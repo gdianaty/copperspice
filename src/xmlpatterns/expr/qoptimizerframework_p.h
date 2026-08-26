@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,22 +24,19 @@
 #ifndef QOptimizerFramework_P_H
 #define QOptimizerFramework_P_H
 
-#include <QSharedData>
+#include <qshareddata.h>
+
 #include <qexpression_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class ExpressionCreator : public QSharedData
 {
  public:
    typedef QExplicitlySharedDataPointer<ExpressionCreator> Ptr;
 
-   /**
-    * For some reason this constructor cannot be synthesized.
-    */
-   inline ExpressionCreator() {
-   }
+   ExpressionCreator()
+   { }
 
    virtual ~ExpressionCreator();
 
@@ -58,11 +55,8 @@ class ExpressionIdentifier : public QSharedData
    typedef QExplicitlySharedDataPointer<ExpressionIdentifier> Ptr;
    typedef QList<ExpressionIdentifier::Ptr> List;
 
-   /**
-    * For some reason this constructor cannot be synthesized.
-    */
-   inline ExpressionIdentifier() {
-   }
+   ExpressionIdentifier()
+   { }
 
    virtual ~ExpressionIdentifier();
    virtual bool matches(const Expression::Ptr &expr) const = 0;
@@ -103,8 +97,7 @@ class OptimizationPass : public QSharedData
    OptimizationPass(const OptimizationPass &) = delete;
    OptimizationPass &operator=(const OptimizationPass &) = delete;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

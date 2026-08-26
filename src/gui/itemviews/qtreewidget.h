@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -31,22 +31,26 @@
 
 #ifndef QT_NO_TREEWIDGET
 
-class QTreeWidget;
 class QTreeModel;
+class QTreeWidget;
 class QWidgetItemData;
+
 class QTreeWidgetItemPrivate;
 class QTreeWidgetPrivate;
 
 class Q_GUI_EXPORT QTreeWidgetItem
 {
-   friend class QTreeModel;
-   friend class QTreeWidget;
-   friend class QTreeWidgetPrivate;
-   friend class QTreeWidgetItemIterator;
-   friend class QTreeWidgetItemPrivate;
-
  public:
-   enum ItemType { Type = 0, UserType = 1000 };
+   enum ItemType {
+      Type     = 0,
+      UserType = 1000
+   };
+
+   enum ChildIndicatorPolicy {
+      ShowIndicator,
+      DontShowIndicator,
+      DontShowIndicatorWhenChildless
+   };
 
    explicit QTreeWidgetItem(int type = Type);
    explicit QTreeWidgetItem(const QStringList &strings, int type = Type);
@@ -65,8 +69,8 @@ class Q_GUI_EXPORT QTreeWidgetItem
 
    virtual QTreeWidgetItem *clone() const;
 
-   inline QTreeWidget *treeWidget() const {
-      return view;
+   QTreeWidget *treeWidget() const {
+      return m_view;
    }
 
    inline void setSelected(bool select);
@@ -84,32 +88,31 @@ class Q_GUI_EXPORT QTreeWidgetItem
    inline void setDisabled(bool disabled);
    inline bool isDisabled() const;
 
-   enum ChildIndicatorPolicy { ShowIndicator, DontShowIndicator, DontShowIndicatorWhenChildless };
    void setChildIndicatorPolicy(QTreeWidgetItem::ChildIndicatorPolicy policy);
    QTreeWidgetItem::ChildIndicatorPolicy childIndicatorPolicy() const;
 
    Qt::ItemFlags flags() const;
    void setFlags(Qt::ItemFlags flags);
 
-   inline QString text(int column) const {
+   QString text(int column) const {
       return data(column, Qt::DisplayRole).toString();
    }
 
    inline void setText(int column, const QString &text);
 
-   inline QIcon icon(int column) const {
+   QIcon icon(int column) const {
       return data(column, Qt::DecorationRole).value<QIcon>();
    }
 
    inline void setIcon(int column, const QIcon &icon);
 
-   inline QString statusTip(int column) const {
+   QString statusTip(int column) const {
       return data(column, Qt::StatusTipRole).toString();
    }
    inline void setStatusTip(int column, const QString &statusTip);
 
 #ifndef QT_NO_TOOLTIP
-   inline QString toolTip(int column) const {
+   QString toolTip(int column) const {
       return data(column, Qt::ToolTipRole).toString();
    }
 
@@ -117,72 +120,72 @@ class Q_GUI_EXPORT QTreeWidgetItem
 #endif
 
 #ifndef QT_NO_WHATSTHIS
-   inline QString whatsThis(int column) const {
+   QString whatsThis(int column) const {
       return data(column, Qt::WhatsThisRole).toString();
    }
 
    inline void setWhatsThis(int column, const QString &whatsThis);
 #endif
 
-   inline QFont font(int column) const {
+   QFont font(int column) const {
       return data(column, Qt::FontRole).value<QFont>();
    }
 
    inline void setFont(int column, const QFont &font);
 
-   inline int textAlignment(int column) const {
+   int textAlignment(int column) const {
       return data(column, Qt::TextAlignmentRole).toInt();
    }
 
-   inline void setTextAlignment(int column, int alignment) {
+   void setTextAlignment(int column, int alignment) {
       setData(column, Qt::TextAlignmentRole, alignment);
    }
 
-   inline QColor backgroundColor(int column) const {
+   QColor backgroundColor(int column) const {
       return data(column, Qt::BackgroundColorRole).value<QColor>();
    }
 
-   inline void setBackgroundColor(int column, const QColor &color) {
+   void setBackgroundColor(int column, const QColor &color) {
       setData(column, Qt::BackgroundColorRole, color);
    }
 
-   inline QBrush background(int column) const {
+   QBrush background(int column) const {
       return data(column, Qt::BackgroundRole).value<QBrush>();
    }
 
-   inline void setBackground(int column, const QBrush &brush) {
+   void setBackground(int column, const QBrush &brush) {
       setData(column, Qt::BackgroundRole, brush);
    }
 
-   inline QColor textColor(int column) const {
+   QColor textColor(int column) const {
       return data(column, Qt::TextColorRole).value<QColor>();
    }
 
-   inline void setTextColor(int column, const QColor &color) {
+   void setTextColor(int column, const QColor &color) {
       setData(column, Qt::TextColorRole, color);
    }
 
-   inline QBrush foreground(int column) const {
+   QBrush foreground(int column) const {
       return data(column, Qt::ForegroundRole).value<QBrush>();
    }
 
-   inline void setForeground(int column, const QBrush &brush) {
+   void setForeground(int column, const QBrush &brush) {
       setData(column, Qt::ForegroundRole, brush);
    }
 
-   inline Qt::CheckState checkState(int column) const {
+   Qt::CheckState checkState(int column) const {
       return static_cast<Qt::CheckState>(data(column, Qt::CheckStateRole).toInt());
    }
 
-   inline void setCheckState(int column, Qt::CheckState state) {
+   void setCheckState(int column, Qt::CheckState state) {
       setData(column, Qt::CheckStateRole, state);
    }
 
-   inline QSize sizeHint(int column) const {
+   QSize sizeHint(int column) const {
       return data(column, Qt::SizeHintRole).value<QSize>();
    }
 
-   inline void setSizeHint(int column, const QSize &size) {
+   void setSizeHint(int column, const QSize &size) {
       setData(column, Qt::SizeHintRole, size);
    }
 
@@ -196,25 +199,26 @@ class Q_GUI_EXPORT QTreeWidgetItem
 
    QTreeWidgetItem &operator=(const QTreeWidgetItem &other);
 
-   inline QTreeWidgetItem *parent() const {
+   QTreeWidgetItem *parent() const {
       return par;
    }
 
-   inline QTreeWidgetItem *child(int index) const {
-      if (index < 0 || index >= children.size()) {
+   QTreeWidgetItem *child(int index) const {
+      if (index < 0 || index >= m_children.size()) {
          return nullptr;
       }
       executePendingSort();
-      return children.at(index);
+      return m_children.at(index);
    }
 
-   inline int childCount() const {
-      return children.count();
+   int childCount() const {
+      return m_children.count();
    }
 
-   inline int columnCount() const {
+   int columnCount() const {
       return values.count();
    }
+
    inline int indexOfChild(QTreeWidgetItem *child) const;
 
    void addChild(QTreeWidgetItem *child);
@@ -226,10 +230,11 @@ class Q_GUI_EXPORT QTreeWidgetItem
    void insertChildren(int index, const QList<QTreeWidgetItem *> &children);
    QList<QTreeWidgetItem *> takeChildren();
 
-   inline int type() const {
+   int type() const {
       return rtti;
    }
-   inline void sortChildren(int column, Qt::SortOrder order) {
+
+   void sortChildren(int column, Qt::SortOrder order) {
       sortChildren(column, order, false);
    }
 
@@ -243,13 +248,22 @@ class Q_GUI_EXPORT QTreeWidgetItem
    void executePendingSort() const;
 
    int rtti;
+
    // One item has a vector of column entries. Each column has a vector of (role, value) pairs.
    QVector< QVector<QWidgetItemData>> values;
-   QTreeWidget *view;
+
+   QTreeWidget *m_view;
    QTreeWidgetItemPrivate *d;
    QTreeWidgetItem *par;
-   QList<QTreeWidgetItem *> children;
+
+   QList<QTreeWidgetItem *> m_children;
    Qt::ItemFlags itemFlags;
+
+   friend class QTreeModel;
+   friend class QTreeWidget;
+   friend class QTreeWidgetPrivate;
+   friend class QTreeWidgetItemIterator;
+   friend class QTreeWidgetItemPrivate;
 };
 
 inline void QTreeWidgetItem::setText(int column, const QString &text)
@@ -291,7 +305,7 @@ inline void QTreeWidgetItem::setFont(int column, const QFont &font)
 inline int QTreeWidgetItem::indexOfChild(QTreeWidgetItem *child) const
 {
    executePendingSort();
-   return children.indexOf(child);
+   return m_children.indexOf(child);
 }
 
 Q_GUI_EXPORT QDataStream &operator<<(QDataStream &out, const QTreeWidgetItem &item);
@@ -492,50 +506,50 @@ inline void QTreeWidget::setHeaderLabel(const QString &label)
 
 inline void QTreeWidgetItem::setSelected(bool select)
 {
-   if (view) {
-      view->setItemSelected(this, select);
+   if (m_view) {
+      m_view->setItemSelected(this, select);
    }
 }
 
 inline bool QTreeWidgetItem::isSelected() const
 {
-   return (view ? view->isItemSelected(this) : false);
+   return (m_view ? m_view->isItemSelected(this) : false);
 }
 
 inline void QTreeWidgetItem::setHidden(bool hide)
 {
-   if (view) {
-      view->setItemHidden(this, hide);
+   if (m_view) {
+      m_view->setItemHidden(this, hide);
    }
 }
 
 inline bool QTreeWidgetItem::isHidden() const
 {
-   return (view ? view->isItemHidden(this) : false);
+   return (m_view ? m_view->isItemHidden(this) : false);
 }
 
 inline void QTreeWidgetItem::setExpanded(bool expand)
 {
-   if (view) {
-      view->setItemExpanded(this, expand);
+   if (m_view) {
+      m_view->setItemExpanded(this, expand);
    }
 }
 
 inline bool QTreeWidgetItem::isExpanded() const
 {
-   return (view ? view->isItemExpanded(this) : false);
+   return (m_view ? m_view->isItemExpanded(this) : false);
 }
 
 inline void QTreeWidgetItem::setFirstColumnSpanned(bool span)
 {
-   if (view) {
-      view->setFirstItemColumnSpanned(this, span);
+   if (m_view) {
+      m_view->setFirstItemColumnSpanned(this, span);
    }
 }
 
 inline bool QTreeWidgetItem::isFirstColumnSpanned() const
 {
-   return (view ? view->isFirstItemColumnSpanned(this) : false);
+   return (m_view ? m_view->isFirstItemColumnSpanned(this) : false);
 }
 
 inline void QTreeWidgetItem::setDisabled(bool disabled)

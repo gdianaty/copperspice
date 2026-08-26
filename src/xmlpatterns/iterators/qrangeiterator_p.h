@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,42 +26,17 @@
 
 #include <qitem_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class RangeIterator : public Item::Iterator
 {
  public:
-
-   /**
-    * RangeIterator can iterate in both directions.
-    * This enumerator exist for identifying different directions.
-    */
    enum Direction {
-      /**
-       * Signifies that the QAbstractXmlForwardIterator operates in a reverse direction, where the
-       * first item returned by the next() function is from the beginning of the
-       * source sequence.
-       */
       Backward = 0,
-
-      /**
-       * Signifies the forward direction. Iterators do conceptually operate
-       * in the forward direction by default.
-       */
       Forward = 1
    };
 
-   /**
-    * Creates an QAbstractXmlForwardIterator that returns integer values from consecutive sequence
-    * of integers between @p start and @p end, where the step taken
-    * between each integer is 1 with polarity as specified in @p direction.
-    *
-    * @note @p start must be smaller than @p end, not larger
-    * or equal. This is not checked.
-    */
-   RangeIterator(const xsInteger start, const Direction direction, const xsInteger end); 
+   RangeIterator(const xsInteger start, const Direction direction, const xsInteger end);
 
    Item next() override;
    Item current() const override;
@@ -78,13 +53,9 @@ class RangeIterator : public Item::Iterator
    xsInteger m_count;
    const Direction m_direction;
 
-   /**
-    * We only need to store -1 or 1, so save memory with a bit field.
-    */
    const qint8 m_increment : 2;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

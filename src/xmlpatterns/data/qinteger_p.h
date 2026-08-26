@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,13 +26,11 @@
 
 #include <qschemanumeric_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class Integer : public Numeric
 {
  public:
-
    typedef Numeric::Ptr Ptr;
 
    static AtomicValue::Ptr fromLexical(const QString &strNumeric);
@@ -56,22 +54,9 @@ class Integer : public Numeric
    Numeric::Ptr abs() const override;
    quint64 toUnsignedInteger() const override;
 
-   /**
-    * @returns always @c false, @c xs:integer doesn't have
-    * not-a-number in its value space.
-    */
    bool isNaN() const  override;
-
-   /**
-    * @returns always @c false, @c xs:integer doesn't have
-    * infinity in its value space.
-    */
    bool isInf() const  override;
    Item toNegated() const  override;
-
-   /**
-    * @short Returns always @c true.
-    */
    bool isSigned() const  override;
 
  protected:
@@ -80,8 +65,7 @@ class Integer : public Numeric
  private:
    const xsInteger m_value;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

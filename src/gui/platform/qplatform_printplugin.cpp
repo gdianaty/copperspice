@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,12 +21,13 @@
 *
 ***********************************************************************/
 
-#include "qplatform_printplugin.h"
-#include "qplatform_printersupport.h"
+#include <qplatform_printplugin.h>
 
-#include <qprinterinfo.h>
-#include <qfactoryloader_p.h>
 #include <qcoreapplication.h>
+#include <qplatform_printersupport.h>
+#include <qprinterinfo.h>
+
+#include <qfactoryloader_p.h>
 
 static QFactoryLoader *loader()
 {

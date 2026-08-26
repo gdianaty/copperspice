@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,17 +24,14 @@
 #ifndef QTCPSERVER_H
 #define QTCPSERVER_H
 
-#include <qobject.h>
 #include <qabstractsocket.h>
 #include <qhostaddress.h>
+#include <qobject.h>
 #include <qscopedpointer.h>
 
+class QNetworkProxy;
 class QTcpServerPrivate;
 class QTcpSocket;
-
-#ifndef QT_NO_NETWORKPROXY
-   class QNetworkProxy;
-#endif
 
 class Q_NETWORK_EXPORT QTcpServer : public QObject
 {

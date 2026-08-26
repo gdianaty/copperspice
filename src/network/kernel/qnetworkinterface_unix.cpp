@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,14 +21,14 @@
 *
 ***********************************************************************/
 
-#include <qnetworkinterface.h>
-#include <qnetworkinterface_p.h>
-#include <qnet_unix_p.h>
-
 #include <qalgorithms.h>
+#include <qnetworkinterface.h>
 #include <qplatformdefs.h>
 #include <qset.h>
 #include <qvarlengtharray.h>
+
+#include <qnet_unix_p.h>
+#include <qnetworkinterface_p.h>
 
 #ifndef QT_NO_NETWORKINTERFACE
 
@@ -77,7 +77,7 @@ static QHostAddress addressFromSockaddr(sockaddr *sa, int ifindex = 0, const QSt
          char scopeid[IFNAMSIZ];
 
          if (::if_indextoname(scope, scopeid)) {
-            address.setScopeId(QLatin1String(scopeid));
+            address.setScopeId(scopeid);
 
          } else
 #endif
@@ -114,10 +114,10 @@ static QSet<QByteArray> interfaceNames(int socket)
    QSet<QByteArray> result;
 
 #ifdef QT_NO_IPV6IFNAME
-   QByteArray storageBuffer;
+   static constexpr const int STORAGEBUFFER_GROWTH = 256;
 
+   QByteArray storageBuffer;
    struct ifconf interfaceList;
-   static const int STORAGEBUFFER_GROWTH = 256;
 
    while(true) {
       // grow the storage buffer
@@ -133,7 +133,7 @@ static QSet<QByteArray> interfaceNames(int socket)
             break;
          }
       } else {
-         // internal error
+         // system error
          return result;
       }
 
@@ -194,8 +194,9 @@ static QNetworkInterfacePrivate *findInterface(int socket, QList<QNetworkInterfa
 #else
    // Search by name
    QList<QNetworkInterfacePrivate *>::iterator if_it = interfaces.begin();
+
    for ( ; if_it != interfaces.end(); ++if_it)
-      if ((*if_it)->name == QLatin1String(req.ifr_name)) {
+      if ((*if_it)->name == req.ifr_name) {
          // existing interface
          iface = *if_it;
          break;
@@ -215,9 +216,11 @@ static QList<QNetworkInterfacePrivate *> interfaceListing()
 {
    QList<QNetworkInterfacePrivate *> interfaces;
    int socket;
+
    if ((socket = qt_safe_socket(AF_INET, SOCK_STREAM, IPPROTO_IP)) == -1) {
       return interfaces;   // error
    }
+
    QSet<QByteArray> names = interfaceNames(socket);
    QSet<QByteArray>::const_iterator it = names.constBegin();
 

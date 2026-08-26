@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,48 +26,26 @@
 
 #include <qunlimitedcontainer_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class ExpressionSequence : public UnlimitedContainer
 {
  public:
-   /**
-    * Creates an ExpressionSequence with the operands @p operands. @p operands
-    * must contain two or more Expression instances.
-    */
    ExpressionSequence(const Expression::List &operands);
 
    Item::Iterator::Ptr evaluateSequence(const DynamicContext::Ptr &) const override;
 
-   /**
-    * Forwards the call to its children.
-    */
    void evaluateToSequenceReceiver(const DynamicContext::Ptr &context) const override;
 
    SequenceType::List expectedOperandTypes() const override;
    SequenceType::Ptr staticType() const override;
 
-   /**
-    * Removes any empty sequences, typically "()", from its list of children. If
-    * after that rewrite has no children, it rewrites itself to the CommonValues::empty;
-    * if it has only one, it rewrites to the child.
-    *
-    * This optimization is not very usable by itself, but potentially becomes effective after other
-    * optimizations have rewritten themselves into empty sequences. Thus,
-    * saving memory consumption and runtime overhead.
-    */
    Expression::Ptr compress(const StaticContext::Ptr &context) override;
 
    inline Item::Iterator::Ptr mapToSequence(const Expression::Ptr &, const DynamicContext::Ptr &) const;
 
    Expression::Ptr typeCheck(const StaticContext::Ptr &context, const SequenceType::Ptr &reqType) override;
 
-   /**
-    * @returns Expression::DisableElimination, plus the union
-    * of all this ExpressionSequence's children's properties. If any child
-    * does not have IsEvaluated, it is removed from the result.
-    */
    Expression::Properties properties() const override;
    ExpressionVisitorResult::Ptr accept(const ExpressionVisitor::Ptr &visitor) const override;
    ID id() const override;
@@ -75,8 +53,7 @@ class ExpressionSequence : public UnlimitedContainer
  private:
    typedef QExplicitlySharedDataPointer<const ExpressionSequence> ConstPtr;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

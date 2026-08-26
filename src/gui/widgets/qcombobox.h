@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,17 +24,18 @@
 #ifndef QCOMBOBOX_H
 #define QCOMBOBOX_H
 
-#include <qwidget.h>
 #include <qabstractitemdelegate.h>
 #include <qabstractitemmodel.h>
 #include <qvariant.h>
+#include <qwidget.h>
 
 #ifndef QT_NO_COMBOBOX
 
 class QAbstractItemView;
-class QLineEdit;
-class QComboBoxPrivate;
 class QCompleter;
+class QLineEdit;
+
+class QComboBoxPrivate;
 
 class Q_GUI_EXPORT QComboBox : public QWidget
 {

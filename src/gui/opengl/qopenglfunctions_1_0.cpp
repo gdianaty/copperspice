@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2013 Klarälvdalens Datakonsult AB, a KDAB Group company
 * Copyright (c) 2015 The Qt Company Ltd.
@@ -22,8 +22,9 @@
 *
 ***********************************************************************/
 
-#include "qopenglfunctions_1_0.h"
-#include "qopenglcontext.h"
+#include <qopenglfunctions_1_0.h>
+
+#include <qopenglcontext.h>
 
 QOpenGLFunctions_1_0::QOpenGLFunctions_1_0()
  : QAbstractOpenGLFunctions()
@@ -35,11 +36,11 @@ QOpenGLFunctions_1_0::QOpenGLFunctions_1_0()
 QOpenGLFunctions_1_0::~QOpenGLFunctions_1_0()
 {
     if (d_1_0_Core && !d_1_0_Core->refs.deref()) {
-        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_1_0_Core->context, QOpenGLFunctions_1_0_CoreBackend::versionStatus());
+        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_1_0_Core->m_context, QOpenGLFunctions_1_0_CoreBackend::versionStatus());
         delete d_1_0_Core;
     }
     if (d_1_0_Deprecated && !d_1_0_Deprecated->refs.deref()) {
-        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_1_0_Deprecated->context, QOpenGLFunctions_1_0_DeprecatedBackend::versionStatus());
+        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_1_0_Deprecated->m_context, QOpenGLFunctions_1_0_DeprecatedBackend::versionStatus());
         delete d_1_0_Deprecated;
     }
 }

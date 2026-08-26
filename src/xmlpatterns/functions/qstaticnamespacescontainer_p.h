@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,38 +26,26 @@
 
 #include <qfunctioncall_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class StaticNamespacesContainer : public FunctionCall
 {
  public:
-   /**
-    * Reimplemented to store data from the @p context.
-    */
    Expression::Ptr typeCheck(const StaticContext::Ptr &context, const SequenceType::Ptr &reqType) override;
 
  protected:
-   /**
-    * Before typeCheck(), behavior of this function is undefined. After
-    * typeCheck(), this function guarantees to return a valid pointer.
-    */
    const NamespaceResolver::Ptr &staticNamespaces() const {
       Q_ASSERT(m_resolver);
       return m_resolver;
    }
 
-   /**
-    * This constructor only exists to ensure this class is subclassed.
-    */
    StaticNamespacesContainer() {
    }
 
  private:
    NamespaceResolver::Ptr m_resolver;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

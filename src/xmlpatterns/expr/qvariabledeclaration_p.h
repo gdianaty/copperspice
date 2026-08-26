@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,11 @@
 #ifndef QVariableDeclaration_P_H
 #define QVariableDeclaration_P_H
 
-#include <QSharedData>
+#include <qshareddata.h>
+
 #include <qexpression_p.h>
 #include <qpatternistlocale_p.h>
 #include <qvariablereference_p.h>
-
-QT_BEGIN_NAMESPACE
 
 template<typename T> class QStack;
 
@@ -40,8 +39,6 @@ class VariableDeclaration : public QSharedData
    typedef QExplicitlySharedDataPointer<VariableDeclaration> Ptr;
    typedef QStack<VariableDeclaration::Ptr> Stack;
    typedef QList<VariableDeclaration::Ptr> List;
-
-
    typedef QHash<QXmlName, VariableDeclaration::Ptr> Hash;
 
    enum Type {
@@ -54,62 +51,38 @@ class VariableDeclaration : public QSharedData
       ExternalVariable
    };
 
-
-   VariableDeclaration(const QXmlName n,
-                       const VariableSlotID varSlot,
-                       const Type t,
-                       const SequenceType::Ptr &seqType) : name(n)
-      , slot(varSlot)
-      , type(t)
-      , sequenceType(seqType)
-      , canSourceRewrite(true) {
+   VariableDeclaration(const QXmlName n, const VariableSlotID varSlot, const Type t, const SequenceType::Ptr &seqType)
+      : name(n), slot(varSlot), type(t), sequenceType(seqType), canSourceRewrite(true)
+   {
       Q_ASSERT(!name.isNull());
       Q_ASSERT(t == ExternalVariable || t == TemplateParameter || varSlot > -1);
    }
 
-   inline bool isUsed() const {
+   bool isUsed() const {
       return !references.isEmpty();
    }
 
-   inline const Expression::Ptr &expression() const {
+   const Expression::Ptr &expression() const {
       return m_expression;
    }
 
-   inline void setExpression(const Expression::Ptr &expr) {
+   void setExpression(const Expression::Ptr &expr) {
       m_expression = expr;
    }
 
-   /**
-    * @short Returns how many times this variable is used.
-    */
-   inline bool usedByMany() const {
+   bool usedByMany() const {
       return references.count() > 1;
    }
 
-   /**
-    * @short Returns @c true if @p list contains @p lookup.
-    */
-   static bool contains(const VariableDeclaration::List &list,
-                        const QXmlName &lookup);
+   static bool contains(const VariableDeclaration::List &list, const QXmlName &lookup);
 
-   const QXmlName                  name;
-   const VariableSlotID            slot;
-   const Type                      type;
+   const QXmlName name;
+   const VariableSlotID slot;
+   const Type type;
 
-   /**
-    * The declared type of the variable. What the value might be, depends
-    * on the context which VariableDeclaration is used in. Note that
-    * sequenceType is hence not in anyway obligated to the type of
-    * expression().
-    */
-   const SequenceType::Ptr         sequenceType;
-   VariableReference::List         references;
+   const SequenceType::Ptr sequenceType;
+   VariableReference::List references;
 
-   /**
-    * @short Whether a reference can rewrite itself to expression().
-    *
-    * The default value is @c true.
-    */
    bool canSourceRewrite;
 
  private:
@@ -119,13 +92,7 @@ class VariableDeclaration : public QSharedData
    VariableDeclaration &operator=(const VariableDeclaration &) = delete;
 };
 
-/**
- * @short Formats @p var appropriately for display.
- *
- * @relates VariableDeclaration
- */
-static inline QString formatKeyword(const VariableDeclaration::Ptr &var,
-                                    const NamePool::Ptr &np)
+static inline QString formatKeyword(const VariableDeclaration::Ptr &var, const NamePool::Ptr &np)
 {
    Q_ASSERT(var);
    Q_ASSERT(np);
@@ -133,7 +100,5 @@ static inline QString formatKeyword(const VariableDeclaration::Ptr &var,
 }
 
 }
-
-QT_END_NAMESPACE
 
 #endif

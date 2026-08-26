@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,12 +21,12 @@
 *
 ***********************************************************************/
 
-#include <qdatastream.h>
 #include <qcryptographichash.h>
+#include <qdatastream.h>
 #include <qsslkey.h>
 
-#include <qsslkey_p.h>
 #include <qasn1element_p.h>
+#include <qsslkey_p.h>
 
 static const quint8 bits_table[256] = {
    0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4,
@@ -50,7 +50,8 @@ static const quint8 bits_table[256] = {
 // OIDs of named curves allowed in TLS as per RFCs 4492 and 7027,
 // see also https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-8
 
-typedef QMap<QByteArray, int> OidLengthMap;
+using OidLengthMap = QMap<QByteArray, int>;
+
 static OidLengthMap createOidMap()
 {
    OidLengthMap oids;

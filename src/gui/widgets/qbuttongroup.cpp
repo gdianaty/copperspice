@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,11 +21,11 @@
 *
 ***********************************************************************/
 
-#include "qbuttongroup_p.h"
+#include <qbuttongroup_p.h>
 
 #ifndef QT_NO_BUTTONGROUP
 
-#include "qabstractbutton_p.h"
+#include <qabstractbutton_p.h>
 
 // detect a checked button other than the current one
 void QButtonGroupPrivate::detectCheckedButton()

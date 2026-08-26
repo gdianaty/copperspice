@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,24 +23,24 @@
 
 #include <qaccessiblewidget_complex_p.h>
 
+#include <qabstractbutton.h>
+#include <qabstractscrollarea.h>
 #include <qaccessible.h>
 #include <qapplication.h>
-#include <qabstractbutton.h>
+#include <qcombobox.h>
 #include <qevent.h>
 #include <qheaderview.h>
-#include <qtabbar.h>
-#include <qcombobox.h>
-#include <qlistview.h>
-#include <qtableview.h>
 #include <qlineedit.h>
-#include <qstyle.h>
-#include <qstyleoption.h>
-#include <qtooltip.h>
-#include <qwhatsthis.h>
-#include <qtreeview.h>
-#include <qabstractscrollarea.h>
+#include <qlistview.h>
 #include <qscrollarea.h>
 #include <qscrollbar.h>
+#include <qstyle.h>
+#include <qstyleoption.h>
+#include <qtabbar.h>
+#include <qtableview.h>
+#include <qtooltip.h>
+#include <qtreeview.h>
+#include <qwhatsthis.h>
 
 #include <qtabbar_p.h>
 
@@ -160,9 +160,6 @@ class QAccessibleTabButton: public QAccessibleInterface, public QAccessibleActio
 
 };
 
-/*!
-  Constructs a QAccessibleTabBar object for \a w.
-*/
 QAccessibleTabBar::QAccessibleTabBar(QWidget *w)
    : QAccessibleWidget(w, QAccessible::PageTabList)
 {
@@ -176,7 +173,6 @@ QAccessibleTabBar::~QAccessibleTabBar()
    }
 }
 
-/*! Returns the QTabBar. */
 QTabBar *QAccessibleTabBar::tabBar() const
 {
    return qobject_cast<QTabBar *>(object());
@@ -244,26 +240,13 @@ QString QAccessibleTabBar::text(QAccessible::Text t) const
 #endif // QT_NO_TABBAR
 
 #ifndef QT_NO_COMBOBOX
-/*!
-  \class QAccessibleComboBox
-  \brief The QAccessibleComboBox class implements the QAccessibleInterface for editable and read-only combo boxes.
-  \internal
 
-  \ingroup accessibility
-*/
-
-/*!
-  Constructs a QAccessibleComboBox object for \a w.
-*/
 QAccessibleComboBox::QAccessibleComboBox(QWidget *w)
    : QAccessibleWidget(w, QAccessible::ComboBox)
 {
    Q_ASSERT(comboBox());
 }
 
-/*!
-  Returns the combobox.
-*/
 QComboBox *QAccessibleComboBox::comboBox() const
 {
    return qobject_cast<QComboBox *>(object());
@@ -370,7 +353,7 @@ void QAccessibleComboBox::doAction(const QString &actionName)
    }
 }
 
-QStringList QAccessibleComboBox::keyBindingsForAction(const QString &/*actionName*/) const
+QStringList QAccessibleComboBox::keyBindingsForAction(const QString &) const
 {
    return QStringList();
 }

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,22 +21,22 @@
 *
 ***********************************************************************/
 
-#ifndef QMEDIARECORDER_H
-#define QMEDIARECORDER_H
+#ifndef QMEDIA_RECORDER_H
+#define QMEDIA_RECORDER_H
 
+#include <qmediabindableinterface.h>
+#include <qmediaencodersettings.h>
+#include <qmediaobject.h>
+#include <qmultimedia.h>
 #include <qpair.h>
 #include <qurl.h>
-#include <qmultimedia.h>
-#include <qmediaobject.h>
-#include <qmediaencodersettings.h>
-#include <qmediabindableinterface.h>
 
-class QSize;
-class QAudioFormat;
-class QMediaRecorderService;
 class QAudioEncoderSettings;
-class QVideoEncoderSettings;
+class QAudioFormat;
 class QMediaRecorderPrivate;
+class QMediaRecorderService;
+class QSize;
+class QVideoEncoderSettings;
 
 class Q_MULTIMEDIA_EXPORT QMediaRecorder : public QObject, public QMediaBindableInterface
 {
@@ -168,25 +168,34 @@ class Q_MULTIMEDIA_EXPORT QMediaRecorder : public QObject, public QMediaBindable
 
    MULTI_CS_SLOT_1(Public, void record())
    MULTI_CS_SLOT_2(record)
+
    MULTI_CS_SLOT_1(Public, void pause())
    MULTI_CS_SLOT_2(pause)
+
    MULTI_CS_SLOT_1(Public, void stop())
    MULTI_CS_SLOT_2(stop)
+
    MULTI_CS_SLOT_1(Public, void setMuted(bool muted))
    MULTI_CS_SLOT_2(setMuted)
+
    MULTI_CS_SLOT_1(Public, void setVolume(qreal volume))
    MULTI_CS_SLOT_2(setVolume)
 
    MULTI_CS_SIGNAL_1(Public, void stateChanged(QMediaRecorder::State state))
    MULTI_CS_SIGNAL_2(stateChanged, state)
+
    MULTI_CS_SIGNAL_1(Public, void statusChanged(QMediaRecorder::Status status))
    MULTI_CS_SIGNAL_2(statusChanged, status)
+
    MULTI_CS_SIGNAL_1(Public, void durationChanged(qint64 duration))
    MULTI_CS_SIGNAL_2(durationChanged, duration)
+
    MULTI_CS_SIGNAL_1(Public, void mutedChanged(bool muted))
    MULTI_CS_SIGNAL_2(mutedChanged, muted)
+
    MULTI_CS_SIGNAL_1(Public, void volumeChanged(qreal volume))
    MULTI_CS_SIGNAL_2(volumeChanged, volume)
+
    MULTI_CS_SIGNAL_1(Public, void actualLocationChanged(const QUrl &location))
    MULTI_CS_SIGNAL_2(actualLocationChanged, location)
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,11 @@
 #ifndef QOutputValidator_P_H
 #define QOutputValidator_P_H
 
-#include <QSet>
-#include <qdynamiccontext_p.h>
 #include <qabstractxmlreceiver.h>
-#include <qsourcelocationreflection_p.h>
+#include <qset.h>
 
-QT_BEGIN_NAMESPACE
+#include <qdynamiccontext_p.h>
+#include <qsourcelocationreflection_p.h>
 
 namespace QPatternist {
 
@@ -61,15 +60,9 @@ class OutputValidator : public QAbstractXmlReceiver, public DelegatingSourceLoca
    bool m_hasReceivedChildren;
    QAbstractXmlReceiver *const m_receiver;
    const DynamicContext::Ptr m_context;
-
-   /**
-    * Keeps the current received attributes, in order to check uniqueness.
-    */
    QSet<QXmlName> m_attributes;
    const bool m_isXSLT;
 };
 }
-
-QT_END_NAMESPACE
 
 #endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,8 +24,6 @@
 #include "qanyuri_p.h"
 
 #include "qunparsedtextfn_p.h"
-
-QT_BEGIN_NAMESPACE
 
 using namespace QPatternist;
 
@@ -60,5 +58,3 @@ Item UnparsedTextFN::evaluateSingleton(const DynamicContext::Ptr &context) const
    Q_ASSERT(uri.isValid() && !uri.isRelative());
    return context->resourceLoader()->openUnparsedText(uri, encoding, context, this);
 }
-
-QT_END_NAMESPACE

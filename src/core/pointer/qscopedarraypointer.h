@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,4 +21,36 @@
 *
 ***********************************************************************/
 
+#ifndef QSCOPEDARRAYPOINTER_H
+#define QSCOPEDARRAYPOINTER_H
+
 #include <quniquepointer.h>
+
+#if ! defined(CS_DOXYPRESS)
+
+template <typename T, typename Deleter = std::default_delete<CsPointer::cs_add_missing_extent_t<T>>>
+class QScopedArrayPointer : public QUniqueArrayPointer<T, Deleter>
+{
+public:
+   using QUniqueArrayPointer<T, Deleter>::QUniqueArrayPointer;
+
+   QScopedArrayPointer(QScopedArrayPointer && other) = delete;
+   QScopedArrayPointer &operator=(QScopedArrayPointer && other) = delete;
+};
+
+#endif
+
+// free functions
+template <typename T, typename Deleter>
+void swap(QScopedArrayPointer<T, Deleter> &ptr1, QScopedArrayPointer<T, Deleter> &ptr2) noexcept
+{
+   ptr1.swap(ptr2);
+}
+
+template <typename T, typename = typename std::enable_if_t<std::is_array_v<T>>>
+QScopedArrayPointer<T> QMakeScoped(std::size_t size)
+{
+   return CsPointer::make_unique<T>(size);
+}
+
+#endif

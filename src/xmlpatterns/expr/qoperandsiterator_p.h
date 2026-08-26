@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,18 +24,14 @@
 #ifndef QOperandsIterator_P_H
 #define QOperandsIterator_P_H
 
-#include <QPair>
-#include <QStack>
-#include <qexpression_p.h>
+#include <qpair.h>
+#include <qstack.h>
 
-QT_BEGIN_NAMESPACE
+#include <qexpression_p.h>
 
 namespace QPatternist {
 class OperandsIterator
 {
-   /**
-    * The second value, the int, is the current position in the first.
-    */
    typedef QPair<Expression::List, int> Level;
 
  public:
@@ -44,14 +40,9 @@ class OperandsIterator
       IncludeParent
    };
 
-   /**
-    * if @p treatParent is @c IncludeParent, @p start is excluded.
-    *
-    * @p start must be a valid Expression.
-    */
-   inline OperandsIterator(const Expression::Ptr &start,
-                           const TreatParent treatParent) {
+   OperandsIterator(const Expression::Ptr &start, const TreatParent treatParent) {
       Q_ASSERT(start);
+
       if (treatParent == IncludeParent) {
          Expression::List l;
          l.append(start);
@@ -61,15 +52,7 @@ class OperandsIterator
       m_exprs.push(qMakePair(start->operands(), -1));
    }
 
-   /**
-    * @short Returns the current Expression and advances the iterator.
-    *
-    * If the end has been reached, a default constructed pointer is
-    * returned.
-    *
-    * We intentionally return by reference.
-    */
-   inline Expression::Ptr next() {
+   Expression::Ptr next() {
       if (m_exprs.isEmpty()) {
          return Expression::Ptr();
       }
@@ -78,7 +61,7 @@ class OperandsIterator
       ++lvl.second;
 
       if (lvl.second == lvl.first.size()) {
-         /* Resume iteration above us. */
+         // Resume iteration above current position
          m_exprs.pop();
 
          if (m_exprs.isEmpty()) {
@@ -110,9 +93,6 @@ class OperandsIterator
       }
    }
 
-   /**
-    * Advances this iterator by the current expression and its operands.
-    */
    Expression::Ptr skipOperands() {
       if (m_exprs.isEmpty()) {
          return Expression::Ptr();
@@ -122,7 +102,6 @@ class OperandsIterator
       ++lvl.second;
 
       if (lvl.second == lvl.first.size()) {
-         /* We've reached the end of this level, at least. */
          m_exprs.pop();
       }
 
@@ -135,8 +114,7 @@ class OperandsIterator
 
    QStack<Level> m_exprs;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

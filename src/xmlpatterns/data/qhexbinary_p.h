@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,8 +26,6 @@
 
 #include <qbase64binary_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 class HexBinary : public Base64Binary
 {
@@ -39,25 +37,15 @@ class HexBinary : public Base64Binary
    QString stringValue() const override;
    ItemType::Ptr type() const override;
 
-   /**
-    * Creates a @c xs:hexBinary from the lexical representation @p value.
-    */
    static AtomicValue::Ptr fromLexical(const NamePool::Ptr &np, const QString &value);
-
-   /**
-    * Creates an instance representing @p value.
-    */
    static HexBinary::Ptr fromValue(const QByteArray &data);
 
  protected:
    HexBinary(const QByteArray &val);
 
  private:
-
    static inline qint8 fromHex(const QChar &c);
 };
 }
-
-QT_END_NAMESPACE
 
 #endif

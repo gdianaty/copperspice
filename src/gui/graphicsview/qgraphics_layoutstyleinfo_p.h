@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,11 +24,13 @@
 #ifndef QGRAPHICS_LAYOUTSTYLEINFO_P_H
 #define QGRAPHICS_LAYOUTSTYLEINFO_P_H
 
-#include <qabstractlayoutstyleinfo_p.h>
 #include <qstyleoption.h>
+
+#include <qabstractlayoutstyleinfo_p.h>
 
 class QStyle;
 class QWidget;
+
 class QGraphicsLayoutPrivate;
 
 class QGraphicsLayoutStyleInfo : public QAbstractLayoutStyleInfo
@@ -37,19 +39,17 @@ class QGraphicsLayoutStyleInfo : public QAbstractLayoutStyleInfo
    QGraphicsLayoutStyleInfo(const QGraphicsLayoutPrivate *layout);
    ~QGraphicsLayoutStyleInfo();
 
-   virtual qreal combinedLayoutSpacing(QLayoutPolicy::ControlTypes controls1,
-      QLayoutPolicy::ControlTypes controls2,
-      Qt::Orientation orientation) const override;
+   qreal combinedLayoutSpacing(QLayoutPolicy::ControlTypes controls1,
+      QLayoutPolicy::ControlTypes controls2, Qt::Orientation orientation) const override;
 
-   virtual qreal perItemSpacing(QLayoutPolicy::ControlType control1,
-      QLayoutPolicy::ControlType control2,
-      Qt::Orientation orientation) const override;
+   qreal perItemSpacing(QLayoutPolicy::ControlType control1,
+      QLayoutPolicy::ControlType control2, Qt::Orientation orientation) const override;
 
-   virtual qreal spacing(Qt::Orientation orientation) const override;
+   qreal spacing(Qt::Orientation orientation) const override;
 
-   virtual qreal windowMargin(Qt::Orientation orientation) const override;
+   qreal windowMargin(Qt::Orientation orientation) const override;
 
-   virtual void invalidate() override {
+   void invalidate() override {
       m_style = nullptr;
       QAbstractLayoutStyleInfo::invalidate();
    }

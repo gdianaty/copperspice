@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,13 @@
 #ifndef QGSTREAMERVIDEOOVERLAY_P_H
 #define QGSTREAMERVIDEOOVERLAY_P_H
 
-#include <qgstreamerbushelper_p.h>
-#include <qgstreamerbufferprobe_p.h>
-#include <qwindowdefs.h>
 #include <qsize.h>
+#include <qwindowdefs.h>
 
-class QGstreamerVideoOverlay
-   : public QObject, public QGstreamerSyncMessageFilter
-   , public QGstreamerBusMessageFilter, private QGstreamerBufferProbe
+#include <qgstreamerbufferprobe_p.h>
+#include <qgstreamerbushelper_p.h>
+
+class QGstreamerVideoOverlay : public QObject, public QGstreamerSyncMessageFilter, public QGstreamerBusMessageFilter, private QGstreamerBufferProbe
 {
    CS_OBJECT_MULTIPLE(QGstreamerVideoOverlay, QObject)
 

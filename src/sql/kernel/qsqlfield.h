@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -31,7 +31,6 @@ class QSqlFieldPrivate;
 
 class Q_SQL_EXPORT QSqlField
 {
-
  public:
    enum RequiredStatus { Unknown = -1, Optional = 0, Required = 1 };
 
@@ -42,14 +41,14 @@ class Q_SQL_EXPORT QSqlField
    QSqlField &operator=(const QSqlField &other);
    bool operator==(const QSqlField &other) const;
 
-   inline bool operator!=(const QSqlField &other) const {
+   bool operator!=(const QSqlField &other) const {
       return !operator==(other);
    }
 
    ~QSqlField();
 
    void setValue(const QVariant &value);
-   inline QVariant value() const {
+   QVariant value() const {
       return val;
    }
 
@@ -65,7 +64,7 @@ class Q_SQL_EXPORT QSqlField
    void setType(QVariant::Type type);
 
    void setRequiredStatus(RequiredStatus status);
-   inline void setRequired(bool status) {
+   void setRequired(bool status) {
       setRequiredStatus(status ? Required : Optional);
    }
 

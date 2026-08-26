@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,17 +21,14 @@
 *
 ***********************************************************************/
 
-//#define DEBUG_DECODER
-
 #include <qgstreameraudiodecodersession.h>
 
 #include <qdatetime.h>
 #include <qdebug.h>
-#include <qsize.h>
-#include <qtimer.h>
-#include <qdebug.h>
 #include <qdir.h>
+#include <qsize.h>
 #include <qstandardpaths.h>
+#include <qtimer.h>
 #include <qurl.h>
 
 #include <qgstreamerbushelper_p.h>
@@ -115,9 +112,11 @@ QGstreamerAudioDecoderSession::~QGstreamerAudioDecoderSession()
       stop();
 
       delete m_busHelper;
+
 #if defined(HAVE_GST_APPSRC)
       delete m_appSrc;
 #endif
+
       gst_object_unref(GST_OBJECT(m_bus));
       gst_object_unref(GST_OBJECT(m_playbin));
    }
@@ -149,26 +148,26 @@ void QGstreamerAudioDecoderSession::configureAppSrcElement(GObject *object, GObj
 bool QGstreamerAudioDecoderSession::processBusMessage(const QGstreamerMessage &message)
 {
    GstMessage *gm = message.rawMessage();
+
    if (gm) {
       if (GST_MESSAGE_TYPE(gm) == GST_MESSAGE_DURATION) {
          updateDuration();
+
       } else if (GST_MESSAGE_SRC(gm) == GST_OBJECT_CAST(m_playbin)) {
          switch (GST_MESSAGE_TYPE(gm))  {
             case GST_MESSAGE_STATE_CHANGED: {
-               GstState    oldState;
-               GstState    newState;
-               GstState    pending;
+               GstState oldState;
+               GstState newState;
+               GstState pending;
 
                gst_message_parse_state_changed(gm, &oldState, &newState, &pending);
 
-#ifdef DEBUG_DECODER
+#if defined(CS_SHOW_DEBUG_PLUGINS_GSTREAMER)
                QStringList states;
                states << "GST_STATE_VOID_PENDING" <<  "GST_STATE_NULL" << "GST_STATE_READY" << "GST_STATE_PAUSED" << "GST_STATE_PLAYING";
 
-               qDebug() << QString("state changed: old: %1  new: %2  pending: %3") \
-                  .formatArg(states[oldState]) \
-                  .formatArg(states[newState]) \
-                  .formatArg(states[pending]) << "internal" << m_state;
+               qDebug() << QString("State changed, old: %1  new: %2  pending: %3")
+                  .formatArg(states[oldState]).formatArg(states[newState]).formatArg(states[pending]) << "internal" << m_state;
 #endif
 
                QAudioDecoder::State prevState = m_state;
@@ -178,12 +177,15 @@ bool QGstreamerAudioDecoderSession::processBusMessage(const QGstreamerMessage &m
                   case GST_STATE_NULL:
                      m_state = QAudioDecoder::StoppedState;
                      break;
+
                   case GST_STATE_READY:
                      m_state = QAudioDecoder::StoppedState;
                      break;
+
                   case GST_STATE_PLAYING:
                      m_state = QAudioDecoder::DecodingState;
                      break;
+
                   case GST_STATE_PAUSED:
                      m_state = QAudioDecoder::DecodingState;
 
@@ -234,31 +236,37 @@ bool QGstreamerAudioDecoderSession::processBusMessage(const QGstreamerMessage &m
             }
             break;
 
-#ifdef DEBUG_DECODER
+#if defined(CS_SHOW_DEBUG_PLUGINS_GSTREAMER)
             case GST_MESSAGE_INFO: {
                GError *err;
                gchar *debug;
                gst_message_parse_info (gm, &err, &debug);
+
                qDebug() << "Info:" << QString::fromUtf8(err->message);
+
                g_error_free (err);
                g_free (debug);
             }
             break;
 #endif
+
             default:
                break;
          }
+
       } else if (GST_MESSAGE_TYPE(gm) == GST_MESSAGE_ERROR) {
          GError *err;
          gchar *debug;
          gst_message_parse_error(gm, &err, &debug);
          QAudioDecoder::Error qerror = QAudioDecoder::ResourceError;
+
          if (err->domain == GST_STREAM_ERROR) {
             switch (err->code) {
                case GST_STREAM_ERROR_DECRYPT:
                case GST_STREAM_ERROR_DECRYPT_NOKEY:
                   qerror = QAudioDecoder::AccessDeniedError;
                   break;
+
                case GST_STREAM_ERROR_FORMAT:
                case GST_STREAM_ERROR_DEMUX:
                case GST_STREAM_ERROR_DECODE:
@@ -267,14 +275,17 @@ bool QGstreamerAudioDecoderSession::processBusMessage(const QGstreamerMessage &m
                case GST_STREAM_ERROR_CODEC_NOT_FOUND:
                   qerror = QAudioDecoder::FormatError;
                   break;
+
                default:
                   break;
             }
+
          } else if (err->domain == GST_CORE_ERROR) {
             switch (err->code) {
                case GST_CORE_ERROR_MISSING_PLUGIN:
                   qerror = QAudioDecoder::FormatError;
                   break;
+
                default:
                   break;
             }
@@ -449,7 +460,6 @@ QAudioBuffer QGstreamerAudioDecoderSession::read()
       const char *bufferData = nullptr;
       int bufferSize = 0;
 
-#if GST_CHECK_VERSION(1,0,0)
       GstSample *sample = gst_app_sink_pull_sample(m_appSink);
       GstBuffer *buffer = gst_sample_get_buffer(sample);
       GstMapInfo mapInfo;
@@ -457,12 +467,6 @@ QAudioBuffer QGstreamerAudioDecoderSession::read()
       bufferData = (const char *)mapInfo.data;
       bufferSize = mapInfo.size;
       QAudioFormat format = QGstUtils::audioFormatForSample(sample);
-#else
-      GstBuffer *buffer = gst_app_sink_pull_buffer(m_appSink);
-      bufferData = (const char *)buffer->data;
-      bufferSize = buffer->size;
-      QAudioFormat format = QGstUtils::audioFormatForBuffer(buffer);
-#endif
 
       if (format.isValid()) {
          // XXX At the moment we have to copy data from GstBuffer into QAudioBuffer.
@@ -475,11 +479,8 @@ QAudioBuffer QGstreamerAudioDecoderSession::read()
             emit positionChanged(m_position);
          }
       }
-#if GST_CHECK_VERSION(1,0,0)
+
       gst_sample_unref(sample);
-#else
-      gst_buffer_unref(buffer);
-#endif
    }
 
    return audioBuffer;
@@ -555,11 +556,7 @@ void QGstreamerAudioDecoderSession::addAppSink()
    GstAppSinkCallbacks callbacks;
    memset(&callbacks, 0, sizeof(callbacks));
 
-#if GST_CHECK_VERSION(1,0,0)
    callbacks.new_sample = &new_sample;
-#else
-   callbacks.new_buffer = &new_sample;
-#endif
 
    gst_app_sink_set_callbacks(m_appSink, &callbacks, this, nullptr);
    gst_app_sink_set_max_buffers(m_appSink, MAX_BUFFERS_IN_QUEUE);
@@ -615,6 +612,6 @@ qint64 QGstreamerAudioDecoderSession::getPositionFromBuffer(GstBuffer *buffer)
    } else {
       position = -1;
    }
+
    return position;
 }
-

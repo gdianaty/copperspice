@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,8 +25,8 @@
 
 #include <qdebug.h>
 #include <qpainter.h>
-#include <qscreen.h>
 #include <qplatform_graphicsbuffer.h>
+#include <qscreen.h>
 #include <qxcb_connection.h>
 #include <qxcb_screen.h>
 #include <qxcb_window.h>

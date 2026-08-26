@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,11 +27,8 @@
 #include <qabstractvideosurface.h>
 #include <qvideosurfaceformat.h>
 
-
-
 class QAbstractVideoSurfacePrivate
 {
-
  public:
    QAbstractVideoSurfacePrivate()
       : error(QAbstractVideoSurface::NoError), active(false)

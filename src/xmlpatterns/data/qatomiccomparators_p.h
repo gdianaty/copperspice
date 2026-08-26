@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,41 +28,23 @@
 #include <qatomiccomparator_p.h>
 #include <qprimitives_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class StringComparator : public AtomicComparator
 {
-
  public:
    ComparisonResult compare(const Item &op1, const AtomicComparator::Operator op, const Item &op2) const override;
 
-   /**
-    * Compares two strings, and returns @c true if they are considered equal as per
-    * an ordinary string comparison. In other words, this is an implementation with
-    * the Unicode code point collation.
-    *
-    * @see <a href="http://www.w3.org/TR/xpath-functions/#string-compare">XQuery 1.0 and XPath
-    * 2.0 Functions and Operators, 7.3 ValueComparison::Equality and Comparison of Strings</a>
-    */
    bool equals(const Item &op1, const Item &op2) const override;
 };
 
 class CaseInsensitiveStringComparator : public AtomicComparator
 {
  public:
-   /**
-    * Converts both string values to upper case and afterwards compare them.
-    */
    ComparisonResult compare(const Item &op1, const AtomicComparator::Operator op, const Item &op2) const override;
 
-   /**
-    * Converts both string values case insensitively.
-    */
    bool equals(const Item &op1, const Item &op2) const override;
 };
-
 
 class BinaryDataComparator : public AtomicComparator
 {
@@ -77,7 +59,6 @@ class BooleanComparator : public AtomicComparator
 
    bool equals(const Item &op1, const Item &op2) const override;
 };
-
 
 class AbstractFloatComparator : public AtomicComparator
 {
@@ -119,7 +100,6 @@ class AbstractFloatSortComparator : public AbstractFloatComparator
 
 };
 
-
 class DecimalComparator : public AtomicComparator
 {
  public:
@@ -128,7 +108,6 @@ class DecimalComparator : public AtomicComparator
    bool equals(const Item &op1, const Item &op2) const override;
 };
 
-
 class IntegerComparator : public AtomicComparator
 {
  public:
@@ -136,7 +115,6 @@ class IntegerComparator : public AtomicComparator
 
    bool equals(const Item &op1, const Item &op2) const override;
 };
-
 
 class QNameComparator : public AtomicComparator
 {
@@ -151,7 +129,6 @@ class AbstractDateTimeComparator : public AtomicComparator
    bool equals(const Item &op1, const Item &op2) const override;
 };
 
-
 class AbstractDurationComparator : public AtomicComparator
 {
  public:
@@ -162,8 +139,7 @@ class AbstractDurationComparator : public AtomicComparator
    static inline QDateTime addDurationToDateTime(const QDateTime &dateTime,
          const AbstractDuration *const duration);
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

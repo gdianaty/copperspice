@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,17 +24,17 @@
 #include <qdialogbuttonbox.h>
 
 #include <qaction.h>
-#include <qhash.h>
-#include <qpushbutton.h>
-#include <qstyle.h>
-#include <qlayout.h>
-#include <qdialog.h>
 #include <qapplication.h>
+#include <qdialog.h>
+#include <qhash.h>
+#include <qlayout.h>
 #include <qplatform_dialoghelper.h>
 #include <qplatform_theme.h>
+#include <qpushbutton.h>
+#include <qstyle.h>
 
+#include <qapplication_p.h>
 #include <qwidget_p.h>
-#include <qguiapplication_p.h>
 
 class QDialogButtonBoxPrivate : public QWidgetPrivate
 {
@@ -354,7 +354,8 @@ QPushButton *QDialogButtonBoxPrivate::createButton(QDialogButtonBox::StandardBut
    }
 
    standardButtonHash.insert(button, sbutton);
-   QPlatformDialogHelper::ButtonRole role = QPlatformDialogHelper::buttonRole(static_cast<QPlatformDialogHelper::StandardButton>(sbutton));
+   QPlatformDialogHelper::ButtonRole role =
+         QPlatformDialogHelper::buttonRole(static_cast<QPlatformDialogHelper::StandardButton>(sbutton));
 
    if (role != QPlatformDialogHelper::InvalidRole) {
       addButton(button, static_cast<QDialogButtonBox::ButtonRole>(role), doLayout);

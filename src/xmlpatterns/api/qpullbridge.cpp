@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,33 +21,17 @@
 *
 ***********************************************************************/
 
-#include <QVariant>
+#include <qpullbridge_p.h>
 
-#include "qabstractxmlnodemodel_p.h"
-#include "qitemmappingiterator_p.h"
-#include "qitem_p.h"
-#include "qxmlname.h"
-#include "qxmlquery_p.h"
+#include <qvariant.h>
 
-#include "qpullbridge_p.h"
-
-QT_BEGIN_NAMESPACE
+#include <qabstractxmlnodemodel_p.h>
+#include <qitem_p.h>
+#include <qitemmappingiterator_p.h>
+#include <qxmlname.h>
+#include <qxmlquery_p.h>
 
 using namespace QPatternist;
-
-/*!
-  \brief Bridges a QPatternist::SequenceIterator to QAbstractXmlPullProvider.
-  \class QPatternist::PullBridge
-  \internal
-  \reentrant
-  \ingroup xml-tools
-
-  The approach of this class is rather straight forward since QPatternist::SequenceIterator
-  and QAbstractXmlPullProvider are conceptually similar. While QPatternist::SequenceIterator only
-  delivers top level items(since it's not an event stream, it's a list of items), PullBridge
-  needs to recursively iterate the children of nodes too, which is achieved through the
-  stack m_iterators.
- */
 
 AbstractXmlPullProvider::Event PullBridge::next()
 {
@@ -190,6 +174,3 @@ QHash<QXmlName, QXmlItem> PullBridge::attributeItems()
 
    return attributes;
 }
-
-QT_END_NAMESPACE
-

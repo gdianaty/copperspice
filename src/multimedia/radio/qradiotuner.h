@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,9 +24,9 @@
 #ifndef QRADIOTUNER_H
 #define QRADIOTUNER_H
 
+#include <qmediaobject.h>
 #include <qobject.h>
 #include <qpair.h>
-#include <qmediaobject.h>
 #include <qradiodata.h>
 
 class QRadioTunerPrivate;
@@ -79,11 +79,36 @@ class Q_MULTIMEDIA_EXPORT QRadioTuner : public QMediaObject
    MULTI_CS_ENUM(SearchMode)
 
  public:
-    enum State { ActiveState, StoppedState };
-    enum Band { AM, FM, SW, LW, FM2 };
-    enum Error { NoError, ResourceError, OpenError, OutOfRangeError };
-    enum StereoMode { ForceStereo, ForceMono, Auto };
-    enum SearchMode { SearchFast, SearchGetStationId };
+   enum State {
+      ActiveState,
+      StoppedState
+   };
+
+   enum Band {
+      AM,
+      FM,
+      SW,
+      LW,
+      FM2
+   };
+
+   enum Error {
+      NoError,
+      ResourceError,
+      OpenError,
+      OutOfRangeError
+   };
+
+   enum StereoMode {
+      ForceStereo,
+      ForceMono,
+      Auto
+   };
+
+   enum SearchMode {
+      SearchFast,
+      SearchGetStationId
+   };
 
     explicit QRadioTuner(QObject *parent = nullptr);
 

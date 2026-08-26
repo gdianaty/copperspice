@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,30 +24,30 @@
 #ifndef QHTTP_NETWORKCONNECTIONCHANNEL_P_H
 #define QHTTP_NETWORKCONNECTIONCHANNEL_P_H
 
-#include <qnetwork_request.h>
-#include <qnetwork_reply.h>
 #include <qabstractsocket.h>
 #include <qauthenticator.h>
-#include <qnetworkproxy.h>
 #include <qbuffer.h>
+#include <qnetwork_reply.h>
+#include <qnetwork_request.h>
+#include <qnetworkproxy.h>
 
-#include <qhttp_networkheader_p.h>
-#include <qhttp_networkrequest_p.h>
-#include <qhttp_networkreply_p.h>
-#include <qhttp_networkconnection_p.h>
 #include <qabstract_protocolhandler_p.h>
+#include <qhttp_networkconnection_p.h>
+#include <qhttp_networkheader_p.h>
+#include <qhttp_networkreply_p.h>
+#include <qhttp_networkrequest_p.h>
 
 #ifdef QT_SSL
-#   include <qsslsocket.h>
-#   include <qsslerror.h>
 #   include <qsslconfiguration.h>
+#   include <qsslerror.h>
+#   include <qsslsocket.h>
 #else
 #   include <qtcpsocket.h>
 #endif
 
-class QHttpNetworkRequest;
-class QHttpNetworkReply;
 class QByteArray;
+class QHttpNetworkReply;
+class QHttpNetworkRequest;
 
 using HttpMessagePair = QPair<QHttpNetworkRequest, QHttpNetworkReply*>;
 

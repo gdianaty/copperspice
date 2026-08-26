@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,15 +24,11 @@
 #ifndef QDATASTREAM_H
 #define QDATASTREAM_H
 
-#include <qglobal.h>
 #include <qcontainerfwd.h>
+#include <qglobal.h>
 #include <qiodevice.h>
 #include <qregularexpression.h>
 #include <qscopedpointer.h>
-
-#ifdef Status
-#error qdatastream.h must be included before any header file that defines Status
-#endif
 
 class QDataStream;
 class QDataStreamPrivate;
@@ -50,11 +46,9 @@ class Q_CORE_EXPORT QDataStream
 {
  public:
 
-#if CS_VERSION >= 0x010900
+#if CS_VERSION >= 0x020200
 #error (CopperSpice compile issue in qdatastream.h) Verify version number is listed in the following enum
 #endif
-
-   // emerald, may want to consider adding a setVersion(QDataStream::CS_1_7) to a stream written to disk
 
    enum Version {
       CS_1_0 = 128,
@@ -66,8 +60,12 @@ class Q_CORE_EXPORT QDataStream
       CS_1_6 = CS_1_5,
       CS_1_7 = CS_1_6,
       CS_1_8 = CS_1_7,
+      CS_1_9 = CS_1_8,
 
-      CS_DefaultStreamVersion = CS_1_8
+      CS_2_0 = CS_1_9,
+      CS_2_1 = CS_2_0,
+
+      CS_DefaultStreamVersion = CS_2_1
    };
 
    enum ByteOrder {
@@ -75,7 +73,7 @@ class Q_CORE_EXPORT QDataStream
       LittleEndian = QSysInfo::LittleEndian
    };
 
-   enum Status {
+   enum DataStreamStatus {
       Ok,
       ReadPastEnd,
       ReadCorruptData,
@@ -103,8 +101,8 @@ class Q_CORE_EXPORT QDataStream
 
    bool atEnd() const;
 
-   Status status() const;
-   void setStatus(Status status);
+   DataStreamStatus status() const;
+   void setStatus(DataStreamStatus status);
    void resetStatus();
 
    FloatingPointPrecision floatingPointPrecision() const;
@@ -157,17 +155,17 @@ class Q_CORE_EXPORT QDataStream
  private:
    QScopedPointer<QDataStreamPrivate> d;
 
-   QIODevice *dev;
+   QIODevice *m_device;
    bool owndev;
    bool noswap;
    ByteOrder byteorder;
    int ver;
-   Status q_status;
+   DataStreamStatus q_status;
 };
 
 inline QIODevice *QDataStream::device() const
 {
-   return dev;
+   return m_device;
 }
 
 inline QDataStream::ByteOrder QDataStream::byteOrder() const
@@ -335,6 +333,7 @@ template <typename T>
 QDataStream &operator<<(QDataStream &stream, const QVector<T> &vector)
 {
    stream << quint32(vector.size());
+
    for (typename QVector<T>::const_iterator it = vector.begin(); it != vector.end(); ++it) {
       stream << *it;
    }
@@ -379,7 +378,7 @@ QDataStream &operator<<(QDataStream &stream, const QSet<T> &set)
 template <class Key, class T>
 QDataStream &operator>>(QDataStream &stream, QHash<Key, T> &hash)
 {
-   QDataStream::Status oldStatus = stream.status();
+   QDataStream::DataStreamStatus oldStatus = stream.status();
    stream.resetStatus();
 
    hash.clear();
@@ -428,7 +427,7 @@ QDataStream &operator<<(QDataStream &stream, const QHash<Key, T> &hash)
 template <class Key, class T>
 QDataStream &operator>>(QDataStream &stream, QMultiHash<Key, T> &hash)
 {
-   QDataStream::Status oldStatus = stream.status();
+   QDataStream::DataStreamStatus oldStatus = stream.status();
    stream.resetStatus();
 
    hash.clear();
@@ -477,7 +476,7 @@ QDataStream &operator<<(QDataStream &stream, const QMultiHash<Key, T> &hash)
 template <class aKey, class aT>
 QDataStream &operator>>(QDataStream &stream, QMap<aKey, aT> &map)
 {
-   QDataStream::Status oldStatus = stream.status();
+   QDataStream::DataStreamStatus oldStatus = stream.status();
    stream.resetStatus();
 
    map.clear();
@@ -526,7 +525,7 @@ QDataStream &operator<<(QDataStream &stream, const QMap<Key, Val, C> &map)
 template <class aKey, class aT>
 QDataStream &operator>>(QDataStream &stream, QMultiMap<aKey, aT> &map)
 {
-   QDataStream::Status oldStatus = stream.status();
+   QDataStream::DataStreamStatus oldStatus = stream.status();
    stream.resetStatus();
 
    map.clear();

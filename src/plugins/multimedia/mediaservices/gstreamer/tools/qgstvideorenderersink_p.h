@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,19 +24,19 @@
 #ifndef QGSTVIDEORENDERERSINK_P_H
 #define QGSTVIDEORENDERERSINK_P_H
 
-#include <gst/video/gstvideosink.h>
-#include <gst/video/video.h>
-
+#include <qabstractvideobuffer.h>
 #include <qlist.h>
 #include <qmutex.h>
-#include <qqueue.h>
 #include <qpointer.h>
-#include <qwaitcondition.h>
-#include <qvideosurfaceformat.h>
+#include <qqueue.h>
 #include <qvideoframe.h>
-#include <qabstractvideobuffer.h>
+#include <qvideosurfaceformat.h>
+#include <qwaitcondition.h>
 
 #include <qgstvideorendererplugin_p.h>
+
+#include <gst/video/gstvideosink.h>
+#include <gst/video/video.h>
 
 class QAbstractVideoSurface;
 
@@ -46,14 +46,14 @@ class QGstDefaultVideoRenderer : public QGstVideoRenderer
    QGstDefaultVideoRenderer();
    ~QGstDefaultVideoRenderer();
 
-   GstCaps *getCaps(QAbstractVideoSurface *surface);
-   bool start(QAbstractVideoSurface *surface, GstCaps *caps);
-   void stop(QAbstractVideoSurface *surface);
+   GstCaps *getCaps(QAbstractVideoSurface *surface) override;
+   bool start(QAbstractVideoSurface *surface, GstCaps *caps) override;
+   void stop(QAbstractVideoSurface *surface) override;
 
-   bool proposeAllocation(GstQuery *query);
+   bool proposeAllocation(GstQuery *query) override;
 
-   bool present(QAbstractVideoSurface *surface, GstBuffer *buffer);
-   void flush(QAbstractVideoSurface *surface);
+   bool present(QAbstractVideoSurface *surface, GstBuffer *buffer) override;
+   void flush(QAbstractVideoSurface *surface) override;
 
  private:
    QVideoSurfaceFormat m_format;
@@ -83,12 +83,6 @@ class QVideoSurfaceGstDelegate : public QObject
    bool event(QEvent *event) override;
 
  private:
-   CS_SLOT_1(Private, bool handleEvent(QMutexLocker *locker))
-   CS_SLOT_2(handleEvent)
-
-   CS_SLOT_1(Private, void updateSupportedFormats())
-   CS_SLOT_2(updateSupportedFormats)
-
    void notify();
    bool waitForAsyncEvent(QMutexLocker *locker, QWaitCondition *condition, unsigned long time);
 
@@ -109,6 +103,12 @@ class QVideoSurfaceGstDelegate : public QObject
    bool m_notified;
    bool m_stop;
    bool m_flush;
+
+   CS_SLOT_1(Private, bool handleEvent(QMutexLocker *locker))
+   CS_SLOT_2(handleEvent)
+
+   CS_SLOT_1(Private, void updateSupportedFormats())
+   CS_SLOT_2(updateSupportedFormats)
 };
 
 class QGstVideoRendererSink
@@ -141,7 +141,6 @@ class QGstVideoRendererSink
 
    QVideoSurfaceGstDelegate *delegate;
 };
-
 
 class QGstVideoRendererSinkClass
 {

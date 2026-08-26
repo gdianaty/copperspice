@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,11 +21,9 @@
 *
 ***********************************************************************/
 
-#include <QList>
+#include <qlist.h>
 
 #include "qemptycontainer_p.h"
-
-QT_BEGIN_NAMESPACE
 
 using namespace QPatternist;
 
@@ -47,5 +45,3 @@ bool EmptyContainer::compressOperands(const StaticContext::Ptr &)
 {
    return true;
 }
-
-QT_END_NAMESPACE

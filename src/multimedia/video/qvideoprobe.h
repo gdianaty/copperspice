@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,13 +29,14 @@
 
 class QMediaObject;
 class QMediaRecorder;
+
 class QVideoProbePrivate;
 
 class Q_MULTIMEDIA_EXPORT QVideoProbe : public QObject
 {
     MULTI_CS_OBJECT(QVideoProbe)
 
-public:
+ public:
     explicit QVideoProbe(QObject *parent = nullptr);
     ~QVideoProbe();
 
@@ -50,7 +51,7 @@ public:
     MULTI_CS_SIGNAL_1(Public, void flush())
     MULTI_CS_SIGNAL_2(flush)
 
-private:
+ private:
     QVideoProbePrivate *d;
 };
 

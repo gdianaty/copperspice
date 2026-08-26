@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,29 +22,28 @@
 ***********************************************************************/
 
 #include <qfont.h>
-#include <qdebug.h>
-#include <qpaintdevice.h>
-#include <qfontdatabase.h>
-#include <qfontmetrics.h>
-#include <qfontinfo.h>
-#include <qpainter.h>
-#include <qhash.h>
-#include <qdatastream.h>
-#include <qapplication.h>
-#include <qstringlist.h>
-#include <qscreen.h>
+#include <qfont_p.h>
 
+#include <qapplication.h>
+#include <qdatastream.h>
+#include <qdebug.h>
+#include <qfontdatabase.h>
+#include <qfontinfo.h>
+#include <qfontmetrics.h>
+#include <qhash.h>
+#include <qmutex.h>
+#include <qmutexlocker.h>
+#include <qpaintdevice.h>
+#include <qpainter.h>
+#include <qplatform_fontdatabase.h>
+#include <qplatform_integration.h>
+#include <qplatform_screen.h>
+#include <qscreen.h>
+#include <qstringlist.h>
 #include <qthread.h>
 #include <qthreadstorage.h>
-#include <qplatform_screen.h>
-#include <qplatform_integration.h>
-#include <qplatform_fontdatabase.h>
-
-#include <qmutexlocker.h>
-#include <qmutex.h>
 
 #include <qapplication_p.h>
-#include <qfont_p.h>
 #include <qfontengine_p.h>
 #include <qpainter_p.h>
 #include <qtextengine_p.h>
@@ -52,36 +51,40 @@
 
 #include <limits.h>
 
-#ifdef QFONTCACHE_DEBUG
-#  define FC_DEBUG qDebug
-#else
-#  define FC_DEBUG if (false) qDebug
-#endif
+static constexpr const uint MinCacheSize = 4 * 1024;        // 4 mb
 
 #ifndef QFONTCACHE_DECREASE_TRIGGER_LIMIT
 #  define QFONTCACHE_DECREASE_TRIGGER_LIMIT 256
 #endif
 
+#if defined(CS_SHOW_DEBUG_GUI_TEXT)
+// fast timeouts for debugging
+static constexpr const int fast_timeout =   1000;  // 1s
+static constexpr const int slow_timeout =   5000;  // 5s
+
+#else
+static constexpr const int fast_timeout =  10000;  // 10s
+static constexpr const int slow_timeout = 300000;  //  5m
+
+#endif
+
 bool QFontDef::exactMatch(const QFontDef &other) const
 {
    /*
-     QFontDef comparison is more complicated than just simple
-     per-member comparisons.
+     QFontDef comparison is more complicated than just simple per-member comparisons.
 
-     When comparing point/pixel sizes, either point or pixelsize
-     could be -1.  in This case we have to compare the non negative
-     size value.
+     When comparing point/pixel sizes, either point or pixelsize could be -1.
+     In this case we have to compare the non negative size value.
 
-     This test will fail if the point-sizes differ by 1/2 point or
-     more or they do not round to the same value.  We have to do this
-     since our API still uses 'int' point-sizes in the API, but store
-     deci-point-sizes internally.
+     This test will fail if the point-sizes differ by 1/2 point or more or they do not
+     round to the same value. We need to do this since our API uses 'int' point sizes
+     however we store decimal point sizes in the code.
 
-     To compare the family members, we need to parse the font names
-     and compare the family/foundry strings separately.  This allows
-     us to compare e.g. "Helvetica" and "Helvetica [Adobe]" with
-     positive results.
+     To compare the family members parse the font names and compare the family/foundry
+     strings separately.  This allows us to compare font like  "Helvetica" and
+     "Helvetica [Adobe]" sucessfully.
    */
+
    if (pixelSize != -1 && other.pixelSize != -1) {
       if (pixelSize != other.pixelSize) {
          return false;
@@ -379,13 +382,11 @@ QFont::QFont(const QFont &font, QPaintDevice *pd)
    }
 }
 
-// internal
 QFont::QFont(QFontPrivate *data)
    : d(data), resolve_mask(QFont::AllPropertiesResolved)
 {
 }
 
-// internal
 void QFont::detach()
 {
    if (d->ref.load() == 1) {
@@ -406,12 +407,6 @@ void QFont::detach()
    d.detach();
 }
 
-/*!
-    \internal
-    Detaches the font object from common font attributes data.
-    Call this instead of QFont::detach() if the only font attributes data
-    has been changed (underline, letterSpacing, kerning, etc.).
-*/
 void QFontPrivate::detachButKeepEngineData(QFont *font)
 {
    if (font->d->ref.load() == 1) {
@@ -538,7 +533,7 @@ QFont::HintingPreference QFont::hintingPreference() const
 void QFont::setPointSize(int pointSize)
 {
    if (pointSize <= 0) {
-      qWarning("QFont::setPointSize: Point size <= 0 (%d), must be greater than 0", pointSize);
+      qWarning("QFont::setPointSize() Point size of %d must be greater than 0", pointSize);
       return;
    }
 
@@ -556,7 +551,7 @@ void QFont::setPointSize(int pointSize)
 void QFont::setPointSizeF(qreal pointSize)
 {
    if (pointSize <= 0) {
-      qWarning("QFont::setPointSizeF: Point size <= 0 (%f), must be greater than 0", pointSize);
+      qWarning("QFont::setPointSizeF() Point size of %f must be greater than 0", pointSize);
       return;
    }
 
@@ -571,22 +566,15 @@ void QFont::setPointSizeF(qreal pointSize)
    resolve_mask |= QFont::SizeResolved;
 }
 
-/*!
-    Returns the point size of the font. Returns -1 if the font size was
-    specified in pixels.
-
-    \sa pointSize() setPointSizeF() pixelSize() QFontInfo::pointSize() QFontInfo::pixelSize()
-*/
 qreal QFont::pointSizeF() const
 {
    return d->request.pointSize;
 }
 
-
 void QFont::setPixelSize(int pixelSize)
 {
    if (pixelSize <= 0) {
-      qWarning("QFont::setPixelSize: Pixel size <= 0 (%d)", pixelSize);
+      qWarning("QFont::setPixelSize() Pixel size of %d must be greater than 0", pixelSize);
       return;
    }
 
@@ -601,30 +589,16 @@ void QFont::setPixelSize(int pixelSize)
    resolve_mask |= QFont::SizeResolved;
 }
 
-/*!
-    Returns the pixel size of the font if it was set with
-    setPixelSize(). Returns -1 if the size was set with setPointSize()
-    or setPointSizeF().
-
-    \sa setPixelSize() pointSize() QFontInfo::pointSize() QFontInfo::pixelSize()
-*/
 int QFont::pixelSize() const
 {
    return d->request.pixelSize;
 }
-
 
 QFont::Style QFont::style() const
 {
    return (QFont::Style)d->request.style;
 }
 
-
-/*!
-  Sets the style of the font to \a style.
-
-  \sa italic(), QFontInfo
-*/
 void QFont::setStyle(Style style)
 {
    if ((resolve_mask & QFont::StyleResolved) && d->request.style == style) {
@@ -636,12 +610,6 @@ void QFont::setStyle(Style style)
    resolve_mask |= QFont::StyleResolved;
 }
 
-/*!
-    Returns the weight of the font which is one of the enumerated
-    values from \l{QFont::Weight}.
-
-    \sa setWeight(), Weight, QFontInfo
-*/
 int QFont::weight() const
 {
    return d->request.weight;
@@ -665,12 +633,6 @@ bool QFont::underline() const
    return d->underline;
 }
 
-/*!
-    If \a enable is true, sets underline on; otherwise sets underline
-    off.
-
-    \sa underline(), QFontInfo
-*/
 void QFont::setUnderline(bool enable)
 {
    if ((resolve_mask & QFont::UnderlineResolved) && d->underline == enable) {
@@ -683,21 +645,11 @@ void QFont::setUnderline(bool enable)
    resolve_mask |= QFont::UnderlineResolved;
 }
 
-/*!
-    Returns true if overline has been set; otherwise returns false.
-
-    \sa setOverline()
-*/
 bool QFont::overline() const
 {
    return d->overline;
 }
 
-/*!
-  If \a enable is true, sets overline on; otherwise sets overline off.
-
-  \sa overline(), QFontInfo
-*/
 void QFont::setOverline(bool enable)
 {
    if ((resolve_mask & QFont::OverlineResolved) && d->overline == enable) {
@@ -710,22 +662,11 @@ void QFont::setOverline(bool enable)
    resolve_mask |= QFont::OverlineResolved;
 }
 
-/*!
-    Returns true if strikeout has been set; otherwise returns false.
-
-    \sa setStrikeOut()
-*/
 bool QFont::strikeOut() const
 {
    return d->strikeOut;
 }
 
-/*!
-    If \a enable is true, sets strikeout on; otherwise sets strikeout
-    off.
-
-    \sa strikeOut(), QFontInfo
-*/
 void QFont::setStrikeOut(bool enable)
 {
    if ((resolve_mask & QFont::StrikeOutResolved) && d->strikeOut == enable) {
@@ -738,22 +679,11 @@ void QFont::setStrikeOut(bool enable)
    resolve_mask |= QFont::StrikeOutResolved;
 }
 
-/*!
-    Returns true if fixed pitch has been set; otherwise returns false.
-
-    \sa setFixedPitch(), QFontInfo::fixedPitch()
-*/
 bool QFont::fixedPitch() const
 {
    return d->request.fixedPitch;
 }
 
-/*!
-    If \a enable is true, sets fixed pitch on; otherwise sets fixed
-    pitch off.
-
-    \sa fixedPitch(), QFontInfo
-*/
 void QFont::setFixedPitch(bool enable)
 {
    if ((resolve_mask & QFont::FixedPitchResolved) && d->request.fixedPitch == enable) {
@@ -767,27 +697,11 @@ void QFont::setFixedPitch(bool enable)
    resolve_mask |= QFont::FixedPitchResolved;
 }
 
-/*!
-  Returns true if kerning should be used when drawing text with this font.
-
-  \sa setKerning()
-*/
 bool QFont::kerning() const
 {
    return d->kerning;
 }
 
-/*!
-    Enables kerning for this font if \a enable is true; otherwise
-    disables it. By default, kerning is enabled.
-
-    When kerning is enabled, glyph metrics do not add up anymore,
-    even for Latin text. In other words, the assumption that
-    width('a') + width('b') is equal to width("ab") is not
-    neccesairly true.
-
-    \sa kerning(), QFontMetrics
-*/
 void QFont::setKerning(bool enable)
 {
    if ((resolve_mask & QFont::KerningResolved) && d->kerning == enable) {
@@ -799,36 +713,15 @@ void QFont::setKerning(bool enable)
    resolve_mask |= QFont::KerningResolved;
 }
 
-/*!
-    Returns the StyleStrategy.
-
-    The style strategy affects the \l{QFont}{font matching} algorithm.
-    See \l QFont::StyleStrategy for the list of available strategies.
-
-    \sa setStyleHint() QFont::StyleHint
-*/
 QFont::StyleStrategy QFont::styleStrategy() const
 {
    return (StyleStrategy) d->request.styleStrategy;
 }
 
-/*!
-    Returns the StyleHint.
-
-    The style hint affects the \l{QFont}{font matching} algorithm.
-    See \l QFont::StyleHint for the list of available hints.
-
-    \sa setStyleHint(), QFont::StyleStrategy QFontInfo::styleHint()
-*/
 QFont::StyleHint QFont::styleHint() const
 {
    return (StyleHint) d->request.styleHint;
 }
-
-
-
-
-
 
 void QFont::setStyleHint(StyleHint hint, StyleStrategy strategy)
 {
@@ -846,11 +739,6 @@ void QFont::setStyleHint(StyleHint hint, StyleStrategy strategy)
    resolve_mask |= QFont::StyleStrategyResolved;
 }
 
-/*!
-    Sets the style strategy for the font to \a s.
-
-    \sa QFont::StyleStrategy
-*/
 void QFont::setStyleStrategy(StyleStrategy s)
 {
    if ((resolve_mask & QFont::StyleStrategyResolved) &&
@@ -863,17 +751,15 @@ void QFont::setStyleStrategy(StyleStrategy s)
    resolve_mask |= QFont::StyleStrategyResolved;
 }
 
-
 int QFont::stretch() const
 {
    return d->request.stretch;
 }
 
-
 void QFont::setStretch(int factor)
 {
    if (factor < 1 || factor > 4000) {
-      qWarning("QFont::setStretch: Parameter '%d' out of range", factor);
+      qWarning("QFont::setStretch() Parameter '%d' is out of range", factor);
       return;
    }
 
@@ -887,7 +773,6 @@ void QFont::setStretch(int factor)
    d->request.stretch = (uint)factor;
    resolve_mask |= QFont::StretchResolved;
 }
-
 
 qreal QFont::letterSpacing() const
 {
@@ -912,18 +797,15 @@ void QFont::setLetterSpacing(SpacingType type, qreal spacing)
    resolve_mask |= QFont::LetterSpacingResolved;
 }
 
-
 QFont::SpacingType QFont::letterSpacingType() const
 {
    return d->letterSpacingIsAbsolute ? AbsoluteSpacing : PercentageSpacing;
 }
 
-
 qreal QFont::wordSpacing() const
 {
    return d->wordSpacing.toReal();
 }
-
 
 void QFont::setWordSpacing(qreal spacing)
 {
@@ -952,12 +834,6 @@ void QFont::setCapitalization(Capitalization caps)
    resolve_mask |= QFont::CapitalizationResolved;
 }
 
-/*!
-    \since 4.4
-    Returns the current capitalization type of the font.
-
-    \sa setCapitalization()
-*/
 QFont::Capitalization QFont::capitalization() const
 {
    return static_cast<QFont::Capitalization> (d->capital);
@@ -968,7 +844,7 @@ bool QFont::exactMatch() const
    QFontEngine *engine = d->engineForScript(QChar::Script_Common);
    Q_ASSERT(engine != nullptr);
 
-   return d->request.exactMatch(engine->fontDef);
+   return d->request.exactMatch(engine->m_fontDef);
 }
 
 bool QFont::operator==(const QFont &f) const
@@ -1042,20 +918,15 @@ bool QFont::operator<(const QFont &f) const
    return f1attrs < f2attrs;
 }
 
-
 bool QFont::operator!=(const QFont &f) const
 {
    return !(operator==(f));
 }
 
-/*!
-   Returns the font as a QVariant
-*/
 QFont::operator QVariant() const
 {
    return QVariant(QVariant::Font, this);
 }
-
 
 bool QFont::isCopyOf(const QFont &f) const
 {
@@ -1064,7 +935,6 @@ bool QFont::isCopyOf(const QFont &f) const
 
 QFont QFont::resolve(const QFont &other) const
 {
-
    if (resolve_mask == 0 || (resolve_mask == other.resolve_mask && *this == other)) {
       QFont o(other);
       o.resolve_mask = resolve_mask;
@@ -1248,7 +1118,8 @@ QString QFont::key() const
 
 QString QFont::toString() const
 {
-   const QChar comma(QLatin1Char(','));
+   const QChar comma(QChar(','));
+
    return family() + comma +
       QString::number(     pointSizeF()) + comma +
       QString::number(      pixelSize()) + comma +
@@ -1268,11 +1139,17 @@ uint qHash(const QFont &font, uint seed)
 
 bool QFont::fromString(const QString &descrip)
 {
-   QStringList l(descrip.split(QLatin1Char(',')));
+   QStringList l(descrip.split(QChar(',')));
 
    int count = l.count();
-   if (!count || (count > 2 && count < 9) || count > 11) {
-      qWarning("QFont::fromString: Invalid description '%s'", descrip.isEmpty() ? "(empty)" : csPrintable(descrip));
+   if (! count || (count > 2 && count < 9) || count > 11) {
+
+      if (descrip.isEmpty()) {
+         qWarning("QFont::fromString() Font description was empty");
+      } else {
+         qWarning("QFont::fromString() Invalid font description of %s ", csPrintable(descrip));
+      }
+
       return false;
    }
 
@@ -1347,6 +1224,7 @@ QString QFont::lastResortFont() const
 {
    return QString("arial");
 }
+
 QDataStream &operator<<(QDataStream &s, const QFont &font)
 {
    if (s.version() == 1) {
@@ -1467,7 +1345,7 @@ QString QFontInfo::family() const
    QFontEngine *engine = d->engineForScript(QChar::Script_Common);
    Q_ASSERT(engine != nullptr);
 
-   return engine->fontDef.family;
+   return engine->m_fontDef.family;
 }
 
 QString QFontInfo::styleName() const
@@ -1475,7 +1353,7 @@ QString QFontInfo::styleName() const
    QFontEngine *engine = d->engineForScript(QChar::Script_Common);
    Q_ASSERT(engine != nullptr);
 
-   return engine->fontDef.styleName;
+   return engine->m_fontDef.styleName;
 }
 
 int QFontInfo::pointSize() const
@@ -1483,7 +1361,7 @@ int QFontInfo::pointSize() const
    QFontEngine *engine = d->engineForScript(QChar::Script_Common);
    Q_ASSERT(engine != nullptr);
 
-   return qRound(engine->fontDef.pointSize);
+   return qRound(engine->m_fontDef.pointSize);
 }
 
 qreal QFontInfo::pointSizeF() const
@@ -1491,7 +1369,7 @@ qreal QFontInfo::pointSizeF() const
    QFontEngine *engine = d->engineForScript(QChar::Script_Common);
    Q_ASSERT(engine != nullptr);
 
-   return engine->fontDef.pointSize;
+   return engine->m_fontDef.pointSize;
 }
 
 int QFontInfo::pixelSize() const
@@ -1499,7 +1377,7 @@ int QFontInfo::pixelSize() const
    QFontEngine *engine = d->engineForScript(QChar::Script_Common);
    Q_ASSERT(engine != nullptr);
 
-   return engine->fontDef.pixelSize;
+   return engine->m_fontDef.pixelSize;
 }
 
 bool QFontInfo::italic() const
@@ -1507,7 +1385,7 @@ bool QFontInfo::italic() const
    QFontEngine *engine = d->engineForScript(QChar::Script_Common);
    Q_ASSERT(engine != nullptr);
 
-   return engine->fontDef.style != QFont::StyleNormal;
+   return engine->m_fontDef.style != QFont::StyleNormal;
 }
 
 QFont::Style QFontInfo::style() const
@@ -1515,7 +1393,7 @@ QFont::Style QFontInfo::style() const
    QFontEngine *engine = d->engineForScript(QChar::Script_Common);
    Q_ASSERT(engine != nullptr);
 
-   return (QFont::Style)engine->fontDef.style;
+   return (QFont::Style)engine->m_fontDef.style;
 }
 
 int QFontInfo::weight() const
@@ -1523,8 +1401,7 @@ int QFontInfo::weight() const
    QFontEngine *engine = d->engineForScript(QChar::Script_Common);
    Q_ASSERT(engine != nullptr);
 
-   return engine->fontDef.weight;
-
+   return engine->m_fontDef.weight;
 }
 
 bool QFontInfo::underline() const
@@ -1548,19 +1425,19 @@ bool QFontInfo::fixedPitch() const
    Q_ASSERT(engine != nullptr);
 
 #ifdef Q_OS_DARWIN
-   if (! engine->fontDef.fixedPitchComputed) {
+   if (! engine->m_fontDef.fixedPitchComputed) {
       QGlyphLayoutArray<2> g;
       int l = 2;
 
       static const QString imStr = QString("im");
       engine->stringToCMap(imStr, &g, &l, nullptr);
 
-      engine->fontDef.fixedPitch = g.advances[0] == g.advances[1];
-      engine->fontDef.fixedPitchComputed = true;
+      engine->m_fontDef.fixedPitch = g.advances[0] == g.advances[1];
+      engine->m_fontDef.fixedPitchComputed = true;
    }
 #endif
 
-   return engine->fontDef.fixedPitch;
+   return engine->m_fontDef.fixedPitch;
 }
 
 QFont::StyleHint QFontInfo::styleHint() const
@@ -1568,7 +1445,7 @@ QFont::StyleHint QFontInfo::styleHint() const
    QFontEngine *engine = d->engineForScript(QChar::Script_Common);
    Q_ASSERT(engine != nullptr);
 
-   return (QFont::StyleHint) engine->fontDef.styleHint;
+   return (QFont::StyleHint) engine->m_fontDef.styleHint;
 }
 
 bool QFontInfo::exactMatch() const
@@ -1576,19 +1453,8 @@ bool QFontInfo::exactMatch() const
    QFontEngine *engine = d->engineForScript(QChar::Script_Common);
    Q_ASSERT(engine != nullptr);
 
-   return d->request.exactMatch(engine->fontDef);
+   return d->request.exactMatch(engine->m_fontDef);
 }
-
-#ifdef QFONTCACHE_DEBUG
-// fast timeouts for debugging
-static const int fast_timeout =   1000;  // 1s
-static const int slow_timeout =   5000;  // 5s
-#else
-static const int fast_timeout =  10000;  // 10s
-static const int slow_timeout = 300000;  //  5m
-#endif
-
-const uint QFontCache::min_cost = 4 * 1024; // 4mb
 
 static QThreadStorage<QFontCache *> *theFontCache()
 {
@@ -1626,9 +1492,8 @@ void QFontCache::cleanup()
 std::atomic<int> font_cache_id{1};
 
 QFontCache::QFontCache()
-   : QObject(), total_cost(0), max_cost(min_cost),
-     current_timestamp(0), fast(false), timer_id(-1),
-     m_id(font_cache_id.fetch_add(1, std::memory_order_relaxed))
+   : QObject(), total_cost(0), max_cost(MinCacheSize), current_timestamp(0), fast(false),
+     timer_id(-1), m_id(font_cache_id.fetch_add(1, std::memory_order_relaxed))
 {
 }
 
@@ -1686,8 +1551,12 @@ void QFontCache::clear()
                delete engine;
 
             } else if (cacheCount == 0) {
-               FC_DEBUG("QFontCache::clear: engine %p still has refcount %d", engine, engine->m_refCount.load());
+#if defined(CS_SHOW_DEBUG_GUI_TEXT)
+               qDebug("QFontCache::clear() Engine %p still has refcount %d",
+                     static_cast<void *>(engine), engine->m_refCount.load());
+#endif
             }
+
             it.value().data = nullptr;
          }
       }
@@ -1698,19 +1567,19 @@ void QFontCache::clear()
    engineCacheCount.clear();
 
    total_cost = 0;
-   max_cost = min_cost;
+   max_cost   = MinCacheSize;
 }
 
 QFontEngineData *QFontCache::findEngineData(const QFontDef &def) const
 {
-   EngineDataCache::const_iterator it = engineDataCache.constFind(def);
+   EngineDataCache::const_iterator iter = engineDataCache.constFind(def);
 
-   if (it == engineDataCache.constEnd()) {
+   if (iter == engineDataCache.constEnd()) {
       return nullptr;
    }
 
    // found
-   return it.value();
+   return iter.value();
 }
 
 void QFontCache::insertEngineData(const QFontDef &def, QFontEngineData *engineData)
@@ -1719,9 +1588,8 @@ void QFontCache::insertEngineData(const QFontDef &def, QFontEngineData *engineDa
 
    engineData->m_refCount.ref();
 
-   // Decrease now rather than waiting
-
-   if (total_cost > min_cost * 2 && engineDataCache.size() >= QFONTCACHE_DECREASE_TRIGGER_LIMIT) {
+   // decrease now rather than waiting
+   if (total_cost > MinCacheSize * 2 && engineDataCache.size() >= QFONTCACHE_DECREASE_TRIGGER_LIMIT) {
       decreaseCache();
    }
 
@@ -1758,11 +1626,14 @@ void QFontCache::insertEngine(const Key &key, QFontEngine *engine, bool insertMu
    Q_ASSERT(engine != nullptr);
    Q_ASSERT(key.multi == (engine->type() == QFontEngine::Multi));
 
-   FC_DEBUG("QFontCache: inserting new engine %p", engine);
+#if defined(CS_SHOW_DEBUG_GUI_TEXT)
+   qDebug("QFontCache::insertEngine() Inserting new engine %p", static_cast<void *>(engine));
+#endif
+
    engine->m_refCount.ref();
 
-   // Decrease now rather than waiting
-   if (total_cost > min_cost * 2 && engineCache.size() >= QFONTCACHE_DECREASE_TRIGGER_LIMIT) {
+   // decrease now rather than waiting
+   if (total_cost > MinCacheSize * 2 && engineCache.size() >= QFONTCACHE_DECREASE_TRIGGER_LIMIT) {
       decreaseCache();
    }
 
@@ -1790,14 +1661,18 @@ void QFontCache::increaseCost(uint cost)
    cost = cost > 0 ? cost : 1;
    total_cost += cost;
 
-   FC_DEBUG("  COST: increased %u kb, total_cost %u kb, max_cost %u kb",
+#if defined(CS_SHOW_DEBUG_GUI_TEXT)
+   qDebug("QFontCache::increaseCost() Increased %u kb, total_cost %u kb, max_cost %u kb",
       cost, total_cost, max_cost);
+#endif
 
    if (total_cost > max_cost) {
       max_cost = total_cost;
 
       if (timer_id == -1 || ! fast) {
-         FC_DEBUG("  TIMER: starting fast timer (%d ms)", fast_timeout);
+#if defined(CS_SHOW_DEBUG_GUI_TEXT)
+         qDebug("QFontCache::increaseCost() Starting fast timer (%d ms)", fast_timeout);
+#endif
 
          if (timer_id != -1) {
             killTimer(timer_id);
@@ -1813,20 +1688,27 @@ void QFontCache::decreaseCost(uint cost)
 {
    cost = (cost + 512) / 1024; // cost is stored in kb
    cost = cost > 0 ? cost : 1;
+
    Q_ASSERT(cost <= total_cost);
    total_cost -= cost;
 
-   FC_DEBUG("  COST: decreased %u kb, total_cost %u kb, max_cost %u kb",
+#if defined(CS_SHOW_DEBUG_GUI_TEXT)
+   qDebug("QFontCache::decreaseCost) Decreased %u kb, total_cost %u kb, max_cost %u kb",
       cost, total_cost, max_cost);
+#endif
 }
 
 void QFontCache::timerEvent(QTimerEvent *)
 {
-   FC_DEBUG("QFontCache::timerEvent() Performing cache maintenance (timestamp %u)",
+#if defined(CS_SHOW_DEBUG_GUI_TEXT)
+   qDebug("QFontCache::timerEvent() Performing cache maintenance (timestamp %u)",
       current_timestamp);
+#endif
 
-   if (total_cost <= max_cost && max_cost <= min_cost) {
-      FC_DEBUG("  cache redused sufficiently, stopping timer");
+   if (total_cost <= max_cost && max_cost <= MinCacheSize) {
+#if defined(CS_SHOW_DEBUG_GUI_TEXT)
+      qDebug("QFontCache::timerEvent() Cache reduce sufficiently, stopping timer");
+#endif
 
       killTimer(timer_id);
       timer_id = -1;
@@ -1834,6 +1716,7 @@ void QFontCache::timerEvent(QTimerEvent *)
 
       return;
    }
+
    decreaseCache();
 }
 
@@ -1843,11 +1726,8 @@ void QFontCache::decreaseCache()
    uint in_use_cost = 0;
 
    {
-      FC_DEBUG("  SWEEP engine data:");
-
       // make sure the cost of each engine data is at least 1kb
-      const uint engine_data_cost =
-         sizeof(QFontEngineData) > 1024 ? sizeof(QFontEngineData) : 1024;
+      const uint engine_data_cost = sizeof(QFontEngineData) > 1024 ? sizeof(QFontEngineData) : 1024;
 
       EngineDataCache::const_iterator it  = engineDataCache.constBegin();
       EngineDataCache::const_iterator end = engineDataCache.constEnd();
@@ -1861,8 +1741,6 @@ void QFontCache::decreaseCache()
    }
 
    {
-      FC_DEBUG("  SWEEP engine:");
-
       for (const auto &item : engineCache) {
          if (item.data->m_refCount.load() != 0) {
             in_use_cost += item.data->cache_cost / engineCacheCount.value(item.data);
@@ -1878,19 +1756,23 @@ void QFontCache::decreaseCache()
    /*
      calculate the new maximum cost for the cache
 
-     NOTE: in_use_cost is *not* correct due to rounding errors in the
-     above algorithm.  instead of worrying about getting the
-     calculation correct, we are more interested in speed, and use
+     in_use_cost is *not* correct due to rounding errors in the above algorithm.
+     instead of trying to get the calculation exact, more interested in speed so
      in_use_cost as a floor for new_max_cost
    */
-   uint new_max_cost = qMax(qMax(max_cost / 2, in_use_cost), min_cost);
 
-   FC_DEBUG("  after sweep, in use %u kb, total %u kb, max %u kb, new max %u kb",
+   uint new_max_cost = qMax(qMax(max_cost / 2, in_use_cost), MinCacheSize);
+
+#if defined(CS_SHOW_DEBUG_GUI_TEXT)
+   qDebug("QFontCache::decreaseCache() In use %u kb, total %u kb, max %u kb, new max %u kb",
       in_use_cost, total_cost, max_cost, new_max_cost);
+#endif
 
    if (new_max_cost == max_cost) {
       if (fast) {
-         FC_DEBUG("  cannot shrink cache, slowing timer");
+#if defined(CS_SHOW_DEBUG_GUI_TEXT)
+         qDebug("QFontCache::decreaseCache() Uunable to shrink cache, slowing timer");
+#endif
 
          killTimer(timer_id);
          timer_id = startTimer(slow_timeout);
@@ -1898,9 +1780,8 @@ void QFontCache::decreaseCache()
       }
 
       return;
-   } else if (! fast) {
-      FC_DEBUG("  dropping into passing gear");
 
+   } else if (! fast) {
       killTimer(timer_id);
       timer_id = startTimer(fast_timeout);
       fast = true;
@@ -1909,7 +1790,9 @@ void QFontCache::decreaseCache()
    max_cost = new_max_cost;
 
    {
-      FC_DEBUG("  CLEAN engine data:");
+#if defined(CS_SHOW_DEBUG_GUI_TEXT)
+      qDebug("QFontCache::decreaseCache() Expire engine data");
+#endif
 
       // clean out all unused engine data
       EngineDataCache::iterator it  = engineDataCache.begin();

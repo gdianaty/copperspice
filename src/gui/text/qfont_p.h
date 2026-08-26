@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,11 +25,12 @@
 #define QFONT_P_H
 
 #include <qfont.h>
-#include <qmap.h>
+
+#include <qfontdatabase.h>
 #include <qhash.h>
+#include <qmap.h>
 #include <qobject.h>
 #include <qstringlist.h>
-#include <qfontdatabase.h>
 
 #include <qfixed_p.h>
 #include <qunicodetables_p.h>
@@ -38,7 +39,7 @@ class QFontCache;
 class QFontEngine;
 
 struct QFontDef {
-   inline QFontDef()
+   QFontDef()
       : pointSize(-1.0), pixelSize(-1), styleStrategy(QFont::PreferDefault), styleHint(QFont::AnyStyle),
         weight(50), fixedPitch(false), style(QFont::StyleNormal), stretch(100),
         hintingPreference(QFont::PreferDefaultHinting), ignorePitch(true), fixedPitchComputed(0), reserved(0) {
@@ -81,7 +82,7 @@ struct QFontDef {
          && hintingPreference == other.hintingPreference;
    }
 
-   inline bool operator<(const QFontDef &other) const {
+   bool operator<(const QFontDef &other) const {
       if (pixelSize != other.pixelSize) {
          return pixelSize < other.pixelSize;
       }
@@ -236,7 +237,7 @@ class QFontCache : public QObject
       uchar multi  : 1;
       uchar screen : 7;
 
-      inline bool operator<(const Key &other) const {
+      bool operator<(const Key &other) const {
          if (script != other.script) {
             return script < other.script;
          }
@@ -256,7 +257,7 @@ class QFontCache : public QObject
          return def < other.def;
       }
 
-      inline bool operator==(const Key &other) const {
+      bool operator==(const Key &other) const {
          return script == other.script
             && screen == other.screen
             && multi == other.multi
@@ -304,7 +305,6 @@ class QFontCache : public QObject
    void timerEvent(QTimerEvent *event) override;
    void decreaseCache();
 
-   static const uint min_cost;
    uint total_cost;
    uint max_cost;
    uint current_timestamp;

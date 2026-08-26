@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,7 +28,6 @@
 #include <qlist.h>
 #include <qstring.h>
 #include <qstringlist.h>
-
 #include <qxmlstreamreader.h>
 #include <qxmlstreamwriter.h>
 
@@ -109,7 +108,6 @@ class DomConnections;
 class DomConnection;
 class DomConnectionHints;
 class DomConnectionHint;
-class DomScript;
 class DomWidgetData;
 class DomDesignerData;
 class DomSlots;
@@ -427,6 +425,7 @@ class QDESIGNER_UILIB_EXPORT DomUI
    QString m_comment;
    QString m_exportMacro;
    QString m_class;
+
    DomWidget *m_widget;
    DomLayoutDefault *m_layoutDefault;
    DomLayoutFunction *m_layoutFunction;
@@ -1124,6 +1123,7 @@ class QDESIGNER_UILIB_EXPORT DomImage
    // child element data
    uint m_children;
    DomImageData *m_data;
+
    enum Child {
       Data = 1
    };
@@ -1403,17 +1403,6 @@ class QDESIGNER_UILIB_EXPORT DomCustomWidget
    }
    void clearElementPixmap();
 
-   DomScript *elementScript() const {
-      return m_script;
-   }
-
-   DomScript *takeElementScript();
-   void setElementScript(DomScript *a);
-   bool hasElementScript() const {
-      return m_children & Script;
-   }
-   void clearElementScript();
-
    DomProperties *elementProperties() const {
       return m_properties;
    }
@@ -1462,9 +1451,9 @@ class QDESIGNER_UILIB_EXPORT DomCustomWidget
    DomSize *m_sizeHint;
    QString m_addPageMethod;
    int m_container;
-   DomSizePolicyData *m_sizePolicy;
    QString m_pixmap;
-   DomScript *m_script;
+
+   DomSizePolicyData *m_sizePolicy;
    DomProperties *m_properties;
    DomSlots *m_slots;
    DomPropertySpecifications *m_propertyspecifications;
@@ -1478,10 +1467,9 @@ class QDESIGNER_UILIB_EXPORT DomCustomWidget
       Container = 32,
       SizePolicy = 64,
       Pixmap = 128,
-      Script = 256,
-      Properties = 512,
-      Slots = 1024,
-      Propertyspecifications = 2048
+      Properties = 256,
+      Slots = 512,
+      Propertyspecifications = 1024
    };
 
    DomCustomWidget(const DomCustomWidget &other);
@@ -2421,11 +2409,6 @@ class QDESIGNER_UILIB_EXPORT DomWidget
    }
    void setElementProperty(const QList<DomProperty *> &a);
 
-   QList<DomScript *> elementScript() const {
-      return m_script;
-   }
-   void setElementScript(const QList<DomScript *> &a);
-
    QList<DomWidgetData *> elementWidgetData() const {
       return m_widgetData;
    }
@@ -2499,7 +2482,7 @@ class QDESIGNER_UILIB_EXPORT DomWidget
    uint m_children;
    QStringList m_class;
    QList<DomProperty *> m_property;
-   QList<DomScript *> m_script;
+
    QList<DomWidgetData *> m_widgetData;
    QList<DomProperty *> m_attribute;
    QList<DomRow *> m_row;
@@ -2515,18 +2498,17 @@ class QDESIGNER_UILIB_EXPORT DomWidget
    enum Child {
       Class = 1,
       Property = 2,
-      Script = 4,
-      WidgetData = 8,
-      Attribute = 16,
-      Row = 32,
-      Column = 64,
-      Item = 128,
-      Layout = 256,
-      Widget = 512,
-      Action = 1024,
-      ActionGroup = 2048,
-      AddAction = 4096,
-      ZOrder = 8192
+      WidgetData = 4,
+      Attribute = 8,
+      Row = 16,
+      Column = 32,
+      Item = 64,
+      Layout = 128,
+      Widget = 256,
+      Action = 512,
+      ActionGroup = 1024,
+      AddAction = 2048,
+      ZOrder = 4096
    };
 
    DomWidget(const DomWidget &other);
@@ -5426,70 +5408,6 @@ class QDESIGNER_UILIB_EXPORT DomConnectionHint
 
    DomConnectionHint(const DomConnectionHint &other);
    void operator = (const DomConnectionHint &other);
-};
-
-class QDESIGNER_UILIB_EXPORT DomScript
-{
- public:
-   DomScript();
-   ~DomScript();
-
-   void read(QXmlStreamReader &reader);
-   void write(QXmlStreamWriter &writer, const QString &tagName = QString()) const;
-
-   QString text() const {
-      return m_text;
-   }
-   void setText(const QString &s) {
-      m_text = s;
-   }
-
-   // attribute accessors
-   bool hasAttributeSource() const {
-      return m_has_attr_source;
-   }
-   QString attributeSource() const {
-      return m_attr_source;
-   }
-   void setAttributeSource(const QString &a) {
-      m_attr_source = a;
-      m_has_attr_source = true;
-   }
-   void clearAttributeSource() {
-      m_has_attr_source = false;
-   }
-
-   bool hasAttributeLanguage() const {
-      return m_has_attr_language;
-   }
-   QString attributeLanguage() const {
-      return m_attr_language;
-   }
-   void setAttributeLanguage(const QString &a) {
-      m_attr_language = a;
-      m_has_attr_language = true;
-   }
-   void clearAttributeLanguage() {
-      m_has_attr_language = false;
-   }
-
-   // child element accessors
- private:
-   QString m_text;
-   void clear(bool clear_all = true);
-
-   // attribute data
-   QString m_attr_source;
-   bool m_has_attr_source;
-
-   QString m_attr_language;
-   bool m_has_attr_language;
-
-   // child element data
-   uint m_children;
-
-   DomScript(const DomScript &other);
-   void operator = (const DomScript &other);
 };
 
 class QDESIGNER_UILIB_EXPORT DomWidgetData

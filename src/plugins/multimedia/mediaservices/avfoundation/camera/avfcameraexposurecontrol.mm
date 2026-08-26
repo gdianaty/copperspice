@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,16 +21,14 @@
 *
 ***********************************************************************/
 
-#include "avfcameraexposurecontrol.h"
-#include "avfcamerautility.h"
-#include "avfcamerasession.h"
-#include "avfcameraservice.h"
-#include "avfcameradebug.h"
+#include <avfcameraexposurecontrol.h>
 
-#include <qvariant.h>
-#include <qpointer.h>
-#include <qdebug.h>
+#include <avfcameraservice.h>
+#include <avfcamerasession.h>
+#include <avfcamerautility.h>
 #include <qpair.h>
+#include <qpointer.h>
+#include <qvariant.h>
 
 #include <AVFoundation/AVFoundation.h>
 

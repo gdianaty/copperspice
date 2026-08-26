@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -32,7 +32,7 @@ TEST_CASE("QElapsedTimer traits", "[qelapsedtimer]")
    REQUIRE(std::has_virtual_destructor_v<QElapsedTimer> == false);
 }
 
-TEST_CASE("QElapsedTimer operators", "[qelapsedtimer]")
+TEST_CASE("QElapsedTimer comparison", "[qelapsedtimer]")
 {
    QElapsedTimer timer;
    timer.start();
@@ -42,8 +42,8 @@ TEST_CASE("QElapsedTimer operators", "[qelapsedtimer]")
    REQUIRE(timer.secsTo(timer) == qint64(0));
 
    REQUIRE(timer == timer);
-   REQUIRE(! (timer != timer));
-   REQUIRE(! (timer < timer));
+   REQUIRE((timer != timer) == false);
+   REQUIRE((timer < timer) == false);
 
    QThread::msleep(10);
 

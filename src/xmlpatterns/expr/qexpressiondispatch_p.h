@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,11 +24,10 @@
 #ifndef QExpressionDispatch_P_H
 #define QExpressionDispatch_P_H
 
-#include <QSharedData>
-
-QT_BEGIN_NAMESPACE
+#include <qshareddata.h>
 
 namespace QPatternist {
+
 class AndExpression;
 class ApplyTemplate;
 class ArgumentConverter;
@@ -186,8 +185,7 @@ class ExpressionVisitor : public QSharedData
    virtual ExpressionVisitorResult::Ptr visit(const ValidationError *) const = 0;
    virtual ExpressionVisitorResult::Ptr visit(const ValueComparison *) const = 0;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

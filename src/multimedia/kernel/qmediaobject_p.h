@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,16 +24,17 @@
 #ifndef QMEDIAOBJECT_P_H
 #define QMEDIAOBJECT_P_H
 
+#include <qmediaobject.h>
+
 #include <qbytearray.h>
 #include <qset.h>
 #include <qtimer.h>
-#include <qmediaobject.h>
 
-class QMetaDataReaderControl;
 class QMediaAvailabilityControl;
+class QMetaDataReaderControl;
 
 #define Q_DECLARE_NON_CONST_PUBLIC(T) \
-    inline T *q_func() { return static_cast<T *>(q_ptr); } \
+    T *q_func() { return static_cast<T *>(q_ptr); } \
     friend class Ts;
 
 class QMediaObjectPrivate

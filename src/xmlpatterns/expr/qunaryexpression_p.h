@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,8 +24,6 @@
 #ifndef QUnaryExpression_P_H
 #define QUnaryExpression_P_H
 
-QT_BEGIN_NAMESPACE
-
 #include <qarithmeticexpression_p.h>
 
 namespace QPatternist {
@@ -42,8 +40,7 @@ class UnaryExpression : public ArithmeticExpression
    UnaryExpression(const UnaryExpression &) = delete;
    UnaryExpression &operator=(const UnaryExpression &) = delete;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

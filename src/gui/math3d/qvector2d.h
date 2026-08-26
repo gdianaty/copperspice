@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,15 +26,14 @@
 
 #include <qpoint.h>
 
+class QVariant;
 class QVector3D;
 class QVector4D;
-class QVariant;
 
 #ifndef QT_NO_VECTOR2D
 
 class Q_GUI_EXPORT QVector2D
 {
-
  public:
    QVector2D();
    QVector2D(qreal xpos, qreal ypos);

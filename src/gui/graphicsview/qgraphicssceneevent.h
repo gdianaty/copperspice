@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,9 +26,9 @@
 
 #include <qcoreevent.h>
 #include <qpoint.h>
-#include <qscopedpointer.h>
-#include <qrect.h>
 #include <qpolygon.h>
+#include <qrect.h>
+#include <qscopedpointer.h>
 #include <qset.h>
 
 #if ! defined(QT_NO_GRAPHICSVIEW)
@@ -37,15 +37,16 @@ class QMimeData;
 class QPointF;
 class QSizeF;
 class QWidget;
-class QGraphicsSceneEventPrivate;
-class QGraphicsSceneMouseEventPrivate;
-class QGraphicsSceneWheelEventPrivate;
+
 class QGraphicsSceneContextMenuEventPrivate;
-class QGraphicsSceneHoverEventPrivate;
-class QGraphicsSceneHelpEventPrivate;
 class QGraphicsSceneDragDropEventPrivate;
-class QGraphicsSceneResizeEventPrivate;
+class QGraphicsSceneEventPrivate;
+class QGraphicsSceneHelpEventPrivate;
+class QGraphicsSceneHoverEventPrivate;
+class QGraphicsSceneMouseEventPrivate;
 class QGraphicsSceneMoveEventPrivate;
+class QGraphicsSceneResizeEventPrivate;
+class QGraphicsSceneWheelEventPrivate;
 
 class Q_GUI_EXPORT QGraphicsSceneEvent : public QEvent
 {

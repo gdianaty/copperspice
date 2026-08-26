@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2013 Klarälvdalens Datakonsult AB, a KDAB Group company
 * Copyright (c) 2015 The Qt Company Ltd.
@@ -283,33 +283,47 @@ void QTriangulatingStroker::moveTo(const qreal *pts)
             m_vertices[count - 1] = m_vertices.at(count + 1);
             m_vertices[count - 2] = m_vertices.at(count + 0);
         }
-        break; }
-    default: break; // ssssh gcc...
+        break;
     }
+
+    default:
+      break;
+
+    }
+
     emitLineSegment(m_cx, m_cy, m_nvx, m_nvy);
 }
 
 void QTriangulatingStroker::cubicTo(const qreal *pts)
 {
-    const QPointF *p = (const QPointF *) pts;
-    QBezier bezier = QBezier::fromPoints(*(p - 1), p[0], p[1], p[2]);
+    QBezier bezier = QBezier::fromPoints(
+         QPointF(pts[-2], pts[-1]), QPointF(pts[0], pts[1]), QPointF(pts[2], pts[3]), QPointF(pts[4], pts[5]));
 
     QRectF bounds = bezier.bounds();
-    float rad = qMax(bounds.width(), bounds.height());
+    float rad     = qMax(bounds.width(), bounds.height());
+
     int threshold = qMin<float>(64, (rad + m_curvyness_add) * m_curvyness_mul);
-    if (threshold < 4)
+
+    if (threshold < 4) {
         threshold = 4;
+    }
+
     qreal threshold_minus_1 = threshold - 1;
-    float vx, vy;
 
-    float cx = m_cx, cy = m_cy;
-    float x, y;
+    float vx = 0.0;
+    float vy = 0.0;
 
-    for (int i=1; i<threshold; ++i) {
-        qreal t = qreal(i) / threshold_minus_1;
-        QPointF p = bezier.pointAt(t);
-        x = p.x();
-        y = p.y();
+    float cx = m_cx;
+    float cy = m_cy;
+    float x;
+    float y;
+
+    for (int i = 1; i < threshold; ++i) {
+        qreal t  = qreal(i) / threshold_minus_1;
+        QPointF currentPoint = bezier.pointAt(t);
+
+        x = currentPoint.x();
+        y = currentPoint.y();
 
         normalVector(cx, cy, x, y, &vx, &vy);
 

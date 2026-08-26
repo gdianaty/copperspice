@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -49,15 +49,6 @@ static void swapPixel01(QImage *image)        // 1-bpp: swap 0 and 1 pixels
       image->setColor(1, t);
    }
 }
-
-/*
-    QImageIO::defineIOHandler("BMP", "^BM", 0,
-                               read_bmp_image, write_bmp_image);
-*/
-
-/*****************************************************************************
-  BMP (DIB) image read/write functions
- *****************************************************************************/
 
 const int BMP_FILEHDR_SIZE = 14;                // size of BMP_FILEHDR data
 
@@ -597,7 +588,7 @@ static bool read_dib_body(QDataStream &s, const BMP_INFOHDR &bi, int offset, int
    return true;
 }
 
-// this is also used in qmime_win.cpp
+// used in qmime_win.cpp
 bool qt_write_dib(QDataStream &s, QImage image)
 {
    int nbits;
@@ -605,7 +596,7 @@ bool qt_write_dib(QDataStream &s, QImage image)
    int bpl = image.bytesPerLine();
 
    QIODevice *d = s.device();
-   if (!d->isWritable()) {
+   if (! d->isWritable()) {
       return false;
    }
 
@@ -622,38 +613,45 @@ bool qt_write_dib(QDataStream &s, QImage image)
    }
 
    BMP_INFOHDR bi;
-   bi.biSize               = BMP_WIN;                // build info header
-   bi.biWidth               = image.width();
-   bi.biHeight               = image.height();
-   bi.biPlanes               = 1;
+   bi.biSize          = BMP_WIN;                // build info header
+   bi.biWidth         = image.width();
+   bi.biHeight        = image.height();
+   bi.biPlanes        = 1;
    bi.biBitCount      = nbits;
    bi.biCompression   = BMP_RGB;
    bi.biSizeImage     = bpl_bmp * image.height();
-   bi.biXPelsPerMeter = image.dotsPerMeterX() ? image.dotsPerMeterX()
-      : 2834; // 72 dpi default
+
+   bi.biXPelsPerMeter = image.dotsPerMeterX() ? image.dotsPerMeterX() : 2834;    // 72 dpi default
    bi.biYPelsPerMeter = image.dotsPerMeterY() ? image.dotsPerMeterY() : 2834;
    bi.biClrUsed       = image.colorCount();
    bi.biClrImportant  = image.colorCount();
    s << bi;
+
    // write info header
    if (s.status() != QDataStream::Ok) {
       return false;
    }
 
-   if (image.depth() != 32) {                // write color table
+   if (image.depth() != 32) {
+      // write color table
+
       uchar *color_table = new uchar[4 * image.colorCount()];
       uchar *rgb = color_table;
+
       QVector<QRgb> c = image.colorTable();
+
       for (int i = 0; i < image.colorCount(); i++) {
          *rgb++ = qBlue (c[i]);
          *rgb++ = qGreen(c[i]);
          *rgb++ = qRed  (c[i]);
          *rgb++ = 0;
       }
+
       if (d->write((char *)color_table, 4 * image.colorCount()) == -1) {
          delete [] color_table;
          return false;
       }
+
       delete [] color_table;
    }
 
@@ -676,40 +674,56 @@ bool qt_write_dib(QDataStream &s, QImage image)
    }
 
    uchar *buf = new uchar[bpl_bmp];
-   uchar *b, *end;
+   uchar *b;
+   uchar *end;
+
    const uchar *p;
 
    memset(buf, 0, bpl_bmp);
-   for (y = image.height() - 1; y >= 0; y--) {  // write the image bits
-      if (nbits == 4) {                        // convert 8 -> 4 bits
+   for (y = image.height() - 1; y >= 0; y--) {
+      // write the image bits
+
+      if (nbits == 4) {
+         // convert 8 -> 4 bits
+
          p = image.constScanLine(y);
          b = buf;
          end = b + image.width() / 2;
+
          while (b < end) {
             *b++ = (*p << 4) | (*(p + 1) & 0x0f);
             p += 2;
          }
+
          if (image.width() & 1) {
             *b = *p << 4;
          }
 
-      } else {                                // 32 bits
-         const QRgb *p   = (const QRgb *)image.constScanLine(y);
-         const QRgb *end = p + image.width();
+      } else {
+         // 32 bits
+
+         const QRgb *ptr_32 = (const QRgb *)image.constScanLine(y);
+         const QRgb *end_32 = ptr_32 + image.width();
+
          b = buf;
-         while (p < end) {
-            *b++ = qBlue(*p);
-            *b++ = qGreen(*p);
-            *b++ = qRed(*p);
-            p++;
+
+         while (ptr_32 < end_32) {
+            *b++ = qBlue(*ptr_32);
+            *b++ = qGreen(*ptr_32);
+            *b++ = qRed(*ptr_32);
+
+            ptr_32++;
          }
       }
+
       if (bpl_bmp != d->write((char *)buf, bpl_bmp)) {
          delete[] buf;
          return false;
       }
    }
+
    delete[] buf;
+
    return true;
 }
 
@@ -776,7 +790,7 @@ bool QBmpHandler::canRead()
 bool QBmpHandler::canRead(QIODevice *device)
 {
    if (!device) {
-      qWarning("QBmpHandler::canRead() called with 0 pointer");
+      qWarning("QBmpHandler::canRead() Invalid device (nullptr)");
       return false;
    }
 
@@ -795,7 +809,7 @@ bool QBmpHandler::read(QImage *image)
    }
 
    if (!image) {
-      qWarning("QBmpHandler::read: cannot read into null pointer");
+      qWarning("QBmpHandler::read() Invalid image (nullptr)");
       return false;
    }
 

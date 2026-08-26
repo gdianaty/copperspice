@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,16 +21,17 @@
 *
 ***********************************************************************/
 
-#include <Cocoa/Cocoa.h>
+#include <qcocoamenubar.h>
 
 #include <qalgorithms.h>
 #include <qapplication.h>
-#include <qdebug.h>
-#include <qcocoamenubar.h>
-#include <qcocoawindow.h>
-#include <qcocoamenuloader.h>
 #include <qcocoaapplication.h>             // for custom application category
 #include <qcocoaapplicationdelegate.h>
+#include <qcocoamenuloader.h>
+#include <qcocoawindow.h>
+#include <qdebug.h>
+
+#include <Cocoa/Cocoa.h>
 
 static QList<QCocoaMenuBar *> static_menubars;
 
@@ -130,8 +131,8 @@ void QCocoaMenuBar::insertMenu(QPlatformMenu *platformMenu, QPlatformMenu *befor
       return;
    }
 
-   int insertionIndex = beforeMenu ? m_menus.indexOf(beforeMenu) : m_menus.size();
-   m_menus.insert(insertionIndex, menu);
+   int insertionIndex = beforeMenu ? m_menus.indexOf(QPointer<QCocoaMenu>(beforeMenu)) : m_menus.size();
+   m_menus.insert(insertionIndex, QPointer<QCocoaMenu>(menu));
 
    {
       QMacAutoReleasePool pool;
@@ -162,16 +163,17 @@ void QCocoaMenuBar::insertMenu(QPlatformMenu *platformMenu, QPlatformMenu *befor
 void QCocoaMenuBar::removeMenu(QPlatformMenu *platformMenu)
 {
    QCocoaMenu *menu = static_cast<QCocoaMenu *>(platformMenu);
-   if (! m_menus.contains(menu)) {
+
+   if (! m_menus.contains(QPointer<QCocoaMenu>(menu))) {
       qWarning("Trying to remove a menu that does not belong to the menubar");
       return;
    }
 
-   NSMenuItem *item = nativeItemForMenu(menu);
+   NSMenuItem *item = nativeItemForMenu(QPointer<QCocoaMenu>(menu));
    if (menu->attachedItem() == item) {
       menu->setAttachedItem(nil);
    }
-   m_menus.removeOne(menu);
+   m_menus.removeOne(QPointer<QCocoaMenu>(menu));
 
    QMacAutoReleasePool pool;
 

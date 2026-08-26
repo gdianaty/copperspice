@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,11 +23,11 @@
 
 #include <qplatform_themefactory_p.h>
 
-#include <qplatform_themeplugin.h>
+#include <qapplication.h>
+#include <qdebug.h>
 #include <qdir.h>
 #include <qmutex.h>
-#include <qguiapplication.h>
-#include <qdebug.h>
+#include <qplatform_themeplugin.h>
 
 #include <qfactoryloader_p.h>
 
@@ -64,12 +64,6 @@ QPlatformTheme *QPlatformThemeFactory::create(const QString &key, const QString 
    return nullptr;
 }
 
-/*!
-    Returns the list of valid keys, i.e. the keys this factory can
-    create styles for.
-
-    \sa create()
-*/
 QStringList QPlatformThemeFactory::keys(const QString &platformPluginPath)
 {
    QStringList list;
@@ -95,4 +89,3 @@ QStringList QPlatformThemeFactory::keys(const QString &platformPluginPath)
    return list;
 
 }
-

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,8 +27,6 @@
 #include <qnamedschemacomponent_p.h>
 #include <qxsdannotated_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class XsdAttributeTerm : public NamedSchemaComponent, public XsdAnnotated
@@ -36,20 +34,10 @@ class XsdAttributeTerm : public NamedSchemaComponent, public XsdAnnotated
  public:
    typedef QExplicitlySharedDataPointer<XsdAttributeTerm> Ptr;
 
-   /**
-    * Returns @c true if the term is an attribute use, @c false otherwise.
-    */
    virtual bool isAttributeUse() const;
-
-   /**
-    * Returns @c true if the term is an attribute use reference, @c false otherwise.
-    *
-    * @note The reference term is only used internally as helper during type resolving.
-    */
    virtual bool isReference() const;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,13 +21,13 @@
 *
 ***********************************************************************/
 
-#include <qmath.h>
 #include <qtextureglyphcache_p.h>
+
+#include <qmath.h>
+
+#include <qfontengine_p.h>
 #include <qnativeimage_p.h>
 #include <qnumeric_p.h>
-#include <qfontengine_p.h>
-
-// #define CACHE_DEBUG
 
 QTextureGlyphCache::~QTextureGlyphCache()
 {
@@ -307,13 +307,12 @@ void QImageTextureGlyphCache::fillTexture(const Coord &c, glyph_t g, QFixed subP
 
    if (m_format == QFontEngine::Format_A32 || m_format == QFontEngine::Format_ARGB) {
 
-      QImage ref(m_image.bits() + (c.x * 4 + c.y * m_image.bytesPerLine()),
-         qMax(mask.width(), c.w), qMax(mask.height(), c.h), m_image.bytesPerLine(),
-         m_image.format());
+      QImage imageData(m_image.bits() + (c.x * 4 + c.y * m_image.bytesPerLine()),
+         qMax(mask.width(), c.w), qMax(mask.height(), c.h), m_image.bytesPerLine(), m_image.format());
 
-      QPainter p(&ref);
+      QPainter p(&imageData);
       p.setCompositionMode(QPainter::CompositionMode_Source);
-      p.fillRect(0, 0, c.w, c.h, QColor(0, 0, 0, 0)); // TODO optimize this
+      p.fillRect(0, 0, c.w, c.h, QColor(0, 0, 0, 0));          // TODO optimize this
       p.drawImage(0, 0, mask);
       p.end();
 
@@ -336,6 +335,7 @@ void QImageTextureGlyphCache::fillTexture(const Coord &c, glyph_t g, QFixed subP
 
          if (y < mh) {
             const uchar *src = mask.constScanLine(y);
+
             for (int x = 0; x < c.w / 8; ++x) {
                if (x < (mw + 7) / 8) {
                   dest[x] = src[x];
@@ -343,13 +343,17 @@ void QImageTextureGlyphCache::fillTexture(const Coord &c, glyph_t g, QFixed subP
                   dest[x] = 0;
                }
             }
+
          } else {
             for (int x = 0; x < c.w / 8; ++x) {
                dest[x] = 0;
             }
          }
       }
-   } else { // A8
+
+   } else {
+      // A8
+
       int mw = qMin(mask.width(), c.w);
       int mh = qMin(mask.height(), c.h);
       uchar *d = m_image.bits();
@@ -367,9 +371,11 @@ void QImageTextureGlyphCache::fillTexture(const Coord &c, glyph_t g, QFixed subP
                }
             }
          }
+
       } else if (mask.depth() == 8) {
          for (int y = 0; y < c.h; ++y) {
             uchar *dest = d + (c.y + y) * dbpl + c.x;
+
             if (y < mh) {
                const uchar *src = mask.constScanLine(y);
                for (int x = 0; x < c.w; ++x) {

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,24 +22,19 @@
 ***********************************************************************/
 
 #include <qsound.h>
-#include <qsoundeffect.h>
+
 #include <qcoreapplication.h>
+#include <qsoundeffect.h>
 
 void QSound::play(const QString &filename)
 {
    // Object destruction is generaly handled via deleteOnComplete
    // Unexpected cases will be handled via parenting of QSound objects to qApp
    QSound *sound = new QSound(filename, qApp);
-   sound->connect(sound->m_soundEffect, SIGNAL(playingChanged()), SLOT(deleteOnComplete()));
+   sound->connect(sound->m_soundEffect, &QSoundEffect::playingChanged, sound, &QSound::deleteOnComplete);
    sound->play();
 }
 
-/*!
-    Constructs a QSound object from the file specified by the given \a
-    filename and with the given \a parent.
-
-    \sa play()
-*/
 QSound::QSound(const QString &filename, QObject *parent)
    : QObject(parent)
 {
@@ -47,13 +42,6 @@ QSound::QSound(const QString &filename, QObject *parent)
    m_soundEffect->setSource(QUrl::fromLocalFile(filename));
 }
 
-/*!
-    Destroys this sound object. If the sound is not finished playing,
-    the stop() function is called before the sound object is
-    destroyed.
-
-    \sa stop(), isFinished()
-*/
 QSound::~QSound()
 {
    if (!isFinished()) {
@@ -61,9 +49,6 @@ QSound::~QSound()
    }
 }
 
-/*!
-    Returns true if the sound has finished playing; otherwise returns false.
-*/
 bool QSound::isFinished() const
 {
    return !m_soundEffect->isPlaying();
@@ -74,12 +59,6 @@ void QSound::play()
    m_soundEffect->play();
 }
 
-/*!
-    Returns the number of times the sound will play.
-    Return value of \c QSound::Infinite indicates infinite number of loops
-
-    \sa loopsRemaining(), setLoops()
-*/
 int QSound::loops() const
 {
    // retain old API value for infite loops
@@ -91,13 +70,6 @@ int QSound::loops() const
    return loopCount;
 }
 
-/*!
-    Returns the remaining number of times the sound will loop (for all
-    positive values this value decreases each time the sound is played).
-    Return value of \c QSound::Infinite indicates infinite number of loops
-
-    \sa loops(), isFinished()
-*/
 int QSound::loopsRemaining() const
 {
    // retain old API value for infite loops
@@ -109,17 +81,6 @@ int QSound::loopsRemaining() const
    return loopsRemaining;
 }
 
-/*!
-    \fn void QSound::setLoops(int number)
-
-    Sets the sound to repeat the given \a number of times when it is
-    played.
-
-    Note that passing the value \c QSound::Infinite will cause the sound to loop
-    indefinitely.
-
-    \sa loops()
-*/
 void QSound::setLoops(int n)
 {
    if (n == Infinite) {
@@ -129,33 +90,19 @@ void QSound::setLoops(int n)
    m_soundEffect->setLoopCount(n);
 }
 
-/*!
-    Returns the filename associated with this QSound object.
-
-    \sa QSound()
-*/
 QString QSound::fileName() const
 {
    return m_soundEffect->source().toLocalFile();
 }
 
-/*!
-    Stops the sound playing.
-
-    \sa play()
-*/
 void QSound::stop()
 {
    m_soundEffect->stop();
 }
 
-/*!
-    \internal
-*/
 void QSound::deleteOnComplete()
 {
    if (!m_soundEffect->isPlaying()) {
       deleteLater();
    }
 }
-

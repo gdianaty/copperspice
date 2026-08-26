@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,11 +22,12 @@
 ***********************************************************************/
 
 #include <qplatform_inputcontext.h>
-#include <qguiapplication.h>
+#include <qplatform_inputcontext_p.h>
+
+#include <qapplication.h>
 #include <qrect.h>
 
 #include <qkeymapper_p.h>
-#include <qplatform_inputcontext_p.h>
 
 bool QPlatformInputContextPrivate::s_inputMethodAccepted = false;
 

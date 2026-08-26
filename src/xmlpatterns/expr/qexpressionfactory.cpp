@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,37 +21,28 @@
 *
 ***********************************************************************/
 
-#include "qexpressionfactory_p.h"
+#include <qexpressionfactory_p.h>
 
-#include <QBuffer>
-#include <QByteArray>
+#include <qbuffer.h>
+#include <qbytearray.h>
 
 #include <qcalltemplate_p.h>
 #include <qcommonsequencetypes_p.h>
 #include <qxmlpatterns_debug_p.h>
-#include "qexpression_p.h"
-#include "qgenericstaticcontext_p.h"
-#include "qoperandsiterator_p.h"
-#include "qoptimizationpasses_p.h"
-#include "qparsercontext_p.h"
-#include "qpath_p.h"
-#include "qquerytransformparser_p.h"
-#include "qstaticfocuscontext_p.h"
-#include "qtokenrevealer_p.h"
-#include "qxquerytokenizer_p.h"
-#include "qxslttokenizer_p.h"
+#include <qexpression_p.h>
+#include <qgenericstaticcontext_p.h>
+#include <qoperandsiterator_p.h>
+#include <qoptimizationpasses_p.h>
+#include <qparsercontext_p.h>
+#include <qpath_p.h>
+#include <qquerytransformparser_p.h>
+#include <qstaticfocuscontext_p.h>
+#include <qtokenrevealer_p.h>
+#include <qxquerytokenizer_p.h>
+#include <qxslttokenizer_p.h>
 
 namespace QPatternist {
 
-/**
- * @short The entry point to the parser.
- *
- * @param info supplies the information the parser & scanner
- * needs to create expressions. The created expression, if everything
- * succeeds, can be retrieved via the object @p info points to.
- * @returns non-negative if the parser fails.
- * @see ExpressionFactory::createExpression()
- */
 extern int XPathparse(QPatternist::ParserContext *const info);
 
 Expression::Ptr ExpressionFactory::createExpression(const QString &expr,
@@ -265,9 +256,8 @@ Expression::Ptr ExpressionFactory::createExpression(const Tokenizer::Ptr &tokeni
          }
       }
 
-      /* Type check and compress template rules. */
+      // Type check and compress template rules
       {
-         QHashIterator<QXmlName, TemplateMode::Ptr> it(info->templateRules);
 
          /* Since a pattern can exist of AxisStep, its typeCheck() stage
           * requires a focus. In the case that we're invoked with a name but
@@ -276,29 +266,27 @@ Expression::Ptr ExpressionFactory::createExpression(const Tokenizer::Ptr &tokeni
           * expression, since the static type of the pattern is used as the
           * static type for the focus of the template body. */
          StaticContext::Ptr patternContext;
+
          if (hasExternalFocus) {
             patternContext = context;
          } else {
             patternContext = StaticContext::Ptr(new StaticFocusContext(BuiltinTypes::node, context));
          }
 
-         /* For each template pattern. */
-         while (it.hasNext()) {
-            it.next();
-            const TemplateMode::Ptr &mode = it.value();
+         // For each template pattern
+         for (const auto &mode : info->templateRules) {
             const int len = mode->templatePatterns.count();
+
             TemplatePattern::ID currentTemplateID = -1;
             bool hasDoneItOnce = false;
 
-            /* For each template pattern. */
             for (int i = 0; i < len; ++i) {
-               /* We can't use references for these two members, since we
-                * assign to them. */
+               // do not use references for these two members since we assign to them
+
                const TemplatePattern::Ptr &pattern = mode->templatePatterns.at(i);
                Expression::Ptr matchPattern(pattern->matchPattern());
 
-               processTemplateRule(pattern->templateTarget()->body,
-                                   pattern, mode->name(), TemplateInitial);
+               processTemplateRule(pattern->templateTarget()->body, pattern, mode->name(), TemplateInitial);
 
                matchPattern = matchPattern->typeCheck(patternContext, CommonSequenceTypes::ZeroOrMoreItems);
                matchPattern = matchPattern->compress(patternContext);
@@ -307,22 +295,21 @@ Expression::Ptr ExpressionFactory::createExpression(const Tokenizer::Ptr &tokeni
                if (currentTemplateID == -1 && hasDoneItOnce) {
                   currentTemplateID = pattern->id();
                   continue;
+
                } else if (currentTemplateID == pattern->id() && hasDoneItOnce) {
                   hasDoneItOnce = false;
                   continue;
+
                }
 
                hasDoneItOnce = true;
                currentTemplateID = pattern->id();
                Expression::Ptr body(pattern->templateTarget()->body);
 
-               /* Patterns for a new template has started, we must
-                * deal with the body & parameters. */
+               // Patterns for a new template has started, we must deal with the body & parameters
                {
-                  /* TODO type is wrong, it has to be the union of all
-                   * patterns. */
-                  const StaticContext::Ptr focusContext(new StaticFocusContext(matchPattern->staticType()->itemType(),
-                                                        context));
+                  // type may be incorrect, it should be the union of all patterns
+                  const StaticContext::Ptr focusContext(new StaticFocusContext(matchPattern->staticType()->itemType(), context));
                   body = body->typeCheck(focusContext, CommonSequenceTypes::ZeroOrMoreItems);
 
                   pattern->templateTarget()->compileParameters(focusContext);
@@ -426,4 +413,3 @@ void ExpressionFactory::processNamedTemplate(const QXmlName &name,
 }
 
 } // namespace QPatternist
-

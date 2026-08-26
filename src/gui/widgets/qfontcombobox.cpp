@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,75 +25,103 @@
 
 #ifndef QT_NO_FONTCOMBOBOX
 
-#include <qstringlistmodel.h>
+#include <qapplication.h>
+#include <qcombobox_p.h>
+#include <qdebug.h>
+#include <qdesktopwidget.h>
+#include <qevent.h>
 #include <qitemdelegate.h>
 #include <qlistview.h>
 #include <qpainter.h>
-#include <qevent.h>
-#include <qapplication.h>
-#include <qcombobox_p.h>
-#include <qdesktopwidget.h>
-#include <qdebug.h>
+#include <qstringlistmodel.h>
 
 static QFontDatabase::WritingSystem writingSystemFromScript(QLocale::Script script)
 {
    switch (script) {
       case QLocale::ArabicScript:
          return QFontDatabase::Arabic;
+
       case QLocale::CyrillicScript:
          return QFontDatabase::Cyrillic;
+
       case QLocale::GurmukhiScript:
          return QFontDatabase::Gurmukhi;
+
       case QLocale::SimplifiedHanScript:
          return QFontDatabase::SimplifiedChinese;
+
       case QLocale::TraditionalHanScript:
          return QFontDatabase::TraditionalChinese;
+
       case QLocale::LatinScript:
          return QFontDatabase::Latin;
+
       case QLocale::ArmenianScript:
          return QFontDatabase::Armenian;
+
       case QLocale::BengaliScript:
          return QFontDatabase::Bengali;
+
       case QLocale::DevanagariScript:
          return QFontDatabase::Devanagari;
+
       case QLocale::GeorgianScript:
          return QFontDatabase::Georgian;
+
       case QLocale::GreekScript:
          return QFontDatabase::Greek;
+
       case QLocale::GujaratiScript:
          return QFontDatabase::Gujarati;
+
       case QLocale::HebrewScript:
          return QFontDatabase::Hebrew;
+
       case QLocale::JapaneseScript:
          return QFontDatabase::Japanese;
+
       case QLocale::KhmerScript:
          return QFontDatabase::Khmer;
+
       case QLocale::KannadaScript:
          return QFontDatabase::Kannada;
+
       case QLocale::KoreanScript:
          return QFontDatabase::Korean;
+
       case QLocale::LaoScript:
          return QFontDatabase::Lao;
+
       case QLocale::MalayalamScript:
          return QFontDatabase::Malayalam;
+
       case QLocale::MyanmarScript:
          return QFontDatabase::Myanmar;
+
       case QLocale::TamilScript:
          return QFontDatabase::Tamil;
+
       case QLocale::TeluguScript:
          return QFontDatabase::Telugu;
+
       case QLocale::ThaanaScript:
          return QFontDatabase::Thaana;
+
       case QLocale::ThaiScript:
          return QFontDatabase::Thai;
+
       case QLocale::TibetanScript:
          return QFontDatabase::Tibetan;
+
       case QLocale::SinhalaScript:
          return QFontDatabase::Sinhala;
+
       case QLocale::SyriacScript:
          return QFontDatabase::Syriac;
+
       case QLocale::OriyaScript:
          return QFontDatabase::Oriya;
+
       case QLocale::OghamScript:
          return QFontDatabase::Ogham;
 
@@ -112,7 +140,8 @@ static QFontDatabase::WritingSystem writingSystemFromLocale()
 {
    QStringList uiLanguages = QLocale::system().uiLanguages();
    QLocale::Script script;
-   if (!uiLanguages.isEmpty()) {
+
+   if (! uiLanguages.isEmpty()) {
       script = QLocale(uiLanguages.at(0)).script();
    } else {
       script = QLocale::system().script();
@@ -120,10 +149,10 @@ static QFontDatabase::WritingSystem writingSystemFromLocale()
 
    return writingSystemFromScript(script);
 }
+
 static QFontDatabase::WritingSystem writingSystemForFont(const QFont &font, bool *hasLatin)
 {
    QList<QFontDatabase::WritingSystem> writingSystems = QFontDatabase().writingSystems(font.family());
-   //     qDebug() << font.family() << writingSystems;
 
    // this just confuses the algorithm below. Vietnamese is Latin with lots of special chars
    writingSystems.removeOne(QFontDatabase::Vietnamese);
@@ -199,8 +228,10 @@ void QFontFamilyDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
    const QModelIndex &index) const
 {
    QString text = index.data(Qt::DisplayRole).toString();
+
    QFont font(option.font);
    font.setPointSize(QFontInfo(font).pointSize() * 3 / 2);
+
    QFont font2 = font;
    font2.setFamily(text);
 
@@ -269,7 +300,6 @@ void QFontFamilyDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
    if (option.state & QStyle::State_Selected) {
       painter->restore();
    }
-
 }
 
 QSize QFontFamilyDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -282,14 +312,14 @@ QSize QFontFamilyDelegate::sizeHint(const QStyleOptionViewItem &option, const QM
    font.setPointSize(QFontInfo(font).pointSize() * 3 / 2);
 
    QFontMetrics fontMetrics(font);
+
    return QSize(fontMetrics.width(text), fontMetrics.height());
 }
-
 
 class QFontComboBoxPrivate : public QComboBoxPrivate
 {
  public:
-   inline QFontComboBoxPrivate() {
+   QFontComboBoxPrivate() {
       filters = QFontComboBox::AllFonts;
    }
 
@@ -305,6 +335,7 @@ class QFontComboBoxPrivate : public QComboBoxPrivate
 void QFontComboBoxPrivate::_q_updateModel()
 {
    Q_Q(QFontComboBox);
+
    const int scalableMask = (QFontComboBox::ScalableFonts | QFontComboBox::NonScalableFonts);
    const int spacingMask = (QFontComboBox::ProportionalFonts | QFontComboBox::MonospacedFonts);
 
@@ -472,12 +503,10 @@ bool QFontComboBox::event(QEvent *e)
                QApplication::desktop()->availableGeometry(lview).width()));
       }
    }
+
    return QComboBox::event(e);
 }
 
-/*!
-    \reimp
-*/
 QSize QFontComboBox::sizeHint() const
 {
    QSize sz = QComboBox::sizeHint();

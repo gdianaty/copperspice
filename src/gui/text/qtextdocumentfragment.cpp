@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,26 +22,28 @@
 ***********************************************************************/
 
 #include <qtextdocumentfragment.h>
+#include <qtextdocumentfragment_p.h>
 
-#include <qtextlist.h>
-#include <qdebug.h>
-#include <qtextcodec.h>
 #include <qbytearray.h>
 #include <qdatastream.h>
 #include <qdatetime.h>
+#include <qdebug.h>
+#include <qtextcodec.h>
+#include <qtextlist.h>
 
-#include <qtextdocumentfragment_p.h>
 #include <qtextcursor_p.h>
 
 QTextCopyHelper::QTextCopyHelper(const QTextCursor &_source, const QTextCursor &_destination,
       bool forceCharFormat, const QTextCharFormat &fmt)
    : formatCollection(*_destination.d->priv->formatCollection()), originalText(_source.d->priv->buffer())
 {
-   src = _source.d->priv;
-   dst = _destination.d->priv;
+   src       = _source.d->priv;
+   dst       = _destination.d->priv;
    insertPos = _destination.position();
-   this->forceCharFormat = forceCharFormat;
+
+   m_forceCharFormat      = forceCharFormat;
    primaryCharFormatIndex = convertFormatIndex(fmt);
+
    cursor = _source;
 }
 
@@ -51,8 +53,10 @@ int QTextCopyHelper::convertFormatIndex(const QTextFormat &oldFormat, int object
 
    if (objectIndexToSet != -1) {
       fmt.setObjectIndex(objectIndexToSet);
+
    } else if (fmt.objectIndex() != -1) {
       int newObjectIndex = objectIndexMap.value(fmt.objectIndex(), -1);
+
       if (newObjectIndex == -1) {
          QTextFormat objFormat = src->formatCollection()->objectFormat(fmt.objectIndex());
          Q_ASSERT(objFormat.objectIndex() == -1);
@@ -77,7 +81,8 @@ int QTextCopyHelper::appendFragment(int pos, int endPos, int objectIndex)
       || (frag->size_array[0] == 1 && src->formatCollection()->format(frag->format).objectIndex() != -1));
 
    int charFormatIndex;
-   if (forceCharFormat) {
+
+   if (m_forceCharFormat) {
       charFormatIndex = primaryCharFormatIndex;
    } else {
       charFormatIndex = convertFormatIndex(frag->format, objectIndex);
@@ -102,8 +107,7 @@ int QTextCopyHelper::appendFragment(int pos, int endPos, int objectIndex)
    QStringView txtToInsert = originalText.midView(frag->stringPosition + inFragmentOffset, charsToCopy);
 
    if (txtToInsert.length() == 1 && (txtToInsert.at(0) == QChar::ParagraphSeparator
-         || txtToInsert.at(0) == QTextBeginningOfFrame
-         || txtToInsert.at(0) == QTextEndOfFrame) ) {
+         || txtToInsert.at(0) == QTextBeginningOfFrame || txtToInsert.at(0) == QTextEndOfFrame) ) {
 
       dst->insertBlock(txtToInsert.at(0), insertPos, blockIdx, charFormatIndex);
       ++insertPos;
@@ -252,11 +256,6 @@ QTextDocumentFragment::QTextDocumentFragment()
 {
 }
 
-/*!
-    Converts the given \a document into a QTextDocumentFragment.
-    Note that the QTextDocumentFragment only stores the document contents, not meta information
-    like the document's title.
-*/
 QTextDocumentFragment::QTextDocumentFragment(const QTextDocument *document)
    : d(nullptr)
 {
@@ -269,12 +268,6 @@ QTextDocumentFragment::QTextDocumentFragment(const QTextDocument *document)
    d = new QTextDocumentFragmentPrivate(cursor);
 }
 
-/*!
-    Creates a QTextDocumentFragment from the \a{cursor}'s selection.
-    If the cursor doesn't have a selection, the created fragment is empty.
-
-    \sa isEmpty() QTextCursor::selection()
-*/
 QTextDocumentFragment::QTextDocumentFragment(const QTextCursor &cursor)
    : d(nullptr)
 {
@@ -285,11 +278,6 @@ QTextDocumentFragment::QTextDocumentFragment(const QTextCursor &cursor)
    d = new QTextDocumentFragmentPrivate(cursor);
 }
 
-/*!
-    \fn QTextDocumentFragment::QTextDocumentFragment(const QTextDocumentFragment &other)
-
-    Copy constructor. Creates a copy of the \a other fragment.
-*/
 QTextDocumentFragment::QTextDocumentFragment(const QTextDocumentFragment &rhs)
    : d(rhs.d)
 {
@@ -298,11 +286,6 @@ QTextDocumentFragment::QTextDocumentFragment(const QTextDocumentFragment &rhs)
    }
 }
 
-/*!
-    \fn QTextDocumentFragment &QTextDocumentFragment::operator=(const QTextDocumentFragment &other)
-
-    Assigns the \a other fragment to this fragment.
-*/
 QTextDocumentFragment &QTextDocumentFragment::operator=(const QTextDocumentFragment &rhs)
 {
    if (rhs.d) {
@@ -315,9 +298,6 @@ QTextDocumentFragment &QTextDocumentFragment::operator=(const QTextDocumentFragm
    return *this;
 }
 
-/*!
-    Destroys the document fragment.
-*/
 QTextDocumentFragment::~QTextDocumentFragment()
 {
    if (d && !d->ref.deref()) {
@@ -325,20 +305,11 @@ QTextDocumentFragment::~QTextDocumentFragment()
    }
 }
 
-/*!
-    Returns true if the fragment is empty; otherwise returns false.
-*/
 bool QTextDocumentFragment::isEmpty() const
 {
    return !d || !d->doc || d->doc->docHandle()->length() <= 1;
 }
 
-/*!
-    Returns the document fragment's text as plain text (i.e. with no
-    formatting information).
-
-    \sa toHtml()
-*/
 QString QTextDocumentFragment::toPlainText() const
 {
    if (!d) {
@@ -397,7 +368,6 @@ QTextHtmlImporter::QTextHtmlImporter(QTextDocument *_doc, const QString &_html, 
    if (startFragmentPos != -1) {
       QString qt3RichTextHeader("<meta name=\"qrichtext\" content=\"1\" />");
 
-      // backward compaitbitly for Qt3 RTF file format
       const bool hasQtRichtextMetaTag = html.contains(qt3RichTextHeader);
 
       const int endFragmentPos = html.indexOf("<!--EndFragment-->");
@@ -413,19 +383,21 @@ QTextHtmlImporter::QTextHtmlImporter(QTextDocument *_doc, const QString &_html, 
    }
 
    parse(html, resourceProvider ? resourceProvider : doc);
-   //  dumpHtml();
 }
 
 void QTextHtmlImporter::import()
 {
    cursor.beginEditBlock();
+
    hasBlock = true;
    forceBlockMerging = false;
    compressNextWhitespace = RemoveWhiteSpace;
-   blockTagClosed = false;
+
+   m_blockTagClosed = false;
+
    for (currentNodeIdx = 0; currentNodeIdx < count(); ++currentNodeIdx) {
       currentNode = &at(currentNodeIdx);
-      wsm = textEditMode ? QTextHtmlParserNode::WhiteSpacePreWrap : currentNode->wsm;
+      wsm = m_textEditMode ? QTextHtmlParserNode::WhiteSpacePreWrap : currentNode->wsm;
 
       /*
        * process each node in three stages:
@@ -446,31 +418,35 @@ void QTextHtmlImporter::import()
        *  2) the current node not being a child of the previous node
        *      means there was a tag closing in the input html
        */
-      if (currentNodeIdx > 0 && (currentNode->parent != currentNodeIdx - 1)) {
-         blockTagClosed = closeTag();
+
+      if (currentNodeIdx > 0 && (currentNode->m_parserNodeParent != currentNodeIdx - 1)) {
+         m_blockTagClosed = closeTag();
+
          // visually collapse subsequent block tags, but if the element after the closed block tag
          // is for example an inline element (!isBlock) we have to make sure we start a new paragraph by setting
          // hasBlock to false.
 
-         if (blockTagClosed && !currentNode->isBlock() && currentNode->id != Html_unknown) {
+         if (m_blockTagClosed && ! currentNode->isBlock() && currentNode->id != Html_unknown) {
             hasBlock = false;
 
-         } else if (blockTagClosed && hasBlock) {
+         } else if (m_blockTagClosed && hasBlock) {
             // when collapsing subsequent block tags we need to clear the block format
             QTextBlockFormat blockFormat = currentNode->blockFormat;
             blockFormat.setIndent(indent);
 
             QTextBlockFormat oldFormat = cursor.blockFormat();
+
             if (oldFormat.hasProperty(QTextFormat::PageBreakPolicy)) {
                QTextFormat::PageBreakFlags pageBreak = oldFormat.pageBreakPolicy();
-               if (pageBreak == QTextFormat::PageBreak_AlwaysAfter)
-                  /* We remove an empty paragrah that requested a page break after.
-                     moving that request to the next paragraph means we also need to make
-                      that a pagebreak before to keep the same visual appearance.
-                  */
-               {
+
+               if (pageBreak == QTextFormat::PageBreak_AlwaysAfter) {
+                  // We remove an empty paragrah that requested a page break after.
+                  // moving that request to the next paragraph means we also need to make
+                  // that a pagebreak before to keep the same visual appearance.
+
                   pageBreak = QTextFormat::PageBreak_AlwaysBefore;
                }
+
                blockFormat.setPageBreakPolicy(pageBreak);
             }
 
@@ -491,11 +467,8 @@ void QTextHtmlImporter::import()
       }
 
       // make sure there's a block for 'Blah' after <ul><li>foo</ul>Blah
-      if (blockTagClosed
-         && !hasBlock
-         && !currentNode->isBlock()
-         && !currentNode->text.isEmpty() && !currentNode->hasOnlyWhitespace()
-         && currentNode->displayMode == QTextHtmlElement::DisplayInline) {
+      if (m_blockTagClosed && ! hasBlock && ! currentNode->isBlock() && ! currentNode->text.isEmpty() &&
+            ! currentNode->hasOnlyWhitespace() && currentNode->displayMode == QTextHtmlElement::DisplayInline) {
 
          QTextBlockFormat block = currentNode->blockFormat;
          block.setIndent(indent);
@@ -550,10 +523,10 @@ bool QTextHtmlImporter::appendNodeText()
             continue;
          }
 
-         if (wsm == QTextHtmlParserNode::WhiteSpacePre || textEditMode) {
+         if (wsm == QTextHtmlParserNode::WhiteSpacePre || m_textEditMode) {
 
             if (ch == '\n') {
-               if (textEditMode) {
+               if (m_textEditMode) {
                   continue;
                }
 
@@ -637,14 +610,16 @@ QTextHtmlImporter::ProcessNodeResult QTextHtmlImporter::processSpecialNodes()
       case Html_ul: {
          QTextListFormat::Style style = currentNode->listStyle;
 
-         if (currentNode->id == Html_ul && !currentNode->hasOwnListStyle && currentNode->parent) {
-            const QTextHtmlParserNode *n = &at(currentNode->parent);
+         if (currentNode->id == Html_ul && !currentNode->hasOwnListStyle && currentNode->m_parserNodeParent) {
+            const QTextHtmlParserNode *n = &at(currentNode->m_parserNodeParent);
+
             while (n) {
                if (n->id == Html_ul) {
                   style = nextListStyle(currentNode->listStyle);
                }
-               if (n->parent) {
-                  n = &at(n->parent);
+
+               if (n->m_parserNodeParent) {
+                  n = &at(n->m_parserNodeParent);
                } else {
                   n = nullptr;
                }
@@ -738,16 +713,17 @@ QTextHtmlImporter::ProcessNodeResult QTextHtmlImporter::processSpecialNodes()
    return ContinueWithCurrentNode;
 }
 
-// returns true if a block tag was closed
 bool QTextHtmlImporter::closeTag()
 {
    const QTextHtmlParserNode *closedNode = &at(currentNodeIdx - 1);
    const int endDepth = depth(currentNodeIdx) - 1;
    int depth = this->depth(currentNodeIdx - 1);
+
    bool blockTagClosed = false;
 
    while (depth > endDepth) {
       Table *t = nullptr;
+
       if (!tables.isEmpty()) {
          t = &tables.last();
       }
@@ -786,11 +762,12 @@ bool QTextHtmlImporter::closeTag()
                }
             }
 
-            // we don't need an extra block after tables, so we don't
-            // claim to have closed one for the creation of a new one
-            // in import()
+            // do not need an extra block after tables, so do not
+            // claim to have closed one for the creation of a new one in import()
+
             blockTagClosed = false;
             compressNextWhitespace = RemoveWhiteSpace;
+
             break;
 
          case Html_th:
@@ -798,8 +775,10 @@ bool QTextHtmlImporter::closeTag()
             if (t && !t->isTextFrame) {
                ++t->currentCell;
             }
+
             blockTagClosed = true;
             compressNextWhitespace = RemoveWhiteSpace;
+
             break;
 
          case Html_ol:
@@ -807,9 +786,11 @@ bool QTextHtmlImporter::closeTag()
             if (lists.isEmpty()) {
                break;
             }
+
             lists.resize(lists.size() - 1);
             --indent;
             blockTagClosed = true;
+
             break;
 
          case Html_br:
@@ -829,7 +810,7 @@ bool QTextHtmlImporter::closeTag()
             break;
       }
 
-      closedNode = &at(closedNode->parent);
+      closedNode = &at(closedNode->m_parserNodeParent);
       --depth;
    }
 
@@ -1064,13 +1045,12 @@ QTextHtmlImporter::ProcessNodeResult QTextHtmlImporter::processBlockNode()
    int bottomMargin = this->bottomMargin(currentNodeIdx);
 
    // for list items we may want to collapse with the bottom margin of the list.
-   const QTextHtmlParserNode *parentNode = currentNode->parent ? &at(currentNode->parent) : nullptr;
+   const QTextHtmlParserNode *parentNode = currentNode->m_parserNodeParent ? &at(currentNode->m_parserNodeParent) : nullptr;
 
-   if ((currentNode->id == Html_li || currentNode->id == Html_dt || currentNode->id == Html_dd)
-      && parentNode
-      && (parentNode->isListStart() || parentNode->id == Html_dl)
-      && (parentNode->children.last() == currentNodeIdx)) {
-      bottomMargin = qMax(bottomMargin, this->bottomMargin(currentNode->parent));
+   if ((currentNode->id == Html_li || currentNode->id == Html_dt || currentNode->id == Html_dd) &&
+         parentNode && (parentNode->isListStart() || parentNode->id == Html_dl) &&
+         (parentNode->children.last() == currentNodeIdx)) {
+      bottomMargin = qMax(bottomMargin, this->bottomMargin(currentNode->m_parserNodeParent));
    }
 
    if (block.bottomMargin() != bottomMargin) {
@@ -1177,7 +1157,8 @@ QTextHtmlImporter::ProcessNodeResult QTextHtmlImporter::processBlockNode()
    }
 
    hasBlock = true;
-   blockTagClosed = false;
+   m_blockTagClosed = false;
+
    return ContinueWithCurrentNode;
 }
 

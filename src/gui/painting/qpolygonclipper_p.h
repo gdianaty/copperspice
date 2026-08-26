@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -50,7 +50,7 @@ template <typename InType, typename OutType, typename CastType> class QPolygonCl
       return QRect(QPoint(x1, y1), QPoint(x2, y2));
    }
 
-   inline OutType intersectLeft(const OutType &p1, const OutType &p2) {
+   OutType intersectLeft(const OutType &p1, const OutType &p2) {
       OutType t;
       qreal dy = (p1.y - p2.y) / qreal(p1.x - p2.x);
       t.x = x1;
@@ -58,7 +58,7 @@ template <typename InType, typename OutType, typename CastType> class QPolygonCl
       return t;
    }
 
-   inline OutType intersectRight(const OutType &p1, const OutType &p2) {
+   OutType intersectRight(const OutType &p1, const OutType &p2) {
       OutType t;
       qreal dy = (p1.y - p2.y) / qreal(p1.x - p2.x);
       t.x = x2;
@@ -66,7 +66,7 @@ template <typename InType, typename OutType, typename CastType> class QPolygonCl
       return t;
    }
 
-   inline OutType intersectTop(const OutType &p1, const OutType &p2) {
+   OutType intersectTop(const OutType &p1, const OutType &p2) {
       OutType t;
       qreal dx = (p1.x - p2.x) / qreal(p1.y - p2.y);
       t.x = static_cast<CastType>(p2.x + (y1 - p2.y) * dx);
@@ -74,7 +74,7 @@ template <typename InType, typename OutType, typename CastType> class QPolygonCl
       return t;
    }
 
-   inline OutType intersectBottom(const OutType &p1, const OutType &p2) {
+   OutType intersectBottom(const OutType &p1, const OutType &p2) {
       OutType t;
       qreal dx = (p1.x - p2.x) / qreal(p1.y - p2.y);
       t.x = static_cast<CastType>(p2.x + (y2 - p2.y) * dx);

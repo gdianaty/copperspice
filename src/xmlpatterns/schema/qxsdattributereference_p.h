@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,8 +24,9 @@
 #ifndef QXsdAttributeReference_P_H
 #define QXsdAttributeReference_P_H
 
+#include <qsourcelocation.h>
+
 #include <qxsdattributeuse_p.h>
-#include <QSourceLocation>
 
 namespace QPatternist {
 
@@ -34,54 +35,21 @@ class XsdAttributeReference : public XsdAttributeUse
  public:
    typedef QExplicitlySharedDataPointer<XsdAttributeReference> Ptr;
 
-   /**
-    * Describes the type of the attribute reference.
-    */
    enum Type {
-      AttributeUse,   ///< The reference points to an attribute use.
-      AttributeGroup  ///< The reference points to an attribute group.
+      AttributeUse,      // reference points to an attribute use
+      AttributeGroup     // reference points to an attribute group
    };
 
-   /**
-    * Always returns false, used to avoid dynamic casts.
-    */
    bool isAttributeUse() const override;
-
-   /**
-    * Always returns true, used to avoid dynamic casts.
-    */
    bool isReference() const override;
 
-   /**
-    * Sets the @p type of the attribute reference.
-    */
    void setType(Type type);
-
-   /**
-    * Returns the type of the attribute reference.
-    */
    Type type() const;
 
-   /**
-    * Sets the @p name of the attribute or attribute group the
-    * attribute reference refers to.
-    */
    void setReferenceName(const QXmlName &name);
-
-   /**
-    * Returns the name of the attribute or attribute group the
-    * attribute reference refers to.
-    */
    QXmlName referenceName() const;
 
-   /**
-    * Sets the source @p location where the reference is located.
-    */
    void setSourceLocation(const QSourceLocation &location);
-
-   /**
-    * Returns the source location where the reference is located.
-    */
    QSourceLocation sourceLocation() const;
 
  private:

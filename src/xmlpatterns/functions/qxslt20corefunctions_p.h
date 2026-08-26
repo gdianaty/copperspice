@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,19 +26,17 @@
 
 #include <qabstractfunctionfactory_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class XSLT20CoreFunctions : public AbstractFunctionFactory
 {
  protected:
-   Expression::Ptr retrieveExpression(const QXmlName name, const Expression::List &args, 
+   Expression::Ptr retrieveExpression(const QXmlName name, const Expression::List &args,
                   const FunctionSignature::Ptr &sign) const override;
 
    FunctionSignature::Ptr retrieveFunctionSignature(const NamePool::Ptr &np, const QXmlName name) override;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

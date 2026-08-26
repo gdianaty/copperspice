@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,9 @@
 #ifndef QXMLFORMATTER_H
 #define QXMLFORMATTER_H
 
-#include <QXmlSerializer>
 #include <qstringfwd.h>
+#include <qxmlserializer.h>
 
-QT_BEGIN_NAMESPACE
 class QIODevice;
 class QTextCodec;
 class QXmlQuery;
@@ -55,16 +54,11 @@ class Q_XMLPATTERNS_EXPORT QXmlFormatter : public QXmlSerializer
    int indentationDepth() const;
    void setIndentationDepth(int depth);
 
-   /* The members below are internal, not part of the public API, and
-    * unsupported. Using them leads to undefined behavior. */
    void item(const QPatternist::Item &item) override;
 
  private:
    inline void startFormattingContent();
    Q_DECLARE_PRIVATE(QXmlFormatter)
 };
-
-QT_END_NAMESPACE
-
 
 #endif

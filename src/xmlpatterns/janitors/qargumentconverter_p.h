@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,11 +24,10 @@
 #ifndef QArgumentConverter_P_H
 #define QArgumentConverter_P_H
 
-#include "quntypedatomicconverter_p.h"
-
-QT_BEGIN_NAMESPACE
+#include <quntypedatomicconverter_p.h>
 
 namespace QPatternist {
+
 class ArgumentConverter : public UntypedAtomicConverter
 {
  public:
@@ -48,8 +47,7 @@ class ArgumentConverter : public UntypedAtomicConverter
    typedef QExplicitlySharedDataPointer<const ArgumentConverter> ConstPtr;
 
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,10 +29,7 @@
 #include "qliteral_p.h"
 #include "qschemanumeric_p.h"
 #include "qvaluecomparison_p.h"
-
 #include "qoptimizerblocks_p.h"
-
-QT_BEGIN_NAMESPACE
 
 using namespace QPatternist;
 
@@ -151,5 +148,3 @@ Expression::Ptr ByIDCreator::create(const Expression::ID id,
    context->wrapExpressionWith(r, result);
    return result;
 }
-
-QT_END_NAMESPACE

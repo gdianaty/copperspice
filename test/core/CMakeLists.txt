@@ -6,22 +6,6 @@ set_target_properties(CsCoreTest
    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/test"
 )
 
-if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
-   if (MSVC)
-      # CopperSpice must be compiled with C++20 in order to run the unit test for C++20
-
-   else()
-      set_target_properties(CsCoreTest
-         PROPERTIES
-
-         # only a request for C++20
-         CXX_STANDARD_REQUIRED OFF
-         CXX_STANDARD 20
-      )
-
-   endif()
-endif()
-
 if (CS_INSTALL_MODE STREQUAL "Deploy" AND CMAKE_SYSTEM_NAME MATCHES "Windows")
 
    STRING(CONCAT CORE_BATCH_FILE
@@ -66,6 +50,7 @@ target_sources(CsCoreTest
    PRIVATE
    ${CMAKE_CURRENT_SOURCE_DIR}/../catch2/catch.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/../cs_catch2.h
+   ${CMAKE_CURRENT_SOURCE_DIR}/../cs_catch_defines.h
 
    ${CMAKE_CURRENT_SOURCE_DIR}/test_main.cpp
 
@@ -75,6 +60,7 @@ target_sources(CsCoreTest
    ${CMAKE_CURRENT_SOURCE_DIR}/concurrent/qthreadpool.cpp
 
    ${CMAKE_CURRENT_SOURCE_DIR}/containers/qcache.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/containers/qcontiguouscache.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/containers/qflatmap.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/containers/qhash.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/containers/qlinkedlist.cpp
@@ -96,8 +82,12 @@ target_sources(CsCoreTest
    ${CMAKE_CURRENT_SOURCE_DIR}/io/qdatastream.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/io/qdebug.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/io/qdir.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/io/qdiriterator.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/io/qfile.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/io/qfiledevice.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/io/qfileinfo.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/io/qfileinfolist.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/io/qformat.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/io/qiodevice.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/io/qlockfile.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/io/qresource.cpp
@@ -106,6 +96,7 @@ target_sources(CsCoreTest
    ${CMAKE_CURRENT_SOURCE_DIR}/io/qtemporarydir.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/io/qtemporaryfile.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/io/qurl.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/io/qurlquery.cpp
 
    ${CMAKE_CURRENT_SOURCE_DIR}/json/qjsonarray.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/json/qjsondocument.cpp
@@ -125,10 +116,10 @@ target_sources(CsCoreTest
    ${CMAKE_CURRENT_SOURCE_DIR}/pointer/qpointer.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/pointer/qscopedarraypointer.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/pointer/qscopedpointer.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/pointer/qsharedarraypointer.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/pointer/qsharedpointer.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/pointer/qweakpointer.cpp
 
-   ${CMAKE_CURRENT_SOURCE_DIR}/string/cs_string.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/string/qchar.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/string/qreqularexpression.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/string/qstring8.cpp
@@ -141,11 +132,13 @@ target_sources(CsCoreTest
    ${CMAKE_CURRENT_SOURCE_DIR}/thread/qmutex.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/thread/qreadwritelock.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/thread/qthread.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/thread/qthreadstorage.cpp
 
    ${CMAKE_CURRENT_SOURCE_DIR}/tools/qbitarray.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/tools/qbytearray.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/tools/qcommandlineoption.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/tools/qcommandlineparser.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/tools/qeasingcurve.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/tools/qelapsedtimer.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/tools/qline.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/tools/qlinef.cpp
@@ -159,6 +152,12 @@ target_sources(CsCoreTest
    ${CMAKE_CURRENT_SOURCE_DIR}/tools/qsize.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/tools/qsizef.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/tools/qtextboundaryfinder.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/tools/qtimeline.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/tools/qvarlengtharray.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/tools/qversionnumber.cpp
+
+   ${CMAKE_CURRENT_SOURCE_DIR}/xml/qxmlstreamreader.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/xml/qxmlstreamwriter.cpp
 
    ${CMAKE_CURRENT_SOURCE_DIR}/kernel/test_de.ts
 

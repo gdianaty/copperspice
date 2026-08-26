@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,37 +26,22 @@
 
 #include <qanytype_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 class AtomicType;
 
 class Untyped : public AnyType
 {
  public:
-
    typedef QExplicitlySharedDataPointer<Untyped> Ptr;
 
-   /**
-    * @returns always BuiltinTypes::xsAnyType.
-    */
    SchemaType::Ptr wxsSuperType() const override;
 
    QXmlName name(const NamePool::Ptr &np) const override;
 
-   /**
-    * @returns always <tt>xs:untypedAtomic</tt>
-    */
    virtual ItemType::Ptr atomizedType() const;
 
-   /**
-    * @returns always SchemaType::ComplexType
-    */
    TypeCategory category() const override;
 
-   /**
-    * @returns always NoDerivation
-    */
    DerivationMethod derivationMethod() const override;
 
  protected:
@@ -64,8 +49,7 @@ class Untyped : public AnyType
 
    Untyped();
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

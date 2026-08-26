@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,26 +26,17 @@
 
 #include <qstaticnamespacescontainer_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class SystemPropertyFN : public StaticNamespacesContainer
 {
  public:
    Item evaluateSingleton(const DynamicContext::Ptr &context) const override;
 
  private:
-   /**
-    * Returns a string representation for @p property as defined
-    * for the system properties in "XSL Transformations (XSLT)
-    * Version 2.0, 16.6.5 system-property". Hence, this function
-    * handles only the properties specified in the XSL namespace, and returns
-    * an empty string if an unrecognized property is asked for.
-    */
    static QString retrieveProperty(const QXmlName name);
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

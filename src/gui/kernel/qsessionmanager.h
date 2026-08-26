@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,10 +25,10 @@
 #define QSESSIONMANAGER_H
 
 #include <qobject.h>
-#include <qwindowdefs.h>
+#include <qscopedpointer.h>
 #include <qstring.h>
 #include <qstringlist.h>
-#include <QScopedPointer>
+#include <qwindowdefs.h>
 
 #ifndef QT_NO_SESSIONMANAGER
 

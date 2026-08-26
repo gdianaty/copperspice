@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,12 @@
 #include <qpaintengine_preview_p.h>
 
 #include <qalgorithms.h>
-#include <qprintengine.h>
 #include <qpainter.h>
 #include <qpicture.h>
+#include <qprintengine.h>
 
-#include <qpainter_p.h>
 #include <qpaintengine_p.h>
+#include <qpainter_p.h>
 #include <qpicture_p.h>
 
 #ifndef QT_NO_PRINTPREVIEWWIDGET
@@ -135,6 +135,7 @@ bool QPreviewPaintEngine::newPage()
 
    QPicture *page = new QPicture;
    page->d_func()->in_memory_only = true;
+
    QPainter *tmp_painter = new QPainter(page);
    QPaintEngine *tmp_engine = tmp_painter->paintEngine();
 
@@ -142,8 +143,8 @@ bool QPreviewPaintEngine::newPage()
    Q_ASSERT(painter()->d_func()->state && tmp_painter->d_func()->state);
    *tmp_painter->d_func()->state = *painter()->d_func()->state;
 
-   // composition modes aren't supported on a QPrinter and yields a
-   // warning, so ignore it for now
+   // composition modes are not supported on a QPrinter and yields a warning
+   // ignore it for now
    tmp_engine->setDirty(DirtyFlags(AllDirty & ~DirtyCompositionMode));
    tmp_engine->syncState();
 

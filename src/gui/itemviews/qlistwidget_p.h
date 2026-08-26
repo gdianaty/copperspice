@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,8 +26,9 @@
 
 #include <qabstractitemmodel.h>
 #include <qabstractitemview.h>
-#include <qlistwidget.h>
 #include <qitemdelegate.h>
+#include <qlistwidget.h>
+
 #include <qlistview_p.h>
 #include <qwidgetitemdata_p.h>
 
@@ -36,7 +37,7 @@
 class QListModelLessThan
 {
  public:
-   inline bool operator()(QListWidgetItem *i1, QListWidgetItem *i2) const {
+   bool operator()(QListWidgetItem *i1, QListWidgetItem *i2) const {
       return *i1 < *i2;
    }
 };
@@ -44,7 +45,7 @@ class QListModelLessThan
 class QListModelGreaterThan
 {
  public:
-   inline bool operator()(QListWidgetItem *i1, QListWidgetItem *i2) const {
+   bool operator()(QListWidgetItem *i1, QListWidgetItem *i2) const {
       return *i2 < *i1;
    }
 };
@@ -111,8 +112,6 @@ class QListModel : public QAbstractListModel
    friend class QListWidget;
 };
 
-
-
 class QListWidgetPrivate : public QListViewPrivate
 {
    Q_DECLARE_PUBLIC(QListWidget)
@@ -120,7 +119,7 @@ class QListWidgetPrivate : public QListViewPrivate
  public:
    QListWidgetPrivate() : QListViewPrivate(), sortOrder(Qt::AscendingOrder), sortingEnabled(false) {}
 
-   inline QListModel *listModel() const {
+   QListModel *listModel() const {
       return qobject_cast<QListModel *>(model);
    }
 

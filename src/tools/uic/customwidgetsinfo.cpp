@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,6 +22,7 @@
 ***********************************************************************/
 
 #include <customwidgetsinfo.h>
+
 #include <driver.h>
 #include <ui4.h>
 #include <utils.h>
@@ -97,20 +98,6 @@ QString CustomWidgetsInfo::realClassName(const QString &className) const
    }
 
    return className;
-}
-
-DomScript *CustomWidgetsInfo::customWidgetScript(const QString &name) const
-{
-   if (m_customWidgets.empty()) {
-      return nullptr;
-   }
-
-   const NameCustomWidgetMap::const_iterator iter = m_customWidgets.constFind(name);
-   if (iter == m_customWidgets.constEnd()) {
-      return nullptr;
-   }
-
-   return iter.value()->elementScript();
 }
 
 QString CustomWidgetsInfo::customWidgetAddPageMethod(const QString &name) const

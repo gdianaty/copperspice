@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -36,8 +36,8 @@ Q_CORE_EXPORT double qSNaN();
 Q_CORE_EXPORT double qQNaN();
 Q_CORE_EXPORT double qInf();
 
-#define Q_INFINITY (QT_PREPEND_NAMESPACE(qInf)())
-#define Q_SNAN (QT_PREPEND_NAMESPACE(qSNaN)())
-#define Q_QNAN (QT_PREPEND_NAMESPACE(qQNaN)())
+#define Q_INFINITY   (qInf())
+#define Q_SNAN       (qSNaN())
+#define Q_QNAN       (qQNaN())
 
 #endif

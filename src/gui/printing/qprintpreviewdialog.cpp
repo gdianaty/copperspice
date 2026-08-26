@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,26 +22,27 @@
 ***********************************************************************/
 
 #include <qprintpreviewdialog.h>
-#include <qprintpreviewwidget.h>
-#include <qprinter_p.h>
-#include <qdialog_p.h>
-#include <qprintdialog.h>
 
 #include <qaction.h>
 #include <qboxlayout.h>
 #include <qcombobox.h>
+#include <qcoreapplication.h>
+#include <qfiledialog.h>
+#include <qformlayout.h>
 #include <qlabel.h>
 #include <qlineedit.h>
+#include <qmainwindow.h>
 #include <qpagesetupdialog.h>
+#include <qprintdialog.h>
 #include <qprinter.h>
+#include <qprintpreviewwidget.h>
 #include <qstyle.h>
+#include <qtoolbar.h>
 #include <qtoolbutton.h>
 #include <qvalidator.h>
-#include <qfiledialog.h>
-#include <qmainwindow.h>
-#include <qtoolbar.h>
-#include <qformlayout.h>
-#include <QCoreApplication>
+
+#include <qdialog_p.h>
+#include <qprinter_p.h>
 
 #ifndef QT_NO_PRINTPREVIEWDIALOG
 
@@ -50,7 +51,7 @@ class QPrintPreviewMainWindow : public QMainWindow
  public:
    QPrintPreviewMainWindow(QWidget *parent)
       : QMainWindow(parent)
-   {}
+   { }
 
    QMenu *createPopupMenu() override {
       return nullptr;
@@ -61,29 +62,34 @@ class ZoomFactorValidator : public QDoubleValidator
 {
  public:
    ZoomFactorValidator(QObject *parent)
-      : QDoubleValidator(parent) {}
+      : QDoubleValidator(parent)
+   { }
 
    ZoomFactorValidator(qreal bottom, qreal top, int decimals, QObject *parent)
-      : QDoubleValidator(bottom, top, decimals, parent) {}
+      : QDoubleValidator(bottom, top, decimals, parent)
+   { }
 
    State validate(QString &input, int &pos) const override {
       bool replacePercent = false;
-      if (input.endsWith(QLatin1Char('%'))) {
+      if (input.endsWith(QChar('%'))) {
          input = input.left(input.length() - 1);
          replacePercent = true;
       }
+
       State state = QDoubleValidator::validate(input, pos);
       if (replacePercent) {
-         input += QLatin1Char('%');
+         input += QChar('%');
       }
+
       const int num_size = 4;
       if (state == Intermediate) {
          int i = input.indexOf(QLocale::system().decimalPoint());
-         if ((i == -1 && input.size() > num_size)
-            || (i != -1 && i > num_size)) {
+
+         if ((i == -1 && input.size() > num_size) || (i != -1 && i > num_size)) {
             return Invalid;
          }
       }
+
       return state;
    }
 };
@@ -94,9 +100,10 @@ class LineEdit : public QLineEdit
 
  public:
    LineEdit(QWidget *parent = nullptr)
-      : QLineEdit(parent) {
+      : QLineEdit(parent)
+   {
       setContextMenuPolicy(Qt::NoContextMenu);
-      connect(this, SIGNAL(returnPressed()), this, SLOT(handleReturnPressed()));
+      connect(this, &LineEdit::returnPressed, this, &LineEdit::handleReturnPressed);
    }
 
  protected:
@@ -106,9 +113,10 @@ class LineEdit : public QLineEdit
    }
 
    void focusOutEvent(QFocusEvent *e) override {
-      if (isModified() && !hasAcceptableInput()) {
+      if (isModified() && ! hasAcceptableInput()) {
          setText(origText);
       }
+
       QLineEdit::focusOutEvent(e);
    }
 
@@ -117,7 +125,6 @@ class LineEdit : public QLineEdit
    GUI_CS_SLOT_2(handleReturnPressed)
 
    QString origText;
-
 };
 
 void LineEdit::handleReturnPressed()
@@ -214,8 +221,8 @@ void QPrintPreviewDialogPrivate::init(QPrinter *_printer)
       preview = new QPrintPreviewWidget(printer, q);
    }
 
-   QObject::connect(preview, SIGNAL(paintRequested(QPrinter *)), q, SLOT(paintRequested(QPrinter *)));
-   QObject::connect(preview, SIGNAL(previewChanged()), q, SLOT(_q_previewChanged()));
+   QObject::connect(preview, &QPrintPreviewWidget::paintRequested, q, &QPrintPreviewDialog::paintRequested);
+   QObject::connect(preview, &QPrintPreviewWidget::previewChanged, q, &QPrintPreviewDialog::_q_previewChanged);
    setupActions();
 
    pageNumEdit = new LineEdit;
@@ -223,7 +230,7 @@ void QPrintPreviewDialogPrivate::init(QPrinter *_printer)
    pageNumEdit->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
    pageNumLabel = new QLabel;
 
-   QObject::connect(pageNumEdit, SIGNAL(editingFinished()), q, SLOT(_q_pageNumEdited()));
+   QObject::connect(pageNumEdit, &LineEdit::editingFinished, q, &QPrintPreviewDialog::_q_pageNumEdited);
 
    zoomFactor = new QComboBox;
    zoomFactor->setEditable(true);
@@ -238,8 +245,8 @@ void QPrintPreviewDialogPrivate::init(QPrinter *_printer)
       zoomFactor->addItem(QPrintPreviewDialog::tr("%1%").formatArg(factorsX2[i] / 2.0));
    }
 
-   QObject::connect(zoomFactor->lineEdit(), SIGNAL(editingFinished()), q, SLOT(_q_zoomFactorChanged()));
-   QObject::connect(zoomFactor, SIGNAL(currentIndexChanged(int)), q, SLOT(_q_zoomFactorChanged()));
+   QObject::connect(zoomFactor->lineEdit(), &QLineEdit::editingFinished, q, &QPrintPreviewDialog::_q_zoomFactorChanged);
+   QObject::connect(zoomFactor, cs_mp_cast<int>(&QComboBox::currentIndexChanged), q, &QPrintPreviewDialog::_q_zoomFactorChanged);
 
    QPrintPreviewMainWindow *mw = new QPrintPreviewMainWindow(q);
    QToolBar *toolbar = new QToolBar(mw);
@@ -307,8 +314,9 @@ void QPrintPreviewDialogPrivate::init(QPrinter *_printer)
    zoomOutButton->setAutoRepeat(true);
    zoomOutButton->setAutoRepeatInterval(200);
    zoomOutButton->setAutoRepeatDelay(200);
-   QObject::connect(zoomInButton, SIGNAL(clicked()), q, SLOT(_q_zoomIn()));
-   QObject::connect(zoomOutButton, SIGNAL(clicked()), q, SLOT(_q_zoomOut()));
+
+   QObject::connect(zoomInButton,  &QToolButton::clicked, q, &QPrintPreviewDialog::_q_zoomIn);
+   QObject::connect(zoomOutButton, &QToolButton::clicked, q, &QPrintPreviewDialog::_q_zoomOut);
 
    mw->addToolBar(toolbar);
    mw->setCentralWidget(preview);
@@ -367,7 +375,8 @@ void QPrintPreviewDialogPrivate::setupActions()
    qt_setupActionIcon(prevPageAction,  "go-previous");
    qt_setupActionIcon(firstPageAction, "go-first");
    qt_setupActionIcon(lastPageAction,  "go-last");
-   QObject::connect(navGroup, SIGNAL(triggered(QAction *)), q, SLOT(_q_navigate(QAction *)));
+
+   QObject::connect(navGroup, &QActionGroup::triggered, q, &QPrintPreviewDialog::_q_navigate);
 
    fitGroup = new QActionGroup(q);
    fitWidthAction = fitGroup->addAction(QCoreApplication::translate("QPrintPreviewDialog", "Fit width"));
@@ -381,14 +390,14 @@ void QPrintPreviewDialogPrivate::setupActions()
    qt_setupActionIcon(fitWidthAction, "fit-width");
    qt_setupActionIcon(fitPageAction,  "fit-page");
 
-   QObject::connect(fitGroup, SIGNAL(triggered(QAction *)), q, SLOT(_q_fit(QAction *)));
+   QObject::connect(fitGroup, &QActionGroup::triggered, q, &QPrintPreviewDialog::_q_fit);
 
    // Zoom
    zoomGroup = new QActionGroup(q);
    zoomInAction = zoomGroup->addAction(QCoreApplication::translate("QPrintPreviewDialog", "Zoom in"));
    zoomOutAction = zoomGroup->addAction(QCoreApplication::translate("QPrintPreviewDialog", "Zoom out"));
-   qt_setupActionIcon(zoomInAction,  QLatin1String("zoom-in"));
-   qt_setupActionIcon(zoomOutAction, QLatin1String("zoom-out"));
+   qt_setupActionIcon(zoomInAction,  "zoom-in");
+   qt_setupActionIcon(zoomOutAction, "zoom-out");
 
    // Portrait/Landscape
    orientationGroup = new QActionGroup(q);
@@ -396,39 +405,43 @@ void QPrintPreviewDialogPrivate::setupActions()
    landscapeAction = orientationGroup->addAction(QCoreApplication::translate("QPrintPreviewDialog", "Landscape"));
    portraitAction->setCheckable(true);
    landscapeAction->setCheckable(true);
-   qt_setupActionIcon(portraitAction, QLatin1String("layout-portrait"));
-   qt_setupActionIcon(landscapeAction, QLatin1String("layout-landscape"));
-   QObject::connect(portraitAction, SIGNAL(triggered(bool)), preview, SLOT(setPortraitOrientation()));
-   QObject::connect(landscapeAction, SIGNAL(triggered(bool)), preview, SLOT(setLandscapeOrientation()));
+   qt_setupActionIcon(portraitAction,  "layout-portrait");
+   qt_setupActionIcon(landscapeAction, "layout-landscape");
+
+   QObject::connect(portraitAction,  &QAction::triggered, preview, &QPrintPreviewWidget::setPortraitOrientation);
+   QObject::connect(landscapeAction, &QAction::triggered, preview, &QPrintPreviewWidget::setLandscapeOrientation);
 
    // Display mode
    modeGroup = new QActionGroup(q);
-   singleModeAction = modeGroup->addAction(QCoreApplication::translate("QPrintPreviewDialog", "Show single page"));
-   facingModeAction = modeGroup->addAction(QCoreApplication::translate("QPrintPreviewDialog", "Show facing pages"));
-   overviewModeAction = modeGroup->addAction(QCoreApplication::translate("QPrintPreviewDialog",
-            "Show overview of all pages"));
-   qt_setupActionIcon(singleModeAction, QLatin1String("view-page-one"));
-   qt_setupActionIcon(facingModeAction, QLatin1String("view-page-sided"));
-   qt_setupActionIcon(overviewModeAction, QLatin1String("view-page-multi"));
-   singleModeAction->setObjectName(QLatin1String("singleModeAction"));
-   facingModeAction->setObjectName(QLatin1String("facingModeAction"));
-   overviewModeAction->setObjectName(QLatin1String("overviewModeAction"));
+   singleModeAction = modeGroup->addAction(QCoreApplication::translate("QPrintPreviewDialog",   "Show single page"));
+   facingModeAction = modeGroup->addAction(QCoreApplication::translate("QPrintPreviewDialog",   "Show facing pages"));
+   overviewModeAction = modeGroup->addAction(QCoreApplication::translate("QPrintPreviewDialog", "Show overview of all pages"));
+
+   qt_setupActionIcon(singleModeAction,   "view-page-one");
+   qt_setupActionIcon(facingModeAction,   "view-page-sided");
+   qt_setupActionIcon(overviewModeAction, "view-page-multi");
+
+   singleModeAction->setObjectName("singleModeAction");
+   facingModeAction->setObjectName("facingModeAction");
+   overviewModeAction->setObjectName("overviewModeAction");
 
    singleModeAction->setCheckable(true);
    facingModeAction->setCheckable(true);
    overviewModeAction->setCheckable(true);
-   QObject::connect(modeGroup, SIGNAL(triggered(QAction *)), q, SLOT(_q_setMode(QAction *)));
+
+   QObject::connect(modeGroup, &QActionGroup::triggered, q, &QPrintPreviewDialog::_q_setMode);
 
    // Print
    printerGroup = new QActionGroup(q);
    printAction = printerGroup->addAction(QCoreApplication::translate("QPrintPreviewDialog", "Print"));
    pageSetupAction = printerGroup->addAction(QCoreApplication::translate("QPrintPreviewDialog", "Page setup"));
-   qt_setupActionIcon(printAction, QLatin1String("print"));
-   qt_setupActionIcon(pageSetupAction, QLatin1String("page-setup"));
-   QObject::connect(printAction, SIGNAL(triggered(bool)), q, SLOT(_q_print()));
-   QObject::connect(pageSetupAction, SIGNAL(triggered(bool)), q, SLOT(_q_pageSetup()));
+   qt_setupActionIcon(printAction, "print");
+   qt_setupActionIcon(pageSetupAction, "page-setup");
 
-   // Initial state:
+   QObject::connect(printAction,     &QAction::triggered, q, &QPrintPreviewDialog::_q_print);
+   QObject::connect(pageSetupAction, &QAction::triggered, q, &QPrintPreviewDialog::_q_pageSetup);
+
+   // Initial state
    fitPageAction->setChecked(true);
    singleModeAction->setChecked(true);
 
@@ -583,20 +596,24 @@ void QPrintPreviewDialogPrivate::_q_print()
    if (printer->outputFormat() != QPrinter::NativeFormat) {
 
       QString title = QCoreApplication::translate("QPrintPreviewDialog", "Export to PDF");
-      QString suffix = QLatin1String(".pdf");
+      QString suffix = ".pdf";
 
-      QString fileName = QFileDialog::getSaveFileName(q, title, printer->outputFileName(),
-            QLatin1Char('*') + suffix);
-      if (!fileName.isEmpty()) {
+      QString fileName = QFileDialog::getSaveFileName(q, title, printer->outputFileName(), QChar('*') + suffix);
+
+      if (! fileName.isEmpty()) {
          if (QFileInfo(fileName).suffix().isEmpty()) {
             fileName.append(suffix);
          }
+
          printer->setOutputFileName(fileName);
       }
+
       if (!printer->outputFileName().isEmpty()) {
          preview->print();
       }
+
       q->accept();
+
       return;
    }
 #endif
@@ -640,7 +657,7 @@ void QPrintPreviewDialogPrivate::_q_zoomFactorChanged()
 {
    QString text = zoomFactor->lineEdit()->text();
    bool ok;
-   qreal factor = text.remove(QLatin1Char('%')).toFloat(&ok);
+   qreal factor = text.remove(QChar('%')).toFloat(&ok);
    factor = qMax(qreal(1.0), qMin(qreal(1000.0), factor));
    if (ok) {
       preview->setZoomFactor(factor / 100.0);
@@ -672,9 +689,6 @@ QPrintPreviewDialog::~QPrintPreviewDialog()
    delete d->printDialog;
 }
 
-/*!
-    \reimp
-*/
 void QPrintPreviewDialog::setVisible(bool visible)
 {
    Q_D(QPrintPreviewDialog);
@@ -686,9 +700,6 @@ void QPrintPreviewDialog::setVisible(bool visible)
    QDialog::setVisible(visible);
 }
 
-/*!
-    \reimp
-*/
 void QPrintPreviewDialog::done(int result)
 {
    Q_D(QPrintPreviewDialog);
@@ -715,26 +726,11 @@ void QPrintPreviewDialog::open(QObject *receiver, const QString &member)
    QDialog::open();
 }
 
-/*!
-    Returns a pointer to the QPrinter object this dialog is currently
-    operating on.
-*/
 QPrinter *QPrintPreviewDialog::printer()
 {
    Q_D(QPrintPreviewDialog);
    return d->printer;
 }
-
-/*!
-    \fn void QPrintPreviewDialog::paintRequested(QPrinter *printer)
-
-    This signal is emitted when the QPrintPreviewDialog needs to generate
-    a set of preview pages.
-
-    The \a printer instance supplied is the paint device onto which you should
-    paint the contents of each page, using the QPrinter instance in the same way
-    as you would when printing directly.
-*/
 
 void QPrintPreviewDialog::_q_fit(QAction *action)
 {
@@ -797,5 +793,3 @@ void QPrintPreviewDialog::_q_zoomFactorChanged()
 }
 
 #endif // QT_NO_PRINTPREVIEWDIALOG
-
-

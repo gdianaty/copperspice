@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,19 +22,22 @@
 ***********************************************************************/
 
 #include <qnetworkinterface.h>
+
 #include <qnetworkinterface_p.h>
 
 #ifndef QT_NO_NETWORKINTERFACE
 
-#include <qhostinfo.h>
 #include <qhash.h>
+#include <qhostinfo.h>
 #include <qurl.h>
 
-// order dependant include files
+// order dependent
 #include <winsock2.h>
 #include <ws2ipdef.h>
 #include <iphlpapi.h>
 #include <ws2tcpip.h>
+
+// order dependent, must be after winsock2.h
 #include <qt_windows.h>
 
 #ifndef NETIO_STATUS
@@ -60,7 +63,7 @@ static QHostAddress addressFromSockaddr(sockaddr *sa)
       }
 
    } else {
-      qWarning("Got unknown socket family %d", sa->sa_family);
+      qWarning("QHostAddress::addressFromSockaddr() Unknown socket family %d", sa->sa_family);
    }
 
    return address;
@@ -98,11 +101,12 @@ static QHash<QHostAddress, QHostAddress> ipv4Netmasks()
    // iterate over the list and add the entries to our listing
    for (PIP_ADAPTER_INFO ptr = pAdapter; ptr; ptr = ptr->Next) {
       for (PIP_ADDR_STRING addr = &ptr->IpAddressList; addr; addr = addr->Next) {
-         QHostAddress address(QLatin1String(addr->IpAddress.String));
-         QHostAddress mask(QLatin1String(addr->IpMask.String));
+         QHostAddress address(addr->IpAddress.String);
+         QHostAddress mask(addr->IpMask.String);
          ipv4netmasks[address] = mask;
       }
    }
+
    if (pAdapter != staticBuf) {
       free(pAdapter);
    }

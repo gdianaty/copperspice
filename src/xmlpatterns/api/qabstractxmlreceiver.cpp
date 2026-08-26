@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -39,25 +39,16 @@ void QAbstractXmlReceiver::sendFromAxis(const QXmlNodeModelIndex &node)
    }
 }
 
-/*!
- \internal
- */
 QAbstractXmlReceiver::QAbstractXmlReceiver(QAbstractXmlReceiverPrivate *d)
    : d_ptr(d)
 {
 }
 
-/*!
-  Constructs an abstract xml receiver.
- */
 QAbstractXmlReceiver::QAbstractXmlReceiver()
    : d_ptr(nullptr)
 {
 }
 
-/*!
-  Destroys the xml receiver.
- */
 QAbstractXmlReceiver::~QAbstractXmlReceiver()
 {
 }
@@ -120,9 +111,6 @@ void QAbstractXmlReceiver::whitespaceOnly(QStringView value)
    characters(QStringView(v));
 }
 
-/*!
-  \internal
- */
 void QAbstractXmlReceiver::item(const QPatternist::Item &item)
 {
    if (item.isNode()) {

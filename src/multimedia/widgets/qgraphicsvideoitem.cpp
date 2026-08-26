@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,9 +24,9 @@
 #include <qgraphicsvideoitem.h>
 
 #include <qcoreevent.h>
-#include <qpointer.h>
 #include <qmediaobject.h>
 #include <qmediaservice.h>
+#include <qpointer.h>
 #include <qvideorenderercontrol.h>
 #include <qvideosurfaceformat.h>
 

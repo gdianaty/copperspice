@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,16 +25,16 @@
 #define QFILESYSTEMMODEL_H
 
 #include <qabstractitemmodel.h>
-#include <qpair.h>
 #include <qdir.h>
-#include <qicon.h>
 #include <qdiriterator.h>
+#include <qicon.h>
+#include <qpair.h>
 
 #ifndef QT_NO_FILESYSTEMMODEL
 
 class ExtendedInformation;
-class QFileSystemModelPrivate;
 class QFileIconProvider;
+class QFileSystemModelPrivate;
 
 class Q_GUI_EXPORT QFileSystemModel : public QAbstractItemModel
 {
@@ -135,7 +135,7 @@ class Q_GUI_EXPORT QFileSystemModel : public QAbstractItemModel
 
    inline QString fileName(const QModelIndex &index) const;
    inline QIcon fileIcon(const QModelIndex &index) const;
-   QFile::Permissions permissions(const QModelIndex &index) const;
+   QFileDevice::Permissions permissions(const QModelIndex &index) const;
    QFileInfo fileInfo(const QModelIndex &index) const;
    bool remove(const QModelIndex &index) const;
 

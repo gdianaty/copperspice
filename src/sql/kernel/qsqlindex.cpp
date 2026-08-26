@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -81,14 +81,6 @@ void QSqlIndex::setDescending(int i, bool desc)
       sorts[i] = desc;
    }
 }
-
-
-/*! \internal
-
-  Creates a string representing the field number \a i using prefix \a
-  prefix. If \a verbose is true, ASC or DESC is included in the field
-  description if the field is sorted in ASCending or DESCending order.
-*/
 
 QString QSqlIndex::createField(int i, const QString &prefix, bool verbose) const
 {

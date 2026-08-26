@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,10 @@
 #ifndef QWINDOWSCURSOR_H
 #define QWINDOWSCURSOR_H
 
-#include <qwin_additional.h>
+#include <qhash.h>
 #include <qplatform_cursor.h>
 #include <qsharedpointer.h>
-#include <qhash.h>
+#include <qwin_additional.h>
 
 struct QWindowsPixmapCursorCacheKey {
    explicit QWindowsPixmapCursorCacheKey(const QCursor &c);

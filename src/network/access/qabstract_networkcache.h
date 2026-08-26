@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,15 +24,15 @@
 #ifndef QABSTRACT_NETWORKCACHE_H
 #define QABSTRACT_NETWORKCACHE_H
 
-#include <qobject.h>
-#include <qshareddata.h>
-#include <qpair.h>
 #include <qnetwork_request.h>
+#include <qobject.h>
+#include <qpair.h>
+#include <qshareddata.h>
 
-class QIODevice;
-class QDateTime;
-class QNetworkCacheMetaDataPrivate;
 class QAbstractNetworkCachePrivate;
+class QDateTime;
+class QIODevice;
+class QNetworkCacheMetaDataPrivate;
 class QUrl;
 
 template <class T>
@@ -41,9 +41,9 @@ class QList;
 class Q_NETWORK_EXPORT QNetworkCacheMetaData
 {
  public:
-   typedef QPair<QByteArray, QByteArray> RawHeader;
-   typedef QList<RawHeader> RawHeaderList;
-   typedef QHash<QNetworkRequest::Attribute, QVariant> AttributesMap;
+   using RawHeader     = QPair<QByteArray, QByteArray>;
+   using RawHeaderList = QList<RawHeader>;
+   using AttributesMap = QHash<QNetworkRequest::Attribute, QVariant>;
 
    QNetworkCacheMetaData();
    QNetworkCacheMetaData(const QNetworkCacheMetaData &other);
@@ -55,10 +55,14 @@ class Q_NETWORK_EXPORT QNetworkCacheMetaData
    }
 
    QNetworkCacheMetaData &operator=(const QNetworkCacheMetaData &other);
-   void swap(QNetworkCacheMetaData &other)
-    { qSwap(d, other.d); }
+
+   void swap(QNetworkCacheMetaData &other) {
+      qSwap(d, other.d);
+   }
+
    bool operator==(const QNetworkCacheMetaData &other) const;
-   inline bool operator!=(const QNetworkCacheMetaData &other) const {
+
+   bool operator!=(const QNetworkCacheMetaData &other) const {
       return !(*this == other);
    }
 

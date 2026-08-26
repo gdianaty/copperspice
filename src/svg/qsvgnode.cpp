@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,11 +21,12 @@
 *
 ***********************************************************************/
 
-#include "qsvgnode_p.h"
-#include "qsvgtinydocument_p.h"
+#include <qsvgnode_p.h>
 
-#include "qdebug.h"
-#include "qstack.h"
+#include <qdebug.h>
+#include <qstack.h>
+
+#include <qsvgtinydocument_p.h>
 
 QSvgNode::QSvgNode(QSvgNode *parent)
    : m_parent(parent), m_visible(true), m_displayMode(BlockMode)
@@ -51,7 +52,6 @@ bool QSvgNode::isDescendantOf(const QSvgNode *parent) const
 
 void QSvgNode::appendStyleProperty(QSvgStyleProperty *prop, const QString &id)
 {
-   //qDebug()<<"appending "<<prop->type()<< " ("<< id <<") "<<"to "<<this<<this->type();
    QSvgTinyDocument *doc;
 
    switch (prop->type()) {
@@ -111,7 +111,10 @@ void QSvgNode::appendStyleProperty(QSvgStyleProperty *prop, const QString &id)
          break;
 
       default:
+#if defined(CS_SHOW_DEBUG_SVG)
          qDebug("QSvgNode: Trying to append unknown property!");
+#endif
+
          break;
    }
 }

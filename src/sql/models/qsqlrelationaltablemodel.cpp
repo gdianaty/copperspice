@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,8 +23,8 @@
 
 #include <qsqlrelationaltablemodel.h>
 
+#include <qdebug.h>
 #include <qhash.h>
-#include <qstringlist.h>
 #include <qsqldatabase.h>
 #include <qsqldriver.h>
 #include <qsqlerror.h>
@@ -32,20 +32,21 @@
 #include <qsqlindex.h>
 #include <qsqlquery.h>
 #include <qsqlrecord.h>
+#include <qstringlist.h>
 
 #include <qsqltablemodel_p.h>
-#include <qdebug.h>
+
+class QRelatedTableModel;
 
 class QSqlRelationalTableModelSql: public QSqlTableModelSql
 {
  public:
-   inline const static QString relTablePrefix(int i) {
+   const static QString relTablePrefix(int i) {
       return QString::number(i).prepend("relTblAl_");
    }
 };
 
-typedef QSqlRelationalTableModelSql Sql;
-class QRelatedTableModel;
+using Sql = QSqlRelationalTableModelSql;
 
 struct QRelation {
  public:
@@ -319,15 +320,14 @@ QSqlRelation QSqlRelationalTableModel::relation(int column) const
    return d->relations.value(column).rel;
 }
 
-QString QSqlRelationalTableModelPrivate::fullyQualifiedFieldName(const QString &tableName,
+QString QSqlRelationalTableModelPrivate::fullyQualifiedFieldName(const QString &newTableName,
    const QString &fieldName) const
 {
-   QString retval;
-   retval.append(tableName).append(QLatin1Char('.')).append(fieldName);
+   QString retval = newTableName;
+   retval.append(QChar('.')).append(fieldName);
 
    return retval;
 }
-
 
 QString QSqlRelationalTableModel::selectStatement() const
 {
@@ -357,15 +357,18 @@ QString QSqlRelationalTableModel::selectStatement() const
          }
 
          const QSqlRecord rec = database().record(relation.tableName());
-         for (int i = 0; i < rec.count(); ++i) {
-            if (name.compare(rec.fieldName(i), Qt::CaseInsensitive) == 0) {
-               name = rec.fieldName(i);
+
+         for (int j = 0; j < rec.count(); ++j) {
+            if (name.compare(rec.fieldName(j), Qt::CaseInsensitive) == 0) {
+               name = rec.fieldName(j);
                break;
             }
          }
+
       } else {
          name = d->baseRec.fieldName(i);
       }
+
       fieldNames[name] = fieldNames.value(name, 0) + 1;
       fieldList.append(name);
    }
@@ -447,9 +450,6 @@ QSqlTableModel *QSqlRelationalTableModel::relationModel(int column) const
    return relation.model;
 }
 
-/*!
-    \reimp
-*/
 void QSqlRelationalTableModel::revertRow(int row)
 {
    QSqlTableModel::revertRow(row);
@@ -486,7 +486,6 @@ void QSqlRelationalTableModel::setTable(const QString &table)
    QSqlTableModel::setTable(table);
 }
 
-// internal
 void QSqlRelationalTableModelPrivate::translateFieldNames(QSqlRecord &values) const
 {
    for (int i = 0; i < values.count(); ++i) {

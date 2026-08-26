@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,12 @@
 #ifndef QTHREAD_P_H
 #define QTHREAD_P_H
 
-#include <qplatformdefs.h>
-#include <qthread.h>
-#include <qmutex.h>
-#include <qstack.h>
-#include <qwaitcondition.h>
 #include <qmap.h>
+#include <qmutex.h>
+#include <qplatformdefs.h>
+#include <qstack.h>
+#include <qthread.h>
+#include <qwaitcondition.h>
 
 #include <algorithm>
 
@@ -39,26 +39,26 @@ class QEventLoop;
 class QPostEvent
 {
  public:
+   QPostEvent()
+      : receiver(nullptr), event(nullptr), priority(0)
+   { }
+
+   QPostEvent(QObject *r, QEvent *e, int p)
+      : receiver(r), event(e), priority(p)
+   { }
+
    QObject *receiver;
    QEvent *event;
 
    int priority;
-   inline QPostEvent()
-      : receiver(nullptr), event(nullptr), priority(0) {
-   }
-
-   inline QPostEvent(QObject *r, QEvent *e, int p)
-      : receiver(r), event(e), priority(p) {
-   }
 };
 
 inline bool operator<(const QPostEvent &first, const QPostEvent &second)
 {
-    return first.priority > second.priority;
+   return first.priority > second.priority;
 }
 
-// This class holds the list of posted events.
-//  The list has to be kept sorted by priority
+// holds the list of posted events and must be kept sorted by priority
 class QPostEventList : public QVector<QPostEvent>
 {
  public:
@@ -67,14 +67,15 @@ class QPostEventList : public QVector<QPostEvent>
 
    // sendOffset == the current event to start sending
    int startOffset;
+
    // insertionOffset == set by sendPostedEvents to tell postEvent() where to start insertions
    int insertionOffset;
 
    QMutex mutex;
 
-   inline QPostEventList()
-        : QVector<QPostEvent>(), recursion(0), startOffset(0), insertionOffset(0)
-    { }
+   QPostEventList()
+      : QVector<QPostEvent>(), recursion(0), startOffset(0), insertionOffset(0)
+   { }
 
    void addEvent(const QPostEvent &ev) {
       int priority = ev.priority;
@@ -101,9 +102,9 @@ class QPostEventList : public QVector<QPostEvent>
 
 class Q_CORE_EXPORT QDaemonThread : public QThread
 {
-public:
-    QDaemonThread(QObject *parent = nullptr);
-    ~QDaemonThread();
+ public:
+   QDaemonThread(QObject *parent = nullptr);
+   ~QDaemonThread();
 };
 
 class QThreadPrivate
@@ -114,13 +115,13 @@ class QThreadPrivate
    QThreadPrivate(QThreadData *d = nullptr);
    virtual ~QThreadPrivate();
 
-    void setPriority(QThread::Priority prio);
+   void setPriority(QThread::Priority prio);
    mutable QMutex mutex;
    QAtomicInt quitLockRef;
 
    bool running;
    bool finished;
-   bool isInFinish;                   //when in QThreadPrivate::finish
+   bool isInFinish;                   // when in QThreadPrivate::finish
    bool interruptionRequested;
    bool exited;
 
@@ -151,19 +152,19 @@ class QThreadPrivate
 
    bool terminationEnabled, terminatePending;
 #endif
-    QThreadData *data;
+   QThreadData *data;
 
-    static void createEventDispatcher(QThreadData *data);
+   static void createEventDispatcher(QThreadData *data);
 
-    void ref() {
-        quitLockRef.ref();
-    }
+   void ref() {
+      quitLockRef.ref();
+   }
 
-    void deref() {
-        if (!quitLockRef.deref() && running) {
-            QCoreApplication::instance()->postEvent(q_ptr, new QEvent(QEvent::Quit));
-        }
-    }
+   void deref() {
+      if (!quitLockRef.deref() && running) {
+         QCoreApplication::instance()->postEvent(q_ptr, new QEvent(QEvent::Quit));
+      }
+   }
 
  protected:
    QThread *q_ptr;
@@ -212,22 +213,22 @@ class QThreadData
 
    QThreadPrivate *get_QThreadPrivate() const;
 
-private:
-    QAtomicInt m_ref;
+ private:
+   QAtomicInt m_ref;
 };
 
 class QScopedLoopLevelCounter
 {
-   QThreadData *threadData;
+   QThreadData *m_threadData;
 
  public:
    QScopedLoopLevelCounter(QThreadData *threadData)
-      : threadData(threadData) {
-      ++threadData->loopLevel;
+      : m_threadData(threadData) {
+      ++m_threadData->loopLevel;
    }
 
    ~QScopedLoopLevelCounter() {
-      --threadData->loopLevel;
+      --m_threadData->loopLevel;
    }
 };
 

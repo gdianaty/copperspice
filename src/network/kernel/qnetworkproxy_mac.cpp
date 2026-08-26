@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,15 +25,16 @@
 
 #ifndef QT_NO_NETWORKPROXY
 
-#include <CFNetwork/CFNetwork.h>
-#include <CoreFoundation/CoreFoundation.h>
-#include <SystemConfiguration/SystemConfiguration.h>
-
 #include <qendian.h>
-#include <qcore_mac_p.h>
 #include <qregularexpression.h>
 #include <qstringlist.h>
 #include <qurl.h>
+
+#include <qcore_mac_p.h>
+
+#include <CFNetwork/CFNetwork.h>
+#include <CoreFoundation/CoreFoundation.h>
+#include <SystemConfiguration/SystemConfiguration.h>
 
 /*
  * MacOS X has a proxy configuration module in System Preferences (on
@@ -65,11 +66,12 @@ static bool isHostExcluded(CFDictionaryRef dict, const QString &host)
       return true;
    }
 
-   bool isSimple = !host.contains(QLatin1Char('.')) && !host.contains(QLatin1Char(':'));
+   bool isSimple = ! host.contains(QChar('.')) && ! host.contains(QChar(':'));
    CFNumberRef excludeSimples;
-   if (isSimple &&
-         (excludeSimples = (CFNumberRef)CFDictionaryGetValue(dict, kSCPropNetProxiesExcludeSimpleHostnames))) {
+
+   if (isSimple && (excludeSimples = (CFNumberRef)CFDictionaryGetValue(dict, kSCPropNetProxiesExcludeSimpleHostnames))) {
       int enabled;
+
       if (CFNumberGetValue(excludeSimples, kCFNumberIntType, &enabled) && enabled) {
          return true;
       }
@@ -81,7 +83,7 @@ static bool isHostExcluded(CFDictionaryRef dict, const QString &host)
    // not a simple host name
    // does it match the list of exclusions?
    CFArrayRef exclusionList = (CFArrayRef)CFDictionaryGetValue(dict, kSCPropNetProxiesExceptionsList);
-   if (!exclusionList) {
+   if (! exclusionList) {
       return false;
    }
 
@@ -111,17 +113,19 @@ static bool isHostExcluded(CFDictionaryRef dict, const QString &host)
 }
 
 static QNetworkProxy proxyFromDictionary(CFDictionaryRef dict, QNetworkProxy::ProxyType type,
-      CFStringRef enableKey, CFStringRef hostKey,
-      CFStringRef portKey)
+      CFStringRef enableKey, CFStringRef hostKey, CFStringRef portKey)
 {
    CFNumberRef protoEnabled;
    CFNumberRef protoPort;
    CFStringRef protoHost;
+
    if (enableKey
          && (protoEnabled = (CFNumberRef)CFDictionaryGetValue(dict, enableKey))
          && (protoHost = (CFStringRef)CFDictionaryGetValue(dict, hostKey))
          && (protoPort = (CFNumberRef)CFDictionaryGetValue(dict, portKey))) {
+
       int enabled;
+
       if (CFNumberGetValue(protoEnabled, kCFNumberIntType, &enabled) && enabled) {
          QString host = QCFString::toQString(protoHost);
 
@@ -136,10 +140,10 @@ static QNetworkProxy proxyFromDictionary(CFDictionaryRef dict, QNetworkProxy::Pr
    return QNetworkProxy();
 }
 
-
 static QNetworkProxy proxyFromDictionary(CFDictionaryRef dict)
 {
    QNetworkProxy::ProxyType proxyType = QNetworkProxy::DefaultProxy;
+
    QString hostName;
    quint16 port = 0;
    QString user;
@@ -212,7 +216,7 @@ QList<QNetworkProxy> macQueryInternal(const QNetworkProxyQuery &query)
    // obtain a dictionary to the proxy settings:
    CFDictionaryRef dict = SCDynamicStoreCopyProxies(nullptr);
    if (! dict) {
-      qWarning("QNetworkProxyFactory::systemProxyForQuery: SCDynamicStoreCopyProxies returned nullptr");
+      qWarning("macQueryInternal() SCDynamicStoreCopyProxies invalid (nullptr)");
       return result;          // failed
    }
 
@@ -229,15 +233,16 @@ QList<QNetworkProxy> macQueryInternal(const QNetworkProxyQuery &query)
 
       if (CFNumberGetValue(pacEnabled, kCFNumberIntType, &enabled) && enabled) {
          // PAC is enabled
+
          CFStringRef pacLocationSetting = (CFStringRef)CFDictionaryGetValue(dict, kSCPropNetProxiesProxyAutoConfigURLString);
-         QCFType<CFStringRef> cfPacLocation = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, pacLocationSetting, nullptr, nullptr,
-                                              kCFStringEncodingUTF8);
+         QCFType<CFStringRef> cfPacLocation = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, pacLocationSetting,
+               nullptr, nullptr, kCFStringEncodingUTF8);
 
          QCFType<CFDataRef> pacData;
          QCFType<CFURLRef> pacUrl = CFURLCreateWithString(kCFAllocatorDefault, cfPacLocation, nullptr);
 
          if (! pacUrl) {
-            qWarning("Invalid PAC URL \"%s\"", csPrintable(QCFString::toQString(cfPacLocation)));
+            qWarning("macQueryInternal() Invalid PAC url %s", csPrintable(QCFString::toQString(cfPacLocation)));
             return result;
          }
 
@@ -245,21 +250,21 @@ QList<QNetworkProxy> macQueryInternal(const QNetworkProxyQuery &query)
          if (! CFURLCreateDataAndPropertiesFromResource(kCFAllocatorDefault, pacUrl, &pacData, nullptr, nullptr, &errorCode)) {
             QString pacLocation = QCFString::toQString(cfPacLocation);
 
-            qWarning("Unable to get the PAC script at \"%s\" (%s)", csPrintable(pacLocation), cfurlErrorDescription(errorCode));
+            qWarning("macQueryInternal() Unable to get the PAC script at %s (%s)", csPrintable(pacLocation), cfurlErrorDescription(errorCode));
             return result;
          }
 
          if (! pacData) {
-            qWarning("\"%s\" returned an empty PAC script", csPrintable(QCFString::toQString(cfPacLocation)));
+            qWarning("macQueryInternal() %s returned an empty PAC script", csPrintable(QCFString::toQString(cfPacLocation)));
             return result;
          }
 
          QCFType<CFStringRef> pacScript = CFStringCreateFromExternalRepresentation(kCFAllocatorDefault, pacData, kCFStringEncodingISOLatin1);
 
-         if (!pacScript) {
+         if (! pacScript) {
             // This should never happen, but the documentation says it may return nullptr if there was a problem creating the object.
             QString pacLocation = QCFString::toQString(cfPacLocation);
-            qWarning("Unable to read the PAC script at \"%s\"", csPrintable(pacLocation));
+            qWarning("macQueryInternal() Unable to read the PAC script at %s", csPrintable(pacLocation));
             return result;
          }
 
@@ -271,17 +276,19 @@ QList<QNetworkProxy> macQueryInternal(const QNetworkProxyQuery &query)
          QCFType<CFURLRef> targetURL = CFURLCreateWithBytes(kCFAllocatorDefault, (UInt8 *)encodedURL.data(),
                encodedURL.size(), kCFStringEncodingUTF8, nullptr);
 
-         if (!targetURL) {
+         if (! targetURL) {
             return result; // URL creation problem, abort
          }
 
          QCFType<CFErrorRef> pacError;
          QCFType<CFArrayRef> proxies = CFNetworkCopyProxiesForAutoConfigurationScript(pacScript, targetURL, &pacError);
-         if (!proxies) {
+
+         if (! proxies) {
             QString pacLocation = QCFString::toQString(cfPacLocation);
             QCFType<CFStringRef> pacErrorDescription = CFErrorCopyDescription(pacError);
-            qWarning("Execution of PAC script at \"%s\" failed: %s", csPrintable(pacLocation),
+            qWarning("macQueryInternal() Execution of PAC script at %s failed, %s", csPrintable(pacLocation),
                      csPrintable(QCFString::toQString(pacErrorDescription)));
+
             return result;
          }
 
@@ -301,58 +308,53 @@ QList<QNetworkProxy> macQueryInternal(const QNetworkProxyQuery &query)
 
    // try the protocol-specific proxy
    QNetworkProxy protocolSpecificProxy;
-   if (protocol == QLatin1String("ftp")) {
-      protocolSpecificProxy =
-         proxyFromDictionary(dict, QNetworkProxy::FtpCachingProxy,
-                             kSCPropNetProxiesFTPEnable,
-                             kSCPropNetProxiesFTPProxy,
-                             kSCPropNetProxiesFTPPort);
-   } else if (protocol == QLatin1String("http")) {
-      protocolSpecificProxy =
-         proxyFromDictionary(dict, QNetworkProxy::HttpProxy,
-                             kSCPropNetProxiesHTTPEnable,
-                             kSCPropNetProxiesHTTPProxy,
-                             kSCPropNetProxiesHTTPPort);
-   } else if (protocol == QLatin1String("https")) {
+
+   if (protocol == "ftp") {
+      protocolSpecificProxy = proxyFromDictionary(dict, QNetworkProxy::FtpCachingProxy,
+            kSCPropNetProxiesFTPEnable, kSCPropNetProxiesFTPProxy, kSCPropNetProxiesFTPPort);
+
+   } else if (protocol == "http") {
+      protocolSpecificProxy = proxyFromDictionary(dict, QNetworkProxy::HttpProxy,
+            kSCPropNetProxiesHTTPEnable, kSCPropNetProxiesHTTPProxy, kSCPropNetProxiesHTTPPort);
+
+   } else if (protocol == "https") {
       isHttps = true;
-      protocolSpecificProxy =
-         proxyFromDictionary(dict, QNetworkProxy::HttpProxy,
-                             kSCPropNetProxiesHTTPSEnable,
-                             kSCPropNetProxiesHTTPSProxy,
-                             kSCPropNetProxiesHTTPSPort);
+
+      protocolSpecificProxy = proxyFromDictionary(dict, QNetworkProxy::HttpProxy,
+            kSCPropNetProxiesHTTPSEnable, kSCPropNetProxiesHTTPSProxy, kSCPropNetProxiesHTTPSPort);
    }
+
    if (protocolSpecificProxy.type() != QNetworkProxy::DefaultProxy) {
       result << protocolSpecificProxy;
    }
 
    // let's add SOCKSv5 if present too
    QNetworkProxy socks5 = proxyFromDictionary(dict, QNetworkProxy::Socks5Proxy,
-                          kSCPropNetProxiesSOCKSEnable,
-                          kSCPropNetProxiesSOCKSProxy,
-                          kSCPropNetProxiesSOCKSPort);
+         kSCPropNetProxiesSOCKSEnable, kSCPropNetProxiesSOCKSProxy, kSCPropNetProxiesSOCKSPort);
+
    if (socks5.type() != QNetworkProxy::DefaultProxy) {
       result << socks5;
    }
 
-   // let's add the HTTPS proxy if present (and if we haven't added
-   // yet)
-   if (!isHttps) {
+   // add the HTTPS proxy if present (and if we haven't added yet)
+   if (! isHttps) {
       QNetworkProxy https = proxyFromDictionary(dict, QNetworkProxy::HttpProxy,
-                            kSCPropNetProxiesHTTPSEnable,
-                            kSCPropNetProxiesHTTPSProxy,
-                            kSCPropNetProxiesHTTPSPort);
+            kSCPropNetProxiesHTTPSEnable, kSCPropNetProxiesHTTPSProxy, kSCPropNetProxiesHTTPSPort);
+
       if (https.type() != QNetworkProxy::DefaultProxy && https != protocolSpecificProxy) {
          result << https;
       }
    }
 
    CFRelease(dict);
+
    return result;
 }
 
 QList<QNetworkProxy> QNetworkProxyFactory::systemProxyForQuery(const QNetworkProxyQuery &query)
 {
    QList<QNetworkProxy> result = macQueryInternal(query);
+
    if (result.isEmpty()) {
       result << QNetworkProxy::NoProxy;
    }
@@ -361,5 +363,3 @@ QList<QNetworkProxy> QNetworkProxyFactory::systemProxyForQuery(const QNetworkPro
 }
 
 #endif
-
-

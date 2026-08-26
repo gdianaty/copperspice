@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,9 +24,9 @@
 #ifndef QVARIABLELOADER_P_H
 #define QVARIABLELOADER_P_H
 
-#include <QSet>
-#include <QXmlQuery>
-#include <QDebug>
+#include <qdebug.h>
+#include <qset.h>
+#include <qxmlquery.h>
 
 #include <qdynamiccontext_p.h>
 #include <qexternalvariableloader_p.h>
@@ -39,9 +39,9 @@ class VariableLoader : public ExternalVariableLoader
    typedef QHash<QXmlName, QVariant> BindingHash;
    typedef QExplicitlySharedDataPointer<VariableLoader> Ptr;
 
-   inline VariableLoader(const NamePool::Ptr &np,
-                  const VariableLoader::Ptr &previousLoader = VariableLoader::Ptr())
-                  : m_namePool(np), m_previousLoader(previousLoader)
+   VariableLoader(const NamePool::Ptr &np,
+         const VariableLoader::Ptr &previousLoader = VariableLoader::Ptr())
+      : m_namePool(np), m_previousLoader(previousLoader)
    {
    }
 
@@ -64,7 +64,6 @@ class VariableLoader : public ExternalVariableLoader
    bool invalidationRequired(const QXmlName &name, const QVariant &variant) const;
 
  private:
-
    inline QPatternist::Item itemForName(const QXmlName &name) const;
 
    const NamePool::Ptr                 m_namePool;

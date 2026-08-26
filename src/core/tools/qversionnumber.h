@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,6 +28,8 @@
 #include <qstring.h>
 #include <qvector.h>
 
+#include <compare>
+
 class QVersionNumber;
 
 Q_CORE_EXPORT uint qHash(const QVersionNumber &key, uint seed = 0);
@@ -42,17 +44,21 @@ class QVersionNumber
 
       // set the InlineSegmentMarker and set length to zero
       SegmentStorage()
-      {}
+      { }
 
-      SegmentStorage(const QVector<int> &seg) : pointer_segments(seg) {
+      SegmentStorage(const QVector<int> &seg)
+         : pointer_segments(seg)
+      {
       }
 
-      explicit SegmentStorage(QVector<int> &&seg) : pointer_segments(std::move(seg)) {
-
+      explicit SegmentStorage(QVector<int> &&seg)
+         : pointer_segments(std::move(seg))
+      {
       }
 
-      SegmentStorage(std::initializer_list<int> args) : pointer_segments(args) {
-
+      SegmentStorage(std::initializer_list<int> args)
+         : pointer_segments(args)
+      {
       }
 
       int size() const {
@@ -78,48 +84,49 @@ class QVersionNumber
 
  public:
    QVersionNumber() : m_segments()
-   {}
+   { }
 
-   explicit QVersionNumber(const QVector<int> &seg) : m_segments(seg)
-   {}
+   explicit QVersionNumber(const QVector<int> &seg)
+      : m_segments(seg)
+   { }
 
    explicit QVersionNumber(QVector<int> &&seg)
       : m_segments(std::move(seg))
-   {}
+   { }
 
-   inline QVersionNumber(std::initializer_list<int> args)
+   QVersionNumber(std::initializer_list<int> args)
       : m_segments(args)
-   {}
+   { }
 
-   inline explicit QVersionNumber(int maj) {
+   explicit QVersionNumber(int maj) {
       m_segments.setSegments(1, maj);
    }
 
-   inline explicit QVersionNumber(int maj, int min) {
+   explicit QVersionNumber(int maj, int min) {
       m_segments.setSegments(2, maj, min);
    }
 
-   inline explicit QVersionNumber(int maj, int min, int mic) {
+   explicit QVersionNumber(int maj, int min, int mic) {
       m_segments.setSegments(3, maj, min, mic);
    }
 
-   inline bool isNull() const {
+   bool isNull() const {
       return segmentCount() == 0;
    }
 
-   inline bool isNormalized() const {
+   bool isNormalized() const {
       return isNull() || segmentAt(segmentCount() - 1) != 0;
    }
 
-   inline int majorVersion() const {
+   int majorVersion() const {
       return segmentAt(0);
    }
 
-   inline int minorVersion() const {
+   int minorVersion() const {
       return segmentAt(1);
    }
 
-   inline int microVersion() const {
+   int microVersion() const {
       return segmentAt(2);
    }
 
@@ -127,11 +134,11 @@ class QVersionNumber
 
    Q_CORE_EXPORT QVector<int> segments() const;
 
-   inline int segmentAt(int index) const {
+   int segmentAt(int index) const {
       return (m_segments.size() > index) ? m_segments.at(index) : 0;
    }
 
-   inline int segmentCount() const {
+   int segmentCount() const {
       return m_segments.size();
    }
 
@@ -144,41 +151,30 @@ class QVersionNumber
    Q_CORE_EXPORT QString toString() const;
    Q_CORE_EXPORT static QVersionNumber fromString(const QString &string, int *suffixIndex = nullptr);
 
+   static uint hash(const QVersionNumber &key, uint seed = 0);
+
+   auto operator<=>(const QVersionNumber &other) const noexcept {
+      int tmp = compare(*this, other);
+
+      if (tmp < 0) {
+         return std::strong_ordering::less;
+
+      } else if (tmp > 0) {
+         return std::strong_ordering::greater;
+
+      } else {
+         return std::strong_ordering::equal;
+      }
+   }
+
+   bool operator==(const QVersionNumber &other) const noexcept {
+      return compare(*this, other) == 0;
+   }
+
  private:
    friend Q_CORE_EXPORT QDataStream &operator>>(QDataStream &stream, QVersionNumber &version);
-   friend Q_CORE_EXPORT uint qHash(const QVersionNumber &key, uint seed);
 };
 
 Q_CORE_EXPORT QDebug operator<<(QDebug, const QVersionNumber &version);
-
-inline bool operator> (const QVersionNumber &lhs, const QVersionNumber &rhs)
-{
-   return QVersionNumber::compare(lhs, rhs) > 0;
-}
-
-inline bool operator>=(const QVersionNumber &lhs, const QVersionNumber &rhs)
-{
-   return QVersionNumber::compare(lhs, rhs) >= 0;
-}
-
-inline bool operator< (const QVersionNumber &lhs, const QVersionNumber &rhs)
-{
-   return QVersionNumber::compare(lhs, rhs) < 0;
-}
-
-inline bool operator<=(const QVersionNumber &lhs, const QVersionNumber &rhs)
-{
-   return QVersionNumber::compare(lhs, rhs) <= 0;
-}
-
-inline bool operator==(const QVersionNumber &lhs, const QVersionNumber &rhs)
-{
-   return QVersionNumber::compare(lhs, rhs) == 0;
-}
-
-inline bool operator!=(const QVersionNumber &lhs, const QVersionNumber &rhs)
-{
-   return QVersionNumber::compare(lhs, rhs) != 0;
-}
 
 #endif

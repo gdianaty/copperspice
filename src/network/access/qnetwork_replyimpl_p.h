@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,18 +24,18 @@
 #ifndef QNETWORK_REPLYIMPL_P_H
 #define QNETWORK_REPLYIMPL_P_H
 
-#include <qnetwork_reply.h>
-#include <qnetaccess_manager.h>
-#include <qnetworkproxy.h>
-#include <qnetworksession.h>
 #include <qbuffer.h>
 #include <qmap.h>
+#include <qnetaccess_manager.h>
+#include <qnetwork_reply.h>
+#include <qnetworkproxy.h>
+#include <qnetworksession.h>
 #include <qqueue.h>
 #include <qsharedpointer.h>
 
+#include <qbytedata_p.h>
 #include <qnetwork_reply_p.h>
 #include <qringbuffer_p.h>
-#include <qbytedata_p.h>
 
 class QAbstractNetworkCache;
 class QNetworkAccessBackend;
@@ -49,9 +49,8 @@ class QNetworkReplyImpl: public QNetworkReply
    QNetworkReplyImpl(QObject *parent = nullptr);
    ~QNetworkReplyImpl();
 
-   virtual void abort() override;
+   void abort() override;
 
-   // reimplemented from QNetworkReply or QIODevice
    void close() override;
    qint64 bytesAvailable() const override;
    void setReadBufferSize(qint64 size) override;
@@ -94,8 +93,8 @@ class QNetworkReplyImpl: public QNetworkReply
 #ifdef QT_SSL
 
  protected:
-   virtual void ignoreSslErrors() override;
-   virtual void ignoreSslErrorsImplementation(const QList<QSslError> &errors) override;
+   void ignoreSslErrors() override;
+   void ignoreSslErrorsImplementation(const QList<QSslError> &errors) override;
 
    void sslConfigurationImplementation(QSslConfiguration &configuration) const override;
    void setSslConfigurationImplementation(const QSslConfiguration &configuration) override;
@@ -112,7 +111,7 @@ class QNetworkReplyImplPrivate: public QNetworkReplyPrivate
       NotifyCopyFinished
    };
 
-   typedef QQueue<InternalNotifications> NotificationQueue;
+   using NotificationQueue = QQueue<InternalNotifications>;
 
    QNetworkReplyImplPrivate();
 
@@ -216,7 +215,8 @@ class QDisabledNetworkReply : public QNetworkReply
    QDisabledNetworkReply(QObject *parent, const QNetworkRequest &req, QNetworkAccessManager::Operation op);
    ~QDisabledNetworkReply();
 
-   void abort() override { }
+   void abort() override {
+   }
 
  protected:
    qint64 readData(char *, qint64) override {

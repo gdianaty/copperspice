@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,26 +24,24 @@
 #ifndef QGSTREAMERPLAYERSERVICE_H
 #define QGSTREAMERPLAYERSERVICE_H
 
-#include <qobject.h>
 #include <qiodevice.h>
-
 #include <qmediaservice.h>
+#include <qobject.h>
 
+class QGStreamerAvailabilityControl;
+class QGstreamerAudioProbeControl;
+class QGstreamerMetaData;
+class QGstreamerMetaDataProvider;
+class QGstreamerPlayerControl;
+class QGstreamerPlayerSession;
+class QGstreamerStreamsControl;
+class QGstreamerVideoProbeControl;
+class QGstreamerVideoRenderer;
+class QGstreamerVideoWidgetControl;
+class QGstreamerVideoWindow;
 class QMediaPlayerControl;
 class QMediaPlaylist;
 class QMediaPlaylistNavigator;
-
-class QGstreamerMetaData;
-class QGstreamerPlayerControl;
-class QGstreamerPlayerSession;
-class QGstreamerMetaDataProvider;
-class QGstreamerStreamsControl;
-class QGstreamerVideoRenderer;
-class QGstreamerVideoWindow;
-class QGstreamerVideoWidgetControl;
-class QGStreamerAvailabilityControl;
-class QGstreamerAudioProbeControl;
-class QGstreamerVideoProbeControl;
 
 class QGstreamerPlayerService : public QMediaService
 {

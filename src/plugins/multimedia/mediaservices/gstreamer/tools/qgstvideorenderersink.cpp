@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,8 +23,8 @@
 
 #include <qgstvideorenderersink_p.h>
 
-#include <qalgorithms.h>
 #include <qabstractvideosurface.h>
+#include <qalgorithms.h>
 #include <qcoreapplication.h>
 #include <qdebug.h>
 #include <qevent.h>
@@ -33,12 +33,10 @@
 #include <qvideoframe.h>
 
 #include <qfactoryloader_p.h>
-#include <qgstvideobuffer_p.h>
 #include <qgstutils_p.h>
+#include <qgstvideobuffer_p.h>
 
 #include <gst/video/video.h>
-
-// #define DEBUG_VIDEO_SURFACE_SINK
 
 QGstDefaultVideoRenderer::QGstDefaultVideoRenderer()
    : m_flushed(true)
@@ -537,7 +535,7 @@ gboolean QGstVideoRendererSink::set_caps(GstBaseSink *base, GstCaps *caps)
 {
    VO_SINK(base);
 
-#ifdef DEBUG_VIDEO_SURFACE_SINK
+#if defined(CS_SHOW_DEBUG_PLUGINS_GSTREAMER)
    qDebug() << "set_caps:";
    qDebug() << caps;
 #endif

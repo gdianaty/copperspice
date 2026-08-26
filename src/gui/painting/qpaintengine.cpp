@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,18 +23,18 @@
 
 #include <qpaintengine.h>
 #include <qpaintengine_p.h>
-#include <qpainter_p.h>
-#include <qpolygon.h>
-#include <qbitmap.h>
 
+#include <qapplication.h>
+#include <qbitmap.h>
 #include <qdebug.h>
 #include <qmath.h>
-#include <qguiapplication.h>
-
-#include <qtextengine_p.h>
+#include <qpolygon.h>
 #include <qvarlengtharray.h>
+
 #include <qfontengine_p.h>
 #include <qpaintengineex_p.h>
+#include <qpainter_p.h>
+#include <qtextengine_p.h>
 
 qreal QTextItem::descent() const
 {
@@ -74,8 +74,8 @@ QFont QTextItem::font() const
 
 void QPaintEngine::syncState()
 {
-   Q_ASSERT(state);
-   updateState(*state);
+   Q_ASSERT(m_engineState);
+   updateState(*m_engineState);
 
    if (isExtended()) {
       static_cast<QPaintEngineEx *>(this)->sync();
@@ -306,15 +306,13 @@ void QPaintEngine::drawImage(const QRectF &r, const QImage &image, const QRectF 
 }
 
 QPaintEngine::QPaintEngine(PaintEngineFeatures caps)
-   : state(nullptr), gccaps(caps), active(0), selfDestruct(false), extended(false),
-     d_ptr(new QPaintEnginePrivate)
+   : m_engineState(nullptr), gccaps(caps), active(0), selfDestruct(false), extended(false), d_ptr(new QPaintEnginePrivate)
 {
    d_ptr->q_ptr = this;
 }
 
-// internal
 QPaintEngine::QPaintEngine(QPaintEnginePrivate &dptr, PaintEngineFeatures caps)
-   : state(nullptr), gccaps(caps), active(0), selfDestruct(false), extended(false), d_ptr(&dptr)
+   : m_engineState(nullptr), gccaps(caps), active(0), selfDestruct(false), extended(false), d_ptr(&dptr)
 {
    d_ptr->q_ptr = this;
 }
@@ -325,13 +323,13 @@ QPaintEngine::~QPaintEngine()
 
 QPainter *QPaintEngine::painter() const
 {
-   return state ? state->painter() : nullptr;
+   return m_engineState ? m_engineState->painter() : nullptr;
 }
 
 void QPaintEngine::drawPath(const QPainterPath &)
 {
    if (hasFeature(PainterPaths)) {
-      qWarning("QPaintEngine::drawPath: Must be implemented when feature PainterPaths is set");
+      qWarning("QPaintEngine::drawPath() Implement when PainterPaths flag is enabled");
    }
 }
 
@@ -343,7 +341,7 @@ void QPaintEngine::drawTextItem(const QPointF &p, const QTextItem &textItem)
    path.setFillRule(Qt::WindingFill);
 
    if (ti.glyphs.numGlyphs) {
-      ti.fontEngine->addOutlineToPath(0, 0, ti.glyphs, &path, ti.flags);
+      ti.m_textItemFontEngine->addOutlineToPath(0, 0, ti.glyphs, &path, ti.flags);
    }
 
    if (! path.isEmpty()) {
@@ -365,9 +363,10 @@ void QPaintEngine::drawLines(const QLineF *linePtr, int lineCount)
       QPointF pts[2] = { linePtr[i].p1(), linePtr[i].p2() };
 
       if (pts[0] == pts[1]) {
-         if (state->pen().capStyle() != Qt::FlatCap) {
+         if (m_engineState->pen().capStyle() != Qt::FlatCap) {
             drawPoints(pts, 1);
          }
+
          continue;
       }
 
@@ -438,7 +437,7 @@ void QPaintEngine::drawRects(const QRect *rectPtr, int rectCount)
 
 void QPaintEngine::drawRects(const QRectF *rectPtr, int rectCount)
 {
-   if (hasFeature(PainterPaths) && ! state->penNeedsResolving() && ! state->brushNeedsResolving()) {
+   if (hasFeature(PainterPaths) && ! m_engineState->penNeedsResolving() && ! m_engineState->brushNeedsResolving()) {
       for (int i = 0; i < rectCount; ++i) {
          QPainterPath path;
          path.addRect(rectPtr[i]);
@@ -464,24 +463,15 @@ void QPaintEngine::drawRects(const QRectF *rectPtr, int rectCount)
    }
 }
 
-/*!
-    \internal
-    Sets the paintdevice that this engine operates on to \a device
-*/
 void QPaintEngine::setPaintDevice(QPaintDevice *device)
 {
    d_func()->pdev = device;
 }
 
-/*!
-    Returns the device that this engine is painting on, if painting is
-    active; otherwise returns 0.
-*/
 QPaintDevice *QPaintEngine::paintDevice() const
 {
    return d_func()->pdev;
 }
-
 
 QPoint QPaintEngine::coordinateOffset() const
 {
@@ -500,40 +490,20 @@ void QPaintEngine::setSystemClip(const QRegion &region)
    }
 }
 
-/*!
-    \internal
-
-    Returns the system clip. The system clip is read only while the
-    painter is active. An empty region indicates that system clip
-    is not in use.
-*/
-
 QRegion QPaintEngine::systemClip() const
 {
    return d_func()->systemClip;
 }
 
-/*!
-    \internal
-
-    Sets the target rect for drawing within the backing store. This
-    function should ONLY be used by the backing store.
-*/
 void QPaintEngine::setSystemRect(const QRect &rect)
 {
    if (isActive()) {
-      qWarning("QPaintEngine::setSystemRect: Should not be changed while engine is active");
+      qWarning("QPaintEngine::setSystemRect() Unable to change while engine is active");
       return;
    }
    d_func()->systemRect = rect;
 }
 
-/*!
-    \internal
-
-    Retrieves the rect for drawing within the backing store. This
-    function should ONLY be used by the backing store.
- */
 QRect QPaintEngine::systemRect() const
 {
    return d_func()->systemRect;
@@ -546,11 +516,12 @@ void QPaintEnginePrivate::drawBoxTextItem(const QPointF &p, const QTextItemInt &
    }
 
    // any fixes here should probably also be done in QFontEngineBox::draw
-   const int size = qRound(ti.fontEngine->ascent());
+   const int size = qRound(ti.m_textItemFontEngine->ascent());
+
    QVarLengthArray<QFixedPoint> positions;
    QVarLengthArray<glyph_t> glyphs;
    QTransform matrix = QTransform::fromTranslate(p.x(), p.y() - size);
-   ti.fontEngine->getGlyphPositions(ti.glyphs, matrix, ti.flags, glyphs, positions);
+   ti.m_textItemFontEngine->getGlyphPositions(ti.glyphs, matrix, ti.flags, glyphs, positions);
 
    if (glyphs.size() == 0) {
       return;
@@ -558,17 +529,17 @@ void QPaintEnginePrivate::drawBoxTextItem(const QPointF &p, const QTextItemInt &
 
    QSize s(size - 3, size - 3);
 
-   QPainter *painter = q_func()->state->painter();
+   QPainter *painter = q_func()->m_engineState->painter();
    painter->save();
    painter->setBrush(Qt::NoBrush);
+
    QPen pen = painter->pen();
-   pen.setWidthF(ti.fontEngine->lineThickness().toReal());
+   pen.setWidthF(ti.m_textItemFontEngine->lineThickness().toReal());
    painter->setPen(pen);
 
    for (int k = 0; k < positions.size(); k++) {
       painter->drawRect(QRectF(positions[k].toPointF(), s));
    }
+
    painter->restore();
 }
-
-

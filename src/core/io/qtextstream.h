@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,17 +24,13 @@
 #ifndef QTEXTSTREAM_H
 #define QTEXTSTREAM_H
 
-#include <qiodevice.h>
-#include <qstring.h>
 #include <qchar.h>
+#include <qiodevice.h>
 #include <qlocale.h>
 #include <qscopedpointer.h>
+#include <qstring.h>
 
 #include <stdio.h>
-
-#ifdef Status
-#error qtextstream.h must be included before any header file that defines Status
-#endif
 
 class QTextCodec;
 class QTextDecoder;
@@ -58,7 +54,7 @@ class Q_CORE_EXPORT QTextStream
       AlignAccountingStyle
    };
 
-   enum Status {
+   enum TextStatus {
       Ok,
       ReadPastEnd,
       ReadCorruptData,
@@ -74,7 +70,8 @@ class Q_CORE_EXPORT QTextStream
    };
    using NumberFlags = QFlags<NumberFlag>;
 
-   class Params {
+   class Params
+   {
       int   p_realNumberPrecision;
       int   p_integerBase;
       int   p_fieldWidth;
@@ -121,8 +118,8 @@ class Q_CORE_EXPORT QTextStream
    void setString(QString *string, QIODevice::OpenMode openMode = QIODevice::ReadWrite);
    QString *string() const;
 
-   Status status() const;
-   void setStatus(Status status);
+   TextStatus status() const;
+   void setStatus(TextStatus status);
    void resetStatus();
 
    bool atEnd() const;
@@ -208,13 +205,9 @@ class Q_CORE_EXPORT QTextStream
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QTextStream::NumberFlags)
 
-/*****************************************************************************
-  QTextStream manipulators
- *****************************************************************************/
-
-typedef QTextStream &(*QTextStreamFunction)(QTextStream &);    // manipulator function
-typedef void (QTextStream::*QTSMFI)(int);                      // manipulator w/int argument
-typedef void (QTextStream::*QTSMFC)(QChar);                    // manipulator w/QChar argument
+using QTextStreamFunction = QTextStream &(*)(QTextStream &);    // manipulator function
+using QTSMFI              = void (QTextStream::*)(int);         // manipulator w/int argument
+using QTSMFC              = void (QTextStream::*)(QChar);       // manipulator w/QChar argument
 
 class Q_CORE_EXPORT QTextStreamManipulator
 {

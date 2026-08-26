@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2013 Klarälvdalens Datakonsult AB, a KDAB Group company
 * Copyright (c) 2015 The Qt Company Ltd.
@@ -85,7 +85,6 @@ QAbstractOpenGLFunctions::~QAbstractOpenGLFunctions()
     delete d_ptr;
 }
 
-// internal
 bool QAbstractOpenGLFunctions::initializeOpenGLFunctions()
 {
     Q_D(QAbstractOpenGLFunctions);
@@ -105,21 +104,18 @@ bool QAbstractOpenGLFunctions::initializeOpenGLFunctions()
     return true;
 }
 
-// internal
 bool QAbstractOpenGLFunctions::isInitialized() const
 {
     Q_D(const QAbstractOpenGLFunctions);
     return d->initialized;
 }
 
-// internal
 void QAbstractOpenGLFunctions::setOwningContext(const QOpenGLContext *context)
 {
     Q_D(QAbstractOpenGLFunctions);
     d->owningContext = const_cast<QOpenGLContext*>(context);
 }
 
-// internal
 QOpenGLContext *QAbstractOpenGLFunctions::owningContext() const
 {
     Q_D(const QAbstractOpenGLFunctions);

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,17 +23,17 @@
 
 #include <qsvgstyle_p.h>
 
-#include <qpainter.h>
-#include <qpair.h>
 #include <qcolor.h>
 #include <qdebug.h>
 #include <qmath.h>
 #include <qnumeric.h>
+#include <qpainter.h>
+#include <qpair.h>
 
-#include <qsvgtinydocument_p.h>
 #include <qsvgfont_p.h>
 #include <qsvggraphics_p.h>
 #include <qsvgnode_p.h>
+#include <qsvgtinydocument_p.h>
 
 QSvgExtraStates::QSvgExtraStates()
    : fillOpacity(1.0), strokeOpacity(1.0), svgFont(nullptr), textAnchor(Qt::AlignLeft), fontWeight(400),
@@ -923,7 +923,7 @@ void QSvgGradientStyle::resolveStops()
             m_gradientStopsSet = st->gradientStopsSet();
          }
       } else {
-         qWarning("Could not resolve property : %s", csPrintable(m_link));
+         qWarning("QSvgGradientStyle::resolveStops() Unable to resolve property, %s", csPrintable(m_link));
       }
       m_link = QString();
    }

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,16 +24,11 @@
 #ifndef QXmlPatterns_Debug_P_H
 #define QXmlPatterns_Debug_P_H
 
-#include <QDebug>
+#include <qdebug.h>
 
-#define Patternist_DEBUG_PARSER
-#define Patternist_DEBUG
-
-#undef Patternist_DEBUG          // disable it for release
-
-#ifdef QT_NO_DEBUG
-#   undef Patternist_DEBUG_PARSER
-#   undef Patternist_DEBUG
+#ifdef QT_DEBUG
+#   define Patternist_DEBUG_PARSER
+#   define Patternist_DEBUG
 #endif
 
 namespace QPatternist {

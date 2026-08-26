@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,13 +24,13 @@
 #ifndef QSVGGRAPHICS_P_H
 #define QSVGGRAPHICS_P_H
 
-#include "qsvgnode_p.h"
+#include <qimage.h>
+#include <qpainterpath.h>
+#include <qstack.h>
+#include <qtextlayout.h>
+#include <qtextoption.h>
 
-#include "QtGui/qpainterpath.h"
-#include "QtGui/qimage.h"
-#include "QtGui/qtextlayout.h"
-#include "QtGui/qtextoption.h"
-#include "QtCore/qstack.h"
+#include <qsvgnode_p.h>
 
 class QTextCharFormat;
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,9 +24,15 @@
 #ifndef QTOOLBARAREALAYOUT_P_H
 #define QTOOLBARAREALAYOUT_P_H
 
-#include <QList>
-#include <QSize>
-#include <QRect>
+#include <qlist.h>
+#include <qrect.h>
+#include <qsize.h>
+#include <qsizepolicy.h>
+
+class QLayoutItem;
+class QMainWindow;
+class QStyleOptionToolBar;
+class QToolBar;
 
 static inline int pick(Qt::Orientation o, const QPoint &pos)
 {
@@ -75,17 +81,12 @@ static inline int &rperp(Qt::Orientation o, QSize &size)
 
 #ifndef QT_NO_TOOLBAR
 
-class QToolBar;
-class QLayoutItem;
-class QMainWindow;
-class QStyleOptionToolBar;
-
 class QToolBarAreaLayoutItem
 {
-
  public:
    QToolBarAreaLayoutItem(QLayoutItem *item = nullptr)
-      : widgetItem(item), pos(0), size(-1), preferredSize(-1), gap(false) {}
+      : widgetItem(item), pos(0), size(-1), preferredSize(-1), gap(false)
+   { }
 
    bool skip() const;
    QSize minimumSize() const;
@@ -95,6 +96,7 @@ class QToolBarAreaLayoutItem
    void resize(Qt::Orientation o, int newSize) {
       newSize = qMax(pick(o, minimumSize()), newSize);
       int sizeh = pick(o, sizeHint());
+
       if (newSize == sizeh) {
          preferredSize = -1;
          size = sizeh;
@@ -133,7 +135,7 @@ class QToolBarAreaLayoutLine
    bool skip() const;
 
    QRect rect;
-   Qt::Orientation o;
+   Qt::Orientation m_lineDirection;
 
    QList<QToolBarAreaLayoutItem> toolBarItems;
 };
@@ -175,7 +177,7 @@ class QToolBarAreaLayout
    static constexpr const uchar ToolBarStateMarker   = 0xfe;
    static constexpr const uchar ToolBarStateMarkerEx = 0xfc;
 
-   QRect rect;
+   QRect m_toolBarAreaRect;
    const QMainWindow *mainWindow;
    QToolBarAreaLayoutInfo docks[4];
    bool visible;

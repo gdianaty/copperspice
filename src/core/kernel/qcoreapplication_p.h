@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,7 +28,7 @@
 #include <qtranslator.h>
 #include <qsettings.h>
 
-typedef QList<QTranslator *> QTranslatorList;
+using QTranslatorList = QList<QTranslator *>;
 
 class QAbstractEventDispatcher;
 
@@ -37,9 +37,12 @@ class Q_CORE_EXPORT QCoreApplicationPrivate
    Q_DECLARE_PUBLIC(QCoreApplication)
 
  public:
-   enum Type { Tty, Gui };
+   enum Type {
+      Tty,
+      Gui
+   };
 
-   QCoreApplicationPrivate(int &aargc,  char **aargv, uint flags);
+   QCoreApplicationPrivate(int &argc,  char **argv);
    virtual ~QCoreApplicationPrivate();
 
    void init();
@@ -48,7 +51,7 @@ class Q_CORE_EXPORT QCoreApplicationPrivate
    bool sendThroughObjectEventFilters(QObject *, QEvent *);
    bool notify_helper(QObject *, QEvent *);
 
-   static inline void setEventSpontaneous(QEvent *e, bool spontaneous) {
+   static void setEventSpontaneous(QEvent *e, bool spontaneous) {
       e->spont = spontaneous;
    }
 
@@ -86,15 +89,19 @@ class Q_CORE_EXPORT QCoreApplicationPrivate
       return CSInternalThreadData::get_m_ThreadData(q_ptr);
    }
 
-   int &argc;
-   char **argv;
    void appendApplicationPathToLibraryPaths(void);
    void processCommandLineArguments();
 
-   static QString qmljsDebugArguments();          // access arguments from other libraries
+   static QSettings *copperspiceConf();
 
-   QTranslatorList translators;
+   static bool testAttribute(uint flag) {
+      return attribs & (1 << flag);
+   }
+
    static bool isTranslatorInstalled(QTranslator *translator);
+
+   int &m_argc;
+   char **m_argv;
 
    QCoreApplicationPrivate::Type application_type;
 
@@ -104,6 +111,8 @@ class Q_CORE_EXPORT QCoreApplicationPrivate
    QString cachedApplicationDirPath;
    QString cachedApplicationFilePath;
 
+   QTranslatorList translators;
+
    static QThread *theMainThread;
    static QAbstractEventDispatcher *eventDispatcher;  // points to the platform dispatcher
    static bool is_app_running;
@@ -111,12 +120,6 @@ class Q_CORE_EXPORT QCoreApplicationPrivate
 
    static bool setuidAllowed;
    static uint attribs;
-
-   static inline bool testAttribute(uint flag) {
-      return attribs & (1 << flag);
-   }
-
-   static QSettings *copperspiceConf();
 
  protected:
    QCoreApplication *q_ptr;

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,22 +24,23 @@
 #ifndef QPLATFORM_BACKINGSTORE_H
 #define QPLATFORM_BACKINGSTORE_H
 
-#include <qrect.h>
 #include <qobject.h>
-#include <qwindow.h>
-#include <qregion.h>
 #include <qopengl.h>
+#include <qrect.h>
+#include <qregion.h>
+#include <qwindow.h>
 
-class QRegion;
-class QRect;
-class QPoint;
 class QImage;
-class QPlatformBackingStorePrivate;
-class QPlatformWindow;
-class QPlatformTextureList;
-class QPlatformTextureListPrivate;
 class QOpenGLContext;
 class QPlatformGraphicsBuffer;
+class QPlatformTextureList;
+class QPlatformWindow;
+class QPoint;
+class QRect;
+class QRegion;
+
+class QPlatformBackingStorePrivate;
+class QPlatformTextureListPrivate;
 
 #ifndef QT_NO_OPENGL
 class Q_GUI_EXPORT QPlatformTextureList : public QObject

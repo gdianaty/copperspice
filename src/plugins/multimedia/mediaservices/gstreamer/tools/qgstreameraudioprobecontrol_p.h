@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,11 @@
 #ifndef QGSTREAMERAUDIOPROBECONTROL_H
 #define QGSTREAMERAUDIOPROBECONTROL_H
 
+#include <qaudiobuffer.h>
 #include <qmediaaudioprobecontrol.h>
 #include <qmutex.h>
-#include <qaudiobuffer.h>
 #include <qshareddata.h>
+
 #include <qgstreamerbufferprobe_p.h>
 
 #include <gst/gst.h>

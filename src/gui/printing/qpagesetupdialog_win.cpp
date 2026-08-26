@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,11 +26,11 @@
 #ifndef QT_NO_PRINTDIALOG
 
 #include <qapplication.h>
-#include <qprinter.h>
 #include <qplatform_nativeinterface.h>
+#include <qprinter.h>
 
-#include <qprintengine_win_p.h>
 #include <qpagesetupdialog_p.h>
+#include <qprintengine_win_p.h>
 
 QPageSetupDialog::QPageSetupDialog(QPrinter *printer, QWidget *parent)
    : QDialog(*(new QPageSetupDialogPrivate(printer)), parent)

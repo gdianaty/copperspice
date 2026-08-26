@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,19 +24,19 @@
 #ifndef QReferenceCountedValue_P_H
 #define QReferenceCountedValue_P_H
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 template<typename T>
 class ReferenceCountedValue : public QSharedData
 {
  public:
    typedef QExplicitlySharedDataPointer<ReferenceCountedValue<T> > Ptr;
 
-   inline ReferenceCountedValue(T *const v) : value(v) {
-   }
+   ReferenceCountedValue(T *const v)
+      : value(v)
+   { }
 
-   inline ~ReferenceCountedValue() {
+   ~ReferenceCountedValue() {
       delete value;
    }
 
@@ -50,8 +50,7 @@ class ReferenceCountedValue : public QSharedData
    ReferenceCountedValue(const ReferenceCountedValue &) = delete;
    ReferenceCountedValue &operator=(const ReferenceCountedValue &) = delete;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

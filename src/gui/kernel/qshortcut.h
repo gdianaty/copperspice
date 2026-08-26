@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,9 +26,7 @@
 
 #include <qwidget.h>
 #include <qkeysequence.h>
-#include <QScopedPointer>
-
-
+#include <qscopedpointer.h>
 
 #ifndef QT_NO_SHORTCUT
 
@@ -78,7 +76,7 @@ class Q_GUI_EXPORT QShortcut : public QObject
 
    int id() const;
 
-   inline QWidget *parentWidget() const {
+   QWidget *parentWidget() const {
       return static_cast<QWidget *>(QObject::parent());
    }
 

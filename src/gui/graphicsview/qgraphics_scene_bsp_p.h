@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -34,19 +34,25 @@
 
 class QGraphicsItem;
 class QGraphicsSceneBspTreeVisitor;
+class QGraphicsSceneFindItemBspTreeVisitor;
 class QGraphicsSceneInsertItemBspTreeVisitor;
 class QGraphicsSceneRemoveItemBspTreeVisitor;
-class QGraphicsSceneFindItemBspTreeVisitor;
 
 class QGraphicsSceneBspTree
 {
  public:
    struct Node {
-      enum Type { Horizontal, Vertical, Leaf };
+      enum Type {
+         Horizontal,
+         Vertical,
+         Leaf
+      };
+
       union {
          qreal offset;
          int leafIndex;
       };
+
       Type type;
    };
 
@@ -63,11 +69,11 @@ class QGraphicsSceneBspTree
    QList<QGraphicsItem *> items(const QRectF &rect, bool onlyTopLevelItems = false) const;
    int leafCount() const;
 
-   inline int firstChildIndex(int index) const {
+   int firstChildIndex(int index) const {
       return index * 2 + 1;
    }
 
-   inline int parentIndex(int index) const {
+   int parentIndex(int index) const {
       return index > 0 ? ((index & 1) ? ((index - 1) / 2) : ((index - 2) / 2)) : -1;
    }
 
@@ -81,7 +87,8 @@ class QGraphicsSceneBspTree
    QVector<Node> nodes;
    QVector<QList<QGraphicsItem *>> leaves;
    int leafCnt;
-   QRectF rect;
+
+   QRectF m_bspTreeRect;
 
    QGraphicsSceneInsertItemBspTreeVisitor *insertVisitor;
    QGraphicsSceneRemoveItemBspTreeVisitor *removeVisitor;

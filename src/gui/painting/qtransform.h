@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,14 @@
 #ifndef QTRANSFORM_H
 #define QTRANSFORM_H
 
+#include <qline.h>
 #include <qmatrix.h>
 #include <qpainterpath.h>
+#include <qpoint.h>
 #include <qpolygon.h>
+#include <qrect.h>
 #include <qregion.h>
 #include <qwindowdefs.h>
-#include <qline.h>
-#include <qpoint.h>
-#include <qrect.h>
 
 class QVariant;
 
@@ -49,7 +49,7 @@ class Q_GUI_EXPORT QTransform
 
    QTransform();
 
-   inline explicit QTransform(Qt::NoDataOverload dummy)
+   explicit QTransform(Qt::NoDataOverload dummy)
       : affine(Qt::NoData)
    {
       (void) dummy;
@@ -148,14 +148,14 @@ class Q_GUI_EXPORT QTransform
    inline QTransform &operator-=(qreal delta);
 
  private:
-   inline QTransform(qreal m11, qreal m12, qreal m13, qreal m21, qreal m22, qreal m23,
+   QTransform(qreal m11, qreal m12, qreal m13, qreal m21, qreal m22, qreal m23,
             qreal m31, qreal m32, qreal m33, bool)
       : affine(m11, m12, m21, m22, m31, m32, true),
         m_13(m13), m_23(m23), m_33(m33), m_type(TxNone), m_dirty(TxProject)
    {
    }
 
-   inline QTransform(bool)
+   QTransform(bool)
       : affine(true), m_13(0), m_23(0), m_33(1), m_type(TxNone), m_dirty(TxNone)
    {
    }

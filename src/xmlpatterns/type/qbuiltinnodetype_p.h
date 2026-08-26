@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,8 +28,6 @@
 #include <qanynodetype_p.h>
 #include <qbuiltintypes_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 template <const QXmlNodeModelIndex::NodeKind kind>
@@ -39,9 +37,6 @@ class BuiltinNodeType : public AnyNodeType
    bool xdtTypeMatches(const ItemType::Ptr &other) const override;
    bool itemMatches(const Item &item) const override;
 
-   /**
-    * @returns for example "text()", depending on what the constructor was passed
-    */
    QString displayName(const NamePool::Ptr &np) const override;
 
    ItemType::Ptr xdtSuperType() const override;
@@ -54,17 +49,11 @@ class BuiltinNodeType : public AnyNodeType
  protected:
    friend class BuiltinTypes;
 
-   /**
-    * This constructor does nothing, but exists in order to make it impossible to
-    * instantiate this class from anywhere but from BuiltinTypes.
-    */
    BuiltinNodeType();
 };
 
 #include "qbuiltinnodetype.cpp"
 
 }
-
-QT_END_NAMESPACE
 
 #endif

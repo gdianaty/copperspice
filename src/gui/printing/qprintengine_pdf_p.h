@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,25 +28,25 @@
 
 #ifndef QT_NO_PRINTER
 
+#include <qdatastream.h>
 #include <qmap.h>
 #include <qmatrix.h>
-#include <qstring.h>
-#include <qvector.h>
 #include <qpaintengine.h>
 #include <qpainterpath.h>
-#include <qdatastream.h>
+#include <qstring.h>
+#include <qvector.h>
 
+#include <qpaintengine_p.h>
+#include <qpaintengine_p.h>
 #include <qpdf_p.h>
-#include <qpaintengine_p.h>
-#include <qpaintengine_p.h>
 #include <qprint_p.h>
 
-class QImage;
 class QDataStream;
+class QFile;
+class QImage;
 class QPen;
 class QPointF;
 class QRegion;
-class QFile;
 
 class QPdfPrintEnginePrivate;
 
@@ -62,11 +62,9 @@ class QPdfPrintEngine: public QPdfEngine, public QPrintEngine
 
    virtual ~QPdfPrintEngine();
 
-   // reimplementations QPaintEngine
    bool begin(QPaintDevice *pdev) override;
    bool end() override;
 
-   // reimplementations QPrintEngine
    bool abort() override {
       return false;
    }
@@ -78,8 +76,8 @@ class QPdfPrintEngine: public QPdfEngine, public QPrintEngine
    }
 
    int metric(QPaintDevice::PaintDeviceMetric) const override;
-   virtual void setProperty(PrintEnginePropertyKey key, const QVariant &value) override;
-   virtual QVariant property(PrintEnginePropertyKey key) const override;
+   void setProperty(PrintEnginePropertyKey key, const QVariant &value) override;
+   QVariant property(PrintEnginePropertyKey key) const override;
 
    QPrinter::PrinterState state;
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,16 +22,17 @@
 ***********************************************************************/
 
 #include <qcursor.h>
+#include <qcursor_p.h>
+
 #include <qapplication.h>
 #include <qbitmap.h>
-#include <qimage.h>
 #include <qdatastream.h>
-#include <qvariant.h>
 #include <qdebug.h>
+#include <qimage.h>
 #include <qplatform_cursor.h>
+#include <qvariant.h>
 
-#include <qcursor_p.h>
-#include <qguiapplication_p.h>
+#include <qapplication_p.h>
 #include <qhighdpiscaling_p.h>
 
 QPoint QCursor::pos(const QScreen *screen)
@@ -280,18 +281,19 @@ QCursor &QCursor::operator=(const QCursor &c)
    return *this;
 }
 
-
 QCursor::operator QVariant() const
 {
    return QVariant(QVariant::Cursor, this);
 }
 
-QDebug operator<<(QDebug dbg, const QCursor &c)
+QDebug operator<<(QDebug debug, const QCursor &c)
 {
-   QDebugStateSaver saver(dbg);
-   dbg.nospace() << "QCursor(Qt::CursorShape(" << c.shape() << "))";
+   QDebugStateSaver saver(debug);
+   debug.nospace();
 
-   return dbg;
+   debug << "QCursor(Qt::CursorShape(" << c.shape() << "))";
+
+   return debug;
 }
 
 QCursorData *qt_cursorTable[Qt::LastCursor + 1];
@@ -344,7 +346,7 @@ QCursorData *QCursorData::setBitmap(const QBitmap &bitmap, const QBitmap &mask, 
    }
 
    if (bitmap.depth() != 1 || mask.depth() != 1 || bitmap.size() != mask.size()) {
-      qWarning("QCursor: Cannot create bitmap cursor; invalid bitmap(s)");
+      qWarning("QCursor::setBitmap() Unable to create bitmap cursor, invalid bitmap(s)");
       QCursorData *c = qt_cursorTable[0];
       c->ref.ref();
       return c;

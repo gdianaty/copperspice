@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,21 +21,19 @@
 *
 ***********************************************************************/
 
-#include <qaccessiblewidget_common_p.h>
-
+#include <qaccessible.h>
 #include <qpushbutton.h>
 #include <qtoolbutton.h>
 #include <qtreeview.h>
 #include <qvariant.h>
-#include <qaccessible.h>
 
 #include <qaccessiblemenu_p.h>
-#include <qwidget_p.h>
-
-#include <qaccessiblewidget_simple_p.h>
-#include <qaccessiblewidget_range_p.h>
+#include <qaccessiblewidget_common_p.h>
 #include <qaccessiblewidget_complex_p.h>
+#include <qaccessiblewidget_range_p.h>
+#include <qaccessiblewidget_simple_p.h>
 #include <qaccessiblewidget_views_p.h>
+#include <qwidget_p.h>
 
 #ifndef QT_NO_ACCESSIBILITY
 
@@ -54,7 +52,7 @@ QAccessibleInterface *qAccessibleFactory(const QString &classname, QObject *obje
    // up here, so we have to ensure that we don't fill the cache with an entry of
    // a widget that is going away.
 
-   if (QWidgetPrivate::get(widget)->data.in_destructor) {
+   if (QWidgetPrivate::get(widget)->m_privateData.in_destructor) {
       return iface;
    }
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -91,12 +91,6 @@ void QGLColormap::setEntry(int idx, QRgb color)
    d->cells->replace(idx, color);
 }
 
-/*!
-    Set an array of cells in this colormap. \a count is the number of
-    colors that should be set, \a colors is the array of colors, and
-    \a base is the starting index.  The first element in \a colors
-    is set at \a base in the colormap.
-*/
 void QGLColormap::setEntries(int count, const QRgb *colors, int base)
 {
    detach();
@@ -111,9 +105,6 @@ void QGLColormap::setEntries(int count, const QRgb *colors, int base)
    }
 }
 
-/*!
-    Returns the QRgb value in the colorcell with index \a idx.
-*/
 QRgb QGLColormap::entryRgb(int idx) const
 {
    if (d == &shared_null || !d->cells) {

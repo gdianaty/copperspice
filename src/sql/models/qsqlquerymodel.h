@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,10 +27,11 @@
 #include <qabstractitemmodel.h>
 #include <qsqldatabase.h>
 
-class QSqlQueryModelPrivate;
 class QSqlError;
-class QSqlRecord;
 class QSqlQuery;
+class QSqlRecord;
+
+class QSqlQueryModelPrivate;
 
 class Q_SQL_EXPORT QSqlQueryModel: public QAbstractTableModel
 {

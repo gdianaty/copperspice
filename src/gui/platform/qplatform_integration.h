@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,30 +25,30 @@
 #define QPLATFORM_INTEGRATION_H
 
 #include <qopenglcontext.h>
+#include <qplatform_screen.h>
 #include <qsurfaceformat.h>
 #include <qwindowdefs.h>
-#include <qplatform_screen.h>
 
-class QPlatformWindow;
-class QWindow;
-class QPlatformBackingStore;
-class QPlatformFontDatabase;
-class QPlatformClipboard;
-class QPlatformNativeInterface;
-class QPlatformDrag;
-class QPlatformOpenGLContext;
-class QGuiGLFormat;
 class QAbstractEventDispatcher;
-class QPlatformInputContext;
+class QGuiGLFormat;
+class QKeyEvent;
+class QOffscreenSurface;
 class QPlatformAccessibility;
-class QPlatformTheme;
+class QPlatformBackingStore;
+class QPlatformClipboard;
 class QPlatformDialogHelper;
-class QPlatformSharedGraphicsCache;
+class QPlatformDrag;
+class QPlatformFontDatabase;
+class QPlatformInputContext;
+class QPlatformNativeInterface;
+class QPlatformOffscreenSurface;
+class QPlatformOpenGLContext;
 class QPlatformServices;
 class QPlatformSessionManager;
-class QKeyEvent;
-class QPlatformOffscreenSurface;
-class QOffscreenSurface;
+class QPlatformSharedGraphicsCache;
+class QPlatformTheme;
+class QPlatformWindow;
+class QWindow;
 
 class Q_GUI_EXPORT QPlatformIntegration
 {

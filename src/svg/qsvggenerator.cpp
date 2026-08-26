@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,16 +25,17 @@
 
 #ifndef QT_NO_SVGGENERATOR
 
-#include <qpainterpath.h>
-#include <qpaintengine_p.h>
-#include <qtextengine_p.h>
-#include <qdrawhelper_p.h>
+#include <qbuffer.h>
+#include <qdebug.h>
 #include <qfile.h>
+#include <qmath.h>
+#include <qpainterpath.h>
 #include <qtextcodec.h>
 #include <qtextstream.h>
-#include <qbuffer.h>
-#include <qmath.h>
-#include <qdebug.h>
+
+#include <qdrawhelper_p.h>
+#include <qpaintengine_p.h>
+#include <qtextengine_p.h>
 
 static void translate_color(const QColor &color, QString *color_string, QString *opacity_string)
 {
@@ -133,8 +134,8 @@ static inline QPaintEngine::PaintEngineFeatures svgEngineFeatures()
 class QSvgPaintEngine : public QPaintEngine
 {
    Q_DECLARE_PRIVATE(QSvgPaintEngine)
- public:
 
+ public:
    QSvgPaintEngine()
       : QPaintEngine(*new QSvgPaintEnginePrivate, svgEngineFeatures()) { }
 
@@ -220,11 +221,13 @@ class QSvgPaintEngine : public QPaintEngine
       saveGradientStops(str, g);
       str << QLatin1String("</linearGradient>") << endl;
    }
+
    void saveRadialGradientBrush(const QGradient *g) {
       QTextStream str(&d_func()->defs, QIODevice::Append);
       const QRadialGradient *grad = static_cast<const QRadialGradient *>(g);
       str << QLatin1String("<radialGradient ");
       saveGradientUnits(str, g);
+
       if (grad) {
          str << QLatin1String("cx=\"") << grad->center().x() << QLatin1String("\" ")
              << QLatin1String("cy=\"") << grad->center().y() << QLatin1String("\" ")
@@ -232,13 +235,14 @@ class QSvgPaintEngine : public QPaintEngine
              << QLatin1String("fx=\"") << grad->focalPoint().x() << QLatin1String("\" ")
              << QLatin1String("fy=\"") << grad->focalPoint().y() << QLatin1String("\" ");
       }
+
       str << QLatin1String("xml:id=\"") << d_func()->generateGradientName() << QLatin1String("\">\n");
       saveGradientStops(str, g);
       str << QLatin1String("</radialGradient>") << endl;
    }
 
    void saveConicalGradientBrush(const QGradient *) {
-      qWarning("Conical gradients are not supported");
+      qWarning("QSvgPaintEngine::saveConicalGradientBrush() Conical gradients are not supported");
    }
 
    void saveGradientStops(QTextStream &str, const QGradient *g) {
@@ -310,7 +314,7 @@ class QSvgPaintEngine : public QPaintEngine
       *d_func()->stream << QLatin1String(">\n");
    }
 
-   inline QTextStream &stream() {
+   QTextStream &stream() {
       return *d_func()->stream;
    }
 
@@ -366,7 +370,7 @@ class QSvgPaintEngine : public QPaintEngine
             break;
          }
          default:
-            qWarning("Unsupported pen style");
+            qWarning("QSvgPaintEngine::qpenToSvg() Unsupported pen style");
             break;
       }
 
@@ -387,7 +391,7 @@ class QSvgPaintEngine : public QPaintEngine
             stream() << "stroke-linecap=\"round\" ";
             break;
          default:
-            qWarning("Unhandled cap style");
+            qWarning("QSvgPaintEngine::qpenToSvg() Unsupported cap style");
       }
 
       switch (spen.joinStyle()) {
@@ -403,7 +407,7 @@ class QSvgPaintEngine : public QPaintEngine
             stream() << "stroke-linejoin=\"round\" ";
             break;
          default:
-            qWarning("Unhandled join style");
+            qWarning("QSvgPaintEngine::qpenToSvg() Unsupported join style");
       }
    }
    void qbrushToSvg(const QBrush &sbrush) {
@@ -550,7 +554,7 @@ void QSvgGenerator::setSize(const QSize &size)
 {
    Q_D(QSvgGenerator);
    if (d->engine->isActive()) {
-      qWarning("QSvgGenerator::setSize(), cannot set size while SVG is being generated");
+      qWarning("QSvgGenerator::setSize() Unable to set size while SVG is being generated");
       return;
    }
    d->engine->setSize(size);
@@ -562,13 +566,6 @@ QRectF QSvgGenerator::viewBoxF() const
    return d->engine->viewBox();
 }
 
-/*!
-    \since 4.5
-
-    Returns viewBoxF().toRect().
-
-    \sa viewBoxF()
-*/
 QRect QSvgGenerator::viewBox() const
 {
    Q_D(const QSvgGenerator);
@@ -579,7 +576,7 @@ void QSvgGenerator::setViewBox(const QRectF &viewBox)
 {
    Q_D(QSvgGenerator);
    if (d->engine->isActive()) {
-      qWarning("QSvgGenerator::setViewBox(), cannot set viewBox while SVG is being generated");
+      qWarning("QSvgGenerator::setViewBox() Unable to set viewBox while SVG is being generated");
       return;
    }
    d->engine->setViewBox(viewBox);
@@ -590,13 +587,6 @@ void QSvgGenerator::setViewBox(const QRect &viewBox)
    setViewBox(QRectF(viewBox));
 }
 
-/*!
-    \property QSvgGenerator::fileName
-    \brief the target filename for the generated SVG drawing
-    \since 4.5
-
-    \sa outputDevice
-*/
 QString QSvgGenerator::fileName() const
 {
    Q_D(const QSvgGenerator);
@@ -607,7 +597,7 @@ void QSvgGenerator::setFileName(const QString &fileName)
 {
    Q_D(QSvgGenerator);
    if (d->engine->isActive()) {
-      qWarning("QSvgGenerator::setFileName(), cannot set file name while SVG is being generated");
+      qWarning("QSvgGenerator::setFileName() Unable to set file name while SVG is being generated");
       return;
    }
 
@@ -622,16 +612,6 @@ void QSvgGenerator::setFileName(const QString &fileName)
    d->engine->setOutputDevice(file);
 }
 
-/*!
-    \property QSvgGenerator::outputDevice
-    \brief the output device for the generated SVG drawing
-    \since 4.5
-
-    If both output device and file name are specified, the output device
-    will have precedence.
-
-    \sa fileName
-*/
 QIODevice *QSvgGenerator::outputDevice() const
 {
    Q_D(const QSvgGenerator);
@@ -642,7 +622,7 @@ void QSvgGenerator::setOutputDevice(QIODevice *outputDevice)
 {
    Q_D(QSvgGenerator);
    if (d->engine->isActive()) {
-      qWarning("QSvgGenerator::setOutputDevice(), cannot set output device while SVG is being generated");
+      qWarning("QSvgGenerator::setOutputDevice() Unable to set output device while SVG is being generated");
       return;
    }
    d->owns_iodevice = false;
@@ -650,16 +630,6 @@ void QSvgGenerator::setOutputDevice(QIODevice *outputDevice)
    d->fileName = QString();
 }
 
-/*!
-    \property QSvgGenerator::resolution
-    \brief the resolution of the generated output
-    \since 4.5
-
-    The resolution is specified in dots per inch, and is used to
-    calculate the physical size of an SVG drawing.
-
-    \sa size, viewBox
-*/
 int QSvgGenerator::resolution() const
 {
    Q_D(const QSvgGenerator);
@@ -672,48 +642,53 @@ void QSvgGenerator::setResolution(int dpi)
    d->engine->setResolution(dpi);
 }
 
-/*!
-    Returns the paint engine used to render graphics to be converted to SVG
-    format information.
-*/
 QPaintEngine *QSvgGenerator::paintEngine() const
 {
    Q_D(const QSvgGenerator);
    return d->engine;
 }
 
-/*!
-    \reimp
-*/
 int QSvgGenerator::metric(QPaintDevice::PaintDeviceMetric metric) const
 {
    Q_D(const QSvgGenerator);
+
    switch (metric) {
       case QPaintDevice::PdmDepth:
          return 32;
+
       case QPaintDevice::PdmWidth:
          return d->engine->size().width();
+
       case QPaintDevice::PdmHeight:
          return d->engine->size().height();
+
       case QPaintDevice::PdmDpiX:
          return d->engine->resolution();
+
       case QPaintDevice::PdmDpiY:
          return d->engine->resolution();
+
       case QPaintDevice::PdmHeightMM:
          return qRound(d->engine->size().height() * 25.4 / d->engine->resolution());
+
       case QPaintDevice::PdmWidthMM:
          return qRound(d->engine->size().width() * 25.4 / d->engine->resolution());
+
       case QPaintDevice::PdmNumColors:
          return 0xffffffff;
+
       case QPaintDevice::PdmPhysicalDpiX:
          return d->engine->resolution();
+
       case QPaintDevice::PdmPhysicalDpiY:
          return d->engine->resolution();
+
       case QPaintDevice::PdmDevicePixelRatio:
       case QPaintDevice::PdmDevicePixelRatioScaled:
         return 1;
+
       default:
-         qWarning("QSvgGenerator::metric(), unhandled metric %d\n", metric);
+         qWarning("QSvgGenerator::metric() Unhandled metric %d\n", metric);
          break;
    }
    return 0;
@@ -723,19 +698,19 @@ bool QSvgPaintEngine::begin(QPaintDevice *)
 {
    Q_D(QSvgPaintEngine);
    if (!d->outputDevice) {
-      qWarning("QSvgPaintEngine::begin(), no output device");
+      qWarning("QSvgPaintEngine::begin() No output device");
       return false;
    }
 
    if (!d->outputDevice->isOpen()) {
       if (!d->outputDevice->open(QIODevice::WriteOnly | QIODevice::Text)) {
-         qWarning("QSvgPaintEngine::begin(), could not open output device: '%s'",
+         qWarning("QSvgPaintEngine::begin() Unable to open output device, '%s'",
                   csPrintable(d->outputDevice->errorString()));
          return false;
       }
 
    } else if (!d->outputDevice->isWritable()) {
-      qWarning("QSvgPaintEngine::begin(), could not write to read-only output device: '%s'",
+      qWarning("QSvgPaintEngine::begin() Unable to write to a read-only output device, '%s'",
                csPrintable(d->outputDevice->errorString()));
       return false;
    }
@@ -884,6 +859,7 @@ void QSvgPaintEngine::updateState(const QPaintEngineState &state)
 
    d->afterFirstUpdate = true;
 }
+
 void QSvgPaintEngine::drawEllipse(const QRectF &r)
 {
     Q_D(QSvgPaintEngine);
@@ -891,16 +867,19 @@ void QSvgPaintEngine::drawEllipse(const QRectF &r)
     const bool isCircle = r.width() == r.height();
     *d->stream << '<' << (isCircle ? "circle" : "ellipse");
 
-    if (state->pen().isCosmetic())
+    if (m_engineState->pen().isCosmetic()) {
         *d->stream << " vector-effect=\"non-scaling-stroke\"";
+    }
 
     const QPointF c = r.center();
     *d->stream << " cx=\"" << c.x() << "\" cy=\"" << c.y();
 
-    if (isCircle)
+    if (isCircle) {
         *d->stream << "\" r=\"" << r.width() / qreal(2.0);
-    else
+    } else {
         *d->stream << "\" rx=\"" << r.width() / qreal(2.0) << "\" ry=\"" << r.height() / qreal(2.0);
+    }
+
     *d->stream << "\"/>" << endl;
 }
 
@@ -909,38 +888,48 @@ void QSvgPaintEngine::drawPath(const QPainterPath &p)
    Q_D(QSvgPaintEngine);
 
    *d->stream << "<path vector-effect=\""
-              << (state->pen().isCosmetic() ? "non-scaling-stroke" : "none")
+              << (m_engineState->pen().isCosmetic() ? "non-scaling-stroke" : "none")
               << "\" fill-rule=\""
               << (p.fillRule() == Qt::OddEvenFill ? "evenodd" : "nonzero")
               << "\" d=\"";
 
    for (int i = 0; i < p.elementCount(); ++i) {
       const QPainterPath::Element &e = p.elementAt(i);
+
       switch (e.type) {
          case QPainterPath::MoveToElement:
             *d->stream << 'M' << e.x << ',' << e.y;
             break;
+
          case QPainterPath::LineToElement:
             *d->stream << 'L' << e.x << ',' << e.y;
             break;
+
          case QPainterPath::CurveToElement:
             *d->stream << 'C' << e.x << ',' << e.y;
             ++i;
+
             while (i < p.elementCount()) {
-               const QPainterPath::Element &e = p.elementAt(i);
-               if (e.type != QPainterPath::CurveToDataElement) {
+               const QPainterPath::Element &newElement = p.elementAt(i);
+
+               if (newElement.type != QPainterPath::CurveToDataElement) {
                   --i;
                   break;
+
                } else {
                   *d->stream << ' ';
                }
-               *d->stream << e.x << ',' << e.y;
+
+               *d->stream << newElement.x << ',' << newElement.y;
                ++i;
             }
+
             break;
+
          default:
             break;
       }
+
       if (i != p.elementCount() - 1) {
          *d->stream << ' ';
       }
@@ -963,13 +952,16 @@ void QSvgPaintEngine::drawPolygon(const QPointF *points, int pointCount,
 
    if (mode == PolylineMode) {
       stream() << "<polyline fill=\"none\" vector-effect=\""
-               << (state->pen().isCosmetic() ? "non-scaling-stroke" : "none")
+               << (m_engineState->pen().isCosmetic() ? "non-scaling-stroke" : "none")
                << "\" points=\"";
+
       for (int i = 0; i < pointCount; ++i) {
          const QPointF &pt = points[i];
          stream() << pt.x() << ',' << pt.y() << ' ';
       }
+
       stream() << "\" />" << endl;
+
    } else {
       path.closeSubpath();
       drawPath(path);
@@ -981,9 +973,13 @@ void QSvgPaintEngine::drawRects(const QRectF *rects, int rectCount)
     Q_D(QSvgPaintEngine);
     for (int i=0; i < rectCount; ++i) {
         const QRectF &rect = rects[i].normalized();
+
         *d->stream << "<rect";
-        if (state->pen().isCosmetic())
+
+        if (m_engineState->pen().isCosmetic()) {
             *d->stream << " vector-effect=\"non-scaling-stroke\"";
+        }
+
         *d->stream << " x=\"" << rect.x() << "\" y=\"" << rect.y()
                    << "\" width=\"" << rect.width() << "\" height=\"" << rect.height()
                    << "\"/>" << endl;

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,9 +23,8 @@
 
 #include <qgstreamermetadataprovider.h>
 
-#include <qdebug.h>
-#include <qmediametadata.h>
 #include <qgstreamerplayersession.h>
+#include <qmediametadata.h>
 
 #include <gst/gstversion.h>
 
@@ -67,10 +66,7 @@ static const QGstreamerMetaDataKeyLookup *qt_gstreamerMetaDataKeys()
 
       // Music
       metadataKeys.insert(GST_TAG_ALBUM,         QMediaMetaData::AlbumTitle);
-
-#if GST_CHECK_VERSION(0, 10, 25)
       metadataKeys.insert(GST_TAG_ALBUM_ARTIST,  QMediaMetaData::AlbumArtist);
-#endif
 
       metadataKeys.insert(GST_TAG_ARTIST,        QMediaMetaData::ContributingArtist);
       //metadataKeys.insert(0,                   QMediaMetaData::Conductor);
@@ -168,4 +164,3 @@ void QGstreamerMetaDataProvider::updateTags()
       emit metaDataChanged();
    }
 }
-

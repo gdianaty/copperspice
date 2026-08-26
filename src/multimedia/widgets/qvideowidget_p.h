@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -34,11 +34,10 @@
 #include <qpaintervideosurface_p.h>
 
 class QMediaService;
-class QVideoWidgetControl;
-class QVideoRendererControl;
-class QVideoWindowControl;
-class QMediaService;
 class QVideoOutputControl;
+class QVideoRendererControl;
+class QVideoWidgetControl;
+class QVideoWindowControl;
 
 class QVideoWidgetControlInterface
 {
@@ -76,7 +75,7 @@ class QVideoWidgetControlBackend : public QObject, public QVideoWidgetControlInt
    MULTI_CS_OBJECT_MULTIPLE(QVideoWidgetControlBackend, QObject)
 
  public:
-   QVideoWidgetControlBackend(QMediaService *service, QVideoWidgetControl *control, QWidget *widget);
+   QVideoWidgetControlBackend(QMediaService *service, QVideoWidgetControl *control, QVideoWidget *widget);
 
    void releaseControl();
 
@@ -164,7 +163,7 @@ class QWindowVideoWidgetBackend : public QVideoWidgetBackend
    MULTI_CS_OBJECT(QWindowVideoWidgetBackend)
 
  public:
-   QWindowVideoWidgetBackend(QMediaService *service, QVideoWindowControl *control, QWidget *widget);
+   QWindowVideoWidgetBackend(QMediaService *service, QVideoWindowControl *control, QVideoWidget *widget);
    ~QWindowVideoWidgetBackend();
 
    void releaseControl();
@@ -190,7 +189,7 @@ class QWindowVideoWidgetBackend : public QVideoWidgetBackend
  private:
    QMediaService *m_service;
    QVideoWindowControl *m_windowControl;
-   QWidget *m_widget;
+   QVideoWidget *m_widget;
    QSize m_pixelAspectRatio;
 };
 

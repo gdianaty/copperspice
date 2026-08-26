@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,10 +29,11 @@
 
 #ifndef QT_NO_TOOLBAR
 
-class QToolBarPrivate;
 class QIcon;
 class QMainWindow;
 class QStyleOptionToolBar;
+
+class QToolBarPrivate;
 
 class Q_GUI_EXPORT QToolBar : public QWidget
 {
@@ -80,7 +81,7 @@ class Q_GUI_EXPORT QToolBar : public QWidget
    void setAllowedAreas(Qt::ToolBarAreas areas);
    Qt::ToolBarAreas allowedAreas() const;
 
-   inline bool isAreaAllowed(Qt::ToolBarArea area) const {
+   bool isAreaAllowed(Qt::ToolBarArea area) const {
       return (allowedAreas() & area) == area;
    }
 

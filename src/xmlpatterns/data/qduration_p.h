@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,8 +26,6 @@
 
 #include <qabstractduration_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class Duration : public AbstractDuration
@@ -35,9 +33,6 @@ class Duration : public AbstractDuration
  public:
    typedef AtomicValue::Ptr Ptr;
 
-   /**
-    * Creates an instance from the lexical representation @p string.
-    */
    static Duration::Ptr fromLexical(const QString &string);
    static Duration::Ptr fromComponents(const bool isPositive, const YearProperty years,
                   const MonthProperty months, const DayCountProperty days, const HourProperty hours,
@@ -46,16 +41,7 @@ class Duration : public AbstractDuration
    ItemType::Ptr type() const override;
    QString stringValue() const override;
 
-   /**
-    * Always results in an assert crash. Calling this function makes no
-    * sense due to that the value space of xs:duration is not well defined.
-    */
    Value value() const override;
-
-   /**
-    * Always results in an assert crash. Calling this function makes no
-    * sense due to that the value space of xs:duration is not well defined.
-    */
    Item fromValue(const Value val) const override;
 
    YearProperty years() const override;
@@ -82,7 +68,5 @@ class Duration : public AbstractDuration
    const MSecondProperty   m_mseconds;
 };
 }
-
-QT_END_NAMESPACE
 
 #endif

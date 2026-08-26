@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -25,24 +25,70 @@
 TEST_CASE("QScopedPointer traits", "[qscopedpointer]")
 {
    REQUIRE(std::is_copy_constructible_v<QScopedPointer<int>> == false);
-   REQUIRE(std::is_move_constructible_v<QScopedPointer<int>> == true);
+   REQUIRE(std::is_move_constructible_v<QScopedPointer<int>> == false);
 
    REQUIRE(std::is_copy_assignable_v<QScopedPointer<int>> == false);
-   REQUIRE(std::is_move_assignable_v<QScopedPointer<int>> == true);
+   REQUIRE(std::is_move_assignable_v<QScopedPointer<int>> == false);
 
    REQUIRE(std::has_virtual_destructor_v<QScopedPointer<int>> == false);
 }
 
-TEST_CASE("QScopedPointer convert", "[qscopedpointer]")
+TEST_CASE("QScopedPointer comparison", "[qscopedpointer]")
 {
-   QScopedPointer<int> ptr1 = QMakeScoped<int>(42);
+   QScopedPointer<int> ptr1 = nullptr;
 
-   std::unique_ptr<int> ptr2 = std::move(ptr1);
+   QScopedPointer<int> ptr2 = QMakeScoped<int>();
 
-   REQUIRE(ptr1 == nullptr);
-   REQUIRE(ptr2 != nullptr);
+   int *ptr3 = ptr2.get();
 
-   REQUIRE(*ptr2 == 42);
+   REQUIRE( (ptr1 == ptr2) == false);
+   REQUIRE( (ptr1 != ptr2) == true);
+   REQUIRE( (ptr1 <  ptr2) == true);
+   REQUIRE( (ptr1 >  ptr2) == false);
+   REQUIRE( (ptr1 <= ptr2) == true);
+   REQUIRE( (ptr1 >= ptr2) == false);
+
+   REQUIRE( (ptr2 == ptr1) == false);
+   REQUIRE( (ptr2 != ptr1) == true);
+   REQUIRE( (ptr2 <  ptr1) == false);
+   REQUIRE( (ptr2 >  ptr1) == true);
+   REQUIRE( (ptr2 <= ptr1) == false);
+   REQUIRE( (ptr2 >= ptr1) == true);
+
+   REQUIRE( (ptr2 == ptr3) == true);
+   REQUIRE( (ptr2 != ptr3) == false);
+   REQUIRE( (ptr2 <  ptr3) == false);
+   REQUIRE( (ptr2 >  ptr3) == false);
+   REQUIRE( (ptr2 <= ptr3) == true);
+   REQUIRE( (ptr2 >= ptr3) == true);
+
+   REQUIRE( (ptr1 == nullptr) == true);
+   REQUIRE( (ptr1 != nullptr) == false);
+   REQUIRE( (ptr1 <  nullptr) == false);
+   REQUIRE( (ptr1 >  nullptr) == false);
+   REQUIRE( (ptr1 <= nullptr) == true);
+   REQUIRE( (ptr1 >= nullptr) == true);
+
+   REQUIRE( (ptr2 == nullptr) == false);
+   REQUIRE( (ptr2 != nullptr) == true);
+   REQUIRE( (ptr2 <  nullptr) == false);
+   REQUIRE( (ptr2 >  nullptr) == true);
+   REQUIRE( (ptr2 <= nullptr) == false);
+   REQUIRE( (ptr2 >= nullptr) == true);
+
+   REQUIRE( (ptr1 == ptr1) == true);
+   REQUIRE( (ptr1 != ptr1) == false);
+   REQUIRE( (ptr1 <  ptr1) == false);
+   REQUIRE( (ptr1 >  ptr1) == false);
+   REQUIRE( (ptr1 <= ptr1) == true);
+   REQUIRE( (ptr1 >= ptr1) == true);
+
+   REQUIRE( (ptr2 == ptr2) == true);
+   REQUIRE( (ptr2 != ptr2) == false);
+   REQUIRE( (ptr2 <  ptr2) == false);
+   REQUIRE( (ptr2 >  ptr2) == false);
+   REQUIRE( (ptr2 <= ptr2) == true);
+   REQUIRE( (ptr2 >= ptr2) == true);
 }
 
 TEST_CASE("QScopedPointer custom_deleter", "[qscopedpointer]")
@@ -77,44 +123,14 @@ TEST_CASE("QScopedPointer empty", "[qscopedpointer]")
    REQUIRE(ptr.isNull() == true);
 }
 
-TEST_CASE("QScopedPointer equality", "[qscopedpointer]")
+TEST_CASE("QScopedPointer is_nullptr", "[qscopedpointer]")
 {
-   QScopedPointer<int> ptr1 = QMakeScoped<int>();
-   QScopedPointer<int> ptr2(nullptr);
+   QScopedPointer<int> ptr = nullptr;
 
-   REQUIRE((ptr1 == ptr2) == false);
-   REQUIRE((ptr1 != ptr2) == true);
+   REQUIRE(ptr == nullptr);
+   REQUIRE(nullptr == ptr);
 
-   REQUIRE((ptr1 == ptr2.get()) == false);
-   REQUIRE((ptr1.get() == ptr2) == false);
-
-   REQUIRE((ptr1 != ptr2.get()) == true);
-   REQUIRE((ptr1.get() != ptr2) == true);
-}
-
-TEST_CASE("QScopedPointer move_assign", "[qscopedpointer]")
-{
-   QScopedPointer<int> ptr1;
-   int *rawPointer = nullptr;
-
-   {
-      QScopedPointer<int> ptr2(new int);
-      rawPointer = ptr2.data();
-      ptr1 = std::move(ptr2);
-
-      REQUIRE(ptr2.isNull());
-   }
-
-   REQUIRE(rawPointer == ptr1.get());
-}
-
-TEST_CASE("QScopedPointer move_construct", "[qscopedpointer]")
-{
-   QScopedPointer<int> ptr1 = QMakeUnique<int>();
-   QScopedPointer<int> ptr2(std::move(ptr1));
-
-   REQUIRE(ptr1.isNull() == true);
-   REQUIRE(ptr2.isNull() == false);
+   REQUIRE(ptr.isNull() == true);
 }
 
 TEST_CASE("QScopedPointer release", "[qscopedpointer]")

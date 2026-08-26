@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -54,9 +54,6 @@ class QRasterWindowPrivate : public QPaintDeviceWindowPrivate
    QScopedPointer<QBackingStore> backingstore;
 };
 
-/*!
-  Constructs a new QRasterWindow with \a parent.
-*/
 QRasterWindow::QRasterWindow(QWindow *parent)
    : QPaintDeviceWindow(* (new QRasterWindowPrivate), parent)
 {
@@ -64,9 +61,6 @@ QRasterWindow::QRasterWindow(QWindow *parent)
    d_func()->backingstore.reset(new QBackingStore(this));
 }
 
-/*!
-  \internal
-*/
 int QRasterWindow::metric(PaintDeviceMetric metric) const
 {
    Q_D(const QRasterWindow);
@@ -80,12 +74,8 @@ int QRasterWindow::metric(PaintDeviceMetric metric) const
    return QPaintDeviceWindow::metric(metric);
 }
 
-/*!
-  \internal
-*/
 QPaintDevice *QRasterWindow::redirected(QPoint *) const
 {
    Q_D(const QRasterWindow);
    return d->backingstore->paintDevice();
 }
-

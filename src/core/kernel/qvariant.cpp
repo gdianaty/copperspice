@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,20 +29,20 @@
 #include <qdebug.h>
 #include <qdatetime.h>
 #include <qeasingcurve.h>
-#include <qstring8.h>
-#include <qstring16.h>
-#include <qstringlist.h>
-#include <qlocale.h>
 #include <qjsonvalue.h>
 #include <qjsonobject.h>
 #include <qjsonarray.h>
 #include <qjsondocument.h>
-#include <qpoint.h>
-#include <qsize.h>
-#include <qrect.h>
 #include <qline.h>
-#include <quuid.h>
+#include <qlocale.h>
+#include <qpoint.h>
+#include <qrect.h>
+#include <qsize.h>
+#include <qstring8.h>
+#include <qstring16.h>
+#include <qstringlist.h>
 #include <qurl.h>
+#include <quuid.h>
 
 #include <limits>
 
@@ -120,8 +120,15 @@ static const QVariant::NamesAndTypes builtinTypes[] = {
    { "signed char",            QVariant::SChar,                typeid(signed char *) },
    { "unsigned char",          QVariant::UChar,                typeid(unsigned char *) },
 
-#if defined(__cpp_char8_t)
+#if defined( _LIBCPP_VERSION )
+   // libC++ does not support this typeid(), only used in getTypeId() for other
+   // standard libraries, dummy value is sufficient
+
+   { "char8_t",                QVariant::Char8_t,              typeid(char *) },
+
+#else
    { "char8_t",                QVariant::Char8_t,              typeid(char8_t *) },
+
 #endif
 
    { "char16_t",               QVariant::Char16_t,             typeid(char16_t *) },
@@ -184,7 +191,7 @@ static const QVariant::NamesAndTypes builtinTypes[] = {
    { "QIcon",                  QVariant::Icon,                 typeid(QIcon *) },
    { "QImage",                 QVariant::Image,                typeid(QImage *) },
    { "QKeySequence",           QVariant::KeySequence,          typeid(QKeySequence *) },
-   { "QMatrix",                QVariant::Matrix,               typeid(QMatrix *)} ,
+   { "QMatrix",                QVariant::Matrix,               typeid(QMatrix *)},
    { "QMatrix4x4",             QVariant::Matrix4x4,            typeid(QMatrix4x4 *) },
    { "QPalette",               QVariant::Palette,              typeid(QPalette *) },
    { "QPen",                   QVariant::Pen,                  typeid(QPen *) },
@@ -459,9 +466,9 @@ QVariant::QVariant(QJsonDocument value)
 
 static bool cs_internal_isNumericType(uint type)
 {
-   return (type == QVariant::Int       || type == QVariant::UInt ||
-            type == QVariant::LongLong  || type == QVariant::ULongLong ||
-            type == QVariant::Double    || type == QVariant::Float);
+   return (type == QVariant::Int  || type == QVariant::UInt ||
+      type == QVariant::LongLong  || type == QVariant::ULongLong ||
+      type == QVariant::Double    || type == QVariant::Float);
 }
 
 static bool cs_internal_isFloatingPoint(uint type)
@@ -509,7 +516,7 @@ static int64_t cs_internal_convertToInt64(const QVariant &data, bool *ok)
          return int64_t(data.getData<float>());
 
       case QVariant::Char:
-        return int64_t(static_cast<signed char>(data.getData<char>()));
+         return int64_t(static_cast<signed char>(data.getData<char>()));
 
       case QVariant::SChar:
          return int64_t(data.getData<signed char>());
@@ -533,7 +540,7 @@ static int64_t cs_internal_convertToInt64(const QVariant &data, bool *ok)
          QJsonValue tmp = data.getData<QJsonValue>();
 
          if (tmp.isDouble()) {
-           return int64_t(tmp.toDouble());
+            return int64_t(tmp.toDouble());
 
          } else {
             break;
@@ -593,7 +600,7 @@ static uint64_t cs_internal_convertToUInt64(const QVariant &data, bool *ok)
          return uint64_t(data.getData<float>());
 
       case QVariant::Char:
-        return uint64_t(static_cast<unsigned char>(data.getData<char>()));
+         return uint64_t(static_cast<unsigned char>(data.getData<char>()));
 
       case QVariant::SChar:
          return uint64_t(static_cast<unsigned char>(data.getData<signed char>()));
@@ -617,7 +624,7 @@ static uint64_t cs_internal_convertToUInt64(const QVariant &data, bool *ok)
          QJsonValue tmp = data.getData<QJsonValue>();
 
          if (tmp.isDouble()) {
-           return uint64_t(tmp.toDouble());
+            return uint64_t(tmp.toDouble());
 
          } else {
             break;
@@ -667,6 +674,7 @@ bool QVariant::cs_internal_convert(uint current_userType, uint new_userType)
             case QVariant::ByteArray: {
 
                QByteArray str = getData<QByteArray>().toLower();
+
                if (str == QByteArray("0") || str == QByteArray("false") || str.isEmpty()) {
                   setValue(false);
                } else {
@@ -679,6 +687,7 @@ bool QVariant::cs_internal_convert(uint current_userType, uint new_userType)
             case QVariant::String: {
 
                QString str = getData<QString>().toLower();
+
                if (str == "0" || str == "false" || str.isEmpty()) {
                   setValue(false);
                } else {
@@ -691,6 +700,7 @@ bool QVariant::cs_internal_convert(uint current_userType, uint new_userType)
             case QVariant::String16: {
 
                QString16 str = getData<QString16>().toLower();
+
                if (str == u"0" || str == u"false" || str.isEmpty()) {
                   setValue(false);
                } else {
@@ -1092,7 +1102,7 @@ bool QVariant::cs_internal_convert(uint current_userType, uint new_userType)
 
          break;
 
-     case QVariant::ByteArray: {
+      case QVariant::ByteArray: {
 
          switch (current_userType) {
 
@@ -1126,7 +1136,7 @@ bool QVariant::cs_internal_convert(uint current_userType, uint new_userType)
 
             case QVariant::LongLong:
                setValue<QByteArray>( QByteArray::number(getData<long long>()) );
-              break;
+               break;
 
             case QVariant::ULongLong:
                setValue<QByteArray>( QByteArray::number(getData<unsigned long long>()) );
@@ -1152,6 +1162,7 @@ bool QVariant::cs_internal_convert(uint current_userType, uint new_userType)
                QByteArray tmp;
 
                auto ch = getData<char>();
+
                if (ch != 0) {
                   tmp.append(ch);
                }
@@ -1176,6 +1187,7 @@ bool QVariant::cs_internal_convert(uint current_userType, uint new_userType)
                QByteArray tmp;
 
                auto ch = getData<signed char>();
+
                if (ch != 0) {
                   tmp.append(ch);
                }
@@ -1188,6 +1200,7 @@ bool QVariant::cs_internal_convert(uint current_userType, uint new_userType)
                QByteArray tmp;
 
                auto ch = getData<unsigned char>();
+
                if (ch != 0) {
                   tmp.append(ch);
                }
@@ -1855,7 +1868,6 @@ bool QVariant::cs_internal_convert(uint current_userType, uint new_userType)
 
          break;
 
-
       default:
          retval = false;
    }
@@ -2122,7 +2134,7 @@ void QVariant::cs_internal_create(uint typeId, const void *other)
          break;
 
       case QVariant::PointF:
-          if (other == nullptr) {
+         if (other == nullptr) {
             setValue<QPointF>(QPointF());
          } else {
             setValue<QPointF>(*static_cast<const QPointF *>(other) );
@@ -2226,7 +2238,7 @@ void QVariant::cs_internal_create(uint typeId, const void *other)
          if (other == nullptr) {
             setValue<QObject *>(nullptr);
          } else {
-            setValue<QObject *>(*static_cast<QObject * const *>(other) );
+            setValue<QObject *>(*static_cast<QObject * const *>(other));
          }
 
          break;
@@ -2469,7 +2481,7 @@ bool QVariant::canConvert(uint newType) const
       case QVariant::SChar:
       case QVariant::UChar:
 
-        if (current_userType == QVariant::Bool) {
+         if (current_userType == QVariant::Bool) {
             return true;
 
          } else if (current_userType == QVariant::Int || current_userType == QVariant::UInt) {
@@ -2724,7 +2736,7 @@ bool QVariant::canConvert(uint newType) const
             return true;
 
          } else if (current_userType == QVariant::Date || current_userType == QVariant::DateTime) {
-             return true;
+            return true;
 
          } else if (current_userType == QVariant::Time) {
             return true;
@@ -2997,7 +3009,7 @@ bool QVariant::canConvert(uint newType) const
          break;
 
       default:
-        return false;
+         return false;
    }
 
    return false;
@@ -3079,7 +3091,7 @@ void QVariant::load(QDataStream &stream)
 
    if (! cs_internal_load(stream, userType()) ) {
       stream.setStatus(QDataStream::ReadCorruptData);
-      qWarning("QVariant::load(): Unable to load Variant::Type %d from stream", userType());
+      qWarning("QVariant::load() Unable to load Variant::Type %d from stream", userType());
    }
 }
 
@@ -3099,7 +3111,7 @@ void QVariant::save(QDataStream &stream) const
    }
 
    if (! cs_internal_save(stream, userType()) ) {
-      qWarning("QVariant::save(): Unable to save Variant::Type %d to data stream", userType());
+      qWarning("QVariant::save() Unable to save Variant::Type %d to data stream", userType());
    }
 }
 
@@ -3137,7 +3149,7 @@ bool QVariant::cs_internal_load(QDataStream &stream, uint type)
          qint32 tmp;
          stream >> tmp;
 
-          setValue<int>(tmp);
+         setValue<int>(tmp);
          break;
       }
 
@@ -3165,7 +3177,7 @@ bool QVariant::cs_internal_load(QDataStream &stream, uint type)
          break;
       }
 
-      case QVariant::LongLong:{
+      case QVariant::LongLong: {
          qint64 tmp;
          stream >> tmp;
 
@@ -3255,7 +3267,7 @@ bool QVariant::cs_internal_load(QDataStream &stream, uint type)
          break;
       }
 
-      case QVariant::String16:{
+      case QVariant::String16: {
          QString16 tmp;
          stream >> tmp;
 
@@ -3287,7 +3299,7 @@ bool QVariant::cs_internal_load(QDataStream &stream, uint type)
          break;
       }
 
-      case QVariant::Map:{
+      case QVariant::Map: {
          QVariantMap tmp;
          stream >> tmp;
 
@@ -3373,7 +3385,7 @@ bool QVariant::cs_internal_load(QDataStream &stream, uint type)
          break;
       }
 
-     case QVariant::Point:  {
+      case QVariant::Point:  {
          QPoint tmp;
          stream >> tmp;
 
@@ -3469,11 +3481,10 @@ bool QVariant::cs_internal_load(QDataStream &stream, uint type)
          }
 
          if (! done)  {
-           return false;
+            return false;
          }
 
          break;
-
    }
 
    return retval;
@@ -3612,7 +3623,7 @@ bool QVariant::cs_internal_save(QDataStream &stream, uint type) const
       case QVariant::JsonDocument:
          return false;
 
-     case QVariant::Line:
+      case QVariant::Line:
          stream << static_cast<QLine>(getData<QLine>());
          break;
 
@@ -3680,7 +3691,7 @@ bool QVariant::cs_internal_save(QDataStream &stream, uint type) const
          }
 
          if (! done)  {
-           return false;
+            return false;
          }
 
          break;
@@ -3784,8 +3795,9 @@ uint QVariant::getTypeId(const std::type_index &index)
 
    for (const auto &item : builtinTypes) {
 
-#if defined(Q_OS_DARWIN) || defined(Q_OS_FREEBSD)
-      // does not support comparing hash_code()
+#if defined( _LIBCPP_VERSION )
+      // libC++ does not support comparing hash_code(), happens mostly when using clang
+      // prior testing: defined(Q_OS_DARWIN) || defined(Q_OS_FREEBSD)
 
       if (strcmp(item.meta_typeT.name(), index.name()) == 0) {
          retval = item.meta_typeId;
@@ -3793,6 +3805,7 @@ uint QVariant::getTypeId(const std::type_index &index)
       }
 
 #else
+
       if (item.meta_typeT == index)  {
          retval = item.meta_typeId;
          break;
@@ -3862,8 +3875,8 @@ QString QVariant::getTypeName(uint typeId)
    return retval;
 }
 
-bool QVariant::isEnum()  const {
-
+bool QVariant::isEnum()  const
+{
    // get a ptr to the requested alternative
    auto ptr = std::get_if<std::shared_ptr<CustomType>>(&(m_data));
 
@@ -3877,8 +3890,8 @@ bool QVariant::isEnum()  const {
    }
 }
 
-int64_t QVariant::enumToInt() const {
-
+int64_t QVariant::enumToInt() const
+{
    // get a ptr to the requested alternative
    auto ptr = std::get_if<std::shared_ptr<CustomType>>(&(m_data));
 
@@ -3892,8 +3905,8 @@ int64_t QVariant::enumToInt() const {
    }
 }
 
-uint64_t QVariant::enumToUInt() const {
-
+uint64_t QVariant::enumToUInt() const
+{
    // get a ptr to the requested alternative
    auto ptr = std::get_if<std::shared_ptr<CustomType>>(&(m_data));
 
@@ -4326,4 +4339,20 @@ QDataStream &operator<<(QDataStream &stream, const QVariant::Type typeId)
    stream << static_cast<quint32>(typeId);
 
    return stream;
+}
+
+QDebug &operator<<(QDebug &debug, const QVariant &value)
+{
+   if (! value.isValid()) {
+      debug << "QVariant(Invalid)";
+
+   } else if (value.canConvert<QString>()) {
+      debug << "QVariant(" << value.typeName() << "," << value.toString() << ")";
+
+   } else {
+      debug << "QVariant(" << value.typeName() << ", unknown)";
+
+   }
+
+   return debug;
 }

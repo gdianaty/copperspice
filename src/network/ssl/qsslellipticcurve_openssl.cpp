@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,12 +22,12 @@
 ***********************************************************************/
 
 #include <qsslellipticcurve.h>
-#include <qsslsocket_p.h>
 
 #include <qsslsocket_openssl_symbols_p.h>
+#include <qsslsocket_p.h>
 
-#include <openssl/ssl.h>
 #include <openssl/obj_mac.h>
+#include <openssl/ssl.h>
 
 #include <algorithm>
 

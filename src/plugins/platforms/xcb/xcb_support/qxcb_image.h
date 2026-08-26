@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,10 @@
 #ifndef QXCB_IMAGE_H
 #define QXCB_IMAGE_H
 
-#include <qxcb_screen.h>
-#include <qpair.h>
 #include <qimage.h>
+#include <qpair.h>
 #include <qpixmap.h>
+#include <qxcb_screen.h>
 
 #include <xcb/xcb_image.h>
 

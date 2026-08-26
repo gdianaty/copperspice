@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,12 +22,13 @@
 ***********************************************************************/
 
 #include <qgridlayout.h>
+
 #include <qapplication.h>
-#include <qwidget.h>
 #include <qlist.h>
 #include <qsizepolicy.h>
-#include <qvector.h>
 #include <qvarlengtharray.h>
+#include <qvector.h>
+#include <qwidget.h>
 
 #include <qlayoutengine_p.h>
 #include <qlayout_p.h>
@@ -37,12 +38,6 @@ struct QGridLayoutSizeTriple {
    QSize hint;
    QSize maxS;
 };
-
-/*
-  Three internal classes related to QGridLayout: (1) QGridBox is a
-  QLayoutItem with (row, column) information and (torow, tocolumn) information; (3) QGridLayoutData is
-  the internal representation of a QGridLayout.
-*/
 
 class QGridBox
 {
@@ -156,73 +151,77 @@ class QGridLayoutPrivate : public QLayoutPrivate
 
    void distribute(QRect rect, int hSpacing, int vSpacing);
 
-   inline int numRows() const {
+   int numRows() const {
       return rr;
    }
 
-   inline int numCols() const {
+   int numCols() const {
       return cc;
    }
 
-   inline void expand(int rows, int cols) {
-
+   void expand(int rows, int cols) {
       setSize(qMax(rows, rr), qMax(cols, cc));
    }
 
-   inline void setRowStretch(int r, int s) {
+   void setRowStretch(int r, int s) {
       expand(r + 1, 0);
       rStretch[r] = s;
       setDirty();
    }
 
-   inline void setColStretch(int c, int s) {
+   void setColStretch(int c, int s) {
       expand(0, c + 1);
       cStretch[c] = s;
       setDirty();
    }
 
-   inline int rowStretch(int r) const {
+   int rowStretch(int r) const {
       return rStretch.at(r);
    }
-   inline int colStretch(int c) const {
+
+   int colStretch(int c) const {
       return cStretch.at(c);
    }
-   inline void setRowMinimumHeight(int r, int s) {
+
+   void setRowMinimumHeight(int r, int s) {
       expand(r + 1, 0);
       rMinHeights[r] = s;
       setDirty();
    }
-   inline void setColumnMinimumWidth(int c, int s) {
+
+   void setColumnMinimumWidth(int c, int s) {
       expand(0, c + 1);
       cMinWidths[c] = s;
       setDirty();
    }
-   inline int rowSpacing(int r) const {
+
+   int rowSpacing(int r) const {
       return rMinHeights.at(r);
    }
-   inline int colSpacing(int c) const {
+
+   int colSpacing(int c) const {
       return cMinWidths.at(c);
    }
 
-   inline void setReversed(bool r, bool c) {
+   void setReversed(bool r, bool c) {
       hReversed = c;
       vReversed = r;
    }
 
-   inline bool horReversed() const {
+   bool horReversed() const {
       return hReversed;
    }
 
-   inline bool verReversed() const {
+   bool verReversed() const {
       return vReversed;
    }
 
-   inline void setDirty() {
+   void setDirty() {
       needRecalc = true;
       hfw_width = -1;
    }
 
-   inline bool isDirty() const {
+   bool isDirty() const {
       return needRecalc;
    }
 
@@ -230,18 +229,18 @@ class QGridLayoutPrivate : public QLayoutPrivate
    int heightForWidth(int width, int hSpacing, int vSpacing);
    int minimumHeightForWidth(int width, int hSpacing, int vSpacing);
 
-   inline void getNextPos(int &row, int &col) {
+   void getNextPos(int &row, int &col) {
       row = nextR;
       col = nextC;
    }
 
-   inline int count() const {
+   int count() const {
       return things.count();
    }
 
    QRect cellRect(int row, int col) const;
 
-   inline QLayoutItem *itemAt(int index) const {
+   QLayoutItem *itemAt(int index) const {
       if (index < things.count()) {
          return things.at(index)->item();
       } else {
@@ -249,7 +248,7 @@ class QGridLayoutPrivate : public QLayoutPrivate
       }
    }
 
-   inline QLayoutItem *takeAt(int index) {
+   QLayoutItem *takeAt(int index) {
       Q_Q(QGridLayout);
 
       if (index < things.count()) {
@@ -485,16 +484,11 @@ bool QGridLayoutPrivate::hasHeightForWidth(int hSpacing, int vSpacing)
    return has_hfw;
 }
 
-/*
-  Assumes that setupLayoutData() has been called, and that
-  qGeomCalc() has filled in colData with appropriate values.
-*/
 void QGridLayoutPrivate::recalcHFW(int w)
 {
-   /*
-     Go through all children, using colData and heightForWidth()
-     and put the results in hfwData.
-   */
+   //  Go through all children, using colData and heightForWidth()
+   //  and put the results in hfwData.
+
    if (! hfwData) {
       hfwData = new QVector<QLayoutStruct>(rr);
    }
@@ -683,10 +677,10 @@ void QGridLayoutPrivate::add(QGridBox *box, int row, int col)
 void QGridLayoutPrivate::add(QGridBox *box, int row1, int row2, int col1, int col2)
 {
    if (row2 >= 0 && row2 < row1) {
-      qWarning("QGridLayout: Multi-cell fromRow greater than toRow");
+      qWarning("QGridLayout:add() Multi cell fromRow is greater than toRow");
    }
    if (col2 >= 0 && col2 < col1) {
-      qWarning("QGridLayout: Multi-cell fromCol greater than toCol");
+      qWarning("QGridLayout:add() Multi cell fromCol is greater than toCol");
    }
    if (row1 == row2 && col1 == col2) {
       add(box, row1, col1);
@@ -1033,11 +1027,6 @@ void QGridLayoutPrivate::addHfwData(QGridBox *box, int width)
    }
 }
 
-/*
-  Similar to setupLayoutData(), but uses heightForWidth(colData)
-  instead of sizeHint(). Assumes that setupLayoutData() and
-  qGeomCalc(colData) has been called.
-*/
 void QGridLayoutPrivate::setupHfwLayoutData()
 {
    QVector<QLayoutStruct> &rData = *hfwData;
@@ -1102,6 +1091,7 @@ void QGridLayoutPrivate::distribute(QRect r, int hSpacing, int vSpacing)
 
    qGeomCalc(colData, 0, cc, r.x(), r.width());
    QVector<QLayoutStruct> *rDataPtr;
+
    if (has_hfw) {
       recalcHFW(r.width());
       qGeomCalc(*hfwData, 0, rr, r.y(), r.height());
@@ -1110,12 +1100,15 @@ void QGridLayoutPrivate::distribute(QRect r, int hSpacing, int vSpacing)
       qGeomCalc(rowData, 0, rr, r.y(), r.height());
       rDataPtr = &rowData;
    }
+
    QVector<QLayoutStruct> &rData = *rDataPtr;
    int i;
 
-   bool reverse = ((r.bottom() > rect.bottom()) || (r.bottom() == rect.bottom()
-            && ((r.right() > rect.right()) != visualHReversed)));
+   bool reverse = ((r.bottom() > m_layoutRect.bottom()) || (r.bottom() == m_layoutRect.bottom()
+            && ((r.right() > m_layoutRect.right()) != visualHReversed)));
+
    int n = things.size();
+
    for (i = 0; i < n; ++i) {
       QGridBox *box = things.at(reverse ? n - i - 1 : i);
       int r2 = box->toRow(rr);
@@ -1250,9 +1243,6 @@ int QGridLayout::columnCount() const
    return d->numCols();
 }
 
-/*!
-    \reimp
-*/
 QSize QGridLayout::sizeHint() const
 {
    Q_D(const QGridLayout);
@@ -1263,9 +1253,6 @@ QSize QGridLayout::sizeHint() const
    return result;
 }
 
-/*!
-    \reimp
-*/
 QSize QGridLayout::minimumSize() const
 {
    Q_D(const QGridLayout);
@@ -1276,9 +1263,6 @@ QSize QGridLayout::minimumSize() const
    return result;
 }
 
-/*!
-    \reimp
-*/
 QSize QGridLayout::maximumSize() const
 {
    Q_D(const QGridLayout);
@@ -1298,17 +1282,11 @@ QSize QGridLayout::maximumSize() const
    return s;
 }
 
-/*!
-    \reimp
-*/
 bool QGridLayout::hasHeightForWidth() const
 {
    return const_cast<QGridLayout *>(this)->d_func()->hasHeightForWidth(horizontalSpacing(), verticalSpacing());
 }
 
-/*!
-    \reimp
-*/
 int QGridLayout::heightForWidth(int w) const
 {
    Q_D(const QGridLayout);
@@ -1316,9 +1294,6 @@ int QGridLayout::heightForWidth(int w) const
    return dat->heightForWidth(w, horizontalSpacing(), verticalSpacing());
 }
 
-/*!
-    \reimp
-*/
 int QGridLayout::minimumHeightForWidth(int w) const
 {
    Q_D(const QGridLayout);
@@ -1326,19 +1301,12 @@ int QGridLayout::minimumHeightForWidth(int w) const
    return dat->minimumHeightForWidth(w, horizontalSpacing(), verticalSpacing());
 }
 
-/*!
-    \reimp
-*/
 int QGridLayout::count() const
 {
    Q_D(const QGridLayout);
    return d->count();
 }
 
-
-/*!
-    \reimp
-*/
 QLayoutItem *QGridLayout::itemAt(int index) const
 {
    Q_D(const QGridLayout);
@@ -1361,9 +1329,6 @@ QLayoutItem *QGridLayout::itemAtPosition(int row, int column) const
    return nullptr;
 }
 
-/*!
-    \reimp
-*/
 QLayoutItem *QGridLayout::takeAt(int index)
 {
    Q_D(QGridLayout);
@@ -1376,10 +1341,6 @@ void QGridLayout::getItemPosition(int index, int *row, int *column, int *rowSpan
    d->getItemPosition(index, row, column, rowSpan, columnSpan);
 }
 
-
-/*!
-    \reimp
-*/
 void QGridLayout::setGeometry(const QRect &rect)
 {
    Q_D(QGridLayout);
@@ -1390,24 +1351,12 @@ void QGridLayout::setGeometry(const QRect &rect)
    }
 }
 
-/*!
-    Returns the geometry of the cell with row \a row and column \a column
-    in the grid. Returns an invalid rectangle if \a row or \a column is
-    outside the grid.
-
-    \warning in the current version of Qt this function does not
-    return valid results until setGeometry() has been called, i.e.
-    after the parentWidget() is visible.
-*/
 QRect QGridLayout::cellRect(int row, int column) const
 {
    Q_D(const QGridLayout);
    return d->cellRect(row, column);
 }
 
-/*!
-    \reimp
-*/
 void QGridLayout::addItem(QLayoutItem *item)
 {
    Q_D(QGridLayout);
@@ -1416,16 +1365,6 @@ void QGridLayout::addItem(QLayoutItem *item)
    addItem(item, r, c);
 }
 
-/*!
-    Adds \a item at position \a row, \a column, spanning \a rowSpan
-    rows and \a columnSpan columns, and aligns it according to \a
-    alignment. If \a rowSpan and/or \a columnSpan is -1, then the item
-    will extend to the bottom and/or right edge, respectively. The
-    layout takes ownership of the \a item.
-
-    \warning Do not use this function to add child layouts or child
-    widget items. Use addLayout() or addWidget() instead.
-*/
 void QGridLayout::addItem(QLayoutItem *item, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment)
 {
    Q_D(QGridLayout);
@@ -1444,7 +1383,7 @@ void QGridLayout::addWidget(QWidget *widget, int row, int column, Qt::Alignment 
    }
 
    if (row < 0 || column < 0) {
-      qWarning("QGridLayout: Cannot add %s/%s to %s/%s at row %d column %d",
+      qWarning("QGridLayout::addWidget() Unable to add %s/%s to %s/%s at row %d column %d",
          csPrintable(widget->metaObject()->className()), csPrintable(widget->objectName()),
          csPrintable(metaObject()->className()), csPrintable(objectName()), row, column);
 
@@ -1490,17 +1429,8 @@ void QGridLayout::addLayout(QLayout *layout, int row, int column, Qt::Alignment 
    d->add(b, row, column);
 }
 
-/*!
-  \overload
-    This version adds the layout \a layout to the cell grid, spanning multiple
-    rows/columns. The cell will start at \a row, \a column spanning \a
-    rowSpan rows and \a columnSpan columns.
-
-    If \a rowSpan and/or \a columnSpan is -1, then the layout will extend to the bottom
-    and/or right edge, respectively.
-*/
 void QGridLayout::addLayout(QLayout *layout, int row, int column,
-   int rowSpan, int columnSpan, Qt::Alignment alignment)
+      int rowSpan, int columnSpan, Qt::Alignment alignment)
 {
    Q_D(QGridLayout);
    if (!d->checkLayout(layout)) {
@@ -1515,19 +1445,6 @@ void QGridLayout::addLayout(QLayout *layout, int row, int column,
    d->add(b, row, (rowSpan < 0) ? -1 : row + rowSpan - 1, column, (columnSpan < 0) ? -1 : column + columnSpan - 1);
 }
 
-/*!
-    Sets the stretch factor of row \a row to \a stretch. The first row
-    is number 0.
-
-    The stretch factor is relative to the other rows in this grid.
-    Rows with a higher stretch factor take more of the available
-    space.
-
-    The default stretch factor is 0. If the stretch factor is 0 and no
-    other row in this table can grow at all, the row may still grow.
-
-    \sa rowStretch(), setRowMinimumHeight(), setColumnStretch()
-*/
 void QGridLayout::setRowStretch(int row, int stretch)
 {
    Q_D(QGridLayout);
@@ -1535,45 +1452,18 @@ void QGridLayout::setRowStretch(int row, int stretch)
    invalidate();
 }
 
-/*!
-    Returns the stretch factor for row \a row.
-
-    \sa setRowStretch()
-*/
 int QGridLayout::rowStretch(int row) const
 {
    Q_D(const QGridLayout);
    return d->rowStretch(row);
 }
 
-/*!
-    Returns the stretch factor for column \a column.
-
-    \sa setColumnStretch()
-*/
 int QGridLayout::columnStretch(int column) const
 {
    Q_D(const QGridLayout);
    return d->colStretch(column);
 }
 
-/*!
-    Sets the stretch factor of column \a column to \a stretch. The first
-    column is number 0.
-
-    The stretch factor is relative to the other columns in this grid.
-    Columns with a higher stretch factor take more of the available
-    space.
-
-    The default stretch factor is 0. If the stretch factor is 0 and no
-    other column in this table can grow at all, the column may still
-    grow.
-
-    An alternative approach is to add spacing using addItem() with a
-    QSpacerItem.
-
-    \sa columnStretch(), setRowStretch()
-*/
 void QGridLayout::setColumnStretch(int column, int stretch)
 {
    Q_D(QGridLayout);
@@ -1581,13 +1471,6 @@ void QGridLayout::setColumnStretch(int column, int stretch)
    invalidate();
 }
 
-
-
-/*!
-    Sets the minimum height of row \a row to \a minSize pixels.
-
-    \sa rowMinimumHeight(), setColumnMinimumWidth()
-*/
 void QGridLayout::setRowMinimumHeight(int row, int minSize)
 {
    Q_D(QGridLayout);
@@ -1595,22 +1478,12 @@ void QGridLayout::setRowMinimumHeight(int row, int minSize)
    invalidate();
 }
 
-/*!
-    Returns the minimum width set for row \a row.
-
-    \sa setRowMinimumHeight()
-*/
 int QGridLayout::rowMinimumHeight(int row) const
 {
    Q_D(const QGridLayout);
    return d->rowSpacing(row);
 }
 
-/*!
-    Sets the minimum width of column \a column to \a minSize pixels.
-
-    \sa columnMinimumWidth(), setRowMinimumHeight()
-*/
 void QGridLayout::setColumnMinimumWidth(int column, int minSize)
 {
    Q_D(QGridLayout);
@@ -1618,36 +1491,24 @@ void QGridLayout::setColumnMinimumWidth(int column, int minSize)
    invalidate();
 }
 
-/*!
-    Returns the column spacing for column \a column.
-
-    \sa setColumnMinimumWidth()
-*/
 int QGridLayout::columnMinimumWidth(int column) const
 {
    Q_D(const QGridLayout);
    return d->colSpacing(column);
 }
 
-/*!
-    \reimp
-*/
 Qt::Orientations QGridLayout::expandingDirections() const
 {
    Q_D(const QGridLayout);
    return d->expandingDirections(horizontalSpacing(), verticalSpacing());
 }
 
-/*!
-    Sets the grid's origin corner, i.e. position (0, 0), to \a corner.
-*/
 void QGridLayout::setOriginCorner(Qt::Corner corner)
 {
    Q_D(QGridLayout);
    d->setReversed(corner == Qt::BottomLeftCorner || corner == Qt::BottomRightCorner,
       corner == Qt::TopRightCorner || corner == Qt::BottomRightCorner);
 }
-
 
 Qt::Corner QGridLayout::originCorner() const
 {
@@ -1659,11 +1520,9 @@ Qt::Corner QGridLayout::originCorner() const
    }
 }
 
-
 void QGridLayout::invalidate()
 {
    Q_D(QGridLayout);
    d->setDirty();
    QLayout::invalidate();
 }
-

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -88,14 +88,15 @@ void QTextOption::setTabArray(const QList<qreal> &tabStops)
       d = new QTextOptionPrivate;
    }
 
-   QList<QTextOption::Tab> tabs;
-   QTextOption::Tab tab;
+   QList<QTextOption::Tab> tabList;
+   QTextOption::Tab newTab;
 
    for (qreal pos : tabStops) {
-      tab.position = pos;
-      tabs.append(tab);
+      newTab.position = pos;
+      tabList.append(newTab);
    }
-   d->tabStops = tabs;
+
+   d->tabStops = tabList;
 }
 
 void QTextOption::setTabs(const QList<QTextOption::Tab> &tabStops)
@@ -103,6 +104,7 @@ void QTextOption::setTabs(const QList<QTextOption::Tab> &tabStops)
    if (! d) {
       d = new QTextOptionPrivate;
    }
+
    d->tabStops = tabStops;
 }
 

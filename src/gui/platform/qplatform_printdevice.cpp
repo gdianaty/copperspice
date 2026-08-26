@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,11 +21,11 @@
 *
 ***********************************************************************/
 
-#include "qplatform_printdevice.h"
+#include <qplatform_printdevice.h>
 
-#include "qprintdevice_p.h"
-#include "qprintdialog.h"
 #include <qpagelayout.h>
+#include <qprintdevice_p.h>
+#include <qprintdialog.h>
 
 #ifndef QT_NO_PRINTER
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,9 +25,8 @@
 
 #include <qdebug.h>
 #include <qdir.h>
-#include <qdebug.h>
-#include <qstring.h>
 #include <qgstreameraudiodecoderservice.h>
+#include <qstring.h>
 
 #include <qgstutils_p.h>
 
@@ -62,15 +61,8 @@ QMultimedia::SupportEstimate QGstreamerAudioDecoderServicePlugin::hasSupport(con
 
 static bool isDecoderOrDemuxer(GstElementFactory *factory)
 {
-#if GST_CHECK_VERSION(0, 10, 31)
-
-   return gst_element_factory_list_is_type(factory, GST_ELEMENT_FACTORY_TYPE_DEMUXER)
-      || gst_element_factory_list_is_type(factory, GST_ELEMENT_FACTORY_TYPE_DECODER
-         | GST_ELEMENT_FACTORY_TYPE_MEDIA_AUDIO);
-#else
-   return (factory && (qstrcmp(factory->details.klass, "Codec/Decoder/Audio") == 0
-            || qstrcmp(factory->details.klass, "Codec/Demux") == 0));
-#endif
+   return gst_element_factory_list_is_type(factory, GST_ELEMENT_FACTORY_TYPE_DEMUXER) ||
+         gst_element_factory_list_is_type(factory, GST_ELEMENT_FACTORY_TYPE_DECODER | GST_ELEMENT_FACTORY_TYPE_MEDIA_AUDIO);
 }
 
 void QGstreamerAudioDecoderServicePlugin::updateSupportedMimeTypes() const
@@ -82,4 +74,3 @@ QStringList QGstreamerAudioDecoderServicePlugin::supportedMimeTypes() const
 {
    return QStringList();
 }
-

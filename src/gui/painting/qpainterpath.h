@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,12 @@
 #ifndef QPAINTERPATH_H
 #define QPAINTERPATH_H
 
-#include <qmatrix.h>
 #include <qglobal.h>
-#include <qrect.h>
 #include <qline.h>
-#include <qvector.h>
+#include <qmatrix.h>
+#include <qrect.h>
 #include <qscopedpointer.h>
+#include <qvector.h>
 
 class QFont;
 class QPen;

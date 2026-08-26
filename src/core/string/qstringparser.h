@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,8 +24,8 @@
 #ifndef QSTRING_PARSER_H
 #define QSTRING_PARSER_H
 
-#include <qglobal.h>
 #include <qchar32.h>
+#include <qglobal.h>
 #include <qlist.h>
 #include <qlocale.h>
 #include <qlog.h>
@@ -34,6 +34,7 @@
 #include <qregularexpression.h>
 
 #include <cctype>
+#include <charconv>
 #include <ios>
 #include <iomanip>
 #include <limits>
@@ -77,9 +78,12 @@ class Q_CORE_EXPORT QStringParser
       };
       using SectionFlags = QFlags<SectionFlag>;
 
-      enum SplitBehavior { KeepEmptyParts, SkipEmptyParts };
+      enum SplitBehavior {
+         KeepEmptyParts,
+         SkipEmptyParts
+      };
 
-      // V is data type quint64, long, short, etc
+      // V is data type char, uchar, int, long, short, long long, etc
       template <typename T, typename V, typename = typename std::enable_if<std::is_integral<V>::value>::type>
       [[nodiscard]] static T formatArg(const T &str, V value, int fieldwidth = 0, int base = 10, QChar32 fillChar = QChar32(' '))
       {
@@ -88,53 +92,72 @@ class Q_CORE_EXPORT QStringParser
          if (d.occurrences == 0) {
             // T must have a toUtf8() method, can not use csPrintable()
 
-            qWarning("Warning: QStringParser::formatArg() is missing a place marker \n"
+            qWarning("QStringParser::formatArg() Missing a place marker \n"
                   "Format string: %s, Argument value: %lld\n", str.toLatin1().constData(), static_cast<long long>(value) );
 
             return str;
          }
 
-         std::basic_ostringstream<char> stream;
-         stream << std::setbase(base);
-
          T arg;
          T locale_arg;
 
-         if (d.occurrences > d.locale_occurrences) {
-            stream << value;
+         if constexpr(std::is_same_v<bool, std::remove_cv_t<V>>)  {
+            // V type of bool must be handled differently
 
-            std::string s1 = stream.str();
-            const char *s2 = s1.c_str();
+            T data;
 
-            arg = T::fromUtf8(s2);
+            if (value) {
+               data = "1";
+            } else {
+               data = "0";
+            }
 
-         }
+            if (d.occurrences > d.locale_occurrences) {
+               arg = data;
+            }
 
-         if (d.locale_occurrences > 0) {
-            stream << value;
+            if (d.locale_occurrences > 0) {
+               locale_arg = data;
+            }
 
-            std::string s1 = stream.str();
-            const char *s2 = s1.c_str();
+            return replaceArgEscapes(str, d, fieldwidth, arg, locale_arg, fillChar);
 
-            locale_arg = T::fromUtf8(s2);
+         } else {
 
-            QLocale locale;
+            if (d.occurrences > d.locale_occurrences) {
+               std::string buffer = std::string(32, '\0');
+               auto result = std::to_chars(buffer.data(), buffer.data() + 32, value, base);
 
-
-            // add thousand marker
-            bool thousands_group = !( locale.numberOptions() & QLocale::OmitGroupSeparator);
-            QChar32 separator    = static_cast<char32_t>(locale.groupSeparator().unicode());
-
-            if (thousands_group && base == 10) {
-               int strLen = locale_arg.size();
-
-               for (int i = strLen - 3; i > 0; i -= 3) {
-                  locale_arg.insert(i, separator);
+               if (result.ec == std::errc()) {
+                  arg = T::fromUtf8(buffer.c_str());
                }
             }
-         }
 
-         return replaceArgEscapes(str, d, fieldwidth, arg, locale_arg, fillChar);
+            if (d.locale_occurrences > 0) {
+               std::string buffer = std::string(32, '\0');
+               auto result = std::to_chars(buffer.data(), buffer.data() + 32, value, base);
+
+               if (result.ec == std::errc()) {
+                  locale_arg = T::fromUtf8(buffer.c_str());
+               }
+
+               QLocale locale;
+
+               // add thousand marker
+               bool thousands_group = !( locale.numberOptions() & QLocale::OmitGroupSeparator);
+               T separator = locale.groupSeparator();
+
+               if (thousands_group && base == 10) {
+                  int strLen = locale_arg.size();
+
+                  for (int i = strLen - 3; i > 0; i -= 3) {
+                     locale_arg.insert(i, separator);
+                  }
+               }
+            }
+
+            return replaceArgEscapes(str, d, fieldwidth, arg, locale_arg, fillChar);
+         }
       }
 
       // V data type is double, float, long double
@@ -147,7 +170,7 @@ class Q_CORE_EXPORT QStringParser
          if (d.occurrences == 0) {
             // T must have a toUtf8() method
 
-            qWarning("Warning: QStringParser::formatArg() is missing place marker '%%n'\n"
+            qWarning("QStringParser::formatArg() Missing place marker '%%n'\n"
                   "Format string: %s, Argument value: %f\n", str.toLatin1().constData(), value);
 
             return str;
@@ -180,10 +203,10 @@ class Q_CORE_EXPORT QStringParser
 
             default:
                if (format <= 32) {
-                  qWarning("Warning: QStringParser::formatArg() invalid format '%d'", format);
+                  qWarning("QStringParser::formatArg() Invalid format '%d'", format);
 
                } else {
-                  qWarning("Warning: QStringParser::formatArg() invalid format '%c'", format);
+                  qWarning("QStringParser::formatArg() Invalid format '%c'", format);
                }
 
                break;
@@ -216,7 +239,7 @@ class Q_CORE_EXPORT QStringParser
 
             // replace decimal with correct char
             int decimal_pos = locale_arg.indexOf('.');
-            QChar32 decimal = static_cast<char32_t>(locale.decimalPoint().unicode());
+            T decimal = locale.decimalPoint();
 
             if (decimal_pos != -1) {
                locale_arg.replace(decimal_pos, 1, decimal);
@@ -227,7 +250,7 @@ class Q_CORE_EXPORT QStringParser
 
             // add thousand marker
             bool thousands_group = !( locale.numberOptions() & QLocale::OmitGroupSeparator);
-            QChar32 separator    = static_cast<char32_t>(locale.groupSeparator().unicode());
+            T separator = locale.groupSeparator();
 
             if (thousands_group) {
                for (int i = decimal_pos - 3; i > 0; i -= 3) {
@@ -239,9 +262,9 @@ class Q_CORE_EXPORT QStringParser
          return replaceArgEscapes(str, d, fieldwidth, arg, locale_arg, fillChar);
       }
 
-      // V data type is char, string
+      // V data type is QChar, QString
       template <typename T, typename V,
-                  typename = typename std::enable_if<! std::is_arithmetic<typename std::remove_reference<V>::type>::value>::type>
+            typename = typename std::enable_if<! std::is_arithmetic<typename std::remove_reference<V>::type>::value>::type>
 
       [[nodiscard]] static T formatArg(const T &str, V &&value, int fieldwidth = 0, QChar32 fillChar = QChar32(' '))
       {
@@ -251,7 +274,7 @@ class Q_CORE_EXPORT QStringParser
          if (d.occurrences == 0) {
             // T must have a toUtf8() method
 
-            qWarning("Warning: QStringParser::formatArg() is missing place marker '%%n'\n"
+            qWarning("QStringParser::formatArg() Missing place marker '%%n'\n"
                   "Format string: %s, Argument value: %s\n", str.toLatin1().constData(), tmp.toLatin1().constData());
 
             return str;
@@ -260,7 +283,7 @@ class Q_CORE_EXPORT QStringParser
          return replaceArgEscapes(str, d, fieldwidth, tmp, tmp, fillChar);
       }
 
-      // a4
+      // multiple arguments
       template <typename T, typename ...Ts>
       [[nodiscard]] static T formatArgs(const T &str, Ts... args)
       {
@@ -271,13 +294,12 @@ class Q_CORE_EXPORT QStringParser
       template <typename T, typename V>
       static T join(const QList<T> &list, const V &separator);
 
-
-      // b1  value - quint64, long, short, etc
+      // V data type is char, uchar, long, short, quint64, etc
       template <typename T = QString8, typename V>
       [[nodiscard]] static T number(V value, int base  = 10)
       {
          if (base < 2 || base > 36) {
-            qWarning("Warning: QStringParser::number() invalid numeric base (%d)", base);
+            qWarning("QStringParser::number() Invalid numeric base (%d)", base);
             base = 10;
          }
 
@@ -293,7 +315,7 @@ class Q_CORE_EXPORT QStringParser
          return retval;
       }
 
-      // b2  value
+      // value is double, float
       template <typename T = QString8>
       [[nodiscard]] static T number(double value, char format = 'g', int precision = 6)
       {
@@ -323,7 +345,7 @@ class Q_CORE_EXPORT QStringParser
                break;
 
             default:
-               qWarning("Warning: QStringParser::number() invalid format '%c'", format);
+               qWarning("QStringParser::number() Invalid format '%c'", format);
                break;
          }
 
@@ -341,37 +363,37 @@ class Q_CORE_EXPORT QStringParser
 
       template <typename T>
       static T section(const T &str, QChar32 separator, int firstSection, int lastSection = -1,
-               SectionFlags flags = SectionDefault) {
+            SectionFlags flags = SectionDefault) {
          return section(str, T(separator), firstSection, lastSection, flags);
       }
 
       template <typename T, int N>
       static T section(const T &str, const char (&separator)[N], int firstSection, int lastSection = -1,
-               SectionFlags flags = SectionDefault) {
+            SectionFlags flags = SectionDefault) {
          return section(str, T(separator), firstSection, lastSection, flags);
       }
 
       template <typename T>
       static T section(const T &str, const T &separator, int firstSection, int lastSection = -1,
-               SectionFlags flags = SectionDefault);
+            SectionFlags flags = SectionDefault);
 
 #if defined (CS_DOXYPRESS)
       template <typename T>
       static T section(const T &str, const QRegularExpression &separator, int firstSection, int lastSection = -1,
-               SectionFlags flags = SectionDefault);
+            SectionFlags flags = SectionDefault);
 #else
       template <typename T>
       static T section(const T &str, const Cs::QRegularExpression<T> &separator, int firstSection, int lastSection = -1,
-               SectionFlags flags = SectionDefault);
+            SectionFlags flags = SectionDefault);
 #endif
 
       template <typename T>
       static QList<T> split(const T &str, QChar32 separator, SplitBehavior behavior = KeepEmptyParts,
-               Qt::CaseSensitivity cs = Qt::CaseSensitive);
+            Qt::CaseSensitivity cs = Qt::CaseSensitive);
 
       template <typename T>
       static QList<T> split(const T &str, const T &separator, SplitBehavior behavior = KeepEmptyParts,
-               Qt::CaseSensitivity cs = Qt::CaseSensitive);
+            Qt::CaseSensitivity cs = Qt::CaseSensitive);
 
 #if defined (CS_DOXYPRESS)
       template <typename T>
@@ -387,7 +409,7 @@ class Q_CORE_EXPORT QStringParser
       static R toInteger(const T &str, bool *ok = nullptr, int base = 10)
       {
          if (base != 0 && (base < 2 || base > 36)) {
-            qWarning("Warning: QStringParser::toInteger() invalid numeric base (%d)", base);
+            qWarning("QStringParser::toInteger() Invalid numeric base (%d)", base);
             base = 10;
          }
 
@@ -494,7 +516,7 @@ class Q_CORE_EXPORT QStringParser
          }
 
          if (argCount > cnt) {
-            qWarning("Warning: Format string has %d arguments and %d place holders.\n%s",
+            qWarning("QStringParser::toInteger() Format string has %d arguments and %d place holders\n%s",
                   int(argCount), cnt, csPrintable(str) );
 
             argCount = cnt;
@@ -985,7 +1007,7 @@ QList<T> QStringParser::split(const T &str, const Cs::QRegularExpression<T> &reg
    QList<T> retval;
 
    if (! regExp.isValid()) {
-      qWarning("QStringParser::split: Invalid QRegularExpression");
+      qWarning("QStringParser::split() Invalid regular expression");
       return retval;
    }
 

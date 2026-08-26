@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,21 +24,21 @@
 #ifndef QPLATFORMINTEGRATION_COCOA_H
 #define QPLATFORMINTEGRATION_COCOA_H
 
-#include <Cocoa/Cocoa.h>
-
-#include "qcocoacursor.h"
-#include "qcocoawindow.h"
-#include "qcocoanativeinterface.h"
-#include "qcocoainputcontext.h"
-#include "qcocoaaccessibility.h"
-#include "qcocoaclipboard.h"
-#include "qcocoadrag.h"
-#include "qcocoaservices.h"
-#include "qcocoakeymapper.h"
-
-#include <QScopedPointer>
+#include <qcocoaaccessibility.h>
+#include <qcocoaclipboard.h>
+#include <qcocoacursor.h>
+#include <qcocoadrag.h>
+#include <qcocoainputcontext.h>
+#include <qcocoakeymapper.h>
+#include <qcocoanativeinterface.h>
+#include <qcocoaservices.h>
+#include <qcocoawindow.h>
 #include <qplatform_integration.h>
+#include <qscopedpointer.h>
+
 #include <qcoretextfontdatabase_p.h>
+
+#include <Cocoa/Cocoa.h>
 
 class QCocoaScreen : public QPlatformScreen
 {

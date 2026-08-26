@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,11 +24,11 @@
 #ifndef QPLATFORM_GRAPHICSBUFFER_H
 #define QPLATFORM_GRAPHICSBUFFER_H
 
-#include <qsize.h>
-#include <qrect.h>
-#include <qpixelformat.h>
 #include <qflags.h>
 #include <qobject.h>
+#include <qpixelformat.h>
+#include <qrect.h>
+#include <qsize.h>
 
 class Q_GUI_EXPORT QPlatformGraphicsBuffer : public QObject
 {

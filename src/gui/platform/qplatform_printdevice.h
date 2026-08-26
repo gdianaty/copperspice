@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,10 @@
 #ifndef QPLATFORMPRINTDEVICE_H
 #define QPLATFORMPRINTDEVICE_H
 
-#include <qprint_p.h>
-
-#include <qvector.h>
 #include <qpagelayout.h>
+#include <qvector.h>
+
+#include <qprint_p.h>
 
 // emerald   #include <qmimetype.h>
 

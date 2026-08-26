@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,10 @@
 #ifndef QCOCOAMENUITEM_H
 #define QCOCOAMENUITEM_H
 
-#include <qplatform_menu.h>
 #include <qimage.h>
+#include <qplatform_menu.h>
 
-// #define QT_COCOA_ENABLE_MENU_DEBUG
+class QCocoaMenu;
 
 #ifdef __OBJC__
 @class NSMenuItem;
@@ -40,8 +40,6 @@ using MSMenu     = struct objc_object;
 using NSObject   = struct objc_object;
 using NSView     = struct objc_object;
 #endif
-
-class QCocoaMenu;
 
 class QCocoaMenuObject
 {

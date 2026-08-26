@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,9 +22,10 @@
 ***********************************************************************/
 
 #include <qmimedata.h>
-#include <qurl.h>
+
 #include <qstringlist.h>
 #include <qtextcodec.h>
+#include <qurl.h>
 
 struct QMimeDataStruct {
    QString format;
@@ -36,7 +37,8 @@ class QMimeDataPrivate
    Q_DECLARE_PUBLIC(QMimeData)
 
  public:
-   virtual ~QMimeDataPrivate() {}
+   virtual ~QMimeDataPrivate()
+   { }
 
    void removeData(const QString &format);
    void setData(const QString &format, const QVariant &data);
@@ -117,6 +119,7 @@ QVariant QMimeDataPrivate::retrieveTypedData(const QString &format, QVariant::Ty
       switch (type) {
 
 #ifndef QT_NO_TEXTCODEC
+
          case QVariant::String: {
             const QByteArray ba = data.toByteArray();
             QTextCodec *codec = QTextCodec::codecForName("utf-8");
@@ -124,44 +127,48 @@ QVariant QMimeDataPrivate::retrieveTypedData(const QString &format, QVariant::Ty
             if (format == "text/html") {
                codec = QTextCodec::codecForHtml(ba, codec);
             }
+
             return codec->toUnicode(ba);
          }
+
 #endif
 
-         case QVariant::Color:
-            {
-               QVariant newData = data;
-               newData.convert(QVariant::Color);
-               return newData;
-            }
-            [[fallthrough]];
+         case QVariant::Color: {
+            QVariant newData = data;
+            newData.convert(QVariant::Color);
+            return newData;
+         }
+
+         [[fallthrough]];
 
          case QVariant::List:
             if (format != "text/uri-list") {
                break;
             }
+
             [[fallthrough]];
 
          case QVariant::Url: {
-            QByteArray ba = data.toByteArray();
+            QByteArray tmpData = data.toByteArray();
 
-            // Qt 3.x will send text/uri-list with a trailing
-            // null-terminator (that is *not* sent for any other text mime-type, so chop it off
+            // legacy application will send text/uri-list with a trailing null-terminator
+            // not sent for any other text mime-type, remove it
 
-            if (ba.endsWith('\0')) {
-               ba.chop(1);
+            if (tmpData.endsWith('\0')) {
+               tmpData.chop(1);
             }
 
-            QList<QByteArray> urls = ba.split('\n');
+            QList<QByteArray> urls = tmpData.split('\n');
             QList<QVariant> list;
 
             for (int i = 0; i < urls.size(); ++i) {
-               QByteArray ba = urls.at(i).trimmed();
+               QByteArray urlData = urls.at(i).trimmed();
 
-               if (!ba.isEmpty()) {
-                  list.append(QUrl::fromEncoded(ba));
+               if (! urlData.isEmpty()) {
+                  list.append(QUrl::fromEncoded(urlData));
                }
             }
+
             return list;
          }
 
@@ -227,7 +234,7 @@ QList<QUrl> QMimeData::urls() const
 {
    Q_D(const QMimeData);
 
-   QVariant data = d->retrieveTypedData(QLatin1String("text/uri-list"), QVariant::List);
+   QVariant data = d->retrieveTypedData("text/uri-list", QVariant::List);
    QList<QUrl> urls;
 
    if (data.type() == QVariant::Url) {
@@ -242,6 +249,7 @@ QList<QUrl> QMimeData::urls() const
          }
       }
    }
+
    return urls;
 }
 
@@ -384,4 +392,3 @@ void QMimeData::removeFormat(const QString &mimeType)
    Q_D(QMimeData);
    d->removeData(mimeType);
 }
-

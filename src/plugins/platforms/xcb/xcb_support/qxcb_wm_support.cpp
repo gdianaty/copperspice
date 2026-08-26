@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,8 +22,9 @@
 ***********************************************************************/
 
 #include <qxcb_wm_support.h>
-#include <qxcb_screen.h>
+
 #include <qdebug.h>
+#include <qxcb_screen.h>
 
 QXcbWMSupport::QXcbWMSupport(QXcbConnection *c)
    : QXcbObject(c)
@@ -82,10 +83,11 @@ void QXcbWMSupport::updateVirtualRoots()
    int offset = 0;
    int remaining = 0;
    do {
-      xcb_get_property_cookie_t cookie = xcb_get_property(xcb_connection(), false, root, atom(QXcbAtom::_NET_VIRTUAL_ROOTS), XCB_ATOM_WINDOW,
-            offset, 1024);
+      xcb_get_property_cookie_t cookie = xcb_get_property(xcb_connection(), false, root, atom(QXcbAtom::_NET_VIRTUAL_ROOTS),
+            XCB_ATOM_WINDOW, offset, 1024);
       xcb_get_property_reply_t *reply = xcb_get_property_reply(xcb_connection(), cookie, nullptr);
-      if (!reply) {
+
+      if (! reply) {
          break;
       }
 
@@ -103,14 +105,15 @@ void QXcbWMSupport::updateVirtualRoots()
       }
 
       free(reply);
+
    } while (remaining > 0);
 
-#ifdef Q_XCB_DEBUG
-   qDebug() << "======== updateVirtualRoots";
+#if defined(CS_SHOW_DEBUG_PLATFORM)
+   qDebug() << "QXcbWMSupport::updateVirtualRoots()";
+
    for (int i = 0; i < net_virtual_roots.size(); ++i) {
-      qDebug() << connection()->atomName(net_virtual_roots.at(i));
+      qDebug() << "\n   " << connection()->atomName(net_virtual_roots.at(i));
    }
-   qDebug() << "======== updateVirtualRoots";
 #endif
 }
 

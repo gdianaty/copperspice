@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,15 +26,14 @@
 
 #include <qatomictypedispatch_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class AtomicMathematicianLocator : public ParameterizedAtomicTypeVisitor
 {
  public:
    typedef QExplicitlySharedDataPointer<AtomicMathematicianLocator> Ptr;
 
-   inline AtomicMathematicianLocator() {
+   AtomicMathematicianLocator() {
    }
 
    virtual ~AtomicMathematicianLocator();
@@ -111,8 +110,7 @@ class AtomicMathematicianLocator : public ParameterizedAtomicTypeVisitor
    AtomicTypeVisitorResult::Ptr visit(const YearMonthDurationType *,
          const qint16 op, const SourceLocationReflection *const reflection) const override;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

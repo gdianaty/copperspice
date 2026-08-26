@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,17 +25,17 @@
 #define QREGION_H
 
 #include <qatomic.h>
+#include <qdatastream.h>
 #include <qrect.h>
 #include <qwindowdefs.h>
-#include <qdatastream.h>
 
 class QBitmap;
 class QVariant;
 
-struct QRegionPrivate;
-
 template <class T>
 class QVector;
+
+struct QRegionPrivate;
 
 class Q_GUI_EXPORT QRegion
 {
@@ -54,12 +54,12 @@ class Q_GUI_EXPORT QRegion
 
    QRegion &operator=(const QRegion &other);
 
-   inline QRegion &operator=(QRegion &&other) {
+   QRegion &operator=(QRegion &&other) {
       qSwap(d, other.d);
       return *this;
    }
 
-   inline void swap(QRegion &other) {
+   void swap(QRegion &other) {
       qSwap(d, other.d);
    }
 
@@ -70,13 +70,13 @@ class Q_GUI_EXPORT QRegion
    bool contains(const QRect &rect) const;
 
    void translate(int dx, int dy);
-   inline void translate(const QPoint &point) {
+   void translate(const QPoint &point) {
       translate(point.x(), point.y());
    }
 
    QRegion translated(int dx, int dy) const;
 
-   inline QRegion translated(const QPoint &point) const {
+   QRegion translated(const QPoint &point) const {
       return translated(point.x(), point.y());
    }
 
@@ -115,7 +115,7 @@ class Q_GUI_EXPORT QRegion
 
    bool operator==(const QRegion &other) const;
 
-   inline bool operator!=(const QRegion &other) const {
+   bool operator!=(const QRegion &other) const {
       return !(operator==(other));
    }
    operator QVariant() const;

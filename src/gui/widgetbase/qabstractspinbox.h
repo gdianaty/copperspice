@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,15 @@
 #ifndef QABSTRACTSPINBOX_H
 #define QABSTRACTSPINBOX_H
 
-#include <qwidget.h>
 #include <qvalidator.h>
+#include <qwidget.h>
 
 #ifndef QT_NO_SPINBOX
 
 class QLineEdit;
-class QAbstractSpinBoxPrivate;
 class QStyleOptionSpinBox;
+
+class QAbstractSpinBoxPrivate;
 
 class Q_GUI_EXPORT QAbstractSpinBox : public QWidget
 {
@@ -200,7 +201,6 @@ class Q_GUI_EXPORT QAbstractSpinBox : public QWidget
    GUI_CS_SLOT_2(_q_editorCursorPositionChanged)
 
    friend class QAccessibleAbstractSpinBox;
-
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QAbstractSpinBox::StepEnabled)

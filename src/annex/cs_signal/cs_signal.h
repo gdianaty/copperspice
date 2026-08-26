@@ -1,12 +1,12 @@
 /***********************************************************************
 *
-* Copyright (c) 2016-2023 Barbara Geller
-* Copyright (c) 2016-2023 Ansel Sermersheim
+* Copyright (c) 2016-2026 Barbara Geller
+* Copyright (c) 2016-2026 Ansel Sermersheim
 *
 * This file is part of CsSignal.
 *
-* CsSignal is free software, released under the BSD 2-Clause license.
-* For license details refer to LICENSE provided with this project.
+* CsSignal is free software which is released under the BSD 2-Clause license.
+* For license details refer to the LICENSE provided with this project.
 *
 * CsSignal is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,20 +19,20 @@
 #ifndef LIB_CS_SIGNAL_H
 #define LIB_CS_SIGNAL_H
 
+#include <cs_internal.h>
+#include <cs_macro.h>
+#include <cs_rcu_guarded.h>
+#include <cs_rcu_list.h>
+#include <cs_slot.h>
+
 #include <algorithm>
 #include <exception>
 #include <mutex>
 #include <stdexcept>
 #include <thread>
-#include <type_traits>
 #include <tuple>
+#include <type_traits>
 #include <unordered_set>
-
-#include "cs_internal.h"
-#include "cs_macro.h"
-#include "cs_slot.h"
-#include "cs_rcu_guarded.h"
-#include "cs_rcu_list.h"
 
 namespace CsSignal {
 

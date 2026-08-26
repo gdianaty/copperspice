@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,18 +25,17 @@
 
 #include <qplatform_theme.h>
 
-#include <qkeysequence_p.h>
 #include <qapplication_p.h>
+#include <qkeysequence_p.h>
 
 #ifndef QT_NO_SHORTCUT
 
+#include <qdatastream.h>
+#include <qdatastream.h>
 #include <qdebug.h>
-#include <qdatastream.h>
 #include <qhashfunc.h>
-#include <qdatastream.h>
-
-#include <qshortcut.h>
 #include <qregularexpression.h>
+#include <qshortcut.h>
 #include <qvariant.h>
 
 #include <algorithm>
@@ -52,7 +51,8 @@ struct MacSpecialKey {
    ushort macSymbol;
 };
 
-static const int NumEntries = 21;
+static constexpr const int NumEntries = 21;
+
 static const MacSpecialKey entries[NumEntries] = {
    { Qt::Key_Escape,    0x238B },
    { Qt::Key_Tab,       0x21E5 },
@@ -99,7 +99,7 @@ QChar qt_macSymbolForQtKey(int key)
    ushort macSymbol = i->macSymbol;
 
    if (qApp->testAttribute(Qt::AA_MacDontSwapCtrlAndMeta)
-      && (macSymbol == kControlUnicode || macSymbol == kCommandUnicode)) {
+         && (macSymbol == kControlUnicode || macSymbol == kCommandUnicode)) {
 
       if (macSymbol == kControlUnicode) {
          macSymbol = kCommandUnicode;
@@ -550,7 +550,7 @@ QKeySequence QKeySequence::mnemonic(const QString &text)
                found = true;
 
             } else {
-               qWarning("QKeySequence::mnemonic: \"%s\" contains multiple occurrences of '&'", csPrintable(text));
+               qWarning("QKeySequence::mnemonic() \"%s\" contains multiple occurrences of '&'", csPrintable(text));
 
             }
          }
@@ -790,17 +790,17 @@ int QKeySequencePrivate::decodeString(const QString &str, QKeySequence::Sequence
             ++tran;
          }
 
-         for (int i = 0; i < numKeyNames; ++i) {
+         for (int j = 0; j < numKeyNames; ++j) {
             QString keyName;
 
             if (tran == 0) {
-               keyName = QCoreApplication::translate("QShortcut", keyname[i].name);
+               keyName = QCoreApplication::translate("QShortcut", keyname[j].name);
             } else {
-               keyName = QString::fromLatin1(keyname[i].name);
+               keyName = QString::fromLatin1(keyname[j].name);
             }
 
             if (accel == keyName.toLower()) {
-               ret |= keyname[i].key;
+               ret |= keyname[j].key;
                found = true;
                break;
             }
@@ -854,10 +854,17 @@ QString QKeySequencePrivate::encodeString(int key, QKeySequence::SequenceFormat 
       // The upshot is a lot more infrastructure to keep the number of
       // if tests down and the code relatively clean.
 
-      static const int ModifierOrder[]         = { Qt::MetaModifier, Qt::AltModifier, Qt::ShiftModifier, Qt::ControlModifier, 0 };
-      static const int QtKeyOrder[]            = { Qt::Key_Meta, Qt::Key_Alt, Qt::Key_Shift, Qt::Key_Control, 0 };
-      static const int DontSwapModifierOrder[] = { Qt::ControlModifier, Qt::AltModifier, Qt::ShiftModifier, Qt::MetaModifier, 0 };
-      static const int DontSwapQtKeyOrder[]    = { Qt::Key_Control, Qt::Key_Alt, Qt::Key_Shift, Qt::Key_Meta, 0 };
+      static const int ModifierOrder[]         = {
+            Qt::MetaModifier, Qt::AltModifier, Qt::ShiftModifier, Qt::ControlModifier, 0 };
+
+      static const int QtKeyOrder[]            = {
+            Qt::Key_Meta, Qt::Key_Alt, Qt::Key_Shift, Qt::Key_Control, 0 };
+
+      static const int DontSwapModifierOrder[] = {
+            Qt::ControlModifier, Qt::AltModifier, Qt::ShiftModifier, Qt::MetaModifier, 0 };
+
+      static const int DontSwapQtKeyOrder[]    = {
+            Qt::Key_Control, Qt::Key_Alt, Qt::Key_Shift, Qt::Key_Meta, 0 };
 
       const int *modifierOrder;
       const int *qtkeyOrder;
@@ -1002,19 +1009,12 @@ QKeySequence::operator QVariant() const
    return QVariant(QVariant::KeySequence, this);
 }
 
-/*!
-    Returns a reference to the element at position \a index in the key
-    sequence. This can only be used to read an element.
- */
 int QKeySequence::operator[](uint index) const
 {
    Q_ASSERT_X(index < QKeySequencePrivate::MaxKeyCount, "QKeySequence::operator[]", "index out of range");
    return d->key[index];
 }
 
-/*!
-    Assignment operator. Assigns the \a other key sequence to this object.
- */
 QKeySequence &QKeySequence::operator=(const QKeySequence &other)
 {
    qAtomicAssign(d, other.d);
@@ -1029,15 +1029,19 @@ bool QKeySequence::operator==(const QKeySequence &other) const
          d->key[3] == other.d->key[3]);
 }
 
-uint qHash(const QKeySequence &key, uint seed)
+uint QKeySequence::hash(const QKeySequence &key, uint seed)
 {
-
    seed = qHash(key.d->key[0], seed);
    seed = qHash(key.d->key[1], seed);
    seed = qHash(key.d->key[2], seed);
    seed = qHash(key.d->key[3], seed);
 
    return seed;
+}
+
+uint qHash(const QKeySequence &key, uint seed)
+{
+   return QKeySequence::hash(key, seed);
 }
 
 bool QKeySequence::operator< (const QKeySequence &other) const
@@ -1051,7 +1055,6 @@ bool QKeySequence::operator< (const QKeySequence &other) const
    return false;
 }
 
-// internal
 bool QKeySequence::isDetached() const
 {
    return d->ref.load() == 1;

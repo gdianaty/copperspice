@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,8 +26,8 @@
 #include <qpixmap.h>
 #include <qpoint.h>
 
+#include <qapplication_p.h>
 #include <qdnd_p.h>
-#include <qguiapplication_p.h>
 
 #ifndef QT_NO_DRAGANDDROP
 
@@ -116,7 +116,7 @@ Qt::DropAction QDrag::exec(Qt::DropActions supportedActions, Qt::DropAction defa
    Q_D(QDrag);
 
    if (! d->data) {
-      qWarning("QDrag::exec(): No mimedata set before starting the drag");
+      qWarning("QDrag::exec() Mime data was not set before starting the drag");
       return d->executed_action;
    }
 
@@ -148,7 +148,7 @@ Qt::DropAction QDrag::start(Qt::DropActions request)
 {
    Q_D(QDrag);
    if (!d->data) {
-      qWarning("QDrag: No mimedata set before starting the drag");
+      qWarning("QDrag::start() Mime data was not set before starting the drag");
       return d->executed_action;
    }
 

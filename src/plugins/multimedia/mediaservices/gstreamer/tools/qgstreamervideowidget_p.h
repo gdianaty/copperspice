@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,15 +26,14 @@
 
 #include <qvideowidgetcontrol.h>
 
-#include <qgstreamervideorendererinterface_p.h>
 #include <qgstreamerbushelper_p.h>
 #include <qgstreamervideooverlay_p.h>
+#include <qgstreamervideorendererinterface_p.h>
 
 class QGstreamerVideoWidget;
 
-class QGstreamerVideoWidgetControl
-   : public QVideoWidgetControl, public QGstreamerVideoRendererInterface
-   , public QGstreamerSyncMessageFilter, public QGstreamerBusMessageFilter
+class QGstreamerVideoWidgetControl : public QVideoWidgetControl, public QGstreamerVideoRendererInterface,
+      public QGstreamerSyncMessageFilter, public QGstreamerBusMessageFilter
 {
    CS_OBJECT_MULTIPLE(QGstreamerVideoWidgetControl, QVideoWidgetControl)
 

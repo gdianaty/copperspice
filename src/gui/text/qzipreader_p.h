@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -36,7 +36,7 @@ class QZipReaderPrivate;
 class Q_GUI_EXPORT QZipReader
 {
  public:
-   enum Status {
+   enum ReaderStatus {
       NoError,
       FileReadError,
       FileOpenError,
@@ -71,7 +71,7 @@ class Q_GUI_EXPORT QZipReader
       uint isDir : 1;
       uint isFile : 1;
       uint isSymLink : 1;
-      QFile::Permissions permissions;
+      QFileDevice::Permissions permissions;
 
       uint crc;
       qint64 size;
@@ -85,7 +85,7 @@ class Q_GUI_EXPORT QZipReader
    QByteArray fileData(const QString &fileName) const;
    bool extractAll(const QString &destinationDir) const;
 
-   Status status() const;
+   ReaderStatus status() const;
    void close();
 
  private:

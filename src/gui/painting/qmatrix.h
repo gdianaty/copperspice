@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,12 @@
 #ifndef QMATRIX_H
 #define QMATRIX_H
 
-#include <qpolygon.h>
-#include <qregion.h>
-#include <qwindowdefs.h>
 #include <qline.h>
 #include <qpoint.h>
+#include <qpolygon.h>
 #include <qrect.h>
+#include <qregion.h>
+#include <qwindowdefs.h>
 
 class QPainterPath;
 class QVariant;
@@ -39,7 +39,7 @@ class QVariant;
 class Q_GUI_EXPORT QMatrix
 {
  public:
-   inline explicit QMatrix(Qt::NoDataOverload dummy) {
+   explicit QMatrix(Qt::NoDataOverload dummy) {
       (void) dummy;
    }
 
@@ -118,13 +118,12 @@ class Q_GUI_EXPORT QMatrix
    operator QVariant() const;
 
  private:
-   inline QMatrix(bool)
+   QMatrix(bool)
       : _m11(1.), _m12(0.), _m21(0.), _m22(1.), _dx(0.), _dy(0.)
    {
    }
 
-
-   inline QMatrix(qreal am11, qreal am12, qreal am21, qreal am22, qreal adx, qreal ady, bool)
+   QMatrix(qreal am11, qreal am12, qreal am21, qreal am22, qreal adx, qreal ady, bool)
       : _m11(am11), _m12(am12), _m21(am21), _m22(am22), _dx(adx), _dy(ady)
    {
    }

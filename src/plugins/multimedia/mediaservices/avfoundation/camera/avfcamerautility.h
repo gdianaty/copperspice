@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,12 @@
 #ifndef AVFCAMERAUTILITY_H
 #define AVFCAMERAUTILITY_H
 
-#include <qsysinfo.h>
-#include <qglobal.h>
-#include <qvector.h>
 #include <qdebug.h>
-#include <qsize.h>
+#include <qglobal.h>
 #include <qpair.h>
+#include <qsize.h>
+#include <qsysinfo.h>
+#include <qvector.h>
 
 #include <AVFoundation/AVFoundation.h>
 

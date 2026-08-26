@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,10 @@
 #ifndef QGLYPHRUN_H
 #define QGLYPHRUN_H
 
-#include <qsharedpointer.h>
-#include <qvector.h>
 #include <qpoint.h>
 #include <qrawfont.h>
+#include <qsharedpointer.h>
+#include <qvector.h>
 
 class QGlyphRunPrivate;
 
@@ -76,7 +76,8 @@ class Q_GUI_EXPORT QGlyphRun
    }
 
    bool operator==(const QGlyphRun &other) const;
-   inline bool operator!=(const QGlyphRun &other) const {
+
+   bool operator!=(const QGlyphRun &other) const {
       return !operator==(other);
    }
 

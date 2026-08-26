@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,8 +24,8 @@
 #ifndef MESSAGES_H
 #define MESSAGES_H
 
-#include <qstring.h>
 #include <qplatform_menu.h>
+#include <qstring.h>
 
 QString msgAboutCs();
 QString qt_mac_applicationmenu_string(int type);

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,24 +26,23 @@
 #include <qcheckbox.h>
 #include <qdatetime.h>
 #include <qfontdatabase.h>
+#include <qheaderview.h>
 #include <qlabel.h>
 #include <qlayout.h>
-#include <qtime.h>
+#include <qprintengine.h>
+#include <qprinter.h>
 #include <qtablewidget.h>
 #include <qtablewidgetitem.h>
-#include <qheaderview.h>
-#include <qprinter.h>
-#include <qprintengine.h>
+#include <qtime.h>
 
 #if ! defined(QT_NO_PRINTER) && ! defined(QT_NO_CUPS)
 
-// internal
 QCupsJobWidget::QCupsJobWidget(QWidget *parent)
     : QWidget(parent)
 {
     m_ui.setupUi(this);
-    //set all the default values
-    //TODO restore last used values
+    // set all the default values
+    // TODO - restore last used values
     initJobHold();
     initJobBilling();
     initJobPriority();

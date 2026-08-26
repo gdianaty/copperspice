@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -37,8 +37,6 @@
 #include "qunparsedtextfn_p.h"
 
 #include "qxslt20corefunctions_p.h"
-
-QT_BEGIN_NAMESPACE
 
 using namespace QPatternist;
 
@@ -133,5 +131,3 @@ FunctionSignature::Ptr XSLT20CoreFunctions::retrieveFunctionSignature(const Name
 
    return s;
 }
-
-QT_END_NAMESPACE

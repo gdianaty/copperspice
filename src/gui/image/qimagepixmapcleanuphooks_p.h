@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,10 +26,10 @@
 
 #include <qpixmap.h>
 
+class QImagePixmapCleanupHooks;
+
 typedef void (*_qt_image_cleanup_hook_64)(qint64);
 typedef void (*_qt_pixmap_cleanup_hook_pmd)(QPlatformPixmap *);
-
-class QImagePixmapCleanupHooks;
 
 class Q_GUI_EXPORT QImagePixmapCleanupHooks
 {

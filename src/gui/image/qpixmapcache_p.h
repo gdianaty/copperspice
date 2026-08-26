@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,10 +25,12 @@
 #define QPIXMAPCACHE_P_H
 
 #include <qpixmapcache.h>
+
+#include <qcache.h>
 #include <qpaintengine.h>
+
 #include <qimage_p.h>
 #include <qpixmap_raster_p.h>
-#include <qcache.h>
 
 uint qHash(const QPixmapCache::Key &k);
 
@@ -54,19 +56,23 @@ class QPixmapCache::KeyData
    int ref;
 };
 
-// XXX: hw: is this a general concept we need to abstract?
+// is this a general concept we need to abstract?
 class QPixmapCacheEntry : public QPixmap
 {
  public:
-   QPixmapCacheEntry(const QPixmapCache::Key &key, const QPixmap &pix) : QPixmap(pix), key(key) {
+   QPixmapCacheEntry(const QPixmapCache::Key &newKey, const QPixmap &pix)
+      : QPixmap(pix), key(newKey)
+   {
       QPlatformPixmap *pd = handle();
 
       if (pd && pd->classId() == QPlatformPixmap::RasterClass) {
          QRasterPlatformPixmap *d = static_cast<QRasterPlatformPixmap *>(pd);
 
-         if (!d->image.isNull() && d->image.d->paintEngine && ! d->image.d->paintEngine->isActive()) {
-            delete d->image.d->paintEngine;
-            d->image.d->paintEngine = nullptr;
+         if (! d->m_rasterImage.isNull() && d->m_rasterImage.d->paintEngine &&
+               ! d->m_rasterImage.d->paintEngine->isActive()) {
+
+            delete d->m_rasterImage.d->paintEngine;
+            d->m_rasterImage.d->paintEngine = nullptr;
          }
       }
    }
@@ -74,6 +80,5 @@ class QPixmapCacheEntry : public QPixmap
    ~QPixmapCacheEntry();
    QPixmapCache::Key key;
 };
-
 
 #endif

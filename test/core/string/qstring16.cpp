@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -42,6 +42,73 @@ TEST_CASE("QString16 append", "[qstring16]")
    REQUIRE(str == "A wacky fox and sizeable pig went to lunch");
 }
 
+TEST_CASE("QString16 u8_append", "[qstring16]")
+{
+   QString16 str = u8"A wacky fox and sizeable pig";
+
+   str.append(u8" went to lunch");
+
+   REQUIRE(str == u8"A wacky fox and sizeable pig went to lunch");
+}
+
+TEST_CASE("QString16 u16_append", "[qstring16]")
+{
+   QString16 str = u"A wacky fox and sizeable pig";
+
+   str.append(u" went to lunch");
+
+   REQUIRE(str == u"A wacky fox and sizeable pig went to lunch");
+}
+
+TEST_CASE("QString16 u32_append", "[qstring16]")
+{
+   QString16 str = U"A wacky fox and sizeable pig";
+
+   str.append(U" went to lunch");
+
+   REQUIRE(str == U"A wacky fox and sizeable pig went to lunch");
+}
+
+TEST_CASE("QString16 u8_constructor", "[qstring16]")
+{
+   {
+      QString16 str = u8"On a clear day you can see forever";
+
+      REQUIRE(str == u8"On a clear day you can see forever");
+   }
+
+   {
+      const char8_t *data = u8"A wacky fox and sizeable pig";
+      QString16 str = data;
+
+      REQUIRE(str == "A wacky fox and sizeable pig");
+   }
+}
+
+TEST_CASE("QString16 u16_constructor", "[qstring16]")
+{
+   QString16 str = u"On a clear day you can see forever";
+
+   REQUIRE(str == u"On a clear day you can see forever");
+}
+
+TEST_CASE("QString16 u32_constructor", "[qstring16]")
+{
+   QString16 str = U"On a clear day you can see forever";
+
+   REQUIRE(str == U"On a clear day you can see forever");
+}
+
+TEST_CASE("QString16 utf8_constructor", "[qstring16]")
+{
+   QString16 str = "!ä";
+
+   REQUIRE(str.length() ==  2);
+
+   REQUIRE(str[0].unicode() == char32_t(33));
+   REQUIRE(str[1].unicode() == char32_t(228));
+}
+
 TEST_CASE("QString16 begin_end", "[qstring16]")
 {
    QString16 str = "On a clear day you can see forever";
@@ -69,15 +136,15 @@ TEST_CASE("QString16 begin_end", "[qstring16]")
       REQUIRE(*iterBegin == 'O');
       REQUIRE(*(iterEnd - 1) == 'r');
    }
-}
 
-TEST_CASE("QString16 clear", "[qstring16]")
-{
-   QString16 str = "On a clear day you can see forever";
+   {
+      QString16::const_iterator iter = str.begin();
 
-   str.clear();
+      REQUIRE(iter == str.cbegin());
+      REQUIRE(iter != str.cend());
 
-   REQUIRE(str.length() == 0);
+      REQUIRE(iter == str.begin());
+   }
 }
 
 TEST_CASE("QString16 chop", "[qstring16]")
@@ -110,20 +177,47 @@ TEST_CASE("QString16 chop", "[qstring16]")
    }
 }
 
-TEST_CASE("QString16 contains", "[qstring16]")
+TEST_CASE("QString16 clear", "[qstring16]")
 {
-   QString16 str = "A wacky fox and sizeable pig jumped halfway over a blue moon";
+   QString16 str = "On a clear day you can see forever";
 
-   REQUIRE(str.contains("jumped"));
-   REQUIRE(! str.contains("lunch"));
+   str.clear();
 
-   REQUIRE(str.contains('x'));
-   REQUIRE(! str.contains('q'));
-
-   REQUIRE(str.contains("jUmpeD", Qt::CaseInsensitive));
+   REQUIRE(str.length() == 0);
 }
 
-TEST_CASE("QString16 compare", "[qstring16]")
+TEST_CASE("QString16 comparison", "[qstring16]")
+{
+   QString16 str1 = "grapes";
+   QString16 str2 = "apples";
+
+   REQUIRE("apples" < str1);
+   REQUIRE(! (str1 < "apples"));
+
+   REQUIRE("apples" <= str1);
+   REQUIRE(! (str1 <= "apples"));
+
+   REQUIRE(! ("apples" > str1));
+   REQUIRE(str1 > "apples");
+
+   REQUIRE(! ("apples" >= str1));
+   REQUIRE(str1 >= "apples");
+
+   //
+   REQUIRE(str2 < str1);
+   REQUIRE(! (str1 < str2));
+
+   REQUIRE(str2 <= str1);
+   REQUIRE(! (str1 <= str2));
+
+   REQUIRE(! (str2 > str1));
+   REQUIRE(str1 > str2);
+
+   REQUIRE(! (str2 >= str1));
+   REQUIRE(str1 >= str2);
+}
+
+TEST_CASE("QString16 comparison_case", "[qstring16]")
 {
    QString16 str1 = "apple";
    QString16 str2 = "APPLE";
@@ -131,6 +225,47 @@ TEST_CASE("QString16 compare", "[qstring16]")
    REQUIRE(str1.compare(str2, Qt::CaseInsensitive) == 0);
    REQUIRE(str1.compare(str2, Qt::CaseSensitive) == 1);
 }
+
+TEST_CASE("QString16 contains", "[qstring16]")
+{
+   QString16 str = "A wacky fox and sizeable pig jumped halfway over a blue moon";
+
+   REQUIRE(str.contains("jumped") == true);
+   REQUIRE(str.contains("lunch")  == false);
+
+   REQUIRE(str.contains('x') == true);
+   REQUIRE(str.contains('q') == false);
+
+   REQUIRE(str.contains("jUmpeD", Qt::CaseInsensitive) == true);
+}
+
+TEST_CASE("QString16 u8_contains", "[qstring16]")
+{
+   QString16 str = u8"A wacky fox and sizeable pig jumped halfway over a blue moon";
+
+   REQUIRE(str.contains(u8"jumped") == true);
+   REQUIRE(str.contains(u8"lunch")  == false);
+
+   REQUIRE(str.contains(u8'x') == true);
+   REQUIRE(str.contains(u8'q') == false);
+}
+
+TEST_CASE("QString16 copy_assign", "[qstring16]")
+{
+   QString16 data_a("A wacky fox and sizeable pig jumped halfway over a blue moon");
+   QString16 data_b(data_a);
+
+   REQUIRE(data_a == data_b);
+   REQUIRE(data_b == QString16("A wacky fox and sizeable pig jumped halfway over a blue moon"));
+
+   //
+   QString16 data_c;
+   data_c = data_a;
+
+   REQUIRE(data_a == data_c);
+   REQUIRE(data_c == QString16("A wacky fox and sizeable pig jumped halfway over a blue moon"));
+}
+
 TEST_CASE("QString16 count", "[qstring16]")
 {
    QString16 str = "A wacky fox and sizeable pig jumped halfway over a blue moon";
@@ -141,11 +276,19 @@ TEST_CASE("QString16 count", "[qstring16]")
    REQUIRE(str.count('a', Qt::CaseInsensitive) == 7);
 }
 
+TEST_CASE("QString16 u8_count", "[qstring16]")
+{
+   QString16 str = u8"A wacky fox and sizeable pig jumped halfway over a blue moon";
+
+   REQUIRE(str.count(u8"o") == 4);
+   REQUIRE(str.count(u8"q") == 0);
+}
+
 TEST_CASE("QString16 empty", "[qstring16]")
 {
    QString16 str;
 
-   REQUIRE(str.isEmpty());
+   REQUIRE(str.isEmpty() == true);
    REQUIRE(str.constData()[0] == '\0');
 
    REQUIRE(str.constBegin() == str.constEnd());
@@ -159,25 +302,25 @@ TEST_CASE("QString16 ends_with", "[qstring16]")
    QString16 str2 = "APPLE";
 
    {
-      REQUIRE(str1.endsWith('e', Qt::CaseInsensitive));
-      REQUIRE(str1.endsWith('e', Qt::CaseSensitive));
-      REQUIRE(! str1.endsWith('E', Qt::CaseSensitive));
+      REQUIRE(str1.endsWith('e', Qt::CaseInsensitive) == true);
+      REQUIRE(str1.endsWith('e', Qt::CaseSensitive) == true);
+      REQUIRE(str1.endsWith('E', Qt::CaseSensitive) == false);
 
-      REQUIRE(! str1.endsWith('t', Qt::CaseInsensitive));
+      REQUIRE(str1.endsWith('t', Qt::CaseInsensitive) == false);
 
-      REQUIRE(str2.endsWith('e', Qt::CaseInsensitive));
-      REQUIRE(! str2.endsWith('e', Qt::CaseSensitive));
-      REQUIRE(str2.endsWith('E', Qt::CaseSensitive));
+      REQUIRE(str2.endsWith('e', Qt::CaseInsensitive) == true);
+      REQUIRE(str2.endsWith('e', Qt::CaseSensitive) == false);
+      REQUIRE(str2.endsWith('E', Qt::CaseSensitive) == true);
    }
 
    {
-      REQUIRE(str1.endsWith("le", Qt::CaseInsensitive));
-      REQUIRE(str1.endsWith("le", Qt::CaseSensitive));
-      REQUIRE(! str1.endsWith("LE", Qt::CaseSensitive));
+      REQUIRE(str1.endsWith("le", Qt::CaseInsensitive) == true);
+      REQUIRE(str1.endsWith("le", Qt::CaseSensitive) == true);
+      REQUIRE(str1.endsWith("LE", Qt::CaseSensitive) == false);
 
-      REQUIRE(str2.endsWith("le", Qt::CaseInsensitive));
-      REQUIRE(! str2.endsWith("le", Qt::CaseSensitive));
-      REQUIRE(str2.endsWith("LE", Qt::CaseSensitive));
+      REQUIRE(str2.endsWith("le", Qt::CaseInsensitive) == true);
+      REQUIRE(str2.endsWith("le", Qt::CaseSensitive) == false);
+      REQUIRE(str2.endsWith("LE", Qt::CaseSensitive) == true);
    }
 }
 
@@ -251,6 +394,42 @@ TEST_CASE("QString16 index", "[qstring16]")
    }
 }
 
+TEST_CASE("QString16 insert_str", "[qstring16]")
+{
+   QString16 str1 = "Sunday Tuesday";
+   QString16 str2 = "Monday ";
+
+   SECTION ("insert_a") {
+      str1.insert(7, str2);
+      REQUIRE(str1 == "Sunday Monday Tuesday");
+   }
+
+   SECTION ("insert_b") {
+      str1.insert(str1.begin() + 7, str2);
+
+      REQUIRE(str1 == "Sunday Monday Tuesday");
+   }
+
+   SECTION ("insert_c") {
+      str1.insert(str1.begin() + 7, str2.begin(), str2.end());
+
+      REQUIRE(str1 == "Sunday Monday Tuesday");
+   }
+
+   SECTION ("insert_d") {
+      str1.insert(6, QChar('!'));
+
+      REQUIRE(str1 == "Sunday! Tuesday");
+   }
+
+   SECTION ("insert_e") {
+      QChar32 data[] = {'M', 'o', 'n', 'd', 'a', 'y', ' '};
+
+      str1.insert(7, data, std::size(data));
+      REQUIRE(str1 == "Sunday Monday Tuesday");
+   }
+}
+
 TEST_CASE("QString16 justify", "[qstring16]")
 {
    QString16 str = "grapefruit";
@@ -274,8 +453,11 @@ TEST_CASE("QString16 left_right", "[qstring16]")
    QString16 str = "A wacky fox and sizeable pig jumped halfway over a blue moon";
 
    REQUIRE(str.left(11)   == "A wacky fox");
-   REQUIRE(str.mid(16, 8) == "sizeable");
    REQUIRE(str.right(11)  == "a blue moon");
+
+   REQUIRE(str.mid(16, 8) == "sizeable");
+
+   REQUIRE(str.remaining(36)  == "halfway over a blue moon");
 }
 
 TEST_CASE("QString16 length", "[qstring16]")
@@ -284,6 +466,50 @@ TEST_CASE("QString16 length", "[qstring16]")
 
    REQUIRE(str.length() == 60);
    REQUIRE(str.size() == 60);
+}
+
+TEST_CASE("QString16 u8_length", "[qstring16]")
+{
+   QString16 str = u8"!ä";
+
+   REQUIRE(str.length() ==  2);
+
+   REQUIRE(str[0].unicode() == char32_t(33));
+   REQUIRE(str[1].unicode() == char32_t(228));
+}
+
+TEST_CASE("QString16 u16_length", "[qstring16]")
+{
+   QString16 str = u"!ä";
+
+   REQUIRE(str.length() ==  2);
+
+   REQUIRE(str[0].unicode() == char32_t(33));
+   REQUIRE(str[1].unicode() == char32_t(228));
+}
+
+TEST_CASE("QString16 u32_length", "[qstring16]")
+{
+   QString16 str = U"!ä";
+
+   REQUIRE(str.length() ==  2);
+
+   REQUIRE(str[0].unicode() == char32_t(33));
+   REQUIRE(str[1].unicode() == char32_t(228));
+}
+
+TEST_CASE("QString16 move_assign", "[qstring16]")
+{
+   QString16 data_a("A wacky fox and sizeable pig jumped halfway over a blue moon");
+   QString16 data_b(std::move(data_a));
+
+   REQUIRE(data_b == QString16("A wacky fox and sizeable pig jumped halfway over a blue moon"));
+
+   //
+   QString16 data_c;
+   data_c = std::move(data_b);
+
+   REQUIRE(data_c == QString16("A wacky fox and sizeable pig jumped halfway over a blue moon"));
 }
 
 TEST_CASE("QString16 normalized", "[qstring16]")
@@ -331,6 +557,15 @@ TEST_CASE("QString16 prepend", "[qstring16]")
    str.prepend("One day, ");
 
    REQUIRE(str == "One day, a wacky fox and sizeable pig");
+}
+
+TEST_CASE("QString16 u8_prepend", "[qstring16]")
+{
+   QString16 str = u8"a wacky fox and sizeable pig";
+
+   str.prepend(u8"One day, ");
+
+   REQUIRE(str == u8"One day, a wacky fox and sizeable pig");
 }
 
 TEST_CASE("QString16 remove", "[qstring16]")
@@ -389,6 +624,25 @@ TEST_CASE("QString16 replace_b", "[qstring16]")
    str2.replace("ß", "Found eszett");
 
    REQUIRE(str2 == "Found eszett");
+}
+
+TEST_CASE("QString16 u8_replace_b", "[qstring16]")
+{
+   QString16 str1 = u8"ß";
+
+   QString16 str2 = str1;
+   str2.replace(u8"ß", u8"Found eszett");
+
+   REQUIRE(str2 == u8"Found eszett");
+}
+
+TEST_CASE("QString16 replace_c", "[qstring16]")
+{
+   QString16 str = "cow";
+
+   str.replace('c', "cr");
+
+   REQUIRE(str == "crow");
 }
 
 TEST_CASE("QString16 replace_regex_a", "[qstring16]")
@@ -473,26 +727,87 @@ TEST_CASE("QString16 starts_with", "[qstring16]")
    QString16 str2 = "APPLE";
 
   {
-      REQUIRE(str1.startsWith('a', Qt::CaseInsensitive));
-      REQUIRE(str1.startsWith('a', Qt::CaseSensitive));
-      REQUIRE(! str1.startsWith('A', Qt::CaseSensitive));
+      REQUIRE(str1.startsWith('a', Qt::CaseInsensitive) == true);
+      REQUIRE(str1.startsWith('a', Qt::CaseSensitive) == true);
+      REQUIRE(str1.startsWith('A', Qt::CaseSensitive) == false);
 
-      REQUIRE(! str1.startsWith('t', Qt::CaseInsensitive));
+      REQUIRE(str1.startsWith('t', Qt::CaseInsensitive) == false);
 
-      REQUIRE(str2.startsWith('a', Qt::CaseInsensitive));
-      REQUIRE(! str2.startsWith('a', Qt::CaseSensitive));
-      REQUIRE(str2.startsWith('A', Qt::CaseSensitive));
+      REQUIRE(str2.startsWith('a', Qt::CaseInsensitive) == true);
+      REQUIRE(str2.startsWith('a', Qt::CaseSensitive) == false);
+      REQUIRE(str2.startsWith('A', Qt::CaseSensitive) == true);
    }
 
    {
-      REQUIRE(str1.startsWith("ap", Qt::CaseInsensitive));
-      REQUIRE(str1.startsWith("ap", Qt::CaseSensitive));
-      REQUIRE(! str1.startsWith("AP", Qt::CaseSensitive));
+      REQUIRE(str1.startsWith("ap", Qt::CaseInsensitive) == true);
+      REQUIRE(str1.startsWith("ap", Qt::CaseSensitive) == true);
+      REQUIRE(str1.startsWith("AP", Qt::CaseSensitive) == false);
 
-      REQUIRE(str2.startsWith("ap", Qt::CaseInsensitive));
-      REQUIRE(! str2.startsWith("ap", Qt::CaseSensitive));
-      REQUIRE(str2.startsWith("AP", Qt::CaseSensitive));
+      REQUIRE(str2.startsWith("ap", Qt::CaseInsensitive) == true);
+      REQUIRE(str2.startsWith("ap", Qt::CaseSensitive) == false);
+      REQUIRE(str2.startsWith("AP", Qt::CaseSensitive) == true);
    }
+}
+
+TEST_CASE("QString16 storage_iterators", "[qstring16]")
+{
+   QString16 str;
+
+   REQUIRE(str.storage_begin()  == str.storage_end());
+   REQUIRE(str.storage_rbegin() == str.storage_rend());
+
+   str = "grape";
+   REQUIRE(*str.storage_begin()  == 'g');
+   REQUIRE(*str.storage_rbegin() == 'e');
+   REQUIRE(str.storage_end() - str.storage_begin() == 5);
+
+   // unicode 1F600, two storage units
+   QString16 face = QString16(UCHAR('\U0001F600'));
+   str = "grape" + face;
+
+   REQUIRE(*(str.storage_end() - 3) == 'e');
+   REQUIRE(*(str.storage_rbegin() + 2) == 'e');
+}
+
+TEST_CASE("QString16 u8_storage_iterators", "[qstring16]")
+{
+   QString16 str;
+
+   REQUIRE(str.storage_begin()  == str.storage_end());
+   REQUIRE(str.storage_rbegin() == str.storage_rend());
+
+   str = u8"grape";
+   REQUIRE(*str.storage_begin()  == u'g');
+   REQUIRE(*str.storage_rbegin() == u'e');
+   REQUIRE(str.storage_end() - str.storage_begin() == 5);
+
+   // unicode 21B4, one storage units
+   QString16 arrow(1, U'↴');
+
+   str = u8"grape" + arrow;
+
+   REQUIRE(*(str.storage_end() - 2) == u'e');
+   REQUIRE(*(str.storage_rbegin() + 1) == u'e');
+}
+
+TEST_CASE("QString16 u16_storage_iterators", "[qstring16]")
+{
+   QString16 str;
+
+   REQUIRE(str.storage_begin()  == str.storage_end());
+   REQUIRE(str.storage_rbegin() == str.storage_rend());
+
+   str = u"grape";
+   REQUIRE(*str.storage_begin()  == u'g');
+   REQUIRE(*str.storage_rbegin() == u'e');
+   REQUIRE(str.storage_end() - str.storage_begin() == 5);
+
+   // unicode 21B4, one storage units
+   QString16 arrow(1, U'↴');
+
+   str = u"grape" + arrow;
+   REQUIRE(*(str.storage_end() - 2) == u'e');
+   REQUIRE(*(str.storage_rbegin() + 1) == u'e');
 }
 
 TEST_CASE("QString16 string_view", "[qstring16]")
@@ -550,7 +865,6 @@ TEST_CASE("QString16 toLower", "[qstring16]")
    }
 }
 
-
 TEST_CASE("QString16 to_integer", "[qstring16]")
 {
    QString16 str = "FF";
@@ -598,16 +912,6 @@ TEST_CASE("QString16 to_integer", "[qstring16]")
    }
 }
 
-TEST_CASE("QString16 utf8", "[qstring16]")
-{
-   QString16 str = "!ä";
-
-   REQUIRE(str.length() ==  2);
-
-   REQUIRE(str[0].unicode() == char32_t(33));
-   REQUIRE(str[1].unicode() == char32_t(228));
-}
-
 TEST_CASE("QString16 toLower_german", "[qstring16]")
 {
    QString16 str = QString16::fromUtf8( "HeizölrückstoßabdämpFung \u20A8 \u2122" );
@@ -633,48 +937,11 @@ TEST_CASE("QString16 toLower_german", "[qstring16]")
    }
 }
 
-TEST_CASE("QString16 trim", "[qstring16]")
+TEST_CASE("QString16 trimmed", "[qstring16]")
 {
    QString16 str = "    A wacky fox and sizeable pig \n\t ";
 
    str = str.trimmed();
 
    REQUIRE(str == "A wacky fox and sizeable pig");
-}
-
-TEST_CASE("QString16 comparison", "[qstring16]")
-{
-   QString16 str = "grapes";
-
-   REQUIRE("apples" < str);
-   REQUIRE(! (str < "apples"));
-
-   REQUIRE("apples" <= str);
-   REQUIRE(! (str <= "apples"));
-
-   REQUIRE(! ("apples" > str));
-   REQUIRE(str > "apples");
-
-   REQUIRE(! ("apples" >= str));
-   REQUIRE(str >= "apples");
-}
-
-TEST_CASE("QString16 storage_iterators", "[qstring16]")
-{
-   QString16 str;
-
-   REQUIRE(str.storage_begin()  == str.storage_end());
-   REQUIRE(str.storage_rbegin() == str.storage_rend());
-
-   str = "grape";
-   REQUIRE(*str.storage_begin()  == 'g');
-   REQUIRE(*str.storage_rbegin() == 'e');
-   REQUIRE(str.storage_end() - str.storage_begin() == 5);
-
-   // unicode 1F600, two storage units
-   QString16 face = QString16(UCHAR('\U0001F600'));
-   str = "grape" + face;
-
-   REQUIRE(*(str.storage_end() - 3) == 'e');
-   REQUIRE(*(str.storage_rbegin() + 2) == 'e');
 }

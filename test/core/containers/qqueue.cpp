@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -32,24 +32,28 @@ TEST_CASE("QQueue traits", "[qqueue]")
    REQUIRE(std::has_virtual_destructor_v<QQueue<int>> == false);
 }
 
-TEST_CASE("QQueue empty", "[qqueue]")
+TEST_CASE("QQueue copy_assign", "[qqueue]")
 {
-   QQueue<QString> list;
+   QQueue<int> list1;
+   list1.enqueue(1);
+   list1.enqueue(2);
 
-   REQUIRE(list.isEmpty());
-}
+   {
+      QQueue<int> list2(list1);
 
-TEST_CASE("QQueue length", "[qqueue]")
-{
-   QQueue<QString> list;
+       REQUIRE(list2.count()   == 2);
+       REQUIRE(list2.dequeue() == 1);
+       REQUIRE(list2.dequeue() == 2);
+   }
 
-   list.enqueue("watermelon");
-   list.enqueue("apple");
-   list.enqueue("pear");
-   list.enqueue("grapefruit");
+   {
+      QQueue<int> list2;
+      list2 = list1;
 
-   REQUIRE(list.length() == 4);
-   REQUIRE(list.size() == 4);
+      REQUIRE(list2.count()   == 2);
+      REQUIRE(list2.dequeue() == 1);
+      REQUIRE(list2.dequeue() == 2);
+   }
 }
 
 TEST_CASE("QQueue clear", "[qqueue]")
@@ -64,6 +68,7 @@ TEST_CASE("QQueue clear", "[qqueue]")
    list.clear();
 
    REQUIRE(list.size() == 0);
+   REQUIRE(list.count() == 0);
 }
 
 TEST_CASE("QQueue contains", "[qqueue]")
@@ -75,8 +80,16 @@ TEST_CASE("QQueue contains", "[qqueue]")
    list.enqueue("pear");
    list.enqueue("grapefruit");
 
-   REQUIRE(list.contains("pear"));
-   REQUIRE(! list.contains("orange"));
+   REQUIRE(list.contains("pear") == true);
+   REQUIRE(list.contains("orange") == false);
+}
+
+TEST_CASE("QQueue empty", "[qqueue]")
+{
+   QQueue<QString> list;
+
+   REQUIRE(list.isEmpty() == true);
+   REQUIRE(list.count() == 0);
 }
 
 TEST_CASE("QQueue erase", "[qqueue]")
@@ -90,13 +103,44 @@ TEST_CASE("QQueue erase", "[qqueue]")
 
    list.erase(list.begin() + 1);
 
-   REQUIRE(! list.contains("apple"));
+   REQUIRE(list.contains("apple") == false);
 
-   REQUIRE(list.contains("watermelon"));
-   REQUIRE(list.contains("pear"));
-   REQUIRE(list.contains("grapefruit"));
+   REQUIRE(list.contains("watermelon") == true);
+   REQUIRE(list.contains("pear") == true);
+   REQUIRE(list.contains("grapefruit") == true);
 
    REQUIRE(list.length() == 3);
+}
+
+TEST_CASE("QQueue insert", "[qqueue]")
+{
+   QQueue<QString> list;
+
+   list.enqueue("watermelon");
+   list.enqueue("apple");
+   list.enqueue("pear");
+   list.enqueue("grapefruit");
+
+   list.insert(1, "mango");
+
+   REQUIRE(list.contains("mango") == true);
+   REQUIRE(list[1] == "mango");
+   REQUIRE(list.length() == 5);
+}
+
+TEST_CASE("QQueue length", "[qqueue]")
+{
+   QQueue<QString> list;
+
+   list.enqueue("watermelon");
+   list.enqueue("apple");
+   list.enqueue("pear");
+   list.enqueue("grapefruit");
+
+   REQUIRE(list.head() == "watermelon");
+
+   REQUIRE(list.length() == 4);
+   REQUIRE(list.size() == 4);
 }
 
 TEST_CASE("QQueue remove", "[qqueue]")
@@ -111,29 +155,13 @@ TEST_CASE("QQueue remove", "[qqueue]")
    list.removeOne("apple");
    list.remove(0);
 
-   REQUIRE(! list.contains("apple"));
-   REQUIRE(! list.contains("watermelon"));
+   REQUIRE(list.contains("apple") == false);
+   REQUIRE(list.contains("watermelon") == false);
 
-   REQUIRE(list.contains("pear"));
-   REQUIRE(list.contains("grapefruit"));
+   REQUIRE(list.contains("pear") == true);
+   REQUIRE(list.contains("grapefruit") == true);
 
    REQUIRE(list.length() == 2);
-}
-
-TEST_CASE("QQueue insert", "[qqueue]")
-{
-   QQueue<QString> list;
-
-   list.enqueue("watermelon");
-   list.enqueue("apple");
-   list.enqueue("pear");
-   list.enqueue("grapefruit");
-
-   list.insert(1, "mango");
-
-   REQUIRE(list.contains("mango"));
-   REQUIRE(list[1] == "mango");
-   REQUIRE(list.length() == 5);
 }
 
 TEST_CASE("QQueue position", "[qqueue]")

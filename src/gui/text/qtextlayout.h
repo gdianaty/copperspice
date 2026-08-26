@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,28 +24,28 @@
 #ifndef QTEXTLAYOUT_H
 #define QTEXTLAYOUT_H
 
-#include <qstring.h>
-#include <qnamespace.h>
-#include <qrect.h>
-#include <qvector.h>
 #include <qcolor.h>
-#include <qobject.h>
 #include <qevent.h>
-#include <qtextformat.h>
 #include <qglyphrun.h>
+#include <qnamespace.h>
+#include <qobject.h>
+#include <qrect.h>
+#include <qstring.h>
 #include <qtextcursor.h>
+#include <qtextformat.h>
+#include <qvector.h>
 
-class QTextEngine;
 class QFont;
+class QPaintDevice;
+class QPainter;
+class QPalette;
 class QRawFont;
 class QRect;
 class QRegion;
-class QTextFormat;
-class QPalette;
-class QPainter;
-class QPaintDevice;
-class QTextLine;
 class QTextBlock;
+class QTextEngine;
+class QTextFormat;
+class QTextLine;
 class QTextOption;
 
 class Q_GUI_EXPORT QTextInlineObject
@@ -57,7 +57,7 @@ class Q_GUI_EXPORT QTextInlineObject
    {
    }
 
-   inline QTextInlineObject()
+   QTextInlineObject()
       : itm(0), eng(nullptr)
    {
    }
@@ -242,7 +242,7 @@ class Q_GUI_EXPORT QTextLine
 
    // cursorPos gets set to the valid position
    qreal cursorToX(int *cursorPos, Edge edge = Leading) const;
-   inline qreal cursorToX(int cursorPos, Edge edge = Leading) const {
+   qreal cursorToX(int cursorPos, Edge edge = Leading) const {
       return cursorToX(&cursorPos, edge);
    }
 

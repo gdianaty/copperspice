@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,15 +24,14 @@
 #ifndef QXCBEGLINTEGRATION_H
 #define QXCBEGLINTEGRATION_H
 
-#include "qxcbglintegration.h"
-#include "qxcbeglwindow.h"
+#include <qxcbglintegration.h>
 
-#include <QOpenGLContext>
+#include <qopenglcontext.h>
 #include <qplatform_screen.h>
-#include <QScreen>
-
-#include "qxcbscreen.h"
-#include "qxcbeglinclude.h"
+#include <qscreen.h>
+#include <qxcbeglinclude.h>
+#include <qxcbeglwindow.h>
+#include <qxcbscreen.h>
 
 class QXcbEglNativeInterfaceHandler;
 

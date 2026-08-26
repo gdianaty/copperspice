@@ -1,12 +1,12 @@
 /***********************************************************************
 *
-* Copyright (c) 2017-2023 Barbara Geller
-* Copyright (c) 2017-2023 Ansel Sermersheim
+* Copyright (c) 2017-2026 Barbara Geller
+* Copyright (c) 2017-2026 Ansel Sermersheim
 *
 * This file is part of CsString.
 *
-* CsString is free software, released under the BSD 2-Clause license.
-* For license details refer to LICENSE provided with this project.
+* CsString is free software which is released under the BSD 2-Clause license.
+* For license details refer to the LICENSE provided with this project.
 *
 * CsString is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,12 +19,16 @@
 #ifndef LIB_CS_ENCODING_H
 #define LIB_CS_ENCODING_H
 
+#include <cs_char.h>
+
 #include <stdint.h>
 #include <vector>
 
-#include <cs_char.h>
-
 namespace CsString {
+
+template <typename Container, typename Value>
+concept EncodingInsert = requires(Container r_str, Container::const_iterator r_iter, Value r_value)
+      { r_iter = r_str.insert(r_iter, r_value); };
 
 class LIB_CS_STRING_EXPORT utf8
 {
@@ -75,8 +79,9 @@ class LIB_CS_STRING_EXPORT utf8
       }
 
       template <typename Container>
+      requires EncodingInsert<Container, uint32_t>
       static typename Container::const_iterator insert(Container &str1,
-                  typename Container::const_iterator iter, CsChar c, size_type count = 1)
+            typename Container::const_iterator iter, CsChar c, size_type count = 1)
       {
          uint32_t value = c.unicode();
 

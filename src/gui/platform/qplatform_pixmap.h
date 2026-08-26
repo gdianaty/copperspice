@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,8 +24,8 @@
 #ifndef QPLATFORM_PIXMAP_H
 #define QPLATFORM_PIXMAP_H
 
-#include <qpixmap.h>
 #include <qatomic.h>
+#include <qpixmap.h>
 
 class QImageReader;
 
@@ -79,15 +79,15 @@ class Q_GUI_EXPORT QPlatformPixmap
    virtual QImage toImage(const QRect &rect) const;
    virtual QPaintEngine *paintEngine() const = 0;
 
-   inline int serialNumber() const {
+   int serialNumber() const {
       return ser_no;
    }
 
-   inline PixelType pixelType() const {
-      return type;
+   PixelType pixelType() const {
+      return m_platformType;
    }
 
-   inline ClassId classId() const {
+   ClassId classId() const {
       return static_cast<ClassId>(id);
    }
 
@@ -96,29 +96,34 @@ class Q_GUI_EXPORT QPlatformPixmap
 
    virtual QImage *buffer();
 
-   inline int width() const {
-      return w;
+   int width() const {
+      return m_pixmap_w;
    }
-   inline int height() const {
-      return h;
+
+   int height() const {
+      return m_pixmap_h;
    }
-   inline int colorCount() const {
+
+   int colorCount() const {
       return metric(QPaintDevice::PdmNumColors);
    }
-   inline int depth() const {
-      return d;
+
+   int depth() const {
+      return m_pixmap_d;
    }
-   inline bool isNull() const {
+
+   bool isNull() const {
       return is_null;
    }
-   inline qint64 cacheKey() const {
+
+   qint64 cacheKey() const {
       int classKey = id;
+
       if (classKey >= 1024) {
          classKey = -(classKey >> 10);
       }
-      return ((((qint64) classKey) << 56)
-            | (((qint64) ser_no) << 32)
-            | ((qint64) detach_no));
+
+      return ((((qint64) classKey) << 56) | (((qint64) ser_no) << 32) | ((qint64) detach_no));
    }
 
    static QPlatformPixmap *create(int w, int h, PixelType type);
@@ -126,28 +131,30 @@ class Q_GUI_EXPORT QPlatformPixmap
  protected:
    void setSerialNumber(int serNo);
    void setDetachNumber(int detNo);
-   int w;
-   int h;
-   int d;
+
+   int m_pixmap_w;
+   int m_pixmap_h;
+   int m_pixmap_d;
+
    bool is_null;
 
  private:
    friend class QPixmap;
-   friend class QImagePixmapCleanupHooks; // Needs to set is_cached
-   friend class QOpenGLTextureCache; //Needs to check the reference count
+   friend class QImagePixmapCleanupHooks;          // Needs to set is_cached
+   friend class QOpenGLTextureCache;               // Needs to check the reference count
    friend class QExplicitlySharedDataPointer<QPlatformPixmap>;
 
    QAtomicInt ref;
    int detach_no;
 
-   PixelType type;
+   PixelType m_platformType;
    int id;
    int ser_no;
    uint is_cached;
 };
 
-#  define QT_XFORM_TYPE_MSBFIRST 0
-#  define QT_XFORM_TYPE_LSBFIRST 1
+#define QT_XFORM_TYPE_MSBFIRST 0
+#define QT_XFORM_TYPE_LSBFIRST 1
 
 extern bool qt_xForm_helper(const QTransform &, int, int, int, uchar *, int, int, int, const uchar *, int, int, int);
 

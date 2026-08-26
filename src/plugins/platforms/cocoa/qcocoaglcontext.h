@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,11 @@
 #ifndef QCOCOAGLCONTEXT_H
 #define QCOCOAGLCONTEXT_H
 
-#include <QPointer>
+#include <qopenglcontext.h>
 #include <qplatform_openglcontext.h>
-#include <QOpenGLContext>
-#include <QWindow>
+#include <qpointer.h>
+#include <qwindow.h>
 
-#undef slots
 #include <Cocoa/Cocoa.h>
 
 class QCocoaGLContext : public QPlatformOpenGLContext

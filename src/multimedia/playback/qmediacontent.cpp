@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,12 +21,12 @@
 *
 ***********************************************************************/
 
-#include <qurl.h>
-#include <qvariant.h>
-#include <QPointer>
+#include <qmediacontent.h>
 
 #include <qmediaplaylist.h>
-#include <qmediacontent.h>
+#include <qpointer.h>
+#include <qurl.h>
+#include <qvariant.h>
 
 class QMediaContentPrivate : public QSharedData
 {

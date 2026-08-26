@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,13 +28,8 @@
 #include <qimage.h>
 #include <qvariant.h>
 #include <qvector.h>
+
 #include <ctype.h>
-
-
-
-/*****************************************************************************
-  PBM/PGM/PPM (ASCII and RAW) image read/write functions
- *****************************************************************************/
 
 static void discard_pbm_line(QIODevice *d)
 {
@@ -473,7 +468,7 @@ bool QPpmHandler::canRead()
 bool QPpmHandler::canRead(QIODevice *device, QByteArray *subType)
 {
    if (!device) {
-      qWarning("QPpmHandler::canRead() called with no device");
+      qWarning("QPpmHandler::canRead() No device");
       return false;
    }
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,17 +23,18 @@
 
 #include <qaccessiblewidget_range_p.h>
 
-#include <qslider.h>
 #include <qdial.h>
-#include <qspinbox.h>
-#include <qscrollbar.h>
-#include <qstyle.h>
-#include <qstyleoption.h>
+#include <qdial.h>
+#include <qdoublespinbox.h>
 #include <qglobal.h>
-#include <QDoubleSpinBox>
-#include <QDial>
 #include <qlineedit.h>
 #include <qmath.h>
+#include <qscrollbar.h>
+#include <qslider.h>
+#include <qspinbox.h>
+#include <qstyle.h>
+#include <qstyleoption.h>
+
 #include <qmath_p.h>
 
 #include <qaccessiblewidget_simple_p.h> // let spinbox use line edit's interface

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,30 +21,28 @@
 *
 ***********************************************************************/
 
-#include <qdebug.h>
+#include <qgstreamerplayerservice.h>
+
+#include <qgstreameravailabilitycontrol.h>
+#include <qgstreamermetadataprovider.h>
+#include <qgstreamerplayercontrol.h>
+#include <qgstreamerplayersession.h>
+#include <qgstreamerstreamscontrol.h>
+#include <qmediaplaylist.h>
 #include <qvariant.h>
 #include <qwidget.h>
 
-#include <qgstreamerplayerservice.h>
-#include <qgstreamerplayercontrol.h>
-#include <qgstreamerplayersession.h>
-#include <qgstreamermetadataprovider.h>
-#include <qgstreameravailabilitycontrol.h>
-#include <qgstreamerstreamscontrol.h>
-#include <qmediaplaylist.h>
-
+#include <qgstreameraudioprobecontrol_p.h>
+#include <qgstreamervideoprobecontrol_p.h>
+#include <qgstreamervideorenderer_p.h>
 #include <qgstreamervideowidget_p.h>
 #include <qgstreamervideowindow_p.h>
-#include <qgstreamervideorenderer_p.h>
+#include <qmediaplaylistnavigator_p.h>
+#include <qmediaresourceset_p.h>
 
 #if defined(HAVE_MIR) && defined (__arm__)
 #include <qgstreamermirtexturerenderer_p.h>
 #endif
-
-#include <qgstreameraudioprobecontrol_p.h>
-#include <qgstreamervideoprobecontrol_p.h>
-#include <qmediaplaylistnavigator_p.h>
-#include <qmediaresourceset_p.h>
 
 QGstreamerPlayerService::QGstreamerPlayerService(QObject *parent)
    : QMediaService(parent), m_audioProbeControl(nullptr), m_videoProbeControl(nullptr), m_videoOutput(nullptr),
@@ -70,7 +68,6 @@ QGstreamerPlayerService::QGstreamerPlayerService(QObject *parent)
       delete m_videoWindow;
       m_videoWindow = nullptr;
    }
-
 
    m_videoWidget = new QGstreamerVideoWidgetControl(this);
 
@@ -189,4 +186,3 @@ void QGstreamerPlayerService::decreaseVideoRef()
       m_control->resources()->setVideoEnabled(false);
    }
 }
-

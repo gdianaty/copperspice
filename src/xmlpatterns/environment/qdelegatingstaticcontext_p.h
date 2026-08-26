@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,11 @@
 #ifndef QDelegatingStaticContext_P_H
 #define QDelegatingStaticContext_P_H
 
-#include <QUrl>
-#include <qstaticcontext_p.h>
+#include <qurl.h>
+
 #include <qfunctionfactory_p.h>
 #include <qschematypefactory_p.h>
-
-QT_BEGIN_NAMESPACE
+#include <qstaticcontext_p.h>
 
 namespace QPatternist {
 
@@ -100,7 +99,5 @@ class DelegatingStaticContext : public StaticContext
    const StaticContext::Ptr m_context;
 };
 }
-
-QT_END_NAMESPACE
 
 #endif

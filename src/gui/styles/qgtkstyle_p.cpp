@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,8 +21,6 @@
 *
 ***********************************************************************/
 
-#include <qgtkstyle_p.h>
-
 // This file is responsible for resolving all GTK functions we use
 // dynamically. This is done to avoid link-time dependancy on GTK
 // as well as crashes occurring due to usage of the GTK_QT engines
@@ -31,45 +29,41 @@
 // to the GTK theme engine as many engines resort to querying the
 // actual widget pointers for details that are not covered by the state flags
 
+#include <qgtkstyle_p.h>
+
 #include <qglobal.h>
 
 #if ! defined(QT_NO_STYLE_GTK)
 
+#include <qapplication.h>
 #include <qcoreevent.h>
-#include <QFile>
-#include <QStringList>
-#include <QTextStream>
-#include <QHash>
-#include <QUrl>
-#include <QLibrary>
-#include <QDebug>
-
-#include <qgtk2painter_p.h>
+#include <qdebug.h>
+#include <qfile.h>
+#include <qhash.h>
+#include <qlibrary.h>
+#include <qmenu.h>
+#include <qmenubar.h>
+#include <qpixmapcache.h>
+#include <qplatform_fontdatabase.h>
+#include <qstatusbar.h>
+#include <qstringlist.h>
+#include <qstyle.h>
+#include <qtextstream.h>
+#include <qtoolbar.h>
+#include <qtoolbutton.h>
+#include <qurl.h>
 
 #include <qapplication_p.h>
+#include <qgtk2painter_p.h>
 #include <qiconloader_p.h>
-#include <qplatform_fontdatabase.h>
-
-#include <QMenu>
-#include <QStyle>
-#include <QApplication>
-#include <QPixmapCache>
-#include <QStatusBar>
-#include <QMenuBar>
-#include <QToolBar>
-#include <QToolButton>
 
 #ifndef Q_OS_DARWIN
-// X11 Includes:
 
-// the following is necessary to work around breakage in many versions
-// of XFree86's Xlib.h still in use
-// ### which versions?
-#if defined(_XLIB_H_) // crude hack, but...
-#error "Can not include <X11/Xlib.h> before this file"
+#if defined(_XLIB_H_)
+#error "Do not include <X11/Xlib.h> before this location"
 #endif
 
-#define XRegisterIMInstantiateCallback qt_XRegisterIMInstantiateCallback
+#define XRegisterIMInstantiateCallback   qt_XRegisterIMInstantiateCallback
 #define XUnregisterIMInstantiateCallback qt_XUnregisterIMInstantiateCallback
 #define XSetIMValues qt_XSetIMValues
 
@@ -281,8 +275,9 @@ QGtkPainter *QGtkStylePrivate::gtkPainter(QPainter *painter)
 GtkWidget *QGtkStylePrivate::gtkWidget(const QHashableLatin1Literal &path)
 {
    GtkWidget *widget = gtkWidgetMap()->value(path);
-   if (!widget) {
-      // Theme might have rearranged widget internals
+
+   if (! widget) {
+      // theme might have rearranged widget data
       widget = gtkWidgetMap()->value(path);
    }
    return widget;
@@ -315,9 +310,6 @@ void QGtkStylePrivate::gtkWidgetSetFocus(GtkWidget *widget, bool focus)
    }
 }
 
-/*! \internal
- *  Get references to gtk functions after we dynamically load the library.
- */
 void QGtkStylePrivate::resolveGtk() const
 {
    // enforce the "0" suffix, so we'll open libgtk-x11-2.0.so.0
@@ -423,10 +415,6 @@ void QGtkStylePrivate::resolveGtk() const
    gnome_vfs_init = (Ptr_gnome_vfs_init)QLibrary::resolve(QLS("gnomevfs-2"), 0, "gnome_vfs_init");
 }
 
-/* \internal
- * Initializes a number of gtk menu widgets.
- * The widgets are cached.
- */
 void QGtkStylePrivate::initGtkMenu() const
 {
    // Create menubar
@@ -467,11 +455,6 @@ void QGtkStylePrivate::initGtkTreeview() const
    addWidget(gtkTreeView);
 }
 
-
-/* \internal
- * Initializes a number of gtk widgets that we can later on use to determine some of our styles.
- * The widgets are cached.
- */
 void QGtkStylePrivate::initGtkWidgets() const
 {
    // From gtkmain.c
@@ -484,7 +467,7 @@ void QGtkStylePrivate::initGtkWidgets() const
       qWarning("\nThis process is currently running setuid or setgid.\nGTK+ does not allow this, "
          "the GTK+ integration will not be used.\nLaunch this app using \'gksudo\', "
          "\'kdesudo\' or a similar tool.\n\n"
-         "See http://www.gtk.org/setuid.html for more information.\n");
+         "Refer to https://www.gtk.org/setuid.html for more information.\n");
       return;
    }
 
@@ -573,9 +556,6 @@ void QGtkStylePrivate::initGtkWidgets() const
    }
 }
 
-/*! \internal
- * destroys all previously buffered widgets.
- */
 void QGtkStylePrivate::cleanupGtkWidgets()
 {
    if (!widgetMap) {
@@ -711,9 +691,6 @@ void QGtkStylePrivate::applyCustomPaletteHash()
    qApp->setPalette(menuBarPal, "QMenuBar");
 }
 
-/*! \internal
- *  Returns the gtk Widget that should be used to determine text foreground and background colors.
-*/
 GtkWidget *QGtkStylePrivate::getTextColorWidget() const
 {
    return  gtkWidget("GtkEntry");
@@ -881,10 +858,11 @@ QIcon QGtkStylePrivate::getFilesystemIcon(const QFileInfo &info)
             NULL,
             GNOME_ICON_LOOKUP_FLAGS_NONE,
             NULL);
+
       QString iconName = QString::fromUtf8(icon_name);
       g_free(icon_name);
 
-      if (iconName.startsWith(QLatin1Char('/'))) {
+      if (iconName.startsWith(QChar('/'))) {
          return QIcon(iconName);
       }
       return QIcon::fromTheme(iconName);

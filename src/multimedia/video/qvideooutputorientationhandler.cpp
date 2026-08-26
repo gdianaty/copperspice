@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,8 +23,8 @@
 
 #include <qvideooutputorientationhandler_p.h>
 
-#include <QGuiApplication>
-#include <QScreen>
+#include <qapplication.h>
+#include <qscreen.h>
 
 QVideoOutputOrientationHandler::QVideoOutputOrientationHandler(QObject *parent)
     : QObject(parent), m_currentOrientation(0)

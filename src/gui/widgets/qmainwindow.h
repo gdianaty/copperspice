@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,17 +24,18 @@
 #ifndef QMainWindow_H
 #define QMainWindow_H
 
-#include <qwidget.h>
 #include <qtabwidget.h>
+#include <qwidget.h>
 
 #ifndef QT_NO_MAINWINDOW
 
 class QDockWidget;
-class QMainWindowPrivate;
+class QMenu;
 class QMenuBar;
 class QStatusBar;
 class QToolBar;
-class QMenu;
+
+class QMainWindowPrivate;
 
 class Q_GUI_EXPORT QMainWindow : public QWidget
 {

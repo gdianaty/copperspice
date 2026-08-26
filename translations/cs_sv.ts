@@ -1128,7 +1128,7 @@ Press ESC to cancel</source>
         <location filename="../src/gui/dialogs/qfiledialog.cpp" line="1397"/>
         <source>%1 already exists.
 Do you want to replace it?</source>
-        <translation>%1 finns redan. 
+        <translation>%1 finns redan.
 Vill du ersätta den?</translation>
     </message>
     <message>
@@ -1136,8 +1136,8 @@ Vill du ersätta den?</translation>
         <source>%1
 File not found.
 Please verify the correct file name was given.</source>
-        <translation>%1 
-Filen hittades inte. 
+        <translation>%1
+Filen hittades inte.
 Kontrollera att det korrekta filnamnet angavs.</translation>
     </message>
     <message>
@@ -1262,8 +1262,8 @@ Kontrollera att det korrekta filnamnet angavs.</translation>
         <source>%1
 Directory not found.
 Please verify the correct directory name was given.</source>
-        <translation>%1 
-Katalogen hittades inte. 
+        <translation>%1
+Katalogen hittades inte.
 Kontrollera att det korrekta katalognamnet angavs.</translation>
     </message>
     <message>
@@ -1397,7 +1397,7 @@ Kontrollera att det korrekta katalognamnet angavs.</translation>
         <location filename="../src/gui/dialogs/qfiledialog_p.cpp" line="1267"/>
         <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-        <translation type="unfinished">\&quot;%1\&quot; är skrivskyddad. 
+        <translation type="unfinished">\&quot;%1\&quot; är skrivskyddad.
 Vill du ta bort den ändå?</translation>
     </message>
     <message>
@@ -1912,63 +1912,63 @@ Vill du ta bort den ändå?</translation>
         <location filename="../src/network/access/qftp.cpp" line="2203"/>
         <source>Connecting to host failed:
 %1</source>
-        <translation>Anslutning till värden misslyckades: 
+        <translation>Anslutning till värden misslyckades:
 %1</translation>
     </message>
     <message>
         <location filename="../src/network/access/qftp.cpp" line="2207"/>
         <source>Login failed:
 %1</source>
-        <translation>Inloggning misslyckades: 
+        <translation>Inloggning misslyckades:
 %1</translation>
     </message>
     <message>
         <location filename="../src/network/access/qftp.cpp" line="2211"/>
         <source>Listing directory failed:
 %1</source>
-        <translation>Listning av katalogen misslyckades: 
+        <translation>Listning av katalogen misslyckades:
 %1</translation>
     </message>
     <message>
         <location filename="../src/network/access/qftp.cpp" line="2215"/>
         <source>Changing directory failed:
 %1</source>
-        <translation>Byte av katalog misslyckades: 
+        <translation>Byte av katalog misslyckades:
 %1</translation>
     </message>
     <message>
         <location filename="../src/network/access/qftp.cpp" line="2219"/>
         <source>Downloading file failed:
 %1</source>
-        <translation>Nedladdningen av filen misslyckades: 
+        <translation>Nedladdningen av filen misslyckades:
 %1</translation>
     </message>
     <message>
         <location filename="../src/network/access/qftp.cpp" line="2223"/>
         <source>Uploading file failed:
 %1</source>
-        <translation>Uppladdningen av filen misslyckades: 
+        <translation>Uppladdningen av filen misslyckades:
 %1</translation>
     </message>
     <message>
         <location filename="../src/network/access/qftp.cpp" line="2227"/>
         <source>Removing file failed:
 %1</source>
-        <translation>Borttagning av filen misslyckades: 
+        <translation>Borttagning av filen misslyckades:
 %1</translation>
     </message>
     <message>
         <location filename="../src/network/access/qftp.cpp" line="2231"/>
         <source>Creating directory failed:
 %1</source>
-        <translation>Skapandet av katalogen misslyckades: 
+        <translation>Skapandet av katalogen misslyckades:
 %1</translation>
     </message>
     <message>
         <location filename="../src/network/access/qftp.cpp" line="2235"/>
         <source>Removing directory failed:
 %1</source>
-        <translation>Borttagning av katalogen misslyckades: 
+        <translation>Borttagning av katalogen misslyckades:
 %1</translation>
     </message>
     <message>
@@ -4525,14 +4525,14 @@ CopperSpice is licensed under the GNU LGPL version 2.1</source>
         <location filename="../src/gui/printing/qprintdialog_unix.cpp" line="811"/>
         <source>File %1 is not writable.
 Please choose a different file name.</source>
-        <translation>Filen %1 är inte skrivbar. 
+        <translation>Filen %1 är inte skrivbar.
 Välj ett annat filnamn.</translation>
     </message>
     <message>
         <location filename="../src/gui/printing/qprintdialog_unix.cpp" line="816"/>
         <source>%1 already exists.
 Do you want to overwrite it?</source>
-        <translation>%1 finns redan. 
+        <translation>%1 finns redan.
 Vill du skriva över den?</translation>
     </message>
     <message>
@@ -5118,347 +5118,6 @@ Please turn one of those options off.</source>
         <location filename="../src/core/io/qsavefile.cpp" line="209"/>
         <source>Writing canceled by application</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QScriptBreakpointsModel</name>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptbreakpointsmodel.cpp" line="441"/>
-        <source>ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptbreakpointsmodel.cpp" line="443"/>
-        <source>Location</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptbreakpointsmodel.cpp" line="445"/>
-        <source>Condition</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptbreakpointsmodel.cpp" line="447"/>
-        <source>Ignore-count</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptbreakpointsmodel.cpp" line="449"/>
-        <source>Single-shot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptbreakpointsmodel.cpp" line="451"/>
-        <source>Hit-count</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QScriptBreakpointsWidget</name>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptbreakpointswidget.cpp" line="276"/>
-        <source>New</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptbreakpointswidget.cpp" line="281"/>
-        <source>Delete</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QScriptDebugger</name>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="921"/>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1964"/>
-        <source>Go to Line</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1729"/>
-        <source>Interrupt</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1732"/>
-        <source>Shift+F5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1747"/>
-        <source>Continue</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1750"/>
-        <source>F5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1766"/>
-        <source>Step Into</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1769"/>
-        <source>F11</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1783"/>
-        <source>Step Over</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1786"/>
-        <source>F10</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1801"/>
-        <source>Step Out</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1804"/>
-        <source>Shift+F11</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1818"/>
-        <source>Run to Cursor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1821"/>
-        <source>Ctrl+F10</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1837"/>
-        <source>Run to New Script</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1852"/>
-        <source>Toggle Breakpoint</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1853"/>
-        <source>F9</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1868"/>
-        <source>Clear Debug Output</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1882"/>
-        <source>Clear Error Log</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1895"/>
-        <source>Clear Console</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1910"/>
-        <source>&amp;Find in Script...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1912"/>
-        <source>Ctrl+F</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1928"/>
-        <source>Find &amp;Next</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1931"/>
-        <source>F3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1946"/>
-        <source>Find &amp;Previous</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1949"/>
-        <source>Shift+F3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1966"/>
-        <source>Ctrl+G</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="1977"/>
-        <source>Debug</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QScriptDebugger::QScriptDebugger</name>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebugger.cpp" line="922"/>
-        <source>Line:</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QScriptDebuggerCodeFinderWidget</name>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebuggercodefinderwidget.cpp" line="125"/>
-        <source>Close</source>
-        <translation type="unfinished">Stäng</translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebuggercodefinderwidget.cpp" line="136"/>
-        <source>Previous</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebuggercodefinderwidget.cpp" line="143"/>
-        <source>Next</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebuggercodefinderwidget.cpp" line="148"/>
-        <source>Case Sensitive</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebuggercodefinderwidget.cpp" line="151"/>
-        <source>Whole words</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebuggercodefinderwidget.cpp" line="160"/>
-        <source>&lt;img src=&quot;:/qt/scripttools/debugging/images/wrap.png&quot;&gt;&amp;nbsp;Search wrapped</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QScriptDebuggerLocalsModel</name>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebuggerlocalsmodel.cpp" line="911"/>
-        <source>Name</source>
-        <translation type="unfinished">Namn</translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebuggerlocalsmodel.cpp" line="913"/>
-        <source>Value</source>
-        <translation type="unfinished">Värde</translation>
-    </message>
-</context>
-<context>
-    <name>QScriptDebuggerStackModel</name>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebuggerstackmodel.cpp" line="149"/>
-        <source>Level</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebuggerstackmodel.cpp" line="151"/>
-        <source>Name</source>
-        <translation type="unfinished">Namn</translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptdebuggerstackmodel.cpp" line="153"/>
-        <source>Location</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QScriptEdit</name>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptedit.cpp" line="393"/>
-        <source>Toggle Breakpoint</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptedit.cpp" line="395"/>
-        <source>Disable Breakpoint</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptedit.cpp" line="396"/>
-        <source>Enable Breakpoint</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptedit.cpp" line="400"/>
-        <source>Breakpoint Condition:</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QScriptEngineDebugger</name>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptenginedebugger.cpp" line="512"/>
-        <source>Loaded Scripts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptenginedebugger.cpp" line="518"/>
-        <source>Breakpoints</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptenginedebugger.cpp" line="524"/>
-        <source>Stack</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptenginedebugger.cpp" line="530"/>
-        <source>Locals</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptenginedebugger.cpp" line="536"/>
-        <source>Console</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptenginedebugger.cpp" line="542"/>
-        <source>Debug Output</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptenginedebugger.cpp" line="548"/>
-        <source>Error Log</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptenginedebugger.cpp" line="560"/>
-        <source>Search</source>
-        <translation type="unfinished">Sök</translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptenginedebugger.cpp" line="567"/>
-        <source>View</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptenginedebugger.cpp" line="585"/>
-        <source>Qt Script Debugger</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QScriptNewBreakpointWidget</name>
-    <message>
-        <location filename="../src/scripttools/debugging/qscriptbreakpointswidget.cpp" line="64"/>
-        <source>Close</source>
-        <translation type="unfinished">Stäng</translation>
     </message>
 </context>
 <context>
@@ -7754,13 +7413,13 @@ Please turn one of those options off.</source>
     </message>
     <message>
         <location filename="../src/xmlpatterns/api/qcoloringmessagehandler.cpp" line="100"/>
-        <source>Error %1 in %2, at line %3, column %4 
+        <source>Error %1 in %2, at line %3, column %4
    Description: %5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/xmlpatterns/api/qcoloringmessagehandler.cpp" line="108"/>
-        <source>Error %1 in &quot;%2&quot; 
+        <source>Error %1 in %2
    Description: %3</source>
         <translation type="unfinished"></translation>
     </message>

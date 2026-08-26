@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -54,11 +54,10 @@ class CameraBinLocks  : public QCameraLocksControl
    void timerEvent(QTimerEvent *event);
 #endif
 
- private :
+ private:
    CS_SLOT_1(Private, void updateFocusStatus(QCamera::LockStatus status, QCamera::LockChangeReason reason))
    CS_SLOT_2(updateFocusStatus)
 
- private:
 #if GST_CHECK_VERSION(1, 2, 0)
    bool isExposureLocked() const;
    void lockExposure(QCamera::LockChangeReason reason);

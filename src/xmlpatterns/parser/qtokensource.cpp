@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,15 +21,10 @@
 *
 ***********************************************************************/
 
-#include "qtokensource_p.h"
-
-QT_BEGIN_NAMESPACE
+#include <qtokensource_p.h>
 
 using namespace QPatternist;
 
 TokenSource::~TokenSource()
 {
 }
-
-QT_END_NAMESPACE
-

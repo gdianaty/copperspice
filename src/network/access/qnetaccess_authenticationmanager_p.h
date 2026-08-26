@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,15 +24,15 @@
 #ifndef QNETWORK_ACCESS_AUTHENTICATIONMANAGER_P_H
 #define QNETWORK_ACCESS_AUTHENTICATIONMANAGER_P_H
 
+#include <qmutex.h>
 #include <qnetaccess_manager.h>
 #include <qnetworkproxy.h>
-#include <qmutex.h>
 
-#include <qnetaccess_cache_p.h>
 #include <qnetaccess_backend_p.h>
+#include <qnetaccess_cache_p.h>
 
-class QAuthenticator;
 class QAbstractNetworkCache;
+class QAuthenticator;
 class QNetworkAuthenticationCredential;
 class QNetworkCookieJar;
 

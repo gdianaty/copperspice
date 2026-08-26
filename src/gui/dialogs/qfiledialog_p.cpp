@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -220,7 +220,7 @@ void QFileDialogPrivate::retranslateStrings()
       return;
    }
 
-   QList<QAction *> actions = qFileDialogUi->treeView->header()->actions();
+   QList<QAction *> newActions = qFileDialogUi->treeView->header()->actions();
    QAbstractItemModel *abstractModel = model;
 
 #ifndef QT_NO_PROXYMODEL
@@ -229,9 +229,10 @@ void QFileDialogPrivate::retranslateStrings()
    }
 #endif
 
-   int total = qMin(abstractModel->columnCount(QModelIndex()), actions.count() + 1);
+   int total = qMin(abstractModel->columnCount(QModelIndex()), newActions.count() + 1);
+
    for (int i = 1; i < total; ++i) {
-      actions.at(i - 1)->setText(QFileDialog::tr("Show ") + abstractModel->headerData(i, Qt::Horizontal,
+      newActions.at(i - 1)->setText(QFileDialog::tr("Show ") + abstractModel->headerData(i, Qt::Horizontal,
             Qt::DisplayRole).toString());
    }
 
@@ -739,7 +740,7 @@ bool QFileDialogPrivate::restoreWidgetState(QStringList &history, int splitterPo
       return false;
    }
 
-   QList<QAction *> actions = headerView->actions();
+   QList<QAction *> newActions = headerView->actions();
    QAbstractItemModel *abstractModel = model;
 
 #ifndef QT_NO_PROXYMODEL
@@ -748,9 +749,9 @@ bool QFileDialogPrivate::restoreWidgetState(QStringList &history, int splitterPo
    }
 #endif
 
-   int total = qMin(abstractModel->columnCount(QModelIndex()), actions.count() + 1);
+   int total = qMin(abstractModel->columnCount(QModelIndex()), newActions.count() + 1);
    for (int i = 1; i < total; ++i) {
-      actions.at(i - 1)->setChecked(!headerView->isSectionHidden(i));
+      newActions.at(i - 1)->setChecked(!headerView->isSectionHidden(i));
    }
 
    return true;
@@ -1049,7 +1050,7 @@ void QFileDialogPrivate::createMenuActions()
    QAction *goHomeAction = new QAction(q);
 
 #ifndef QT_NO_SHORTCUT
-   goHomeAction->setShortcut(Qt::ControlModifier + Qt::Key_H + Qt::ShiftModifier);
+   goHomeAction->setShortcut(cs_enum_cast(Qt::ControlModifier) + cs_enum_cast(Qt::Key_H) + cs_enum_cast(Qt::ShiftModifier));
 #endif
 
    QObject::connect(goHomeAction, &QAction::triggered, q, &QFileDialog::_q_goHome);
@@ -1061,7 +1062,7 @@ void QFileDialogPrivate::createMenuActions()
    goToParent->setObjectName("qt_goto_parent_action");
 
 #ifndef QT_NO_SHORTCUT
-   goToParent->setShortcut(Qt::ControlModifier + Qt::UpArrow);
+   goToParent->setShortcut(cs_enum_cast(Qt::ControlModifier) + cs_enum_cast(Qt::UpArrow));
 #endif
 
    QObject::connect(goToParent, &QAction::triggered, q, &QFileDialog::_q_navigateToParent);
@@ -1220,7 +1221,7 @@ void QFileDialogPrivate::_q_showContextMenu(const QPoint &position)
       // file context menu
       const bool ro = model && model->isReadOnly();
 
-      QFile::Permissions p(index.parent().data(QFileSystemModel::FilePermissions).toInt());
+      QFileDevice::Permissions p(index.parent().data(QFileSystemModel::FilePermissions).toInt());
       renameAction->setEnabled(! ro && p & QFile::WriteUser);
       menu.addAction(renameAction);
       deleteAction->setEnabled(! ro && p & QFile::WriteUser);
@@ -1237,9 +1238,6 @@ void QFileDialogPrivate::_q_showContextMenu(const QPoint &position)
 #endif // QT_NO_MENU
 }
 
-/*!
-    \internal
-*/
 void QFileDialogPrivate::_q_renameCurrent()
 {
    Q_Q(QFileDialog);
@@ -1280,19 +1278,18 @@ void QFileDialogPrivate::_q_deleteCurrent()
       QString filePath = index.data(QFileSystemModel::FilePathRole).toString();
       bool isDir = model->isDir(index);
 
-      QFile::Permissions p(index.parent().data(QFileSystemModel::FilePermissions).toInt());
+      QFileDevice::Permissions p(index.parent().data(QFileSystemModel::FilePermissions).toInt());
 
 #ifndef QT_NO_MESSAGEBOX
       Q_Q(QFileDialog);
 
       if (!(p & QFile::WriteUser) && (QMessageBox::warning(q_func(), QFileDialog::tr("Delete"),
-               QFileDialog::tr("'%1' is write protected.\nDo you want to delete it anyway?")
-               .formatArg(fileName),
-               QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No)) {
+            QFileDialog::tr("'%1' is write protected.\nDo you want to delete it anyway?").formatArg(fileName),
+            QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No)) {
          return;
+
       } else if (QMessageBox::warning(q_func(), QFileDialog::tr("Delete"),
-            QFileDialog::tr("Are you sure you want to delete '%1'?")
-            .formatArg(fileName),
+            QFileDialog::tr("Are you sure you want to delete '%1'?").formatArg(fileName),
             QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
          return;
       }
@@ -1301,15 +1298,14 @@ void QFileDialogPrivate::_q_deleteCurrent()
       if (!(p & QFile::WriteUser)) {
          return;
       }
-#endif // QT_NO_MESSAGEBOX
+#endif
 
-      // the event loop has run, we can NOT reuse index because the model might have removed it.
+      // event loop has run, can NOT reuse index because the model might have removed it
       if (isDir) {
-         if (!removeDirectory(filePath)) {
+         if (! removeDirectory(filePath)) {
 
 #ifndef QT_NO_MESSAGEBOX
-            QMessageBox::warning(q, q->windowTitle(),
-               QFileDialog::tr("Could not delete directory."));
+            QMessageBox::warning(q, q->windowTitle(), QFileDialog::tr("Unable to delete directory."));
 #endif
          }
       } else {
@@ -1347,9 +1343,6 @@ void QFileDialogPrivate::_q_autoCompleteFileName(const QString &text)
    }
 }
 
-/*!
-    \internal
-*/
 void QFileDialogPrivate::_q_updateOkButton()
 {
    Q_Q(QFileDialog);
@@ -1456,21 +1449,12 @@ void QFileDialogPrivate::_q_updateOkButton()
    updateOkButtonText(isOpenDirectory);
 }
 
-/*!
-    \internal
-*/
 void QFileDialogPrivate::_q_currentChanged(const QModelIndex &index)
 {
    _q_updateOkButton();
    emit q_func()->currentChanged(index.data(QFileSystemModel::FilePathRole).toString());
 }
 
-/*!
-    \internal
-
-    This is called when the user double clicks on a file with the corresponding
-    model item \a index.
-*/
 void QFileDialogPrivate::_q_enterDirectory(const QModelIndex &index)
 {
    Q_Q(QFileDialog);
@@ -1593,11 +1577,6 @@ void QFileDialogPrivate::_q_selectionChanged()
    }
 }
 
-/*!
-    \internal
-
-    Includes hidden files and directories in the items displayed in the dialog.
-*/
 void QFileDialogPrivate::_q_showHidden()
 {
    Q_Q(QFileDialog);
@@ -1610,12 +1589,6 @@ void QFileDialogPrivate::_q_showHidden()
    q->setFilter(dirFilters);
 }
 
-/*!
-    \internal
-
-    When parent is root and rows have been inserted when none was there before
-    then select the first one.
-*/
 void QFileDialogPrivate::_q_rowsInserted(const QModelIndex &parent)
 {
    if (!qFileDialogUi->treeView

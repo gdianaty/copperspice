@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -63,7 +63,7 @@ class QStringList : public QList<QString>
 
    int Q_CORE_EXPORT removeDuplicates();
    Q_CORE_EXPORT QStringList &replaceInStrings(const QString &before, const QString &after,
-                  Qt::CaseSensitivity cs = Qt::CaseSensitive);
+         Qt::CaseSensitivity cs = Qt::CaseSensitive);
 
    void Q_CORE_EXPORT sort();
 
@@ -92,9 +92,8 @@ class QStringList : public QList<QString>
    Q_CORE_EXPORT QStringList filter(const QRegularExpression8 &rx) const;
 
    int Q_CORE_EXPORT indexOf(const QRegularExpression8 &rx, int from = 0) const;
+
    int Q_CORE_EXPORT lastIndexOf(const QRegularExpression8 &rx, int from = -1) const;
-   int Q_CORE_EXPORT indexOf(QRegularExpression8 &rx, int from = 0) const;
-   int Q_CORE_EXPORT lastIndexOf(QRegularExpression8 &rx, int from = -1) const;
 
    Q_CORE_EXPORT QStringList &replaceInStrings(const QRegularExpression8 &rx, const QString &after);
 

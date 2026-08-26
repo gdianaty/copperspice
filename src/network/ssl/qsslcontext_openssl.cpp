@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,13 +23,13 @@
 
 #include <qsslcontext_openssl_p.h>
 
-#include <qsslsocket.h>
 #include <qmutex.h>
+#include <qsslsocket.h>
 #include <qstring.h>
 
-#include <qsslsocket_p.h>
 #include <qsslsocket_openssl_p.h>
 #include <qsslsocket_openssl_symbols_p.h>
+#include <qsslsocket_p.h>
 
 // defined in qsslsocket_openssl.cpp:
 extern int q_X509Callback(int ok, X509_STORE_CTX *ctx);
@@ -337,10 +337,11 @@ init_context:
       }
 
       // If we have any intermediate certificates then we need to add them to our chain
-      bool first = true;
+      bool isFirst = true;
+
       for (const QSslCertificate &cert : configuration.d->localCertificateChain) {
-         if (first) {
-            first = false;
+         if (isFirst) {
+            isFirst = false;
             continue;
          }
 
@@ -455,7 +456,7 @@ static int next_proto_cb(SSL *, unsigned char **out, unsigned char *outlen, cons
          break;
 
       default:
-         qWarning("OpenSSL sent unknown NPN status");
+         qWarning("next_proto_cb() OpenSSL sent unknown NPN status");
    }
 
    return SSL_TLSEXT_ERR_OK;
@@ -482,7 +483,7 @@ SSL *QSslContext::createSsl()
    if (session) {
       // Try to resume the last session we cached
       if (! q_SSL_set_session(ssl, session)) {
-         qWarning("Unable to set SSL session");
+         qWarning("QSslContext::createSsl() Unable to set SSL session");
          q_SSL_SESSION_free(session);
          session = nullptr;
       }
@@ -496,8 +497,8 @@ SSL *QSslContext::createSsl()
 
       for (int a = 0; a < protocols.count(); ++a) {
          if (protocols.at(a).size() > 255) {
-            qWarning()  << "TLS NPN extension" << protocols.at(a)
-                        << "is too long and will be truncated to 255 characters.";
+            qWarning()  << "QSslContext::createSsl() TLS NPN extension" << protocols.at(a)
+                        << "is too long and will be truncated to 255 characters";
 
             protocols[a] = protocols.at(a).left(255);
          }
@@ -541,7 +542,7 @@ bool QSslContext::cacheSession(SSL *ssl)
          unsigned char *data = reinterpret_cast<unsigned char *>(m_sessionASN1.data());
 
          if (! q_i2d_SSL_SESSION(session, &data)) {
-            qWarning("Unable to store persistent version of SSL session");
+            qWarning("QSslContext::cacheSession() Unable to store persistent version of SSL session");
          }
 
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
@@ -560,9 +561,9 @@ QByteArray QSslContext::sessionASN1() const
    return m_sessionASN1;
 }
 
-void QSslContext::setSessionASN1(const QByteArray &session)
+void QSslContext::setSessionASN1(const QByteArray &sslSession)
 {
-   m_sessionASN1 = session;
+   m_sessionASN1 = sslSession;
 }
 
 int QSslContext::sessionTicketLifeTimeHint() const

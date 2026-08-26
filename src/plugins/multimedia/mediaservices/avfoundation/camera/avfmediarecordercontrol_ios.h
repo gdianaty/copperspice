@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,9 +24,9 @@
 #ifndef AVFMEDIARECORDERCONTROL_IOS_H
 #define AVFMEDIARECORDERCONTROL_IOS_H
 
+#include <avfcamerautility.h>
 #include <avfmediaassetwriter.h>
 #include <avfstoragelocation.h>
-#include <avfcamerautility.h>
 #include <qglobal.h>
 #include <qmediarecordercontrol.h>
 #include <qurl.h>
@@ -63,8 +63,10 @@ class AVFMediaRecorderControlIOS : public QMediaRecorderControl
 
    CS_SLOT_1(Public, void setState(QMediaRecorder::State state)override)
    CS_SLOT_2(setState)
+
    CS_SLOT_1(Public, void setMuted(bool muted)override)
    CS_SLOT_2(setMuted)
+
    CS_SLOT_1(Public, void setVolume(qreal volume)override)
    CS_SLOT_2(setVolume)
 
@@ -72,7 +74,7 @@ class AVFMediaRecorderControlIOS : public QMediaRecorderControl
    void stopWriter();
 
    AVFCameraService *m_service;
-   AVFScopedPointer<QT_MANGLE_NAMESPACE(AVFMediaAssetWriter)> m_writer;
+   AVFScopedPointer<AVFMediaAssetWriter> m_writer;
 
    QUrl m_outputLocation;
    AVFStorageLocation m_storageLocation;

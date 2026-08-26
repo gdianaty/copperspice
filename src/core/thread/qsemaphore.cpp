@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,15 +22,19 @@
 ***********************************************************************/
 
 #include <qsemaphore.h>
+
+#include <qdatetime.h>
+#include <qelapsedtimer.h>
 #include <qmutex.h>
 #include <qwaitcondition.h>
-#include <qelapsedtimer.h>
-#include <qdatetime.h>
 
 class QSemaphorePrivate
 {
  public:
-   inline QSemaphorePrivate(int n) : avail(n) { }
+   QSemaphorePrivate(int n)
+      : avail(n)
+   {
+   }
 
    QMutex mutex;
    QWaitCondition cond;
@@ -53,9 +57,11 @@ void QSemaphore::acquire(int n)
 {
    Q_ASSERT_X(n >= 0, "QSemaphore::acquire", "parameter 'n' must be non-negative");
    QMutexLocker locker(&d->mutex);
+
    while (n > d->avail) {
       d->cond.wait(locker.mutex());
    }
+
    d->avail -= n;
 }
 
@@ -77,9 +83,11 @@ bool QSemaphore::tryAcquire(int n)
 {
    Q_ASSERT_X(n >= 0, "QSemaphore::tryAcquire", "parameter 'n' must be non-negative");
    QMutexLocker locker(&d->mutex);
+
    if (n > d->avail) {
       return false;
    }
+
    d->avail -= n;
    return true;
 }
@@ -96,8 +104,10 @@ bool QSemaphore::tryAcquire(int n, int timeout)
    } else {
       QElapsedTimer timer;
       timer.start();
+
       while (n > d->avail) {
          const qint64 elapsed = timer.elapsed();
+
          if (timeout - elapsed <= 0
                || !d->cond.wait(locker.mutex(), timeout - elapsed)) {
             return false;
@@ -109,4 +119,3 @@ bool QSemaphore::tryAcquire(int n, int timeout)
 
    return true;
 }
-

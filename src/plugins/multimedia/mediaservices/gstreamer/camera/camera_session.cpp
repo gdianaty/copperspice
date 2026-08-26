@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,13 +21,26 @@
 *
 ***********************************************************************/
 
-#include <camera_session.h>
-#include <camera_control.h>
-#include <camera_recorder.h>
-#include <camera_container.h>
 #include <camera_audioencoder.h>
-#include <camera_videoencoder.h>
+#include <camera_capturebufferformat.h>
+#include <camera_capturedestination.h>
+#include <camera_container.h>
+#include <camera_control.h>
 #include <camera_imageencoder.h>
+#include <camera_imageprocessing.h>
+#include <camera_recorder.h>
+#include <camera_session.h>
+#include <camera_videoencoder.h>
+#include <camera_viewfindersettings.h>
+#include <camera_zoom.h>
+#include <qcoreapplication.h>
+#include <qdatetime.h>
+#include <qdebug.h>
+#include <qdesktopservices.h>
+#include <qimage.h>
+#include <qmediarecorder.h>
+#include <qmetaobject.h>
+#include <qvideosurfaceformat.h>
 
 #ifdef HAVE_GST_PHOTOGRAPHY
 #include <camera_exposure.h>
@@ -36,34 +49,16 @@
 #include <camera_locks.h>
 #endif
 
-#include <camera_zoom.h>
-#include <camera_imageprocessing.h>
-#include <camera_viewfindersettings.h>
-#include <camera_capturedestination.h>
-#include <camera_capturebufferformat.h>
-
-#include <qdebug.h>
-#include <qcoreapplication.h>
-#include <qmetaobject.h>
-#include <qdesktopservices.h>
-#include <qimage.h>
-#include <qdatetime.h>
-#include <qmediarecorder.h>
-#include <qvideosurfaceformat.h>
-
 #include <qgstreamerbushelper_p.h>
 #include <qgstreamervideorendererinterface_p.h>
 #include <qgstutils_p.h>
 
-#ifdef HAVE_GST_PHOTOGRAPHY
-#include <gst/interfaces/photography.h>
-#endif
-
 #include <gst/gsttagsetter.h>
 #include <gst/gstversion.h>
 
-// #define CAMERABIN_DEBUG 1
-// #define CAMERABIN_DEBUG_DUMP_BIN 1
+#ifdef HAVE_GST_PHOTOGRAPHY
+#include <gst/interfaces/photography.h>
+#endif
 
 #define ENUM_NAME(c,e,v) (c::staticMetaObject.enumerator(c::staticMetaObject.indexOfEnumerator(e)).valueToKey((v)))
 
@@ -166,11 +161,7 @@ CameraBinSession::CameraBinSession(GstElementFactory *sourceFactory, QObject *pa
    //post image preview in RGB format
    g_object_set(G_OBJECT(m_camerabin), POST_PREVIEWS_PROPERTY, TRUE, nullptr);
 
-#if GST_CHECK_VERSION(1,0,0)
    GstCaps *previewCaps = gst_caps_new_simple("video/x-raw", "format", G_TYPE_STRING, "RGBx", nullptr);
-#else
-   GstCaps *previewCaps = gst_caps_from_string("video/x-raw-rgb");
-#endif
 
    g_object_set(G_OBJECT(m_camerabin), PREVIEW_CAPS_PROPERTY, previewCaps, nullptr);
    gst_caps_unref(previewCaps);
@@ -261,9 +252,11 @@ bool CameraBinSession::setupCameraBin()
       }
 
       m_viewfinderElement = m_viewfinderInterface ? m_viewfinderInterface->videoSink() : nullptr;
-#if CAMERABIN_DEBUG
-      qDebug() << Q_FUNC_INFO << "Viewfinder changed, reconfigure.";
+
+#if defined(CS_SHOW_DEBUG_PLUGINS_GSTREAMER)
+      qDebug("CameraBinSession::setupCameraBin() Viewfinder changed, reconfigure");
 #endif
+
       m_viewfinderHasChanged = false;
       if (!m_viewfinderElement) {
          if (m_pendingState == QCamera::ActiveState) {
@@ -427,17 +420,8 @@ void CameraBinSession::setAudioCaptureCaps()
       return;
    }
 
-#if GST_CHECK_VERSION(1,0,0)
    GstStructure *structure = gst_structure_new_empty(QT_GSTREAMER_RAW_AUDIO_MIME);
-#else
-   GstStructure *structure = gst_structure_new(
-                                QT_GSTREAMER_RAW_AUDIO_MIME,
-                                "endianness", G_TYPE_INT, 1234,
-                                "signed", G_TYPE_BOOLEAN, TRUE,
-                                "width", G_TYPE_INT, 16,
-                                "depth", G_TYPE_INT, 16,
-                                nullptr);
-#endif
+
    if (sampleRate > 0) {
       gst_structure_set(structure, "rate", G_TYPE_INT, sampleRate, nullptr);
    }
@@ -456,9 +440,6 @@ void CameraBinSession::setAudioCaptureCaps()
 
 GstElement *CameraBinSession::buildCameraSource()
 {
-#if CAMERABIN_DEBUG
-   qDebug() << Q_FUNC_INFO;
-#endif
    if (!m_inputDeviceHasChanged) {
       return m_cameraSrc;
    }
@@ -479,9 +460,11 @@ GstElement *CameraBinSession::buildCameraSource()
    }
 
    if (m_cameraSrc && !m_inputDevice.isEmpty()) {
-#if CAMERABIN_DEBUG
-      qDebug() << "set camera device" << m_inputDevice;
+
+#if defined(CS_SHOW_DEBUG_PLUGINS_GSTREAMER)
+      qDebug() << "Set camera device" << m_inputDevice;
 #endif
+
       m_usingWrapperCameraBinSrc = qstrcmp(qt_gst_element_get_factory_name(m_cameraSrc), "wrappercamerabinsrc") == 0;
 
       if (g_object_class_find_property(G_OBJECT_GET_CLASS(m_cameraSrc), "video-source")) {
@@ -564,8 +547,8 @@ void CameraBinSession::captureImage(int requestId, const QString &fileName)
 
    m_requestId = requestId;
 
-#if CAMERABIN_DEBUG
-   qDebug() << Q_FUNC_INFO << m_requestId << fileName << "actual file name:" << actualFileName;
+#if defined(CS_SHOW_DEBUG_PLUGINS_GSTREAMER)
+   qDebug() << "CameraBinSession::captureImage()" << m_requestId << fileName << "Actual file name:" << actualFileName;
 #endif
 
    g_object_set(G_OBJECT(m_camerabin), FILENAME_PROPERTY, actualFileName.toUtf8().constData(), nullptr);
@@ -732,8 +715,8 @@ void CameraBinSession::setState(QCamera::State newState)
    m_pendingState = newState;
    emit pendingStateChanged(m_pendingState);
 
-#if CAMERABIN_DEBUG
-   qDebug() << Q_FUNC_INFO << newState;
+#if defined(CS_SHOW_DEBUG_PLUGINS_GSTREAMER)
+   qDebug() << "CameraBinSession::setState()" << newState;
 #endif
 
    setStateHelper(newState);
@@ -935,42 +918,29 @@ bool CameraBinSession::processSyncMessage(const QGstreamerMessage &message)
    if (gm && GST_MESSAGE_TYPE(gm) == GST_MESSAGE_ELEMENT) {
       const GstStructure *st = gst_message_get_structure(gm);
       const GValue *sampleValue = nullptr;
+
       if (m_captureMode == QCamera::CaptureStillImage
             && gst_structure_has_name(st, "preview-image")
-#if GST_CHECK_VERSION(1,0,0)
             && gst_structure_has_field_typed(st, "sample", GST_TYPE_SAMPLE)
             && (sampleValue = gst_structure_get_value(st, "sample"))) {
          GstSample *const sample = gst_value_get_sample(sampleValue);
          GstCaps *const previewCaps = gst_sample_get_caps(sample);
          GstBuffer *const buffer = gst_sample_get_buffer(sample);
-#else
-            &&gst_structure_has_field_typed(st, "buffer", GST_TYPE_BUFFER)
-            &&(sampleValue = gst_structure_get_value(st, "buffer"))) {
-         GstBuffer *const buffer = gst_value_get_buffer(sampleValue);
-#endif
 
          QImage image;
-#if GST_CHECK_VERSION(1,0,0)
+
          GstVideoInfo previewInfo;
          if (gst_video_info_from_caps(&previewInfo, previewCaps)) {
             image = QGstUtils::bufferToImage(buffer, previewInfo);
          }
          gst_sample_unref(sample);
-#else
-         image = QGstUtils::bufferToImage(buffer);
-         gst_buffer_unref(buffer);
-#endif
+
          if (!image.isNull()) {
             static QMetaMethod exposedSignal = QMetaMethod::fromSignal(&CameraBinSession::imageExposed);
-            exposedSignal.invoke(this,
-                                 Qt::QueuedConnection,
-                                 Q_ARG(int, m_requestId));
+            exposedSignal.invoke(this, Qt::QueuedConnection, Q_ARG(int, m_requestId));
 
             static QMetaMethod capturedSignal = QMetaMethod::fromSignal(&CameraBinSession::imageCaptured);
-            capturedSignal.invoke(this,
-                                  Qt::QueuedConnection,
-                                  Q_ARG(int, m_requestId),
-                                  Q_ARG(QImage, image));
+            capturedSignal.invoke(this, Qt::QueuedConnection, Q_ARG(int, m_requestId), Q_ARG(QImage, image));
          }
          return true;
       }
@@ -1010,12 +980,10 @@ bool CameraBinSession::processBusMessage(const QGstreamerMessage &message)
             setError(int(QMediaRecorder::ResourceError), message);
          }
 
-#ifdef CAMERABIN_DEBUG_DUMP_BIN
-         _gst_debug_bin_to_dot_file_with_ts(GST_BIN(m_camerabin),
-                                            GstDebugGraphDetails(GST_DEBUG_GRAPH_SHOW_ALL /* GST_DEBUG_GRAPH_SHOW_MEDIA_TYPE | GST_DEBUG_GRAPH_SHOW_NON_DEFAULT_PARAMS | GST_DEBUG_GRAPH_SHOW_STATES*/),
-                                            "camerabin_error");
+#if defined(CS_SHOW_DEBUG_PLUGINS_GSTREAMER)
+         gst_debug_bin_to_dot_file_with_ts(GST_BIN(m_camerabin),
+               GstDebugGraphDetails(GST_DEBUG_GRAPH_SHOW_ALL), "camerabin_error");
 #endif
-
 
          if (err) {
             g_error_free (err);
@@ -1056,22 +1024,17 @@ bool CameraBinSession::processBusMessage(const QGstreamerMessage &message)
 
                gst_message_parse_state_changed(gm, &oldState, &newState, &pending);
 
-
-#if CAMERABIN_DEBUG
+#if defined(CS_SHOW_DEBUG_PLUGINS_GSTREAMER)
                QStringList states;
                states << "GST_STATE_VOID_PENDING" <<  "GST_STATE_NULL" << "GST_STATE_READY" << "GST_STATE_PAUSED" << "GST_STATE_PLAYING";
 
-
-               qDebug() << QString("state changed: old: %1  new: %2  pending: %3") \
-                        .formatArg(states[oldState]) \
-                        .formatArg(states[newState]) \
-                        .formatArg(states[pending]);
+               qDebug() << QString("state changed: old: %1  new: %2  pending: %3")
+                     .formatArg(states[oldState]).formatArg(states[newState]).formatArg(states[pending]);
 #endif
 
-#ifdef CAMERABIN_DEBUG_DUMP_BIN
-               _gst_debug_bin_to_dot_file_with_ts(GST_BIN(m_camerabin),
-                                                  GstDebugGraphDetails(GST_DEBUG_GRAPH_SHOW_ALL /*GST_DEBUG_GRAPH_SHOW_MEDIA_TYPE | GST_DEBUG_GRAPH_SHOW_NON_DEFAULT_PARAMS | GST_DEBUG_GRAPH_SHOW_STATES*/),
-                                                  "camerabin");
+#if defined(CS_SHOW_DEBUG_PLUGINS_GSTREAMER)
+               gst_debug_bin_to_dot_file_with_ts(GST_BIN(m_camerabin),
+                     GstDebugGraphDetails(GST_DEBUG_GRAPH_SHOW_ALL), "camerabin");
 #endif
 
                switch (newState) {
@@ -1158,8 +1121,8 @@ void CameraBinSession::stopVideoRecording()
    g_signal_emit_by_name(G_OBJECT(m_camerabin), CAPTURE_STOP, nullptr);
 }
 
-//internal, only used by CameraBinSession::supportedFrameRates.
-//recursively fills the list of framerates res from value data.
+// used by CameraBinSession::supportedFrameRates.
+// recursively fills the list of framerates res from value data.
 static void readValue(const GValue *value, QList< QPair<int, int> > *res, bool *continuous)
 {
    if (GST_VALUE_HOLDS_FRACTION(value)) {
@@ -1265,11 +1228,8 @@ QList< QPair<int, int> > CameraBinSession::supportedFrameRates(const QSize &fram
       gst_structure_remove_all_fields(structure);
       gst_structure_set_value(structure, "framerate", &rate);
    }
-#if GST_CHECK_VERSION(1,0,0)
+
    caps = gst_caps_simplify(caps);
-#else
-   gst_caps_do_simplify(caps);
-#endif
 
    for (uint i = 0; i < gst_caps_get_size(caps); i++) {
       GstStructure *structure = gst_caps_get_structure(caps, i);
@@ -1279,7 +1239,7 @@ QList< QPair<int, int> > CameraBinSession::supportedFrameRates(const QSize &fram
 
    std::sort(res.begin(), res.end(), rateLessThan);
 
-#if CAMERABIN_DEBUG
+#if defined(CS_SHOW_DEBUG_PLUGINS_GSTREAMER)
    qDebug() << "Supported rates:" << caps;
    qDebug() << res;
 #endif
@@ -1289,8 +1249,8 @@ QList< QPair<int, int> > CameraBinSession::supportedFrameRates(const QSize &fram
    return res;
 }
 
-//internal, only used by CameraBinSession::supportedResolutions
-//recursively find the supported resolutions range.
+// only used by CameraBinSession::supportedResolutions
+// recursively find the supported resolutions range.
 static QPair<int, int> valueRange(const GValue *value, bool *continuous)
 {
    int minValue = 0;
@@ -1337,7 +1297,7 @@ QList<QSize> CameraBinSession::supportedResolutions(QPair<int, int> rate,
 
    GstCaps *supportedCaps = this->supportedCaps(mode);
 
-#if CAMERABIN_DEBUG
+#if defined(CS_SHOW_DEBUG_PLUGINS_GSTREAMER)
    qDebug() << "Source caps:" << supportedCaps;
 #endif
 
@@ -1381,11 +1341,7 @@ QList<QSize> CameraBinSession::supportedResolutions(QPair<int, int> rate,
       gst_structure_set_value(structure, "height", &h);
    }
 
-#if GST_CHECK_VERSION(1,0,0)
    caps = gst_caps_simplify(caps);
-#else
-   gst_caps_do_simplify(caps);
-#endif
 
    for (uint i = 0; i < gst_caps_get_size(caps); i++) {
       GstStructure *structure = gst_caps_get_structure(caps, i);
@@ -1459,7 +1415,7 @@ QList<QSize> CameraBinSession::supportedResolutions(QPair<int, int> rate,
       }
    }
 
-#if CAMERABIN_DEBUG
+#if defined(CS_SHOW_DEBUG_PLUGINS_GSTREAMER)
    qDebug() << "Supported resolutions:" << gst_caps_to_string(caps);
    qDebug() << res;
 #endif
@@ -1514,29 +1470,21 @@ void CameraBinSession::elementAdded(GstBin *, GstElement *element, CameraBinSess
    if (GST_IS_BIN(element)) {
       g_signal_connect(G_OBJECT(element), "element-added",  G_CALLBACK(elementAdded), session);
       g_signal_connect(G_OBJECT(element), "element-removed",  G_CALLBACK(elementRemoved), session);
+
    } else if (!factory) {
       // no-op
-#if GST_CHECK_VERSION(0,10,31)
+
    } else if (gst_element_factory_list_is_type(factory, GST_ELEMENT_FACTORY_TYPE_AUDIO_ENCODER)) {
-#else
-   } else if (strstr(gst_element_factory_get_klass(factory), "Encoder/Audio") != nullptr) {
-#endif
+
       session->m_audioEncoder = element;
-
       session->m_audioEncodeControl->applySettings(element);
-#if GST_CHECK_VERSION(0,10,31)
-   } else if (gst_element_factory_list_is_type(factory, GST_ELEMENT_FACTORY_TYPE_VIDEO_ENCODER)) {
-#else
-   } else if (strstr(gst_element_factory_get_klass(factory), "Encoder/Video") != nullptr) {
-#endif
-      session->m_videoEncoder = element;
 
+   } else if (gst_element_factory_list_is_type(factory, GST_ELEMENT_FACTORY_TYPE_VIDEO_ENCODER)) {
+
+      session->m_videoEncoder = element;
       session->m_videoEncodeControl->applySettings(element);
-#if GST_CHECK_VERSION(0,10,31)
+
    } else if (gst_element_factory_list_is_type(factory, GST_ELEMENT_FACTORY_TYPE_MUXER)) {
-#else
-   } else if (strstr(gst_element_factory_get_klass(factory), "Muxer") != nullptr) {
-#endif
       session->m_muxer = element;
    }
 }
@@ -1551,4 +1499,3 @@ void CameraBinSession::elementRemoved(GstBin *, GstElement *element, CameraBinSe
       session->m_muxer = nullptr;
    }
 }
-

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -30,8 +30,6 @@
 #include <qschematype_p.h>
 #include <qxsdelement_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class XsdValidatedXmlNodeModel : public QAbstractXmlNodeModel
@@ -40,14 +38,8 @@ class XsdValidatedXmlNodeModel : public QAbstractXmlNodeModel
    typedef QExplicitlySharedDataPointer<XsdValidatedXmlNodeModel> Ptr;
    typedef QList<Ptr> List;
 
-   /**
-    * Creates a new validated xml node model.
-    */
    XsdValidatedXmlNodeModel(const QAbstractXmlNodeModel *model);
 
-   /**
-    * Destroys the validated xml node model.
-    */
    virtual ~XsdValidatedXmlNodeModel();
 
    QUrl baseUri(const QXmlNodeModelIndex &ni) const override;
@@ -63,13 +55,12 @@ class XsdValidatedXmlNodeModel : public QAbstractXmlNodeModel
    QVariant typedValue(const QXmlNodeModelIndex &n) const override;
 
    QExplicitlySharedDataPointer<QAbstractXmlForwardIterator<QXmlNodeModelIndex> >
-                  iterate(const QXmlNodeModelIndex &ni, QXmlNodeModelIndex::Axis axis) const override;
+         iterate(const QXmlNodeModelIndex &ni, QXmlNodeModelIndex::Axis axis) const override;
 
    QPatternist::ItemIteratorPtr sequencedTypedValue(const QXmlNodeModelIndex &ni) const override;
    QPatternist::ItemType::Ptr type(const QXmlNodeModelIndex &ni) const override;
 
-   QXmlName::NamespaceCode namespaceForPrefix(const QXmlNodeModelIndex &ni,
-                  const QXmlName::PrefixCode prefix) const override;
+   QXmlName::NamespaceCode namespaceForPrefix(const QXmlNodeModelIndex &ni, const QXmlName::PrefixCode prefix) const override;
 
    bool isDeepEqual(const QXmlNodeModelIndex &ni1, const QXmlNodeModelIndex &ni2) const override;
    void sendNamespaces(const QXmlNodeModelIndex &n, QAbstractXmlReceiver *const receiver) const override;
@@ -77,56 +68,22 @@ class XsdValidatedXmlNodeModel : public QAbstractXmlNodeModel
    QXmlNodeModelIndex elementById(const QXmlName &NCName) const override;
    QVector<QXmlNodeModelIndex> nodesByIdref(const QXmlName &NCName) const override;
 
-   void copyNodeTo(const QXmlNodeModelIndex &node, QAbstractXmlReceiver *const receiver,
-                  const NodeCopySettings &) const override;
+   void copyNodeTo(const QXmlNodeModelIndex &node, QAbstractXmlReceiver *const receiver, const NodeCopySettings &) const override;
 
-   /**
-    * Sets the @p element that is assigned to the xml node at @p index.
-    */
    void setAssignedElement(const QXmlNodeModelIndex &index, const XsdElement::Ptr &element);
 
-   /**
-    * Returns the element that is assigned to the xml node at @p index.
-    */
    XsdElement::Ptr assignedElement(const QXmlNodeModelIndex &index) const;
-
-   /**
-    * Sets the @p attribute that is assigned to the xml node at @p index.
-    */
    void setAssignedAttribute(const QXmlNodeModelIndex &index, const XsdAttribute::Ptr &attribute);
 
-   /**
-    * Returns the attribute that is assigned to the xml node at @p index.
-    */
    XsdAttribute::Ptr assignedAttribute(const QXmlNodeModelIndex &index) const;
-
-   /**
-    * Sets the @p type that is assigned to the xml node at @p index.
-    *
-    * @note The type can be a different than the type of the element or
-    *       attribute that is assigned to the index, since the instance
-    *       document can overwrite it by xsi:type.
-    */
    void setAssignedType(const QXmlNodeModelIndex &index, const SchemaType::Ptr &type);
 
-   /**
-    * Returns the type that is assigned to the xml node at @p index.
-    */
    SchemaType::Ptr assignedType(const QXmlNodeModelIndex &index) const;
 
-   /**
-    * Adds the attribute or element @p binding with the given @p id.
-    */
    void addIdIdRefBinding(const QString &id, const NamedSchemaComponent::Ptr &binding);
 
-   /**
-    * Returns a list of all binding ids.
-    */
    QStringList idIdRefBindingIds() const;
 
-   /**
-    * Returns the set of bindings with the given @p id.
-    */
    QSet<NamedSchemaComponent::Ptr> idIdRefBindings(const QString &id) const;
 
  protected:
@@ -140,8 +97,7 @@ class XsdValidatedXmlNodeModel : public QAbstractXmlNodeModel
    QHash<QXmlNodeModelIndex, SchemaType::Ptr>                m_assignedTypes;
    QHash<QString, QSet<NamedSchemaComponent::Ptr> >          m_idIdRefBindings;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,10 @@
 #ifndef QRESOURCE_H
 #define QRESOURCE_H
 
-#include <qstring.h>
-#include <qlocale.h>
-#include <qstringlist.h>
 #include <qlist.h>
+#include <qlocale.h>
+#include <qstring.h>
+#include <qstringlist.h>
 
 class QResourcePrivate;
 
@@ -64,9 +64,10 @@ class Q_CORE_EXPORT QResource
    friend class QResourceFileEngineIterator;
    bool isDir() const;
 
-   inline bool isFile() const {
+   bool isFile() const {
       return !isDir();
    }
+
    QStringList children() const;
 
    QScopedPointer<QResourcePrivate> d_ptr;

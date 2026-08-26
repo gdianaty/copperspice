@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,10 @@
 #ifndef QNETWORK_ACCESS_CACHEBACKEND_P_H
 #define QNETWORK_ACCESS_CACHEBACKEND_P_H
 
-#include <qnetaccess_backend_p.h>
-
-#include <qnetwork_request.h>
 #include <qnetwork_reply.h>
+#include <qnetwork_request.h>
+
+#include <qnetaccess_backend_p.h>
 
 class QNetworkAccessCacheBackend : public QNetworkAccessBackend
 {

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,10 +26,11 @@
 
 #include <qstring.h>
 
-class QTextStream;
-class QTextDocument;
-class QTextDocumentFragmentPrivate;
 class QTextCursor;
+class QTextDocument;
+class QTextStream;
+
+class QTextDocumentFragmentPrivate;
 
 class Q_GUI_EXPORT QTextDocumentFragment
 {

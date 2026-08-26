@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,20 +23,18 @@
 
 #include <qhttpsocketengine_p.h>
 
-#include <qtcpsocket.h>
+#include <qelapsedtimer.h>
 #include <qhostaddress.h>
 #include <qnetworkinterface.h>
-#include <qelapsedtimer.h>
-#include <qiodevice_p.h>
+#include <qtcpsocket.h>
 #include <qurl.h>
 
 #include <qhttp_networkreply_p.h>
+#include <qiodevice_p.h>
 
 #if ! defined(QT_NO_NETWORKPROXY)
 
 #include <qdebug.h>
-
-#define DEBUG
 
 QHttpSocketEngine::QHttpSocketEngine(QObject *parent)
    : QAbstractSocketEngine(*new QHttpSocketEnginePrivate, parent)
@@ -57,8 +55,9 @@ bool QHttpSocketEngine::initialize(QAbstractSocket::SocketType type, QAbstractSo
 
    setProtocol(protocol);
    setSocketType(type);
+
    d->socket = new QTcpSocket(this);
-   d->reply = new QHttpNetworkReply(QUrl(), this);
+   d->reply  = new QHttpNetworkReply(QUrl(), this);
 
 #ifndef QT_NO_BEARERMANAGEMENT
    d->socket->setProperty("_q_networkSession", property("_q_networkSession"));
@@ -68,25 +67,23 @@ bool QHttpSocketEngine::initialize(QAbstractSocket::SocketType type, QAbstractSo
    // unwanted recursion.
    d->socket->setProxy(QNetworkProxy::NoProxy);
 
-   // Intercept all the signals.
-   connect(d->socket, SIGNAL(connected()),
-           this, SLOT(slotSocketConnected()),
-           Qt::DirectConnection);
-   connect(d->socket, SIGNAL(disconnected()),
-           this, SLOT(slotSocketDisconnected()),
-           Qt::DirectConnection);
-   connect(d->socket, SIGNAL(readyRead()),
-           this, SLOT(slotSocketReadNotification()),
-           Qt::DirectConnection);
-   connect(d->socket, SIGNAL(bytesWritten(qint64)),
-           this, SLOT(slotSocketBytesWritten()),
-           Qt::DirectConnection);
-   connect(d->socket, SIGNAL(error(QAbstractSocket::SocketError)),
-           this, SLOT(slotSocketError(QAbstractSocket::SocketError)),
-           Qt::DirectConnection);
-   connect(d->socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
-           this, SLOT(slotSocketStateChanged(QAbstractSocket::SocketState)),
-           Qt::DirectConnection);
+   connect(d->socket, &QTcpSocket::connected,
+           this, &QHttpSocketEngine::slotSocketConnected, Qt::DirectConnection);
+
+   connect(d->socket, &QTcpSocket::disconnected,
+           this, &QHttpSocketEngine::slotSocketDisconnected, Qt::DirectConnection);
+
+   connect(d->socket, &QTcpSocket::readyRead,
+           this, &QHttpSocketEngine::slotSocketReadNotification, Qt::DirectConnection);
+
+   connect(d->socket, &QTcpSocket::bytesWritten,
+           this, &QHttpSocketEngine::slotSocketBytesWritten, Qt::DirectConnection);
+
+   connect(d->socket, &QTcpSocket::error,
+           this, &QHttpSocketEngine::slotSocketError, Qt::DirectConnection);
+
+   connect(d->socket, &QTcpSocket::stateChanged,
+           this, &QHttpSocketEngine::slotSocketStateChanged, Qt::DirectConnection);
 
    return true;
 }
@@ -132,7 +129,7 @@ bool QHttpSocketEngine::connectInternal()
 
    // If the handshake is done, enter ConnectedState state and return true.
    if (d->state == Connected) {
-      qWarning("QHttpSocketEngine::connectToHost: called when already connected");
+      qWarning("QHttpSocketEngine::connectToHost() Called when already connected");
       setState(QAbstractSocket::ConnectedState);
       return true;
    }
@@ -141,10 +138,10 @@ bool QHttpSocketEngine::connectInternal()
       setState(QAbstractSocket::UnconnectedState);
    }
 
-   // Handshake isn't done. If unconnected, start connecting.
+   // Handshake is not done, if unconnected, then start connecting
    if (d->state == None && d->socket->state() == QAbstractSocket::UnconnectedState) {
       setState(QAbstractSocket::ConnectingState);
-      //limit buffer in internal socket, data is buffered in the external socket under application control
+      // limit buffer in this socket, data is buffered in the external socket under application control
       d->socket->setReadBufferSize(65536);
       d->socket->connectToHost(d->proxy.hostName(), d->proxy.port());
    }
@@ -226,7 +223,7 @@ qint64 QHttpSocketEngine::read(char *data, qint64 maxlen)
       // failed, return the socket's error. Otherwise, return what has been read
       close();
 
-      setError(QAbstractSocket::RemoteHostClosedError, QLatin1String("Remote host closed"));
+      setError(QAbstractSocket::RemoteHostClosedError, "Remote host closed");
       setState(QAbstractSocket::UnconnectedState);
 
       return -1;
@@ -245,15 +242,13 @@ qint64 QHttpSocketEngine::write(const char *data, qint64 len)
 #ifndef QT_NO_NETWORKINTERFACE
 bool QHttpSocketEngine::joinMulticastGroup(const QHostAddress &, const QNetworkInterface &)
 {
-   setError(QAbstractSocket::UnsupportedSocketOperationError,
-            QLatin1String("Operation on socket is not supported"));
+   setError(QAbstractSocket::UnsupportedSocketOperationError, "Operation on socket is not supported");
    return false;
 }
 
 bool QHttpSocketEngine::leaveMulticastGroup(const QHostAddress &, const QNetworkInterface &)
 {
-   setError(QAbstractSocket::UnsupportedSocketOperationError,
-            QLatin1String("Operation on socket is not supported"));
+   setError(QAbstractSocket::UnsupportedSocketOperationError, "Operation on socket is not supported");
 
    return false;
 }
@@ -265,8 +260,7 @@ QNetworkInterface QHttpSocketEngine::multicastInterface() const
 
 bool QHttpSocketEngine::setMulticastInterface(const QNetworkInterface &)
 {
-   setError(QAbstractSocket::UnsupportedSocketOperationError,
-            QLatin1String("Operation on socket is not supported"));
+   setError(QAbstractSocket::UnsupportedSocketOperationError, "Operation on socket is not supported");
    return false;
 }
 #endif // QT_NO_NETWORKINTERFACE
@@ -491,10 +485,10 @@ void QHttpSocketEngine::slotSocketConnected()
 {
    Q_D(QHttpSocketEngine);
 
-   // Send the greeting.
+   // Send the greeting
    const char method[] = "CONNECT";
    QByteArray peerAddress = d->peerName.isEmpty() ?
-                            d->peerAddress.toString().toLatin1() : QUrl::toAce(d->peerName);
+         d->peerAddress.toString().toLatin1() : QUrl::toAce(d->peerName);
 
    QByteArray path = peerAddress + ':' + QByteArray::number(d->peerPort);
    QByteArray data = method;
@@ -513,7 +507,7 @@ void QHttpSocketEngine::slotSocketConnected()
    }
 
    QAuthenticatorPrivate *priv = QAuthenticatorPrivate::getPrivate(d->authenticator);
-   //qDebug() << "slotSocketConnected: priv=" << priv << (priv ? (int)priv->method : -1);
+
    if (priv && priv->method != QAuthenticatorPrivate::None) {
       d->credentialsSent = true;
       data += "Proxy-Authorization: " + priv->calculateResponse(method, path);
@@ -521,9 +515,6 @@ void QHttpSocketEngine::slotSocketConnected()
    }
 
    data += "\r\n";
-   //     qDebug() << ">>>>>>>> sending request" << this;
-   //     qDebug() << data;
-   //     qDebug() << ">>>>>>>";
    d->socket->write(data);
    d->state = ConnectSent;
 }
@@ -792,9 +783,12 @@ void QHttpSocketEngine::slotSocketError(QAbstractSocket::SocketError error)
 
    d->state = None;
    setError(error, d->socket->errorString());
+
+#if defined(CS_SHOW_DEBUG_NETWORK)
    if (error != QAbstractSocket::RemoteHostClosedError) {
       qDebug() << "QHttpSocketEngine::slotSocketError: got weird error =" << error;
    }
+#endif
 
    //read notification needs to always be emitted, otherwise the higher layer doesn't get the disconnected signal
    emitReadNotification();
@@ -808,7 +802,9 @@ void QHttpSocketEngine::slotSocketStateChanged(QAbstractSocket::SocketState stat
 void QHttpSocketEngine::emitPendingReadNotification()
 {
    Q_D(QHttpSocketEngine);
+
    d->readNotificationPending = false;
+
    if (d->readNotificationEnabled) {
       emit readNotification();
    }

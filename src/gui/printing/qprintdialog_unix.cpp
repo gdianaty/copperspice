@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,25 +25,25 @@
 
 #ifndef QT_NO_PRINTDIALOG
 
-#include <qabstractprintdialog_p.h>
 #include <qdialogbuttonbox.h>
-#include <qmessagebox.h>
-#include <qprintdialog.h>
-#include <qfiledialog.h>
 #include <qdir.h>
 #include <qevent.h>
+#include <qfiledialog.h>
 #include <qfilesystemmodel.h>
-#include <qstyleditemdelegate.h>
-#include <qprinter.h>
-#include <qplatform_printplugin.h>
+#include <qmessagebox.h>
 #include <qplatform_printersupport.h>
-#include <qprintdevice_p.h>
+#include <qplatform_printplugin.h>
+#include <qprintdialog.h>
+#include <qprinter.h>
 #include <qregularexpression.h>
-
-#include <qfscompleter_p.h>
+#include <qstyleditemdelegate.h>
 #include <ui_qprintpropertieswidget.h>
 #include <ui_qprintsettingsoutput.h>
 #include <ui_qprintwidget.h>
+
+#include <qabstractprintdialog_p.h>
+#include <qfscompleter_p.h>
+#include <qprintdevice_p.h>
 
 #ifndef QT_NO_CUPS
 #include <qcups_p.h>
@@ -52,6 +52,7 @@
 
 class QOptionTreeItem;
 class QPPDOptionsModel;
+
 class QUnixPrintWidgetPrivate;
 
 static void initResources()
@@ -68,7 +69,7 @@ class QPrintPropertiesDialog : public QDialog
 
    void selectPrinter(QPrinter::OutputFormat outputFormat, const QString &printerName);
 
-   /// copy printer properties to the widget
+   // copy printer properties to the widget
    void applyPrinterProperties(QPrinter *p);
    void setupPrinter() const;
 
@@ -126,14 +127,14 @@ class QUnixPrintWidgetPrivate
    void _q_btnPropertiesClicked();
    void _q_btnBrowseClicked();
 
+   void updateWidget();
+
    QUnixPrintWidget *const parent;
    QPrintPropertiesDialog *propertiesDialog;
    Ui::QPrintWidget widget;
    QAbstractPrintDialog *q;
    QPrinter *printer;
    QPrintDevice m_currentPrintDevice;
-
-   void updateWidget();
 
  private:
    QPrintDialogPrivate *optionsPane;
@@ -186,8 +187,10 @@ QPrintPropertiesDialog::QPrintPropertiesDialog(QAbstractPrintDialog *parent)
 
    QVBoxLayout *lay = new QVBoxLayout(this);
    this->setLayout(lay);
+
    QWidget *content = new QWidget(this);
    widget.setupUi(content);
+
    m_buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
    lay->addWidget(content);
    lay->addWidget(m_buttons);
@@ -293,6 +296,7 @@ void QPrintDialogPrivate::selectPrinter(const QPrinter::OutputFormat outputForma
    Q_Q(QPrintDialog);
    QPrinter *p = q->printer();
    printerOutputFormat = outputFormat;
+
    if (p->colorMode() == QPrinter::Color) {
       options.color->setChecked(true);
    } else {
@@ -303,19 +307,23 @@ void QPrintDialogPrivate::selectPrinter(const QPrinter::OutputFormat outputForma
       case QPrinter::DuplexNone:
          options.noDuplex->setChecked(true);
          break;
+
       case QPrinter::DuplexLongSide:
       case QPrinter::DuplexAuto:
          options.duplexLong->setChecked(true);
          break;
+
       case QPrinter::DuplexShortSide:
          options.duplexShort->setChecked(true);
          break;
    }
+
    options.copies->setValue(p->copyCount());
    options.collate->setChecked(p->collateCopies());
    options.reverse->setChecked(p->pageOrder() == QPrinter::LastPageFirst);
+
    if (outputFormat == QPrinter::PdfFormat || options.printSelection->isChecked()
-      || options.printCurrentPage->isChecked()) {
+         || options.printCurrentPage->isChecked()) {
       options.pageSetCombo->setEnabled(false);
    } else {
       options.pageSetCombo->setEnabled(true);
@@ -354,12 +362,15 @@ void QPrintDialogPrivate::setupPrinter()
    if (options.printAll->isChecked()) {
       p->setPrintRange(QPrinter::AllPages);
       p->setFromTo(0, 0);
+
    } else if (options.printSelection->isChecked()) {
       p->setPrintRange(QPrinter::Selection);
       p->setFromTo(0, 0);
+
    } else if (options.printCurrentPage->isChecked()) {
       p->setPrintRange(QPrinter::CurrentPage);
       p->setFromTo(0, 0);
+
    } else if (options.printRange->isChecked()) {
       if (q->isOptionEnabled(QPrintDialog::PrintPageRange)) {
          p->setPrintRange(QPrinter::PageRange);
@@ -377,20 +388,21 @@ void QPrintDialogPrivate::setupPrinter()
    if (p->printRange() == QPrinter::AllPages || p->printRange() == QPrinter::PageRange) {
       //If the application is selecting pages and the first page number is even then need to adjust the odd-even accordingly
       QCUPSSupport::PageSet pageSet = options.pageSetCombo->itemData(options.pageSetCombo->currentIndex()).value<QCUPSSupport::PageSet>();
-      if (q->isOptionEnabled(QPrintDialog::PrintPageRange)
-         && p->printRange() == QPrinter::PageRange
-         && (q->fromPage() % 2 == 0)) {
 
+      if (q->isOptionEnabled(QPrintDialog::PrintPageRange) && p->printRange() == QPrinter::PageRange && (q->fromPage() % 2 == 0)) {
          switch (pageSet) {
             case QCUPSSupport::AllPages:
                break;
+
             case QCUPSSupport::OddPages:
                QCUPSSupport::setPageSet(p, QCUPSSupport::EvenPages);
                break;
+
             case QCUPSSupport::EvenPages:
                QCUPSSupport::setPageSet(p, QCUPSSupport::OddPages);
                break;
          }
+
       } else if (pageSet != QCUPSSupport::AllPages) {
          QCUPSSupport::setPageSet(p, pageSet);
       }
@@ -450,9 +462,9 @@ void QPrintDialogPrivate::_q_checkFields()
 void QPrintDialogPrivate::updateWidgets()
 {
    Q_Q(QPrintDialog);
+
    options.gbPrintRange->setVisible(q->isOptionEnabled(QPrintDialog::PrintPageRange) ||
-      q->isOptionEnabled(QPrintDialog::PrintSelection) ||
-      q->isOptionEnabled(QPrintDialog::PrintCurrentPage));
+         q->isOptionEnabled(QPrintDialog::PrintSelection) || q->isOptionEnabled(QPrintDialog::PrintCurrentPage));
 
    options.printRange->setEnabled(q->isOptionEnabled(QPrintDialog::PrintPageRange));
    options.printSelection->setVisible(q->isOptionEnabled(QPrintDialog::PrintSelection));
@@ -460,41 +472,47 @@ void QPrintDialogPrivate::updateWidgets()
    options.collate->setVisible(q->isOptionEnabled(QPrintDialog::PrintCollateCopies));
 
 #ifndef QT_NO_CUPS
-   if (!q->isOptionEnabled(QPrintDialog::PrintPageRange)
-      && (q->isOptionEnabled(QPrintDialog::PrintSelection) || q->isOptionEnabled(QPrintDialog::PrintCurrentPage))) {
+   if (! q->isOptionEnabled(QPrintDialog::PrintPageRange) && (q->isOptionEnabled(QPrintDialog::PrintSelection) || q->isOptionEnabled(QPrintDialog::PrintCurrentPage))) {
       options.pageSetCombo->setVisible(false);
       options.pageSetLabel->setVisible(false);
    } else {
       options.pageSetCombo->setVisible(true);
       options.pageSetLabel->setVisible(true);
    }
-   if (!q->isOptionEnabled(QPrintDialog::PrintPageRange)) {
+
+   if (! q->isOptionEnabled(QPrintDialog::PrintPageRange)) {
       options.gbPrintRange->setVisible(true);
       options.printRange->setEnabled(true);
    }
 #endif
+
    switch (q->printRange()) {
       case QPrintDialog::AllPages:
          options.printAll->setChecked(true);
          options.pageSetCombo->setEnabled(true);
          break;
+
       case QPrintDialog::Selection:
          options.printSelection->setChecked(true);
          options.pageSetCombo->setEnabled(false);
          break;
+
       case QPrintDialog::PageRange:
          options.printRange->setChecked(true);
          options.pageSetCombo->setEnabled(true);
          break;
+
       case QPrintDialog::CurrentPage:
          if (q->isOptionEnabled(QPrintDialog::PrintCurrentPage)) {
             options.printCurrentPage->setChecked(true);
             options.pageSetCombo->setEnabled(false);
          }
          break;
+
       default:
          break;
    }
+
    const int minPage = qMax(1, qMin(q->minPage(), q->maxPage()));
    const int maxPage = qMax(1, q->maxPage() == INT_MAX ? 9999 : q->maxPage());
 
@@ -562,8 +580,6 @@ void QPrintDialog::accept()
 
 #if defined (Q_OS_UNIX)
 
-/*! \internal
-*/
 QUnixPrintWidgetPrivate::QUnixPrintWidgetPrivate(QUnixPrintWidget *p, QPrinter *prn)
    : parent(p), propertiesDialog(nullptr), printer(prn), optionsPane(nullptr),
      filePrintersAdded(false), propertiesDialogShown(false)
@@ -629,19 +645,23 @@ void QUnixPrintWidgetPrivate::updateWidget()
    if (!printToFile && filePrintersAdded) {
       widget.printers->removeItem(widget.printers->count() - 1);
       widget.printers->removeItem(widget.printers->count() - 1);
-      if (widget.printers->count()) {
+
+     if (widget.printers->count()) {
          widget.printers->removeItem(widget.printers->count() - 1);   // remove separator
       }
       filePrintersAdded = false;
    }
-   if (printer && filePrintersAdded && (printer->outputFormat() != QPrinter::NativeFormat
-         || printer->printerName().isEmpty())) {
+
+   if (printer && filePrintersAdded && (printer->outputFormat() != QPrinter::NativeFormat || printer->printerName().isEmpty())) {
+
       if (printer->outputFormat() == QPrinter::PdfFormat) {
          widget.printers->setCurrentIndex(widget.printers->count() - 1);
       }
+
       widget.filename->setEnabled(true);
       widget.lOutput->setEnabled(true);
    }
+
    widget.filename->setVisible(printToFile);
    widget.lOutput->setVisible(printToFile);
    widget.fileBrowser->setVisible(printToFile);
@@ -671,14 +691,18 @@ void QUnixPrintWidgetPrivate::_q_printerChanged(int index)
    }
    if (filePrintersAdded) {
       Q_ASSERT(index != printerCount - 2); // separator
-      if (index == printerCount - 1) { // PDF
+
+      if (index == printerCount - 1) {
+         // PDF
          widget.location->setText(QPrintDialog::tr("Local file"));
          widget.type->setText(QPrintDialog::tr("Write PDF file"));
          widget.properties->setEnabled(true);
          widget.filename->setEnabled(true);
+
          QString filename = widget.filename->text();
          widget.filename->setText(filename);
          widget.lOutput->setEnabled(true);
+
          if (optionsPane) {
             optionsPane->selectPrinter(QPrinter::PdfFormat);
          }
@@ -688,12 +712,15 @@ void QUnixPrintWidgetPrivate::_q_printerChanged(int index)
 
    if (printer) {
       QPlatformPrinterSupport *ps = QPlatformPrinterSupportPlugin::get();
+
       if (ps) {
          m_currentPrintDevice = ps->createPrintDevice(widget.printers->itemText(index));
       }
+
       printer->setPrinterName(m_currentPrintDevice.id());
       widget.location->setText(m_currentPrintDevice.location());
       widget.type->setText(m_currentPrintDevice.makeAndModel());
+
       if (optionsPane) {
          optionsPane->selectPrinter(QPrinter::NativeFormat);
       }
@@ -720,7 +747,7 @@ void QUnixPrintWidgetPrivate::_q_btnBrowseClicked()
    filename.clear();
 #endif
 
-   if (!filename.isEmpty()) {
+   if (! filename.isEmpty()) {
       widget.filename->setText(filename);
       widget.printers->setCurrentIndex(widget.printers->count() - 1); // the pdf one
    }
@@ -864,8 +891,8 @@ void QUnixPrintWidgetPrivate::setupPrinterProperties()
 
    propertiesDialog->applyPrinterProperties(q->printer());
 
-   if (q->isOptionEnabled(QPrintDialog::PrintToFile)
-      && (widget.printers->currentIndex() == widget.printers->count() - 1)) {// PDF
+   if (q->isOptionEnabled(QPrintDialog::PrintToFile) && (widget.printers->currentIndex() == widget.printers->count() - 1)) {
+      // PDF
       propertiesDialog->selectPrinter(QPrinter::PdfFormat, QString());
    } else {
       propertiesDialog->selectPrinter(QPrinter::NativeFormat, widget.printers->currentText());
@@ -877,8 +904,10 @@ void QUnixPrintWidgetPrivate::_q_btnPropertiesClicked()
    if (!propertiesDialog) {
       setupPrinterProperties();
    }
+
    propertiesDialog->exec();
-   if (!propertiesDialogShown && propertiesDialog->result() == QDialog::Rejected) {
+
+   if (! propertiesDialogShown && propertiesDialog->result() == QDialog::Rejected) {
       delete propertiesDialog;
       propertiesDialog = nullptr;
       propertiesDialogShown = false;
@@ -900,6 +929,7 @@ void QUnixPrintWidgetPrivate::setupPrinter()
 
       printer->setOutputFormat(QPrinter::PdfFormat);
       QString path = widget.filename->text();
+
       if (QDir::isRelativePath(path)) {
          path = QDir::homePath() + QDir::separator() + path;
       }
@@ -914,31 +944,23 @@ void QUnixPrintWidgetPrivate::setupPrinter()
    if (!propertiesDialog) {
       setupPrinterProperties();
    }
+
    if (propertiesDialog->result() == QDialog::Accepted || !propertiesDialogShown) {
       propertiesDialog->setupPrinter();
    }
 }
 
-
-/*! \internal
-*/
 QUnixPrintWidget::QUnixPrintWidget(QPrinter *printer, QWidget *parent)
    : QWidget(parent), d(new QUnixPrintWidgetPrivate(this, printer))
 {
    d->applyPrinterProperties();
 }
 
-/*! \internal
-*/
 QUnixPrintWidget::~QUnixPrintWidget()
 {
    delete d;
 }
 
-/*! \internal
-
-    Updates the printer with the states held in the QUnixPrintWidget.
-*/
 void QUnixPrintWidget::updatePrinter()
 {
    d->setupPrinter();
@@ -982,8 +1004,5 @@ void QPrintDialog::_q_checkFields()
 }
 
 #endif
-
-
-
 
 #endif // QT_NO_PRINTDIALOG

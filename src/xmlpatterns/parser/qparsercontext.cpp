@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,12 +21,13 @@
 *
 ***********************************************************************/
 
+#include <qparsercontext_p.h>
+
 #include <qglobal.h>
 
-#include "qparsercontext_p.h"
-#include "qexpression_p.h"
-#include "qstaticcontext_p.h"
-#include "qtokenizer_p.h"
+#include <qexpression_p.h>
+#include <qstaticcontext_p.h>
+#include <qtokenizer_p.h>
 
 using namespace QPatternist;
 

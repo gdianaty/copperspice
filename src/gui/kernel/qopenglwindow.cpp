@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -34,7 +34,7 @@
 #include <qopengl_extensions_p.h>
 #include <qopenglcontext_p.h>
 
-// GLES2 builds won't have these constants with the suffixless names
+// GLES2 builds will not have these constants with the suffixless names
 #ifndef GL_READ_FRAMEBUFFER
 #define GL_READ_FRAMEBUFFER 0x8CA8
 #endif
@@ -58,11 +58,10 @@ class QOpenGLWindowPrivate : public QPaintDeviceWindowPrivate
 
  public:
    QOpenGLWindowPrivate(QOpenGLContext *shareContext, QOpenGLWindow::UpdateBehavior updateBehavior)
-      : updateBehavior(updateBehavior)
-      , hasFboBlit(false)
-      , shareContext(shareContext) {
-      if (!shareContext) {
-         this->shareContext = qt_gl_global_share_context();
+      : m_hasFboBlit(false), m_updateBehavior(updateBehavior), m_shareContext(shareContext)
+   {
+      if (! shareContext) {
+         m_shareContext = qt_gl_global_share_context();
       }
    }
 
@@ -79,25 +78,30 @@ class QOpenGLWindowPrivate : public QPaintDeviceWindowPrivate
    void endPaint() override;
    void flush(const QRegion &region) override;
 
-   QOpenGLWindow::UpdateBehavior updateBehavior;
-   bool hasFboBlit;
+   bool m_hasFboBlit;
+
+   QOpenGLWindow::UpdateBehavior m_updateBehavior;
+
+   QOpenGLContext *m_shareContext;
+   QOpenGLTextureBlitter m_blitter;
+
    QScopedPointer<QOpenGLContext> context;
-   QOpenGLContext *shareContext;
    QScopedPointer<QOpenGLFramebufferObject> fbo;
    QScopedPointer<QOpenGLWindowPaintDevice> paintDevice;
-   QOpenGLTextureBlitter blitter;
-   QColor backgroundColor;
    QScopedPointer<QOffscreenSurface> offscreenSurface;
+
+   QColor backgroundColor;
 };
 
 QOpenGLWindowPrivate::~QOpenGLWindowPrivate()
 {
    Q_Q(QOpenGLWindow);
+
    if (q->isValid()) {
-      q->makeCurrent(); // this works even when the platformwindow is destroyed
+      q->makeCurrent();             // this works even when the platformwindow is destroyed
       paintDevice.reset(nullptr);
       fbo.reset(nullptr);
-      blitter.destroy();
+      m_blitter.destroy();
       q->doneCurrent();
    }
 }
@@ -111,18 +115,21 @@ void QOpenGLWindowPrivate::initialize()
    }
 
    context.reset(new QOpenGLContext);
-   context->setShareContext(shareContext);
+   context->setShareContext(m_shareContext);
    context->setFormat(q->requestedFormat());
+
    if (!context->create()) {
-      qWarning("QOpenGLWindow::beginPaint: Failed to create context");
+      qWarning("QOpenGLWindow::initialize() Failed to create context");
    }
+
    if (!context->makeCurrent(q)) {
-      qWarning("QOpenGLWindow::beginPaint: Failed to make context current");
+      qWarning("QOpenGLWindow::initialize() Failed to make context current");
    }
 
    paintDevice.reset(new QOpenGLWindowPaintDevice(q));
-   if (updateBehavior == QOpenGLWindow::PartialUpdateBlit) {
-      hasFboBlit = QOpenGLFramebufferObject::hasOpenGLFramebufferBlit();
+
+   if (m_updateBehavior == QOpenGLWindow::PartialUpdateBlit) {
+      m_hasFboBlit = QOpenGLFramebufferObject::hasOpenGLFramebufferBlit();
    }
 
    q->initializeGL();
@@ -137,23 +144,27 @@ void QOpenGLWindowPrivate::beginPaint(const QRegion &region)
    initialize();
    context->makeCurrent(q);
 
-   const int deviceWidth = q->width() * q->devicePixelRatio();
+   const int deviceWidth  = q->width()  * q->devicePixelRatio();
    const int deviceHeight = q->height() * q->devicePixelRatio();
    const QSize deviceSize(deviceWidth, deviceHeight);
-   if (updateBehavior > QOpenGLWindow::NoPartialUpdate) {
+
+   if (m_updateBehavior > QOpenGLWindow::NoPartialUpdate) {
       if (!fbo || fbo->size() != deviceSize) {
          QOpenGLFramebufferObjectFormat fboFormat;
          fboFormat.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+
          if (q->requestedFormat().samples() > 0) {
-            if (updateBehavior != QOpenGLWindow::PartialUpdateBlend) {
+            if (m_updateBehavior != QOpenGLWindow::PartialUpdateBlend) {
                fboFormat.setSamples(q->requestedFormat().samples());
             } else {
-               qWarning("QOpenGLWindow: PartialUpdateBlend does not support multisampling");
+               qWarning("QOpenGLWindow::beginPaint() PartialUpdateBlend does not support multisampling");
             }
          }
+
          fbo.reset(new QOpenGLFramebufferObject(deviceSize, fboFormat));
          markWindowAsDirty();
       }
+
    } else {
       markWindowAsDirty();
    }
@@ -166,7 +177,7 @@ void QOpenGLWindowPrivate::beginPaint(const QRegion &region)
 
    q->paintUnderGL();
 
-   if (updateBehavior > QOpenGLWindow::NoPartialUpdate) {
+   if (m_updateBehavior > QOpenGLWindow::NoPartialUpdate) {
       fbo->bind();
    }
 }
@@ -175,37 +186,40 @@ void QOpenGLWindowPrivate::endPaint()
 {
    Q_Q(QOpenGLWindow);
 
-   if (updateBehavior > QOpenGLWindow::NoPartialUpdate) {
+   if (m_updateBehavior > QOpenGLWindow::NoPartialUpdate) {
       fbo->release();
    }
 
    context->functions()->glBindFramebuffer(GL_FRAMEBUFFER, context->defaultFramebufferObject());
 
-   if (updateBehavior == QOpenGLWindow::PartialUpdateBlit && hasFboBlit) {
-      const int deviceWidth = q->width() * q->devicePixelRatio();
+   if (m_updateBehavior == QOpenGLWindow::PartialUpdateBlit && m_hasFboBlit) {
+      const int deviceWidth  = q->width()  * q->devicePixelRatio();
       const int deviceHeight = q->height() * q->devicePixelRatio();
+
       QOpenGLExtensions extensions(context.data());
       extensions.glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo->handle());
       extensions.glBindFramebuffer(GL_DRAW_FRAMEBUFFER, context->defaultFramebufferObject());
+
       extensions.glBlitFramebuffer(0, 0, deviceWidth, deviceHeight,
-         0, 0, deviceWidth, deviceHeight,
-         GL_COLOR_BUFFER_BIT, GL_NEAREST);
-   } else if (updateBehavior > QOpenGLWindow::NoPartialUpdate) {
-      if (updateBehavior == QOpenGLWindow::PartialUpdateBlend) {
+            0, 0, deviceWidth, deviceHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+   } else if (m_updateBehavior > QOpenGLWindow::NoPartialUpdate) {
+      if (m_updateBehavior == QOpenGLWindow::PartialUpdateBlend) {
          context->functions()->glEnable(GL_BLEND);
          context->functions()->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       }
-      if (!blitter.isCreated()) {
-         blitter.create();
+
+      if (! m_blitter.isCreated()) {
+         m_blitter.create();
       }
 
       QRect windowRect(QPoint(0, 0), fbo->size());
       QMatrix4x4 target = QOpenGLTextureBlitter::targetTransform(windowRect, windowRect);
-      blitter.bind();
-      blitter.blit(fbo->texture(), target, QOpenGLTextureBlitter::OriginBottomLeft);
-      blitter.release();
+      m_blitter.bind();
+      m_blitter.blit(fbo->texture(), target, QOpenGLTextureBlitter::OriginBottomLeft);
+      m_blitter.release();
 
-      if (updateBehavior == QOpenGLWindow::PartialUpdateBlend) {
+      if (m_updateBehavior == QOpenGLWindow::PartialUpdateBlend) {
          context->functions()->glDisable(GL_BLEND);
       }
    }
@@ -215,7 +229,7 @@ void QOpenGLWindowPrivate::endPaint()
 
 void QOpenGLWindowPrivate::bindFBO()
 {
-   if (updateBehavior > QOpenGLWindow::NoPartialUpdate) {
+   if (m_updateBehavior > QOpenGLWindow::NoPartialUpdate) {
       fbo->bind();
    } else {
       QOpenGLFramebufferObject::bindDefault();
@@ -257,7 +271,7 @@ QOpenGLWindow::~QOpenGLWindow()
 QOpenGLWindow::UpdateBehavior QOpenGLWindow::updateBehavior() const
 {
    Q_D(const QOpenGLWindow);
-   return d->updateBehavior;
+   return d->m_updateBehavior;
 }
 
 bool QOpenGLWindow::isValid() const
@@ -279,11 +293,12 @@ void QOpenGLWindow::makeCurrent()
    if (handle()) {
       d->context->makeCurrent(this);
    } else {
-      if (!d->offscreenSurface) {
+      if (! d->offscreenSurface) {
          d->offscreenSurface.reset(new QOffscreenSurface);
          d->offscreenSurface->setFormat(d->context->format());
          d->offscreenSurface->create();
       }
+
       d->context->makeCurrent(d->offscreenSurface.data());
    }
 
@@ -294,40 +309,38 @@ void QOpenGLWindow::doneCurrent()
 {
    Q_D(QOpenGLWindow);
 
-   if (!isValid()) {
+   if (! isValid()) {
       return;
    }
 
    d->context->doneCurrent();
 }
 
-/*!
-  \return The QOpenGLContext used by this window or \c 0 if not yet initialized.
- */
 QOpenGLContext *QOpenGLWindow::context() const
 {
    Q_D(const QOpenGLWindow);
    return d->context.data();
 }
 
-/*!
-  \return The QOpenGLContext requested to be shared with this window's QOpenGLContext.
-*/
 QOpenGLContext *QOpenGLWindow::shareContext() const
 {
    Q_D(const QOpenGLWindow);
-   return d->shareContext;
+   return d->m_shareContext;
 }
 
 GLuint QOpenGLWindow::defaultFramebufferObject() const
 {
    Q_D(const QOpenGLWindow);
-   if (d->updateBehavior > NoPartialUpdate && d->fbo) {
+
+   if (d->m_updateBehavior > NoPartialUpdate && d->fbo) {
       return d->fbo->handle();
+
    } else if (QOpenGLContext *ctx = QOpenGLContext::currentContext()) {
       return ctx->defaultFramebufferObject();
+
    } else {
       return 0;
+
    }
 }
 
@@ -340,6 +353,7 @@ QImage QOpenGLWindow::grabFramebuffer()
    }
 
    makeCurrent();
+
    return qt_gl_read_framebuffer(size() * devicePixelRatio(), false, false);
 }
 
@@ -382,9 +396,6 @@ void QOpenGLWindow::resizeEvent(QResizeEvent *event)
    resizeGL(width(), height());
 }
 
-/*!
-  \internal
- */
 int QOpenGLWindow::metric(PaintDeviceMetric metric) const
 {
    Q_D(const QOpenGLWindow);
@@ -395,22 +406,22 @@ int QOpenGLWindow::metric(PaintDeviceMetric metric) const
             return d->paintDevice->depth();
          }
          break;
+
       default:
          break;
    }
+
    return QPaintDeviceWindow::metric(metric);
 }
 
-/*!
-  \internal
- */
 QPaintDevice *QOpenGLWindow::redirected(QPoint *) const
 {
    Q_D(const QOpenGLWindow);
+
    if (QOpenGLContext::currentContext() == d->context.data()) {
       return d->paintDevice.data();
    }
+
    return nullptr;
 }
-
 

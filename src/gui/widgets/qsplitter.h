@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,16 +24,17 @@
 #ifndef QSPLITTER_H
 #define QSPLITTER_H
 
+#include <qcontainerfwd.h>
 #include <qframe.h>
 #include <qsizepolicy.h>
-#include <qcontainerfwd.h>
 
 #ifndef QT_NO_SPLITTER
 
-class QTextStream;
-class QSplitterPrivate;
-class QSplitterHandlePrivate;
 class QSplitterHandle;
+class QTextStream;
+
+class QSplitterHandlePrivate;
+class QSplitterPrivate;
 
 class Q_GUI_EXPORT QSplitter : public QFrame
 {

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,9 @@
 #ifndef QMEDIASTREAMSCONTROL_H
 #define QMEDIASTREAMSCONTROL_H
 
-#include <qstring.h>
-
 #include <qmediacontrol.h>
 #include <qmultimedia.h>
+#include <qstring.h>
 
 class Q_MULTIMEDIA_EXPORT QMediaStreamsControl : public QMediaControl
 {
@@ -35,7 +34,13 @@ class Q_MULTIMEDIA_EXPORT QMediaStreamsControl : public QMediaControl
    MULTI_CS_ENUM(StreamType)
 
  public:
-   enum StreamType { UnknownStream, VideoStream, AudioStream, SubPictureStream, DataStream };
+   enum StreamType {
+      UnknownStream,
+      VideoStream,
+      AudioStream,
+      SubPictureStream,
+      DataStream
+   };
 
    virtual ~QMediaStreamsControl();
 

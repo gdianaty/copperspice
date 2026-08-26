@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,18 +21,18 @@
 *
 ***********************************************************************/
 
-#import <Foundation/Foundation.h>
-#import <Cocoa/Cocoa.h>
-
+#include <qapplication.h>
+#include <qdebug.h>
+#include <qmacnativewidget_mac.h>
 #include <qmenu.h>
 #include <qmenubar.h>
-#include <qmacnativewidget_mac.h>
-#include <qdebug.h>
-#include <qguiapplication.h>
-#include <qwindow.h>
 #include <qplatform_nativeinterface.h>
+#include <qwindow.h>
 
 #include <qmenubar_p.h>
+
+#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 
 #ifndef QT_NO_MENU
 
@@ -49,17 +49,9 @@ inline QPlatformNativeInterface::FP_Integration resolvePlatformFunction(const QB
                     << "from QGuiApplication::platformNativeInterface()->nativeResourceFunctionForIntegration()";
     return function;
 }
-} //namespsace
 
+}   // namespace
 
-/*!
-    \since 5.2
-
-    Returns the native NSMenu for this menu. Available on \macos only.
-
-    \note Qt sets the delegate on the native menu. If you need to set your own
-    delegate, make sure you save the original one and forward any calls to it.
-*/
 NSMenu *QMenu::toNSMenu()
 {
     // Call into the cocoa platform plugin: qMenuToNSMenu(platformMenu())
@@ -72,13 +64,6 @@ NSMenu *QMenu::toNSMenu()
     return nil;
 }
 
-
-/*!
-    \since 5.2
-
-    Set this menu to be the dock menu available by option-clicking
-    on the application dock icon. Available on \macos only.
-*/
 void QMenu::setAsDockMenu()
 {
     // Call into the cocoa platform plugin: setDockMenu(platformMenu())
@@ -89,24 +74,14 @@ void QMenu::setAsDockMenu()
     }
 }
 
-
-/*! \fn void qt_mac_set_dock_menu(QMenu *menu)
-    \relates QMenu
-    \deprecated
-
-    Sets this \a menu to be the dock menu available by option-clicking
-    on the application dock icon. Available on \macos only.
-
-    Deprecated; use \l QMenu::setAsDockMenu() instead.
-*/
-
 void QMenuPrivate::moveWidgetToPlatformItem(QWidget *widget, QPlatformMenuItem* item)
 {
     QMacNativeWidget *container = new QMacNativeWidget;
-    QObject::connect(platformMenu, SIGNAL(destroyed()), container, SLOT(deleteLater()));
     container->resize(widget->sizeHint());
     widget->setParent(container);
     widget->setVisible(true);
+
+    QObject::connect(platformMenu.data(), &QPlatformMenu::destroyed, container, &QMacNativeWidget::deleteLater);
 
     NSView *containerView = container->nativeView();
     QWindow *containerWindow = container->windowHandle();
@@ -123,14 +98,6 @@ void QMenuPrivate::moveWidgetToPlatformItem(QWidget *widget, QPlatformMenuItem* 
 
 #ifndef QT_NO_MENUBAR
 
-/*!
-    \since 5.2
-
-    Returns the native NSMenu for this menu bar. Available on \macos only.
-
-    \note Qt may set the delegate on the native menu bar. If you need to set your
-    own delegate, make sure you save the original one and forward any calls to it.
-*/
 NSMenu *QMenuBar::toNSMenu()
 {
     // Call into the cocoa platform plugin: qMenuBarToNSMenu(platformMenuBar())

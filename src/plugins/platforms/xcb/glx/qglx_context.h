@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,12 @@
 #ifndef QGLX_CONTEXT_H
 #define QGLX_CONTEXT_H
 
-#include <qxcb_window.h>
-#include <qxcb_screen.h>
-#include <qplatform_openglcontext.h>
-#include <qplatform_offscreensurface.h>
-#include <qsurfaceformat.h>
 #include <qmutex.h>
+#include <qplatform_offscreensurface.h>
+#include <qplatform_openglcontext.h>
+#include <qsurfaceformat.h>
+#include <qxcb_screen.h>
+#include <qxcb_window.h>
 
 #include <GL/glx.h>
 

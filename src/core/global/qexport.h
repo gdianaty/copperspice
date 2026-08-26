@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -127,18 +127,6 @@
 #      define Q_SVG_EXPORT           Q_DECL_IMPORT
 #    endif
 
-#    if defined(QT_BUILD_SCRIPT_LIB)
-#      define Q_SCRIPT_EXPORT        Q_DECL_EXPORT
-#    else
-#      define Q_SCRIPT_EXPORT        Q_DECL_IMPORT
-#    endif
-
-#    if defined(QT_BUILD_SCRIPTTOOLS_LIB)
-#      define Q_SCRIPTTOOLS_EXPORT   Q_DECL_EXPORT
-#    else
-#      define Q_SCRIPTTOOLS_EXPORT   Q_DECL_IMPORT
-#    endif
-
 #    if defined(QT_BUILD_VULKAN_LIB)
 #      define Q_VULKAN_EXPORT        Q_DECL_EXPORT
 #    else
@@ -157,6 +145,12 @@
 #      define Q_XMLPATTERNS_EXPORT   Q_DECL_IMPORT
 #    endif
 
+#   if defined(QT_BUILD_WAYLAND_CLIENT_LIB)
+#      define Q_WAYLAND_CLIENT_EXPORT Q_DECL_EXPORT
+#   else
+#      define Q_WAYLAND_CLIENT_EXPORT Q_DECL_IMPORT
+#   endif
+
 #    if defined(QT_BUILD_DECLARATIVE_LIB)
 #      define Q_DECLARATIVE_EXPORT   Q_DECL_EXPORT
 #    else
@@ -174,20 +168,20 @@
 #if ! defined(Q_CORE_EXPORT)
 
 #  if ! defined(QT_STATIC)
-#    define Q_CORE_EXPORT           Q_DECL_EXPORT
-#    define Q_DBUS_EXPORT           Q_DECL_EXPORT
-#    define Q_GUI_EXPORT            Q_DECL_EXPORT
-#    define Q_SQL_EXPORT            Q_DECL_EXPORT
-#    define Q_NETWORK_EXPORT        Q_DECL_EXPORT
-#    define Q_SVG_EXPORT            Q_DECL_EXPORT
-#    define Q_DECLARATIVE_EXPORT    Q_DECL_EXPORT
-#    define Q_OPENGL_EXPORT         Q_DECL_EXPORT
-#    define Q_MULTIMEDIA_EXPORT     Q_DECL_EXPORT
-#    define Q_VULKAN_EXPORT         Q_DECL_EXPORT
-#    define Q_XML_EXPORT            Q_DECL_EXPORT
-#    define Q_XMLPATTERNS_EXPORT    Q_DECL_EXPORT
-#    define Q_SCRIPT_EXPORT         Q_DECL_EXPORT
-#    define Q_SCRIPTTOOLS_EXPORT    Q_DECL_EXPORT
+#    define Q_CORE_EXPORT            Q_DECL_EXPORT
+#    define Q_DBUS_EXPORT            Q_DECL_EXPORT
+#    define Q_GUI_EXPORT             Q_DECL_EXPORT
+#    define Q_SQL_EXPORT             Q_DECL_EXPORT
+#    define Q_NETWORK_EXPORT         Q_DECL_EXPORT
+#    define Q_SVG_EXPORT             Q_DECL_EXPORT
+#    define Q_DECLARATIVE_EXPORT     Q_DECL_EXPORT
+#    define Q_OPENGL_EXPORT          Q_DECL_EXPORT
+#    define Q_MULTIMEDIA_EXPORT      Q_DECL_EXPORT
+#    define Q_VULKAN_EXPORT          Q_DECL_EXPORT
+#    define Q_XML_EXPORT             Q_DECL_EXPORT
+#    define Q_XMLPATTERNS_EXPORT     Q_DECL_EXPORT
+#    define Q_WAYLAND_CLIENT_EXPORT  Q_DECL_EXPORT
+
 #  else
 #    define Q_CORE_EXPORT
 #    define Q_DBUS_EXPORT
@@ -201,8 +195,8 @@
 #    define Q_VULKAN_EXPORT
 #    define Q_XML_EXPORT
 #    define Q_XMLPATTERNS_EXPORT
-#    define Q_SCRIPT_EXPORT
-#    define Q_SCRIPTTOOLS_EXPORT
+#    define Q_WAYLAND_CLIENT_EXPORT
+
 #  endif
 
 #endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,13 +22,15 @@
 ***********************************************************************/
 
 #include <qradiobutton.h>
+
 #include <qapplication.h>
 #include <qbitmap.h>
 #include <qbuttongroup.h>
-#include <qstylepainter.h>
+#include <qevent.h>
 #include <qstyle.h>
 #include <qstyleoption.h>
-#include <qevent.h>
+#include <qstylepainter.h>
+
 #include <qabstractbutton_p.h>
 
 class QRadioButtonPrivate : public QAbstractButtonPrivate

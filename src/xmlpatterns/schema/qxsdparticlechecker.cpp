@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,6 +23,8 @@
 
 #include "qxsdparticlechecker_p.h"
 
+#include <qfile.h>
+
 #include "qxsdelement_p.h"
 #include "qxsdmodelgroup_p.h"
 #include "qxsdschemahelper_p.h"
@@ -30,17 +32,10 @@
 #include "qxsdstatemachinebuilder_p.h"
 #include "qxsdtypechecker_p.h"
 
-#include <QFile>
-
-QT_BEGIN_NAMESPACE
-
 using namespace QPatternist;
 
 namespace QPatternist {
-/**
- * This template specialization is picked up by XsdStateMachine and allows us
- * to print nice edge labels.
- */
+
 template <>
 QString XsdStateMachine<XsdTerm::Ptr>::transitionTypeToString(XsdTerm::Ptr term) const
 {
@@ -57,12 +52,9 @@ QString XsdStateMachine<XsdTerm::Ptr>::transitionTypeToString(XsdTerm::Ptr term)
       return QString();
    }
 }
+
 }
 
-/**
- * This method is used by the isUPAConform method to check whether @p term and @p otherTerm
- * are the same resp. match each other.
- */
 static bool termMatches(const XsdTerm::Ptr &term, const XsdTerm::Ptr &otherTerm, const NamePool::Ptr &namePool)
 {
    if (term->isElement()) {
@@ -132,15 +124,6 @@ static bool termMatches(const XsdTerm::Ptr &term, const XsdTerm::Ptr &otherTerm,
    return false;
 }
 
-/**
- * This method is used by the subsumes algorithm to check whether the @p derivedTerm is validly derived from the @p baseTerm.
- *
- * @param baseTerm The term of the base component (type or group).
- * @param derivedTerm The term of the derived component (type or group).
- * @param particles A hash to map the passed base and derived term to the particles they belong to.
- * @param context The schema context.
- * @param errorMsg The error message in the case that an error occurs.
- */
 static bool derivedTermValid(const XsdTerm::Ptr &baseTerm, const XsdTerm::Ptr &derivedTerm,
                              const QHash<XsdTerm::Ptr, XsdParticle::Ptr> &particles, const XsdSchemaContext::Ptr &context, QString &errorMsg)
 {
@@ -312,10 +295,6 @@ static bool derivedTermValid(const XsdTerm::Ptr &baseTerm, const XsdTerm::Ptr &d
 
 typedef QHash<QXmlName, XsdElement::Ptr> ElementHash;
 
-/**
- * Internal helper method that checks if the given @p particle contains an element with the
- * same name and type twice.
- */
 static bool hasDuplicatedElementsInternal(const XsdParticle::Ptr &particle, const NamePool::Ptr &namePool,
       ElementHash &hash, XsdElement::Ptr &conflictingElement)
 {
@@ -360,13 +339,6 @@ bool XsdParticleChecker::hasDuplicatedElements(const XsdParticle::Ptr &particle,
 
 bool XsdParticleChecker::isUPAConform(const XsdParticle::Ptr &particle, const NamePool::Ptr &namePool)
 {
-
-   /**
-    * In case we encounter an <xsd:all> element, don't construct a state machine, but use the approach
-    * described at http://www.w3.org/TR/xmlschema-1/#non-ambig
-    * Reason: For n elements inside the <xsd:all>, represented in the NDA, the state machine
-    * constructs n! states in the DFA, which does not scale.
-    */
    if (particle->term()->isModelGroup()) {
       const XsdModelGroup::Ptr group(particle->term());
       if (group->compositor() == XsdModelGroup::AllCompositor) {
@@ -374,11 +346,9 @@ bool XsdParticleChecker::isUPAConform(const XsdParticle::Ptr &particle, const Na
       }
    }
 
-   /**
-    * The algorithm is implemented like described in http://www.ltg.ed.ac.uk/~ht/XML_Europe_2003.html#S2.2
-    */
-
+   // The algorithm is implemented like described in http://www.ltg.ed.ac.uk/~ht/XML_Europe_2003.html#S2.2
    // create a state machine for the given particle
+
    XsdStateMachine<XsdTerm::Ptr> stateMachine(namePool);
 
    XsdStateMachineBuilder builder(&stateMachine, namePool);
@@ -396,7 +366,9 @@ bool XsdParticleChecker::isUPAConform(const XsdParticle::Ptr &particle, const Na
        }
        ::system(QString("dot -Tpng /tmp/file_upa%1.dot -o/tmp/file_upa%1.png").formatArg(counter).toLatin1().data());
    */
+
    const XsdStateMachine<XsdTerm::Ptr> dfa = stateMachine.toDFA();
+
    /*
        {
            QFile file(QString("/tmp/file_upa%1dfa.dot").formatArg(counter));
@@ -406,6 +378,7 @@ bool XsdParticleChecker::isUPAConform(const XsdParticle::Ptr &particle, const Na
        }
        ::system(QString("dot -Tpng /tmp/file_upa%1dfa.dot -o/tmp/file_upa%1dfa.png").formatArg(counter).toLatin1().data());
    */
+
    const QHash<XsdStateMachine<XsdTerm::Ptr>::StateId, XsdStateMachine<XsdTerm::Ptr>::StateType> states = dfa.states();
    const QHash<XsdStateMachine<XsdTerm::Ptr>::StateId, QHash<XsdTerm::Ptr, QVector<XsdStateMachine<XsdTerm::Ptr>::StateId> > >
    transitions = dfa.transitions();
@@ -450,12 +423,10 @@ bool XsdParticleChecker::isUPAConform(const XsdParticle::Ptr &particle, const Na
 
 bool XsdParticleChecker::isUPAConformXsdAll(const XsdParticle::Ptr &particle, const NamePool::Ptr &namePool)
 {
-   /**
-    * see http://www.w3.org/TR/xmlschema-1/#non-ambig
-    */
    const XsdModelGroup::Ptr group(particle->term());
    const XsdParticle::List particles = group->particles();
    const int count = particles.count();
+
    for (int left = 0; left < count; ++left) {
       for (int right = left + 1; right < count; ++right) {
          if (termMatches(particles.at(left)->term(), particles.at(right)->term(), namePool)) {
@@ -469,9 +440,7 @@ bool XsdParticleChecker::isUPAConformXsdAll(const XsdParticle::Ptr &particle, co
 bool XsdParticleChecker::subsumes(const XsdParticle::Ptr &particle, const XsdParticle::Ptr &derivedParticle,
                                   const XsdSchemaContext::Ptr &context, QString &errorMsg)
 {
-   /**
-    * The algorithm is implemented like described in http://www.ltg.ed.ac.uk/~ht/XML_Europe_2003.html#S2.3
-    */
+    // The algorithm is implemented like described in http://www.ltg.ed.ac.uk/~ht/XML_Europe_2003.html#S2.3
 
    const NamePool::Ptr namePool(context->namePool());
 
@@ -541,7 +510,8 @@ bool XsdParticleChecker::subsumes(const XsdParticle::Ptr &particle, const XsdPar
    processedSet.append(qMakePair<XsdStateMachine<XsdTerm::Ptr>::StateId, XsdStateMachine<XsdTerm::Ptr>::StateId>
                        (baseStartState, derivedStartState));
 
-   while (!workSet.isEmpty()) { // while there are state sets to process
+   while (!workSet.isEmpty()) {
+      // while there are state sets to process
 
       // 3) dequeue on state set
       const QPair<XsdStateMachine<XsdTerm::Ptr>::StateId, XsdStateMachine<XsdTerm::Ptr>::StateId> set = workSet.takeFirst();
@@ -599,5 +569,3 @@ bool XsdParticleChecker::subsumes(const XsdParticle::Ptr &particle, const XsdPar
 
    return true;
 }
-
-QT_END_NAMESPACE

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,11 +24,11 @@
 #ifndef QNETWORK_ACCESS_CACHE_P_H
 #define QNETWORK_ACCESS_CACHE_P_H
 
-#include <qobject.h>
 #include <qbasictimer.h>
 #include <qbytearray.h>
 #include <qdatetime.h>
 #include <qhash.h>
+#include <qobject.h>
 #include <qqueue.h>
 
 class QNetworkRequest;
@@ -51,7 +51,7 @@ class QNetworkAccessCache : public QObject
 
        virtual void dispose() = 0;
 
-       inline QByteArray cacheKey() const {
+       QByteArray cacheKey() const {
           return key;
        }
 

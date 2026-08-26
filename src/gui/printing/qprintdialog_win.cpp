@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,13 +23,13 @@
 
 #ifndef QT_NO_PRINTDIALOG
 
-#include <qprintdialog.h>
-#include <qwidget.h>
 #include <qapplication.h>
 #include <qmessagebox.h>
+#include <qprintdialog.h>
+#include <qwidget.h>
 
-#include <qapplication_p.h>
 #include <qabstractprintdialog_p.h>
+#include <qapplication_p.h>
 #include <qprintengine_win_p.h>
 #include <qprinter_p.h>
 
@@ -147,7 +147,9 @@ static void qt_win_read_back_PRINTDLGEX(PRINTDLGEX *pd, QPrintDialog *pdlg, QPri
       pdlg->setPrintRange(QPrintDialog::CurrentPage);
       pdlg->setFromTo(0, 0);
 
-   } else { // PD_ALLPAGES
+   } else {
+      // PD_ALLPAGES
+
       pdlg->setPrintRange(QPrintDialog::AllPages);
       pdlg->setFromTo(0, 0);
    }
@@ -160,7 +162,7 @@ static void qt_win_read_back_PRINTDLGEX(PRINTDLGEX *pd, QPrintDialog *pdlg, QPri
    if (d->ep->printToFile && d->ep->fileName.isEmpty()) {
       d->ep->fileName = "FILE:";
 
-   } else if (!d->ep->printToFile && d->ep->fileName == QLatin1String("FILE:")) {
+   } else if (! d->ep->printToFile && d->ep->fileName == "FILE:") {
       d->ep->fileName.clear();
    }
 }
@@ -168,7 +170,7 @@ static void qt_win_read_back_PRINTDLGEX(PRINTDLGEX *pd, QPrintDialog *pdlg, QPri
 static bool warnIfNotNative(QPrinter *printer)
 {
    if (printer->outputFormat() != QPrinter::NativeFormat) {
-      qWarning("QPrintDialog: Unable to open a Windows Print Dialog, native format was not configured");
+      qWarning("QPrintDialog::warnIfNotNative() Unable to open a Windows Print Dialog, native format was not configured");
       return false;
    }
 

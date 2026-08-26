@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,11 +24,11 @@
 #ifndef QNETWORK_DISKCACHE_P_H
 #define QNETWORK_DISKCACHE_P_H
 
-#include <qabstract_networkcache_p.h>
-
 #include <qbuffer.h>
 #include <qhash.h>
 #include <qtemporaryfile.h>
+
+#include <qabstract_networkcache_p.h>
 
 #ifndef QT_NO_NETWORKDISKCACHE
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,17 +24,17 @@
 #ifndef QCAMERAFOCUS_H
 #define QCAMERAFOCUS_H
 
-#include <qstringlist.h>
+#include <qmediaobject.h>
 #include <qpair.h>
-#include <qsize.h>
 #include <qpoint.h>
 #include <qrect.h>
 #include <qshareddata.h>
-#include <qmediaobject.h>
+#include <qsize.h>
+#include <qstringlist.h>
 
 class QCamera;
-class QCameraFocusZoneData;
 class QCameraFocusPrivate;
+class QCameraFocusZoneData;
 
 class Q_MULTIMEDIA_EXPORT QCameraFocusZone
 {

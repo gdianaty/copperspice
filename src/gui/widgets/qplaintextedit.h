@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,24 +24,24 @@
 #ifndef QPLAINTEXTEDIT_H
 #define QPLAINTEXTEDIT_H
 
-#include <qtextedit.h>
-
 #include <qabstractscrollarea.h>
 #include <qabstracttextdocumentlayout.h>
-#include <qtextdocument.h>
-#include <qtextoption.h>
 #include <qtextcursor.h>
+#include <qtextdocument.h>
+#include <qtextedit.h>
 #include <qtextformat.h>
+#include <qtextoption.h>
 
 #ifndef QT_NO_TEXTEDIT
 
-class QStyleSheet;
-class QTextDocument;
 class QMenu;
-class QPlainTextEditPrivate;
 class QMimeData;
 class QPagedPaintDevice;
+class QStyleSheet;
+class QTextDocument;
+
 class QPlainTextDocumentLayoutPrivate;
+class QPlainTextEditPrivate;
 
 class Q_GUI_EXPORT QPlainTextEdit : public QAbstractScrollArea
 {

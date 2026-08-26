@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -118,8 +118,8 @@ TEST_CASE("QSettings allkeys", "[qsettings]")
 
       QStringList keys = settings1.allKeys();
 
-      REQUIRE(keys.contains("room_size"));
-      REQUIRE(keys.contains("sofa"));
+      REQUIRE(keys.contains("room_size") == true);
+      REQUIRE(keys.contains("sofa") == true);
 
       REQUIRE(keys.contains("catchTest") == false);
 
@@ -134,7 +134,7 @@ TEST_CASE("QSettings allkeys", "[qsettings]")
    settings1.remove("food");
 }
 
-TEST_CASE("QSettings filename", "[qsettings]")
+TEST_CASE("QSettings fileName", "[qsettings]")
 {
    QCoreApplication::setOrganizationName("CopperSpice");
    QCoreApplication::setApplicationName("CsCoreTest");

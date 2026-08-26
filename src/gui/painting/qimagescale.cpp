@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -30,9 +30,10 @@
 */
 
 #include <qimagescale_p.h>
+
+#include <qcolor.h>
 #include <qdrawhelper_p.h>
 #include <qimage.h>
-#include <qcolor.h>
 
 namespace QImageScale {
 
@@ -676,7 +677,7 @@ QImage qSmoothScaleImage(const QImage &src, int dw, int dh)
 
    buffer = QImage(dw, dh, src.format());
    if (buffer.isNull()) {
-      qWarning("QImage: out of memory, returning null");
+      qWarning("QImage::qSmoothScaleImage() Out of memory");
       qimageFreeScaleInfo(scaleinfo);
       return QImage();
    }

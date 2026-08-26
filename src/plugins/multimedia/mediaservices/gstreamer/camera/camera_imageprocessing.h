@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -32,12 +32,6 @@
 
 #ifdef HAVE_GST_PHOTOGRAPHY
 # include <gst/interfaces/photography.h>
-
-# if !GST_CHECK_VERSION(1,0,0)
-typedef GstWhiteBalanceMode GstPhotographyWhiteBalanceMode;
-typedef GstColourToneMode GstPhotographyColorToneMode;
-# endif
-
 #endif
 
 #ifdef USE_V4L

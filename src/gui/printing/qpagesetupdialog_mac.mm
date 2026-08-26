@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -34,7 +34,7 @@
 
 @class QCocoaPageLayoutDelegate;
 
-@interface QT_MANGLE_NAMESPACE(QCocoaPageLayoutDelegate) : NSObject
+@interface QCocoaPageLayoutDelegate : NSObject
 {
     NSPrintInfo *printInfo;
 }
@@ -43,7 +43,7 @@
               returnCode: (int)returnCode contextInfo: (void *)contextInfo;
 @end
 
-@implementation QT_MANGLE_NAMESPACE(QCocoaPageLayoutDelegate)
+@implementation QCocoaPageLayoutDelegate
 - (id)initWithNSPrintInfo:(NSPrintInfo *)nsPrintInfo
 {
    self = [super init];

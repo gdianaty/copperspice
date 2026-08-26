@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,14 @@
 #ifndef QAUDIODEVICEFACTORY_P_H
 #define QAUDIODEVICEFACTORY_P_H
 
+#include <qaudiodeviceinfo.h>
 #include <qglobal.h>
 #include <qlist.h>
 #include <qmultimedia.h>
-#include <qaudiodeviceinfo.h>
 
+class QAbstractAudioDeviceInfo;
 class QAbstractAudioInput;
 class QAbstractAudioOutput;
-class QAbstractAudioDeviceInfo;
 
 class QAudioDeviceFactory
 {

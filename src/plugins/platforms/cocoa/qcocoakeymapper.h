@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,16 +25,14 @@
 #define QCOCOAKEYMAPPER_H
 
 #include <qcocoahelpers.h>
+#include <qkeyevent.h>
+#include <qlist.h>
 
 #include <Cocoa/Cocoa.h>
 #include <Carbon/Carbon.h>
 
-#include <QList>
-#include <QKeyEvent>
-
 /*
-    \internal
-    A Mac KeyboardLayoutItem has 8 possible states:
+    A Mac KeyboardLayoutItem has 8 possible states
         1. Unmodified
         2. Shift
         3. Control
@@ -54,7 +52,7 @@
 */
 struct KeyboardLayoutItem {
    bool dirty;
-   quint32 qtKey[16]; // Can by any Qt::Key_<foo>, or unicode character
+   quint32 qtKey[16];             // can by any Qt::Key_<foo>, or unicode character
 };
 
 

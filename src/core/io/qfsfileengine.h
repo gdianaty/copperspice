@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -37,6 +37,7 @@ class Q_CORE_EXPORT QFSFileEngine : public QAbstractFileEngine
  public:
    QFSFileEngine();
    explicit QFSFileEngine(const QString &file);
+
    ~QFSFileEngine();
 
    bool open(QIODevice::OpenMode openMode) override;
@@ -67,13 +68,16 @@ class Q_CORE_EXPORT QFSFileEngine : public QAbstractFileEngine
    QString fileName(FileName file) const override;
    uint ownerId(FileOwner own) const override;
    QString owner(FileOwner own) const override;
-   QDateTime fileTime(FileTime time) const override;
+
+   QDateTime fileTime(QFileDevice::FileTimeType type) const override;
+   bool setFileTime(const QDateTime &newTime, QFileDevice::FileTimeType type) override;
+
    void setFileName(const QString &file) override;
    int handle() const override;
 
 #ifndef QT_NO_FILESYSTEMITERATOR
-   Iterator *beginEntryList(QDir::Filters filters, const QStringList &filterNames) override;
-   Iterator *endEntryList() override;
+   QAbstractFileEngineIterator *beginEntryList(QDir::Filters filters, const QStringList &filterNames) override;
+   QAbstractFileEngineIterator *endEntryList() override;
 #endif
 
    qint64 read(char *data, qint64 maxlen) override;

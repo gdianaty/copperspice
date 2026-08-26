@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,15 +24,16 @@
 #ifndef QTEXTHTMLPARSER_P_H
 #define QTEXTHTMLPARSER_P_H
 
-#include <qvector.h>
 #include <qbrush.h>
 #include <qcolor.h>
 #include <qfont.h>
-#include <qtextdocument.h>
 #include <qtextcursor.h>
-#include <qtextformat_p.h>
-#include <qtextdocument_p.h>
+#include <qtextdocument.h>
+#include <qvector.h>
+
 #include <qcssparser_p.h>
+#include <qtextdocument_p.h>
+#include <qtextformat_p.h>
 
 #ifndef QT_NO_TEXTHTMLPARSER
 
@@ -134,7 +135,9 @@ struct QTextHtmlParserNode {
    QString tag;
    QString text;
    QStringList attributes;
-   int parent;
+
+   int m_parserNodeParent;
+
    QVector<int> children;
    QTextHTMLElements id;
    QTextCharFormat charFormat;
@@ -168,21 +171,23 @@ struct QTextHtmlParserNode {
 
    WhiteSpaceMode wsm;
 
-   inline bool isListStart() const {
+   bool isListStart() const {
       return id == Html_ol || id == Html_ul;
    }
-   inline bool isTableCell() const {
+
+   bool isTableCell() const {
       return id == Html_td || id == Html_th;
    }
-   inline bool isBlock() const {
+
+   bool isBlock() const {
       return displayMode == QTextHtmlElement::DisplayBlock;
    }
 
-   inline bool isNotSelfNesting() const {
+   bool isNotSelfNesting() const {
       return id == Html_p || id == Html_li;
    }
 
-   inline bool allowedInContext(int parentId) const {
+   bool allowedInContext(int parentId) const {
       switch (id) {
          case Html_dd:
          case Html_dt:
@@ -210,13 +215,13 @@ struct QTextHtmlParserNode {
       return true;
    }
 
-   inline bool mayNotHaveChildren() const {
+   bool mayNotHaveChildren() const {
       return id == Html_img || id == Html_hr || id == Html_br || id == Html_meta;
    }
 
    void initializeProperties(const QTextHtmlParserNode *parent, const QTextHtmlParser *parser);
 
-   inline int uncollapsedMargin(int mar) const {
+   int uncollapsedMargin(int mar) const {
       return margin[mar];
    }
 
@@ -250,75 +255,88 @@ class QTextHtmlParser
       MarginLeft
    };
 
-   inline const QTextHtmlParserNode &at(int i) const {
+   const QTextHtmlParserNode &at(int i) const {
       return nodes.at(i);
    }
-   inline QTextHtmlParserNode &operator[](int i) {
+
+   QTextHtmlParserNode &operator[](int i) {
       return nodes[i];
    }
-   inline int count() const {
+
+   int count() const {
       return nodes.count();
    }
-   inline int last() const {
+
+   int last() const {
       return nodes.count() - 1;
    }
 
    int depth(int i) const;
    int topMargin(int i) const;
    int bottomMargin(int i) const;
-   inline int leftMargin(int i) const {
+
+   int leftMargin(int i) const {
       return margin(i, MarginLeft);
    }
-   inline int rightMargin(int i) const {
+
+   int rightMargin(int i) const {
       return margin(i, MarginRight);
    }
 
-   inline int topPadding(int i) const {
+   int topPadding(int i) const {
       return at(i).padding[MarginTop];
    }
-   inline int bottomPadding(int i) const {
+
+   int bottomPadding(int i) const {
       return at(i).padding[MarginBottom];
    }
-   inline int leftPadding(int i) const {
+
+   int leftPadding(int i) const {
       return at(i).padding[MarginLeft];
    }
-   inline int rightPadding(int i) const {
+
+   int rightPadding(int i) const {
       return at(i).padding[MarginRight];
    }
-
-   void dumpHtml();
 
    void parse(const QString &text, const QTextDocument *resourceProvider);
 
    static int lookupElement(const QString &element);
 
  protected:
-   QTextHtmlParserNode *newNode(int parent);
-   QVector<QTextHtmlParserNode> nodes;
-   QString txt;
-   int pos, len;
-
-   bool textEditMode;
-
    void parse();
    void parseTag();
    void parseCloseTag();
    void parseExclamationTag();
+
    QString parseEntity();
    QString parseWord();
+
    QTextHtmlParserNode *resolveParent();
    void resolveNode();
+
    QStringList parseAttributes();
    void applyAttributes(const QStringList &attributes);
    void eatSpace();
 
-   inline bool hasPrefix(QChar c, int lookahead = 0) const {
+   bool hasPrefix(QChar c, int lookahead = 0) const {
       return pos + lookahead < len && txt.at(pos) == c;
    }
    int margin(int i, int mar) const;
 
    bool nodeIsChildOf(int i, QTextHTMLElements id) const;
 
+   QTextHtmlParserNode *newNode(int parent);
+   QVector<QTextHtmlParserNode> nodes;
+
+   QString txt;
+
+   int pos;
+   int len;
+
+   bool m_textEditMode;
+
+   const QTextDocument *m_resourceProvider;
 
 #ifndef QT_NO_CSSPARSER
    QVector<QCss::Declaration> declarationsForNode(int node) const;
@@ -326,19 +344,22 @@ class QTextHtmlParser
    void importStyleSheet(const QString &href);
 
    struct ExternalStyleSheet {
-      inline ExternalStyleSheet() {}
-      inline ExternalStyleSheet(const QString &_url, const QCss::StyleSheet &_sheet)
-         : url(_url), sheet(_sheet) {}
+      ExternalStyleSheet()
+      { }
+
+      ExternalStyleSheet(const QString &_url, const QCss::StyleSheet &_sheet)
+         : url(_url), sheet(_sheet)
+      { }
+
       QString url;
       QCss::StyleSheet sheet;
    };
+
    QVector<ExternalStyleSheet> externalStyleSheets;
    QVector<QCss::StyleSheet> inlineStyleSheets;
 #endif
 
-   const QTextDocument *resourceProvider;
 };
-
 
 #endif // QT_NO_TEXTHTMLPARSER
 

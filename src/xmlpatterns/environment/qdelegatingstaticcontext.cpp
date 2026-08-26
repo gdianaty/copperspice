@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,8 +29,6 @@
 #include "qgenericdynamiccontext_p.h"
 
 #include "qstaticfocuscontext_p.h"
-
-QT_BEGIN_NAMESPACE
 
 using namespace QPatternist;
 
@@ -239,5 +237,3 @@ void DelegatingStaticContext::setCompatModeEnabled(const bool newVal)
 {
    m_context->setCompatModeEnabled(newVal);
 }
-
-QT_END_NAMESPACE

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,15 @@
 #include <qnetwork_cookie.h>
 #include <qnetwork_cookie_p.h>
 
-#include <qnetwork_request.h>
-#include <qnetwork_reply.h>
 #include <qbytearray.h>
 #include <qdebug.h>
 #include <qlist.h>
 #include <qlocale.h>
+#include <qnetwork_reply.h>
+#include <qnetwork_request.h>
 #include <qstring.h>
 #include <qstringlist.h>
+#include <qtimezone.h>
 #include <qurl.h>
 
 #include <stdlib.h>
@@ -216,13 +217,12 @@ QByteArray QNetworkCookie::toRawForm(RawForm form) const
 
       if (!isSessionCookie()) {
          result += "; expires=";
-         result += QLocale::c().toString(d->expirationDate.toUTC(),
-                                         QLatin1String("ddd, dd-MMM-yyyy hh:mm:ss 'GMT")).toLatin1();
+         result += QLocale::c().toString(d->expirationDate.toUTC(), QString("ddd, dd-MMM-yyyy hh:mm:ss 'GMT")).toLatin1();
       }
       if (!d->domain.isEmpty()) {
          result += "; domain=";
 
-         if (d->domain.startsWith(QLatin1Char('.'))) {
+         if (d->domain.startsWith('.')) {
             result += '.';
             result += QUrl::toAce(d->domain.mid(1));
          } else {
@@ -324,8 +324,6 @@ static bool checkStaticArray(int &val, const QString &dateString, int at, const 
    return false;
 }
 
-//#define PARSEDATESTRINGDEBUG
-
 #define ADAY   1
 #define AMONTH 2
 #define AYEAR  4
@@ -361,32 +359,34 @@ static QDateTime parseDateString(const QString &dateString)
    int zoneOffset = -1;
 
    // hour:minute:second.ms pm
-   QRegularExpression timeRegEx(QLatin1String("(\\d{1,2}):(\\d{1,2})(:(\\d{1,2})|)(\\.(\\d{1,3})|)((\\s{0,}(am|pm))|)"));
+   QRegularExpression timeRegEx("(\\d{1,2}):(\\d{1,2})(:(\\d{1,2})|)(\\.(\\d{1,3})|)((\\s{0,}(am|pm))|)");
 
    int at = 0;
    while (at < dateString.length()) {
 
-#ifdef PARSEDATESTRINGDEBUG
+#if defined(CS_SHOW_DEBUG_NETWORK)
       qDebug() << dateString.mid(at);
 #endif
+
       bool isNum = isNumber(dateString[at]);
 
       // Month
       if (! isNum && checkStaticArray(month, dateString, at, months, sizeof(months) - 1)) {
          ++month;
 
-#ifdef PARSEDATESTRINGDEBUG
+#if defined(CS_SHOW_DEBUG_NETWORK)
          qDebug() << "Month:" << month;
 #endif
          at += 3;
          continue;
       }
+
       // Zone
       if (! isNum && zoneOffset == -1 && checkStaticArray(zoneOffset, dateString, at, zones, sizeof(zones) - 1)) {
          int sign = (at >= 0 && dateString[at - 1] == '-') ? -1 : 1;
          zoneOffset = sign * zoneOffsets[zoneOffset] * 60 * 60;
 
-#ifdef PARSEDATESTRINGDEBUG
+#if defined(CS_SHOW_DEBUG_NETWORK)
          qDebug() << "Zone:" << month;
 #endif
          at += 3;
@@ -433,7 +433,7 @@ static QDateTime parseDateString(const QString &dateString)
             int sign = dateString[at] == '-' ? -1 : 1;
             zoneOffset = sign * ((minutes * 60) + (hours * 60 * 60));
 
-#ifdef PARSEDATESTRINGDEBUG
+#if defined(CS_SHOW_DEBUG_NETWORK)
             qDebug() << "Zone offset:" << zoneOffset << hours << minutes;
 #endif
             at += end;
@@ -465,7 +465,7 @@ static QDateTime parseDateString(const QString &dateString)
 
             time = QTime(h, m, s, ms);
 
-#ifdef PARSEDATESTRINGDEBUG
+#if defined(CS_SHOW_DEBUG_NETWORK)
             qDebug() << "Time:" << list << match.capturedLength(0);
 #endif
 
@@ -481,7 +481,7 @@ static QDateTime parseDateString(const QString &dateString)
             year = atoi(dateString.mid(at, 4).constData());
             at += 4;
 
-#ifdef PARSEDATESTRINGDEBUG
+#if defined(CS_SHOW_DEBUG_NETWORK)
             qDebug() << "Year:" << year;
 #endif
             continue;
@@ -513,7 +513,7 @@ static QDateTime parseDateString(const QString &dateString)
          }
          at += length;
 
-#ifdef PARSEDATESTRINGDEBUG
+#if defined(CS_SHOW_DEBUG_NETWORK)
          qDebug() << "Saving" << x;
 #endif
          continue;
@@ -656,14 +656,15 @@ static QDateTime parseDateString(const QString &dateString)
          year = unknown[i];
       }
    }
-#ifdef PARSEDATESTRINGDEBUG
+#if defined(CS_SHOW_DEBUG_NETWORK)
    qDebug() << "Final set" << year << month << day;
 #endif
 
    if (year == -1 || month == -1 || day == -1) {
-#ifdef PARSEDATESTRINGDEBUG
+#if defined(CS_SHOW_DEBUG_NETWORK)
       qDebug() << "Parser failure" << year << month << day;
 #endif
+
       return QDateTime();
    }
 
@@ -686,7 +687,7 @@ static QDateTime parseDateString(const QString &dateString)
       date = QDate(day + y2k, month, year);
    }
 
-   QDateTime dateTime(date, time, Qt::UTC);
+   QDateTime dateTime(date, time, QTimeZone::utc());
 
    if (zoneOffset != -1) {
       dateTime = dateTime.addSecs(zoneOffset);
@@ -697,17 +698,6 @@ static QDateTime parseDateString(const QString &dateString)
    return dateTime;
 }
 
-/*!
-    Parses the cookie string \a cookieString as received from a server
-    response in the "Set-Cookie:" header. If there's a parsing error,
-    this function returns an empty list.
-
-    Since the HTTP header can set more than one cookie at the same
-    time, this function returns a QList<QNetworkCookie>, one for each
-    cookie that is parsed.
-
-    \sa toRawForm()
-*/
 QList<QNetworkCookie> QNetworkCookie::parseCookies(const QByteArray &cookieString)
 {
    // cookieString can be a number of set-cookie header strings joined together
@@ -780,18 +770,20 @@ QList<QNetworkCookie> QNetworkCookiePrivate::parseSetCookieHeaderLine(const QByt
                   QByteArray rawDomain = field.second;
                   if (!rawDomain.isEmpty()) {
                      QString maybeLeadingDot;
+
                      if (rawDomain.startsWith('.')) {
-                        maybeLeadingDot = QLatin1Char('.');
+                        maybeLeadingDot = QChar('.');
                         rawDomain = rawDomain.mid(1);
                      }
+
                      QString normalizedDomain = QUrl::fromAce(QUrl::toAce(QString::fromUtf8(rawDomain)));
+
                      if (!normalizedDomain.isEmpty()) {
                         cookie.setDomain(maybeLeadingDot + normalizedDomain);
                      } else {
                         return result;
                      }
                   }
-
 
                } else if (field.first == "max-age") {
                   bool ok = false;
@@ -839,10 +831,12 @@ void QNetworkCookie::normalize(const QUrl &url)
 {
    if (d->path.isEmpty()) {
       QString pathAndFileName = url.path();
-      QString defaultPath = pathAndFileName.left(pathAndFileName.lastIndexOf(QLatin1Char('/')) + 1);
+      QString defaultPath = pathAndFileName.left(pathAndFileName.lastIndexOf(QChar('/')) + 1);
+
       if (defaultPath.isEmpty()) {
-         defaultPath = QLatin1Char('/');
+         defaultPath = QChar('/');
       }
+
       d->path = defaultPath;
    }
 
@@ -850,10 +844,11 @@ void QNetworkCookie::normalize(const QUrl &url)
       d->domain = url.host();
    } else {
       QHostAddress hostAddress(d->domain);
+
       if (hostAddress.protocol() != QAbstractSocket::IPv4Protocol
             && hostAddress.protocol() != QAbstractSocket::IPv6Protocol
-            && !d->domain.startsWith(QLatin1Char('.'))) {
-         d->domain.prepend(QLatin1Char('.'));
+            && ! d->domain.startsWith(QChar('.'))) {
+         d->domain.prepend(QChar('.'));
       }
    }
 }

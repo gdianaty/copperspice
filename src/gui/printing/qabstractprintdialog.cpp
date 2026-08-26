@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,6 +22,7 @@
 ***********************************************************************/
 
 #include <qabstractprintdialog_p.h>
+
 #include <qcoreapplication.h>
 #include <qprintdialog.h>
 #include <qprinter.h>
@@ -42,9 +43,10 @@ QAbstractPrintDialog::QAbstractPrintDialog(QPrinter *printer, QWidget *parent)
    setWindowTitle(QCoreApplication::translate("QPrintDialog", "Print"));
 
    d->setPrinter(printer);
-   d->minPage = printer->fromPage();
+   d->m_minPage = printer->fromPage();
+
    int to = printer->toPage();
-   d->maxPage = to > 0 ? to : INT_MAX;
+   d->m_maxPage = to > 0 ? to : INT_MAX;
 }
 
 QAbstractPrintDialog::QAbstractPrintDialog(QAbstractPrintDialogPrivate &ptr, QPrinter *printer, QWidget *parent)
@@ -128,7 +130,7 @@ void QAbstractPrintDialog::setPrintRange(PrintRange range)
 QAbstractPrintDialog::PrintRange QAbstractPrintDialog::printRange() const
 {
    Q_D(const QAbstractPrintDialog);
-   return QAbstractPrintDialog::PrintRange(d->pd->printRange);
+   return QAbstractPrintDialog::PrintRange(d->m_printDialog->printRange);
 }
 
 void QAbstractPrintDialog::setMinMax(int min, int max)
@@ -137,21 +139,21 @@ void QAbstractPrintDialog::setMinMax(int min, int max)
    Q_ASSERT_X(min <= max, "QAbstractPrintDialog::setMinMax",
       "'min' must be less than or equal to 'max'");
 
-   d->minPage = min;
-   d->maxPage = max;
+   d->m_minPage = min;
+   d->m_maxPage = max;
    d->options |= PrintPageRange;
 }
 
 int QAbstractPrintDialog::minPage() const
 {
    Q_D(const QAbstractPrintDialog);
-   return d->minPage;
+   return d->m_minPage;
 }
 
 int QAbstractPrintDialog::maxPage() const
 {
    Q_D(const QAbstractPrintDialog);
-   return d->maxPage;
+   return d->m_maxPage;
 }
 
 void QAbstractPrintDialog::setFromTo(int from, int to)
@@ -162,15 +164,11 @@ void QAbstractPrintDialog::setFromTo(int from, int to)
 
    d->printer->setFromTo(from, to);
 
-   if (d->minPage == 0 && d->maxPage == 0) {
+   if (d->m_minPage == 0 && d->m_maxPage == 0) {
       setMinMax(1, to);
    }
 }
 
-/*!
-    Returns the first page to be printed
-    By default, this value is set to 0.
-*/
 int QAbstractPrintDialog::fromPage() const
 {
    Q_D(const QAbstractPrintDialog);
@@ -194,14 +192,17 @@ void QAbstractPrintDialogPrivate::setPrinter(QPrinter *newPrinter)
    if (newPrinter) {
       printer = newPrinter;
       ownsPrinter = false;
+
       if (printer->fromPage() || printer->toPage()) {
          options |= QAbstractPrintDialog::PrintPageRange;
       }
+
    } else {
       printer = new QPrinter;
       ownsPrinter = true;
    }
-   pd = printer->d_func();
+
+   m_printDialog = printer->d_func();
 }
 
 void QAbstractPrintDialog::setOptionTabs(const QList<QWidget *> &tabs)

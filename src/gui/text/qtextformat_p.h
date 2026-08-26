@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,6 +25,7 @@
 #define QTEXTFORMAT_P_H
 
 #include <qtextformat.h>
+
 #include <qmultihash.h>
 #include <qvector.h>
 
@@ -85,7 +86,7 @@ class Q_GUI_EXPORT QTextFormatCollection
    QVector<qint32> objFormats;
    QMultiHash<uint, int> hashes;
 
-   inline QFont defaultFont() const {
+   QFont defaultFont() const {
       return defaultFnt;
    }
    void setDefaultFont(const QFont &f);

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,6 +24,8 @@
 #ifndef QABSTRACTTEXTDOCUMENTLAYOUT_P_H
 #define QABSTRACTTEXTDOCUMENTLAYOUT_P_H
 
+#include <qabstracttextdocumentlayout.h>
+
 #include <qhash.h>
 
 struct QTextObjectHandler {
@@ -42,14 +44,14 @@ class QAbstractTextDocumentLayoutPrivate
  public:
    Q_DECLARE_PUBLIC(QAbstractTextDocumentLayout)
 
-   inline QAbstractTextDocumentLayoutPrivate()
+   QAbstractTextDocumentLayoutPrivate()
       : paintDevice(nullptr)
    {
    }
 
    virtual ~QAbstractTextDocumentLayoutPrivate();
 
-   inline void setDocument(QTextDocument *doc) {
+   void setDocument(QTextDocument *doc) {
       document   = doc;
       docPrivate = nullptr;
 
@@ -58,11 +60,11 @@ class QAbstractTextDocumentLayoutPrivate
       }
    }
 
-   inline int _q_dynamicPageCountSlot() const {
+   int _q_dynamicPageCountSlot() const {
       return q_func()->pageCount();
    }
 
-   inline QSizeF _q_dynamicDocumentSizeSlot() const {
+   QSizeF _q_dynamicDocumentSizeSlot() const {
       return q_func()->documentSize();
    }
 
@@ -76,7 +78,6 @@ class QAbstractTextDocumentLayoutPrivate
 
  protected:
    QAbstractTextDocumentLayout *q_ptr;
-
 };
 
 #endif // QABSTRACTTEXTDOCUMENTLAYOUT_P_H

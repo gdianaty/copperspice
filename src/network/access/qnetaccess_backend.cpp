@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,17 +24,17 @@
 #include <qnetaccess_backend_p.h>
 
 #include <qabstract_networkcache.h>
-#include <qnetworkconfigmanager.h>
-#include <qnetwork_request.h>
-#include <qnetwork_reply.h>
 #include <qhash.h>
 #include <qhostinfo.h>
 #include <qmutex.h>
+#include <qnetwork_reply.h>
+#include <qnetwork_request.h>
+#include <qnetworkconfigmanager.h>
 
+#include <qnetaccess_cachebackend_p.h>
 #include <qnetaccess_manager_p.h>
 #include <qnetwork_reply_p.h>
 #include <qnetworksession_p.h>
-#include <qnetaccess_cachebackend_p.h>
 #include <qnoncontiguousbytedevice_p.h>
 
 class QNetworkAccessBackendFactoryData: public QList<QNetworkAccessBackendFactory *>
@@ -120,6 +120,7 @@ QStringList QNetworkAccessManagerPrivate::backendSupportedSchemes() const
 
    return QStringList();
 }
+
 QNonContiguousByteDevice *QNetworkAccessBackend::createUploadByteDevice()
 {
    if (reply->outgoingDataBuffer) {
@@ -134,7 +135,8 @@ QNonContiguousByteDevice *QNetworkAccessBackend::createUploadByteDevice()
 
    // We want signal emissions only for normal asynchronous uploads
    if (!isSynchronous()) {
-      connect(uploadByteDevice.data(), SIGNAL(readProgress(qint64, qint64)), this, SLOT(emitReplyUploadProgress(qint64, qint64)));
+      connect(uploadByteDevice.data(), &QNonContiguousByteDevice::readProgress,
+         this, &QNetworkAccessBackend::emitReplyUploadProgress);
    }
 
    return uploadByteDevice.data();
@@ -378,7 +380,7 @@ bool QNetworkAccessBackend::start()
          // This is not ideal.
          const QString host = reply->url.host();
 
-         if (host == QLatin1String("localhost") || QHostAddress(host).isLoopback() || reply->url.isLocalFile()) {
+         if (host == "localhost" || QHostAddress(host).isLoopback() || reply->url.isLocalFile()) {
             // Don't need an open session for localhost access.
 
          } else {
@@ -400,7 +402,7 @@ bool QNetworkAccessBackend::start()
    if (session) {
       QNetworkConfigurationManager configManager;
       // The active configuration tells us what IAP is in use
-      QVariant v = session->sessionProperty(QLatin1String("ActiveConfiguration"));
+      QVariant v = session->sessionProperty("ActiveConfiguration");
       if (v.isValid()) {
          config = configManager.configurationFromIdentifier(v.value<QString>());
       }

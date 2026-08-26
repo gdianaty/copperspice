@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,21 +22,22 @@
 ***********************************************************************/
 
 #include <qdrawutil.h>
-#include <qbitmap.h>
-#include <qpixmapcache.h>
 
+#include <qbitmap.h>
+#include <qmath.h>
 #include <qpainter.h>
 #include <qpalette.h>
-#include <qpaintengineex_p.h>
+#include <qpixmapcache.h>
 #include <qvarlengtharray.h>
-#include <qmath.h>
+
 #include <qhexstring_p.h>
+#include <qpaintengineex_p.h>
 
 void qDrawShadeLine(QPainter *p, int x1, int y1, int x2, int y2, const QPalette &pal,
    bool sunken, int lineWidth, int midLineWidth)
 {
    if (!(p && lineWidth >= 0 && midLineWidth >= 0))        {
-      qWarning("qDrawShadeLine: Invalid parameters");
+      qWarning("qDrawShadeLine() Invalid parameters");
       return;
    }
 
@@ -130,7 +131,7 @@ void qDrawShadeRect(QPainter *p, int x, int y, int w, int h,
    }
 
    if (! (w > 0 && h > 0 && lineWidth >= 0 && midLineWidth >= 0)) {
-      qWarning("qDrawShadeRect: Invalid parameters");
+      qWarning("qDrawShadeRect() Invalid parameters");
       return;
    }
 
@@ -214,7 +215,7 @@ void qDrawShadePanel(QPainter *p, int x, int y, int w, int h,
    }
 
    if (! (w > 0 && h > 0 && lineWidth >= 0)) {
-      qWarning("qDrawShadePanel: Invalid parameters");
+      qWarning("qDrawShadePanel() Invalid parameters");
    }
 
    QColor shade = pal.dark().color();
@@ -279,29 +280,10 @@ void qDrawShadePanel(QPainter *p, int x, int y, int w, int h,
    p->setPen(oldPen);                        // restore pen
 }
 
-
-/*!
-  \internal
-  This function draws a rectangle with two pixel line width.
-  It is called from qDrawWinButton() and qDrawWinPanel().
-
-  c1..c4 and fill are used:
-
-    1 1 1 1 1 2
-    1 3 3 3 4 2
-    1 3 F F 4 2
-    1 3 F F 4 2
-    1 4 4 4 4 2
-    2 2 2 2 2 2
-*/
-
-static void qDrawWinShades(QPainter *p,
-   int x, int y, int w, int h,
-   const QColor &c1, const QColor &c2,
-   const QColor &c3, const QColor &c4,
-   const QBrush *fill)
+static void qDrawWinShades(QPainter *p, int x, int y, int w, int h,
+      const QColor &c1, const QColor &c2, const QColor &c3, const QColor &c4, const QBrush *fill)
 {
-   if (w < 2 || h < 2) {                      // can't do anything with that
+   if (w < 2 || h < 2) {
       return;
    }
 
@@ -364,7 +346,7 @@ void qDrawPlainRect(QPainter *p, int x, int y, int w, int h, const QColor &c,
    }
 
    if (!(w > 0 && h > 0 && lineWidth >= 0)) {
-      qWarning("qDrawPlainRect: Invalid parameters");
+      qWarning("qDrawPlainRect() Invalid parameters");
    }
    QPen   oldPen   = p->pen();
    QBrush oldBrush = p->brush();

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,20 +21,22 @@
 *
 ***********************************************************************/
 
-#ifndef QMEDIARECORDER_P_H
-#define QMEDIARECORDER_P_H
+#ifndef QMEDIA_RECORDER_P_H
+#define QMEDIA_RECORDER_P_H
 
 #include <qmediarecorder.h>
-#include <qmediaobject_p.h>
+
 #include <qurl.h>
 
-class QMediaRecorderControl;
-class QMediaContainerControl;
+#include <qmediaobject_p.h>
+
 class QAudioEncoderSettingsControl;
-class QVideoEncoderSettingsControl;
-class QMetaDataWriterControl;
 class QMediaAvailabilityControl;
+class QMediaContainerControl;
+class QMediaRecorderControl;
+class QMetaDataWriterControl;
 class QTimer;
+class QVideoEncoderSettingsControl;
 
 class QMediaRecorderPrivate
 {
@@ -42,7 +44,9 @@ class QMediaRecorderPrivate
 
  public:
    QMediaRecorderPrivate();
-   virtual ~QMediaRecorderPrivate() {}
+
+   virtual ~QMediaRecorderPrivate()
+   { }
 
    void applySettingsLater();
    void restartCamera();

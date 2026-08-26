@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -48,9 +48,8 @@ void QPageSetupDialogPrivate::setPrinter(QPrinter *newPrinter)
    }
 
    if (printer->outputFormat() != QPrinter::NativeFormat) {
-      qWarning("QPageSetupDialog: Can not be used on non-native printers");
+      qWarning("setPrinter() Unable to use on a non-native printer");
    }
-
 }
 
 void QPageSetupDialog::open(QObject *receiver, const QString &member)

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,32 +21,14 @@
 *
 ***********************************************************************/
 
-#include <qplatformdefs.h>
 #include <qdatetimeparser_p.h>
 
 #include <qdatastream.h>
-#include <qset.h>
-#include <qlocale.h>
 #include <qdatetime.h>
 #include <qdebug.h>
-
-//#define QDATETIMEPARSER_DEBUG
-#if defined (QDATETIMEPARSER_DEBUG)
-#  define QDTPDEBUG qDebug()
-#  define QDTPDEBUGN qDebug
-#else
-#  define QDTPDEBUG if (false) qDebug()
-#  define QDTPDEBUGN if (false) qDebug
-#endif
-
-/*!
-  \internal
-  Gets the digit from a datetime. E.g.
-
-  QDateTime var(QDate(2004, 02, 02));
-  int digit = getDigit(var, Year);
-  // digit = 2004
-*/
+#include <qlocale.h>
+#include <qplatformdefs.h>
+#include <qset.h>
 
 int QDateTimeParser::getDigit(const QDateTime &t, int index) const
 {
@@ -97,18 +79,6 @@ int QDateTimeParser::getDigit(const QDateTime &t, int index) const
    return -1;
 }
 
-/*!
-  \internal
-  Sets a digit in a datetime. E.g.
-
-  QDateTime var(QDate(2004, 02, 02));
-  int digit = getDigit(var, Year);
-  // digit = 2004
-  setDigit(&var, Year, 2005);
-  digit = getDigit(var, Year);
-  // digit = 2005
-*/
-
 bool QDateTimeParser::setDigit(QDateTime &v, int index, int newVal) const
 {
    if (index < 0 || index >= sectionNodes.size()) {
@@ -118,35 +88,41 @@ bool QDateTimeParser::setDigit(QDateTime &v, int index, int newVal) const
 
    const SectionNode &node = sectionNodes.at(index);
 
-   int year = v.date().year();
-   int month = v.date().month();
-   int day = v.date().day();
-   int hour = v.time().hour();
+   int year   = v.date().year();
+   int month  = v.date().month();
+   int day    = v.date().day();
+   int hour   = v.time().hour();
    int minute = v.time().minute();
    int second = v.time().second();
-   int msec = v.time().msec();
+   int msec   = v.time().msec();
 
    switch (node.type) {
       case Hour24Section:
       case Hour12Section:
          hour = newVal;
          break;
+
       case MinuteSection:
          minute = newVal;
          break;
+
       case SecondSection:
          second = newVal;
          break;
+
       case MSecSection:
          msec = newVal;
          break;
+
       case YearSection2Digits:
       case YearSection:
          year = newVal;
          break;
+
       case MonthSection:
          month = newVal;
          break;
+
       case DaySection:
       case DayOfWeekSectionShort:
       case DayOfWeekSectionLong:
@@ -156,86 +132,86 @@ bool QDateTimeParser::setDigit(QDateTime &v, int index, int newVal) const
             // to 31 for february should return true
             return false;
          }
+
          day = newVal;
          break;
+
       case AmPmSection:
          hour = (newVal == 0 ? hour % 12 : (hour % 12) + 12);
          break;
+
       default:
-         qWarning("QDateTimeParser::setDigit() Internal error (%s)",
-            csPrintable(node.name()));
+         qWarning("QDateTimeParser::setDigit() Internal error (%s)", csPrintable(node.name()));
          break;
    }
 
-   if (!(node.type & DaySectionMask)) {
+   if (! (node.type & DaySectionMask)) {
       if (day < cachedDay) {
          day = cachedDay;
       }
+
       const int max = QDate(year, month, 1).daysInMonth();
+
       if (day > max) {
          day = max;
       }
    }
+
    if (QDate::isValid(year, month, day) && QTime::isValid(hour, minute, second, msec)) {
-      v = QDateTime(QDate(year, month, day), QTime(hour, minute, second, msec), spec);
+      v = QDateTime(QDate(year, month, day), QTime(hour, minute, second, msec), m_timeZone);
       return true;
    }
+
    return false;
 }
-
-
-
-/*!
-  \
-
-  Returns the absolute maximum for a section
-*/
 
 int QDateTimeParser::absoluteMax(int s, const QDateTime &cur) const
 {
    const SectionNode &sn = sectionNode(s);
+
    switch (sn.type) {
       case Hour24Section:
       case Hour12Section:
-         return 23; // this is special-cased in
-      // parseSection. We want it to be
-      // 23 for the stepBy case.
+         return 23; // special-cased in parseSection, want it to be 23 for the stepBy case.
+
       case MinuteSection:
       case SecondSection:
          return 59;
+
       case MSecSection:
          return 999;
+
       case YearSection2Digits:
       case YearSection:
-         return 9999; // sectionMaxSize will prevent
-      // people from typing in a larger
-      // number in count == 2 sections.
+         return 9999;
+
+      // sectionMaxSize will prevent people from typing in a larger number in count == 2 sections.
       // stepBy() will work on real years anyway
+
       case MonthSection:
          return 12;
+
       case DaySection:
       case DayOfWeekSectionShort:
       case DayOfWeekSectionLong:
          return cur.isValid() ? cur.date().daysInMonth() : 31;
+
       case AmPmSection:
          return 1;
+
       default:
          break;
    }
-   qWarning("QDateTimeParser::absoluteMax() Internal error (%s)",
-      csPrintable(sn.name()));
+
+   qWarning("QDateTimeParser::absoluteMax() Internal error (%s)", csPrintable(sn.name()));
+
    return -1;
 }
-
-/*!
-  \internal
-
-  Returns the absolute minimum for a section
-*/
 
 int QDateTimeParser::absoluteMin(int s) const
 {
    const SectionNode &sn = sectionNode(s);
+
    switch (sn.type) {
       case Hour24Section:
       case Hour12Section:
@@ -245,26 +221,24 @@ int QDateTimeParser::absoluteMin(int s) const
       case YearSection2Digits:
       case YearSection:
          return 0;
+
       case MonthSection:
       case DaySection:
       case DayOfWeekSectionShort:
       case DayOfWeekSectionLong:
          return 1;
+
       case AmPmSection:
          return 0;
+
       default:
          break;
    }
-   qWarning("QDateTimeParser::absoluteMin() Internal error (%s, %0x)",
-      csPrintable(sn.name()), sn.type);
+
+   qWarning("QDateTimeParser::absoluteMin() Internal error (%s, %0x)", csPrintable(sn.name()), sn.type);
+
    return -1;
 }
-
-/*!
-  \internal
-
-  Returns the sectionNode for the Section \a s.
-*/
 
 const QDateTimeParser::SectionNode &QDateTimeParser::sectionNode(int sectionIndex) const
 {
@@ -272,17 +246,20 @@ const QDateTimeParser::SectionNode &QDateTimeParser::sectionNode(int sectionInde
       switch (sectionIndex) {
          case FirstSectionIndex:
             return first;
+
          case LastSectionIndex:
             return last;
+
          case NoSectionIndex:
             return none;
       }
+
    } else if (sectionIndex < sectionNodes.size()) {
       return sectionNodes.at(sectionIndex);
    }
 
-   qWarning("QDateTimeParser::sectionNode() Internal error (%d)",
-      sectionIndex);
+   qWarning("QDateTimeParser::sectionNode() Internal error (%d)", sectionIndex);
+
    return none;
 }
 
@@ -290,13 +267,6 @@ QDateTimeParser::Section QDateTimeParser::sectionType(int sectionIndex) const
 {
    return sectionNode(sectionIndex).type;
 }
-
-
-/*!
-  \internal
-
-  Returns the starting position for section \a s.
-*/
 
 int QDateTimeParser::sectionPos(int sectionIndex) const
 {
@@ -308,15 +278,19 @@ int QDateTimeParser::sectionPos(const SectionNode &sn) const
    switch (sn.type) {
       case FirstSection:
          return 0;
+
       case LastSection:
          return displayText().size() - 1;
+
       default:
          break;
    }
+
    if (sn.pos == -1) {
-      qWarning("QDateTimeParser::sectionPos Internal error (%s)", csPrintable(sn.name()));
+      qWarning("QDateTimeParser::sectionPos() Internal error (%s)", csPrintable(sn.name()));
       return -1;
    }
+
    return sn.pos;
 }
 
@@ -360,12 +334,14 @@ static inline int countRepeat(const QString &str, int index, int maxCount)
    while (index + count < max && str.at(index + count) == ch) {
       ++count;
    }
+
    return count;
 }
 
 static inline void appendSeparator(QStringList *list, const QString &string, int from, int size, int lastQuote)
 {
    QString str(string.mid(from, size));
+
    if (lastQuote >= from) {
       str = unquote(str);
    }
@@ -373,23 +349,22 @@ static inline void appendSeparator(QStringList *list, const QString &string, int
    list->append(str);
 }
 
-
 bool QDateTimeParser::parseFormat(const QString &newFormat)
 {
-   const QLatin1Char quote('\'');
-   const QLatin1Char slash('\\');
-   const QLatin1Char zero('0');
+   const QChar quote('\'');
+   const QChar slash('\\');
+   const QChar zero('0');
+
    if (newFormat == displayFormat && !newFormat.isEmpty()) {
       return true;
    }
-
-   QDTPDEBUGN("parseFormat: %s", newFormat.toLatin1().constData());
 
    QVector<SectionNode> newSectionNodes;
    Sections newDisplay = Qt::EmptyFlag;
 
    QStringList newSeparators;
-   int i, index = 0;
+   int i;
+   int index = 0;
    int add = 0;
 
    QChar status(zero);
@@ -400,13 +375,17 @@ bool QDateTimeParser::parseFormat(const QString &newFormat)
       if (newFormat.at(i) == quote) {
          lastQuote = i;
          ++add;
+
          if (status != quote) {
             status = quote;
+
          } else if (i > 0 && newFormat.at(i - 1) != slash) {
             status = zero;
          }
+
       } else if (status != quote) {
          const char sect = newFormat.at(i).toLatin1();
+
          switch (sect) {
             case 'H':
             case 'h':
@@ -419,7 +398,9 @@ bool QDateTimeParser::parseFormat(const QString &newFormat)
                   index = i + 1;
                   newDisplay |= hour;
                }
+
                break;
+
             case 'm':
                if (parserType != QVariant::Date) {
                   const SectionNode sn = { MinuteSection, i - add, countRepeat(newFormat, i, 2), 0 };
@@ -429,7 +410,9 @@ bool QDateTimeParser::parseFormat(const QString &newFormat)
                   index = i + 1;
                   newDisplay |= MinuteSection;
                }
+
                break;
+
             case 's':
                if (parserType != QVariant::Date) {
                   const SectionNode sn = { SecondSection, i - add, countRepeat(newFormat, i, 2), 0 };
@@ -439,6 +422,7 @@ bool QDateTimeParser::parseFormat(const QString &newFormat)
                   index = i + 1;
                   newDisplay |= SecondSection;
                }
+
                break;
 
             case 'z':
@@ -450,7 +434,9 @@ bool QDateTimeParser::parseFormat(const QString &newFormat)
                   index = i + 1;
                   newDisplay |= MSecSection;
                }
+
                break;
+
             case 'A':
             case 'a':
                if (parserType != QVariant::Date) {
@@ -459,19 +445,23 @@ bool QDateTimeParser::parseFormat(const QString &newFormat)
                   newSectionNodes.append(sn);
                   appendSeparator(&newSeparators, newFormat, index, i - index, lastQuote);
                   newDisplay |= AmPmSection;
-                  if (i + 1 < newFormat.size()
-                     && newFormat.at(i + 1) == (cap ? QLatin1Char('P') : QLatin1Char('p'))) {
+
+                  if (i + 1 < newFormat.size() && newFormat.at(i + 1) == (cap ? QChar('P') : QChar('p'))) {
                      ++i;
                   }
+
                   index = i + 1;
                }
+
                break;
+
             case 'y':
                if (parserType != QVariant::Time) {
                   const int repeat = countRepeat(newFormat, i, 4);
+
                   if (repeat >= 2) {
                      const SectionNode sn = { repeat == 4 ? YearSection : YearSection2Digits,
-                                          i - add, repeat == 4 ? 4 : 2, 0 };
+                           i - add, repeat == 4 ? 4 : 2, 0 };
 
                      newSectionNodes.append(sn);
                      appendSeparator(&newSeparators, newFormat, index, i - index, lastQuote);
@@ -480,7 +470,9 @@ bool QDateTimeParser::parseFormat(const QString &newFormat)
                      newDisplay |= sn.type;
                   }
                }
+
                break;
+
             case 'M':
                if (parserType != QVariant::Time) {
                   const SectionNode sn = { MonthSection, i - add, countRepeat(newFormat, i, 4), 0 };
@@ -490,12 +482,15 @@ bool QDateTimeParser::parseFormat(const QString &newFormat)
                   index = i + 1;
                   newDisplay |= MonthSection;
                }
+
                break;
+
             case 'd':
                if (parserType != QVariant::Time) {
                   const int repeat = countRepeat(newFormat, i, 4);
                   const Section sectionType = (repeat == 4 ? DayOfWeekSectionLong
                         : (repeat == 3 ? DayOfWeekSectionShort : DaySection));
+
                   const SectionNode sn = { sectionType, i - add, repeat, 0 };
                   newSectionNodes.append(sn);
                   appendSeparator(&newSeparators, newFormat, index, i - index, lastQuote);
@@ -503,6 +498,7 @@ bool QDateTimeParser::parseFormat(const QString &newFormat)
                   index = i + 1;
                   newDisplay |= sn.type;
                }
+
                break;
 
             default:
@@ -510,14 +506,17 @@ bool QDateTimeParser::parseFormat(const QString &newFormat)
          }
       }
    }
+
    if (newSectionNodes.isEmpty() && context == DateTimeEdit) {
       return false;
    }
 
    if ((newDisplay & (AmPmSection | Hour12Section)) == Hour12Section) {
       const int count = newSectionNodes.size();
-      for (int i = 0; i < count; ++i) {
-         SectionNode &node = newSectionNodes[i];
+
+      for (int j = 0; j < count; ++j) {
+         SectionNode &node = newSectionNodes[j];
+
          if (node.type == Hour12Section) {
             node.type = Hour24Section;
          }
@@ -531,17 +530,10 @@ bool QDateTimeParser::parseFormat(const QString &newFormat)
    }
 
    displayFormat = newFormat;
-   separators = newSeparators;
-   sectionNodes = newSectionNodes;
-   display = newDisplay;
-   last.pos = -1;
-
-   //     for (int i=0; i<sectionNodes.size(); ++i) {
-   //         QDTPDEBUG << sectionNodes.at(i).name() << sectionNodes.at(i).count;
-   //     }
-
-   QDTPDEBUG << newFormat << displayFormat;
-   QDTPDEBUGN("separators:\n'%s'", separators.join(QLatin1String("\n")).toLatin1().constData());
+   separators    = newSeparators;
+   sectionNodes  = newSectionNodes;
+   display       = newDisplay;
+   last.pos      = -1;
 
    return true;
 }
@@ -553,7 +545,7 @@ int QDateTimeParser::sectionSize(int sectionIndex) const
    }
 
    if (sectionIndex >= sectionNodes.size()) {
-      qWarning("QDateTimeParser::sectionSize Internal error (%d)", sectionIndex);
+      qWarning("QDateTimeParser::sectionSize() Internal error (%d)", sectionIndex);
       return -1;
    }
 
@@ -563,32 +555,31 @@ int QDateTimeParser::sectionSize(int sectionIndex) const
       // is the previous value and displayText() is the new value.
       // The size difference is always due to leading zeroes.
       int sizeAdjustment = 0;
-      if (displayText().size() != text.size()) {
+
+      if (displayText().size() != m_text.size()) {
          // Any zeroes added before this section will affect our size.
          int preceedingZeroesAdded = 0;
 
          if (sectionNodes.size() > 1 && context == DateTimeEdit) {
             for (QVector<SectionNode>::const_iterator sectionIt = sectionNodes.constBegin();
-               sectionIt != sectionNodes.constBegin() + sectionIndex; ++sectionIt) {
+                  sectionIt != sectionNodes.constBegin() + sectionIndex; ++sectionIt) {
                preceedingZeroesAdded += sectionIt->zeroesAdded;
             }
          }
+
          sizeAdjustment = preceedingZeroesAdded;
       }
 
       return displayText().size() + sizeAdjustment - sectionPos(sectionIndex) - separators.last().size();
+
    } else {
-      return sectionPos(sectionIndex + 1) - sectionPos(sectionIndex)
-         - separators.at(sectionIndex + 1).size();
+      return sectionPos(sectionIndex + 1) - sectionPos(sectionIndex) - separators.at(sectionIndex + 1).size();
    }
 }
 
-
 int QDateTimeParser::sectionMaxSize(Section s, int count) const
 {
-#ifndef QT_NO_TEXTDATE
    int mcount = 12;
-#endif
 
    switch (s) {
       case FirstSection:
@@ -615,39 +606,35 @@ int QDateTimeParser::sectionMaxSize(Section s, int count) const
 
       case DayOfWeekSectionShort:
       case DayOfWeekSectionLong:
-#ifdef QT_NO_TEXTDATE
-         return 2;
-#else
          mcount = 7;
-#endif
-      [[fallthrough]];
+
+         [[fallthrough]];
 
       case MonthSection:
-#ifdef QT_NO_TEXTDATE
-         return 2;
-#else
+
          if (count <= 2) {
             return 2;
          }
 
          {
-            int ret = 0;
+            int retval = 0;
             const QLocale l = locale();
             const QLocale::FormatType format = count == 4 ? QLocale::LongFormat : QLocale::ShortFormat;
+
             for (int i = 1; i <= mcount; ++i) {
-               const QString str = (s == MonthSection
-                     ? l.monthName(i, format)
-                     : l.dayName(i, format));
-               ret = qMax(str.size(), ret);
+               const QString str = (s == MonthSection ? l.monthName(i, format) : l.dayName(i, format));
+               retval = qMax(str.size(), retval);
             }
-            return ret;
+
+            return retval;
          }
-#endif
 
       case MSecSection:
          return 3;
+
       case YearSection:
          return 4;
+
       case YearSection2Digits:
          return 2;
 
@@ -659,19 +646,18 @@ int QDateTimeParser::sectionMaxSize(Section s, int count) const
       case YearSectionMask:
       case DayOfWeekSectionMask:
       case DaySectionMask:
-         qWarning("QDateTimeParser::sectionMaxSize: Invalid section %s",
-            SectionNode::name(s).toLatin1().constData());
+         qWarning("QDateTimeParser::sectionMaxSize() Invalid section %s", csPrintable(SectionNode::name(s)));
 
       case NoSectionIndex:
       case FirstSectionIndex:
       case LastSectionIndex:
       case CalendarPopupIndex:
-         // these cases can't happen
+         // these cases can not happen
          break;
    }
+
    return -1;
 }
-
 
 int QDateTimeParser::sectionMaxSize(int index) const
 {
@@ -679,21 +665,16 @@ int QDateTimeParser::sectionMaxSize(int index) const
    return sectionMaxSize(sn.type, sn.count);
 }
 
-/*!
-  \internal
-
-  Returns the text of section \a s. This function operates on the
-  arg text rather than edit->text().
-*/
-
 QString QDateTimeParser::sectionText(const QString &text, int sectionIndex, int index) const
 {
    const SectionNode &sn = sectionNode(sectionIndex);
+
    switch (sn.type) {
       case NoSectionIndex:
       case FirstSectionIndex:
       case LastSectionIndex:
          return QString();
+
       default:
          break;
    }
@@ -704,29 +685,20 @@ QString QDateTimeParser::sectionText(const QString &text, int sectionIndex, int 
 QString QDateTimeParser::sectionText(int sectionIndex) const
 {
    const SectionNode &sn = sectionNode(sectionIndex);
+
    return sectionText(displayText(), sectionIndex, sn.pos);
 }
 
-
-#ifndef QT_NO_TEXTDATE
-/*!
-  \internal:skipToNextSection
-
-  Parses the part of \a text that corresponds to \a s and returns
-  the value of that field. Sets *stateptr to the right state if
-  stateptr != 0.
-*/
-
 int QDateTimeParser::parseSection(const QDateTime &currentValue, int sectionIndex,
-   QString &text, int &cursorPosition, int index,
-   State &state, int *usedptr) const
+      QString &text, int &cursorPosition, int index, State &state, int *usedptr) const
 {
-   state = Invalid;
+   state   = Invalid;
    int num = 0;
+
    const SectionNode &sn = sectionNode(sectionIndex);
+
    if ((sn.type & Internal) == Internal) {
-      qWarning("QDateTimeParser::parseSection Internal error (%s %d)",
-         csPrintable(sn.name()), sectionIndex);
+      qWarning("QDateTimeParser::parseSection() Internal error (%s %d)", csPrintable(sn.name()), sectionIndex);
       return -1;
    }
 
@@ -734,42 +706,47 @@ int QDateTimeParser::parseSection(const QDateTime &currentValue, int sectionInde
    QString sectiontext = text.mid(index, sectionmaxsize);
    int sectiontextSize = sectiontext.size();
 
-   QDTPDEBUG << "sectionValue for" << sn.name()
-      << "with text" << text << "and st" << sectiontext
-      << text.mid(index, sectionmaxsize)
-      << index;
-
    int used = 0;
 
    switch (sn.type) {
       case AmPmSection: {
          const int ampm = findAmPm(sectiontext, sectionIndex, &used);
+
          switch (ampm) {
             case AM: // sectiontext == AM
             case PM: // sectiontext == PM
                num = ampm;
                state = Acceptable;
                break;
+
             case PossibleAM: // sectiontext => AM
             case PossiblePM: // sectiontext => PM
                num = ampm - 2;
                state = Intermediate;
                break;
+
             case PossibleBoth: // sectiontext => AM|PM
                num = 0;
                state = Intermediate;
                break;
+
             case Neither:
                state = Invalid;
-               QDTPDEBUG << "invalid because findAmPm(" << sectiontext << ") returned -1";
+
+#if defined(CS_SHOW_DEBUG_CORE)
+               qDebug() << "QDateTimeParser::parseSection() Invalid findAmPm(" << sectiontext << ") returned -1";
+#endif
+
                break;
+
             default:
-               QDTPDEBUGN("This should never happen (findAmPm returned %d)", ampm);
                break;
          }
+
          if (state != Invalid) {
             text.replace(index, used, sectiontext.left(used));
          }
+
          break;
       }
 
@@ -780,10 +757,13 @@ int QDateTimeParser::parseSection(const QDateTime &currentValue, int sectionInde
             if (sn.type == MonthSection) {
                int min = 1;
                const QDate minDate = getMinimum().date();
+
                if (currentValue.date().year() == minDate.year()) {
                   min = minDate.month();
                }
+
                num = findMonth(sectiontext.toLower(), min, sectionIndex, &sectiontext, &used);
+
             } else {
                num = findDay(sectiontext.toLower(), 1, sectionIndex, &sectiontext, &used);
             }
@@ -794,8 +774,10 @@ int QDateTimeParser::parseSection(const QDateTime &currentValue, int sectionInde
             } else {
                state = Intermediate;
             }
+
             break;
          }
+
          [[fallthrough]];
 
       case DaySection:
@@ -807,17 +789,21 @@ int QDateTimeParser::parseSection(const QDateTime &currentValue, int sectionInde
       case SecondSection:
       case MSecSection: {
          if (sectiontextSize == 0) {
-            num = 0;
-            used = 0;
+            num   = 0;
+            used  = 0;
             state = Intermediate;
+
          } else {
             const int absMax = absoluteMax(sectionIndex);
             QLocale loc;
+
             bool ok = true;
-            int last = -1;
+            int lastNode = -1;
+
             used = -1;
 
             QString digitsStr(sectiontext);
+
             for (int i = 0; i < sectiontextSize; ++i) {
                if (digitsStr.at(i).isSpace()) {
                   sectiontextSize = i;
@@ -826,6 +812,7 @@ int QDateTimeParser::parseSection(const QDateTime &currentValue, int sectionInde
             }
 
             const int max = qMin(sectionmaxsize, sectiontextSize);
+
             for (int digits = max; digits >= 1; --digits) {
                digitsStr.truncate(digits);
 
@@ -834,43 +821,48 @@ int QDateTimeParser::parseSection(const QDateTime &currentValue, int sectionInde
                if (ok && sn.type == Hour12Section) {
                   if (tmp > 12) {
                      tmp = -1;
-                     ok = false;
+                     ok  = false;
+
                   } else if (tmp == 12) {
                      tmp = 0;
                   }
                }
+
                if (ok && tmp <= absMax) {
-                  QDTPDEBUG << sectiontext.left(digits) << tmp << digits;
-                  last = tmp;
+                  lastNode = tmp;
                   used = digits;
                   break;
                }
             }
 
-            if (last == -1) {
-               QChar first(sectiontext.at(0));
-               if (separators.at(sectionIndex + 1).startsWith(first)) {
-                  used = 0;
+            if (lastNode == -1) {
+               QChar firstCh(sectiontext.at(0));
+
+               if (separators.at(sectionIndex + 1).startsWith(firstCh)) {
+                  used  = 0;
                   state = Intermediate;
+
                } else {
                   state = Invalid;
                }
 
             } else {
-               num += last;
+               num += lastNode;
                const FieldInfo fi = fieldInfo(sectionIndex);
                const bool done = (used == sectionmaxsize);
-               if (!done && fi & Fraction) { // typing 2 in a zzz field should be .200, not .002
+
+               if (! done && fi & Fraction) {
+                  // typing 2 in a zzz field should be .200, not .002
+
                   for (int i = used; i < sectionmaxsize; ++i) {
                      num *= 10;
                   }
                }
+
                const int absMin = absoluteMin(sectionIndex);
+
                if (num < absMin) {
                   state = done ? Invalid : Intermediate;
-                  if (done) {
-                     QDTPDEBUG << "invalid because" << num << "is less than absoluteMin" << absMin;
-                  }
 
                } else if (num > absMax) {
                   state = Intermediate;
@@ -878,24 +870,29 @@ int QDateTimeParser::parseSection(const QDateTime &currentValue, int sectionInde
                } else if (!done && (fi & (FixedWidth | Numeric)) == (FixedWidth | Numeric)) {
                   if (skipToNextSection(sectionIndex, currentValue, digitsStr)) {
                      state = Acceptable;
+
                      const int missingZeroes = sectionmaxsize - digitsStr.size();
-                     text.insert(index, QString().fill(QLatin1Char('0'), missingZeroes));
+                     text.insert(index, QString().fill(QChar('0'), missingZeroes));
                      used = sectionmaxsize;
+
                      cursorPosition += missingZeroes;
                      ++(const_cast<QDateTimeParser *>(this)->sectionNodes[sectionIndex].zeroesAdded);
+
                   } else {
                      state = Intermediate;
                   }
+
                } else {
                   state = Acceptable;
                }
             }
          }
+
          break;
       }
 
       default:
-         qWarning("QDateTimeParser::parseSection Internal error (%s %d)", csPrintable(sn.name()), sectionIndex);
+         qWarning("QDateTimeParser::parseSection() Internal error (%s %d)", csPrintable(sn.name()), sectionIndex);
          return -1;
    }
 
@@ -905,11 +902,9 @@ int QDateTimeParser::parseSection(const QDateTime &currentValue, int sectionInde
 
    return (state != Invalid ? num : -1);
 }
-#endif // QT_NO_TEXTDATE
 
-// internal
 QDateTimeParser::StateNode QDateTimeParser::parse(QString &input, int &cursorPosition,
-   const QDateTime &currentValue, bool fixup) const
+      const QDateTime &currentValue, bool fixup) const
 {
    const QDateTime minimum = getMinimum();
    const QDateTime maximum = getMaximum();
@@ -920,7 +915,6 @@ QDateTimeParser::StateNode QDateTimeParser::parse(QString &input, int &cursorPos
    bool conflicts = false;
    const int sectionNodesCount = sectionNodes.size();
 
-   QDTPDEBUG << "parse" << input;
    {
       int pos = 0;
       int year, month, day;
@@ -941,24 +935,19 @@ QDateTimeParser::StateNode QDateTimeParser::parse(QString &input, int &cursorPos
       for (int index = 0; state != Invalid && index < sectionNodesCount; ++index) {
 
          if (input.midView(pos, separators.at(index).size()) != separators.at(index)) {
-
-            QDTPDEBUG << "invalid because" << input.mid(pos, separators.at(index).size())
-               << "!=" << separators.at(index)
-               << index << pos << currentSectionIndex;
-
             state = Invalid;
             goto end;
          }
 
          pos += separators.at(index).size();
          sectionNodes[index].pos = pos;
+
          int *current = nullptr;
-         const SectionNode sn = sectionNodes.at(index);
          int used;
+         const SectionNode sn = sectionNodes.at(index);
 
          num = parseSection(currentValue, index, input, cursorPosition, pos, tmpstate, &used);
-         QDTPDEBUG << "sectionValue" << sn.name() << input
-            << "pos" << pos << "used" << used << stateName(tmpstate);
+
          if (fixup && tmpstate == Intermediate && used < sn.count) {
             const FieldInfo fi = fieldInfo(index);
 
@@ -968,80 +957,100 @@ QDateTimeParser::StateNode QDateTimeParser::parse(QString &input, int &cursorPos
                used = sn.count;
             }
          }
+
          pos += qMax(0, used);
 
          state = qMin<State>(state, tmpstate);
+
          if (state == Intermediate && context == FromString) {
             state = Invalid;
             break;
          }
 
-         QDTPDEBUG << index << sn.name() << "is set to"
-            << pos << "state is" << stateName(state);
 
          if (state != Invalid) {
             switch (sn.type) {
                case Hour24Section:
                   current = &hour;
                   break;
+
                case Hour12Section:
                   current = &hour12;
                   break;
+
                case MinuteSection:
                   current = &minute;
                   break;
+
                case SecondSection:
                   current = &second;
                   break;
+
                case MSecSection:
                   current = &msec;
                   break;
+
                case YearSection:
                   current = &year;
                   break;
+
                case YearSection2Digits:
                   current = &year2digits;
                   break;
+
                case MonthSection:
                   current = &month;
                   break;
+
                case DayOfWeekSectionShort:
                case DayOfWeekSectionLong:
                   current = &dayofweek;
                   break;
+
                case DaySection:
                   current = &day;
                   num = qMax<int>(1, num);
                   break;
+
                case AmPmSection:
                   current = &ampm;
                   break;
+
                default:
-                  qWarning("QDateTimeParser::parse Internal error (%s)",
-                     csPrintable(sn.name()));
+                  qWarning("QDateTimeParser::parse() Internal error (%s)", csPrintable(sn.name()));
                   break;
             }
-            if (!current) {
-               qWarning("QDateTimeParser::parse Internal error 2");
+
+            if (! current) {
+               qWarning("QDateTimeParser::parse() Internal error 2");
                return StateNode();
             }
+
             if (isSet & sn.type && *current != num) {
-               QDTPDEBUG << "CONFLICT " << sn.name() << *current << num;
+#if defined(CS_SHOW_DEBUG_CORE)
+               qDebug() << "QDateTimeParser::parse() Conflict " << sn.name() << *current << num;
+#endif
                conflicts = true;
+
                if (index != currentSectionIndex || num == -1) {
                   continue;
                }
             }
+
             if (num != -1) {
                *current = num;
             }
+
             isSet |= sn.type;
          }
       }
 
       if (state != Invalid && input.midView(pos) != separators.last()) {
-         QDTPDEBUG << "invalid because" << input.mid(pos)
-            << "!=" << separators.last() << pos;
+
+#if defined(CS_SHOW_DEBUG_CORE)
+         qDebug() << "QDateTimeParser::parse() Invalid " << input.mid(pos) << "!=" << separators.last() << pos;
+#endif
+
          state = Invalid;
       }
 
@@ -1051,9 +1060,11 @@ QDateTimeParser::StateNode QDateTimeParser::parse(QString &input, int &cursorPos
                if (!(isSet & YearSection)) {
                   year = (year / 100) * 100;
                   year += year2digits;
+
                } else {
                   conflicts = true;
                   const SectionNode &sn = sectionNode(currentSectionIndex);
+
                   if (sn.type == YearSection2Digits) {
                      year = (year / 100) * 100;
                      year += year2digits;
@@ -1063,62 +1074,74 @@ QDateTimeParser::StateNode QDateTimeParser::parse(QString &input, int &cursorPos
 
             const QDate date(year, month, day);
             const int diff = dayofweek - date.dayOfWeek();
+
             if (diff != 0 && state == Acceptable && isSet & DayOfWeekSectionMask) {
                if (isSet & DaySection) {
                   conflicts = true;
                }
+
                const SectionNode &sn = sectionNode(currentSectionIndex);
+
                if (sn.type & DayOfWeekSectionMask || currentSectionIndex == -1) {
                   // dayofweek should be preferred
                   day += diff;
+
                   if (day <= 0) {
                      day += 7;
                   } else if (day > date.daysInMonth()) {
                      day -= 7;
                   }
-                  QDTPDEBUG << year << month << day << dayofweek
-                     << diff << QDate(year, month, day).dayOfWeek();
                }
             }
 
             bool needfixday = false;
+
             if (sectionType(currentSectionIndex) & DaySectionMask) {
                cachedDay = day;
+
             } else if (cachedDay > day) {
                day = cachedDay;
                needfixday = true;
             }
 
-            if (!QDate::isValid(year, month, day)) {
+            if (! QDate::isValid(year, month, day)) {
                if (day < 32) {
                   cachedDay = day;
                }
+
                if (day > 28 && QDate::isValid(year, month, 1)) {
                   needfixday = true;
                }
             }
+
             if (needfixday) {
                if (context == FromString) {
                   state = Invalid;
                   goto end;
                }
+
                if (state == Acceptable && fixday) {
                   day = qMin<int>(day, QDate(year, month, 1).daysInMonth());
 
                   const QLocale loc = locale();
+
                   for (int i = 0; i < sectionNodesCount; ++i) {
                      const SectionNode sn = sectionNode(i);
+
                      if (sn.type & DaySection) {
                         input.replace(sectionPos(sn), sectionSize(i), loc.toString(day));
+
                      } else if (sn.type & DayOfWeekSectionMask) {
                         const int dayOfWeek = QDate(year, month, day).dayOfWeek();
-                        const QLocale::FormatType dayFormat =
-                           (sn.type == DayOfWeekSectionShort
+
+                        const QLocale::FormatType dayFormat = (sn.type == DayOfWeekSectionShort
                               ? QLocale::ShortFormat : QLocale::LongFormat);
+
                         const QString dayName(loc.dayName(dayOfWeek, dayFormat));
                         input.replace(sectionPos(sn), sectionSize(i), dayName);
                      }
                   }
+
                } else {
                   state = qMin(Intermediate, state);
                }
@@ -1128,6 +1151,7 @@ QDateTimeParser::StateNode QDateTimeParser::parse(QString &input, int &cursorPos
          if (parserType != QVariant::Date) {
             if (isSet & Hour12Section) {
                const bool hasHour = isSet & Hour24Section;
+
                if (ampm == -1) {
                   if (hasHour) {
                      ampm = (hour < 12 ? 0 : 1);
@@ -1135,12 +1159,15 @@ QDateTimeParser::StateNode QDateTimeParser::parse(QString &input, int &cursorPos
                      ampm = 0; // no way to tell if this is am or pm so I assume am
                   }
                }
+
                hour12 = (ampm == 0 ? hour12 % 12 : (hour12 % 12) + 12);
+
                if (!hasHour) {
                   hour = hour12;
                } else if (hour != hour12) {
                   conflicts = true;
                }
+
             } else if (ampm != -1) {
                if (!(isSet & (Hour24Section))) {
                   hour = (12 * ampm); // special case. Only ap section
@@ -1148,26 +1175,22 @@ QDateTimeParser::StateNode QDateTimeParser::parse(QString &input, int &cursorPos
                   conflicts = true;
                }
             }
-
          }
 
-         newCurrentValue = QDateTime(QDate(year, month, day), QTime(hour, minute, second, msec), spec);
-         QDTPDEBUG << year << month << day << hour << minute << second << msec;
+         newCurrentValue = QDateTime(QDate(year, month, day), QTime(hour, minute, second, msec), m_timeZone);
       }
-
-      QDTPDEBUGN("'%s' => '%s'(%s)", input.toLatin1().constData(),
-         newCurrentValue.toString(QString("yyyy/MM/dd hh:mm:ss.zzz")).toLatin1().constData(),
-         stateName(state).toLatin1().constData());
    }
 
 end:
+
    if (newCurrentValue.isValid()) {
       if (context != FromString && state != Invalid && newCurrentValue < minimum) {
          const QChar space(' ');
 
-         if (newCurrentValue >= minimum)
-            qWarning("QDateTimeParser::parse Internal error 3 (%s %s)",
-               csPrintable(newCurrentValue.toString()), csPrintable(minimum.toString()));
+         if (newCurrentValue >= minimum) {
+            qWarning("QDateTimeParser::parse() Internal error 3 (%s %s)",
+                  csPrintable(newCurrentValue.toString()), csPrintable(minimum.toString()));
+         }
 
          bool done = false;
          state = Invalid;
@@ -1177,7 +1200,7 @@ end:
             QString t = sectionText(input, i, sn.pos).toLower();
 
             if ((t.size() < sectionMaxSize(i) && (((int)fieldInfo(i) &
-                     (FixedWidth | Numeric)) != Numeric)) || t.contains(space)) {
+                  (FixedWidth | Numeric)) != Numeric)) || t.contains(space)) {
 
                switch (sn.type) {
                   case AmPmSection:
@@ -1197,32 +1220,40 @@ end:
                         case PossiblePM:
                         case PossibleBoth: {
                            const QDateTime copy(newCurrentValue.addSecs(12 * 60 * 60));
+
                            if (copy >= minimum && copy <= maximum) {
                               state = Intermediate;
                               done = true;
                            }
+
                            break;
                         }
                      }
+
                      [[fallthrough]];
 
                   case MonthSection:
                      if (sn.count >= 3) {
                         int tmp = newCurrentValue.date().month();
-                        // I know the first possible month makes the date too early
+
+                        // the first possible month makes the date too early
                         while ((tmp = findMonth(t, tmp + 1, i)) != -1) {
                            const QDateTime copy(newCurrentValue.addMonths(tmp - newCurrentValue.date().month()));
+
                            if (copy >= minimum && copy <= maximum) {
                               break;   // break out of while
                            }
                         }
+
                         if (tmp == -1) {
                            break;
                         }
+
                         state = Intermediate;
                         done = true;
                         break;
                      }
+
                      [[fallthrough]];
 
                   default: {
@@ -1233,46 +1264,48 @@ end:
                         if (newCurrentValue.daysTo(minimum) != 0) {
                            break;
                         }
+
                         toMin = newCurrentValue.time().msecsTo(minimum.time());
+
                         if (newCurrentValue.daysTo(maximum) > 0) {
                            toMax = -1; // can't get to max
                         } else {
                            toMax = newCurrentValue.time().msecsTo(maximum.time());
                         }
+
                      } else {
                         toMin = newCurrentValue.daysTo(minimum);
                         toMax = newCurrentValue.daysTo(maximum);
                      }
 
                      const int maxChange = sn.maxChange();
+
                      if (toMin > maxChange) {
-                        QDTPDEBUG << "invalid because toMin > maxChange" << toMin
-                           << maxChange << t << newCurrentValue << minimum;
                         state = Invalid;
                         done = true;
                         break;
+
                      } else if (toMax > maxChange) {
                         toMax = -1; // can't get to max
                      }
 
                      const int min = getDigit(minimum, i);
+
                      if (min == -1) {
-                        qWarning("QDateTimeParser::parse Internal error 4 (%s)",
-                           csPrintable(sn.name()));
+                        qWarning("QDateTimeParser::parse() Internal error 4 (%s)", csPrintable(sn.name()));
                         state = Invalid;
-                        done = true;
+                        done  = true;
                         break;
                      }
 
                      int max = toMax != -1 ? getDigit(maximum, i) : absoluteMax(i, newCurrentValue);
                      int pos = cursorPosition - sn.pos;
+
                      if (pos < 0 || pos >= t.size()) {
                         pos = -1;
                      }
 
                      if (! potentialValue(t.simplified(), min, max, i, newCurrentValue, pos)) {
-                        QDTPDEBUG << "invalid because potentialValue(" << t.simplified() << min << max
-                           << sn.name() << "returned" << toMax << toMin << pos;
                         state = Invalid;
                         done = true;
                         break;
@@ -1287,11 +1320,10 @@ end:
          }
 
       } else {
-         if (context == FromString) {
-            // optimization
-            Q_ASSERT(getMaximum().date().toJulianDay() == 4642999);
+         if (context == QDateTimeParser::Context::FromString) {
+            Q_ASSERT(getMaximum().date().toJulianDay() == 2817152);
 
-            if (newCurrentValue.date().toJulianDay() > 4642999) {
+            if (newCurrentValue.date().toJulianDay() > 2817152) {
                state = Invalid;
             }
 
@@ -1300,37 +1332,30 @@ end:
                state = Invalid;
             }
          }
-
-         QDTPDEBUG << "not checking intermediate because newCurrentValue is" << newCurrentValue << getMinimum() << getMaximum();
       }
    }
 
    StateNode node;
-   node.input = input;
-   node.state = state;
+   node.input     = input;
+   node.state     = state;
    node.conflicts = conflicts;
-   node.value = newCurrentValue.toTimeSpec(spec);
-   text = input;
+   node.value     = newCurrentValue.toTimeZone(m_timeZone);
+   m_text         = input;
 
    return node;
 }
 
-#ifndef QT_NO_TEXTDATE
-/*!
-  \internal
-  finds the first possible monthname that \a str1 can
-  match. Starting from \a index; str should already by lowered
-*/
-
 int QDateTimeParser::findMonth(const QString &str1, int startMonth, int sectionIndex,
-   QString *usedMonth, int *used) const
+      QString *usedMonth, int *used) const
 {
    int bestMatch = -1;
    int bestCount = 0;
-   if (!str1.isEmpty()) {
+
+   if (! str1.isEmpty()) {
       const SectionNode &sn = sectionNode(sectionIndex);
+
       if (sn.type != MonthSection) {
-         qWarning("QDateTimeParser::findMonth Internal error");
+         qWarning("QDateTimeParser::findMonth() Internal error");
          return -1;
       }
 
@@ -1341,52 +1366,61 @@ int QDateTimeParser::findMonth(const QString &str1, int startMonth, int sectionI
          QString str2 = l.monthName(month, type).toLower();
 
          if (str1.startsWith(str2)) {
+
             if (used) {
-               QDTPDEBUG << "used is set to" << str2.size();
                *used = str2.size();
             }
+
             if (usedMonth) {
                *usedMonth = l.monthName(month, type);
             }
 
             return month;
          }
+
          if (context == FromString) {
             continue;
          }
 
          const int limit = qMin(str1.size(), str2.size());
 
-         QDTPDEBUG << "limit is" << limit << str1 << str2;
          bool equal = true;
+
          for (int i = 0; i < limit; ++i) {
             if (str1.at(i) != str2.at(i)) {
                equal = false;
+
                if (i > bestCount) {
                   bestCount = i;
                   bestMatch = month;
                }
+
                break;
             }
          }
+
          if (equal) {
             if (used) {
                *used = limit;
             }
+
             if (usedMonth) {
                *usedMonth = l.monthName(month, type);
             }
+
             return month;
          }
       }
+
       if (usedMonth && bestMatch != -1) {
          *usedMonth = l.monthName(bestMatch, type);
       }
    }
+
    if (used) {
-      QDTPDEBUG << "used is set to" << bestCount;
       *used = bestCount;
    }
+
    return bestMatch;
 }
 
@@ -1395,27 +1429,33 @@ int QDateTimeParser::findDay(const QString &str1, int startDay, int sectionIndex
    int bestMatch = -1;
    int bestCount = 0;
 
-   if (!str1.isEmpty()) {
+   if (! str1.isEmpty()) {
       const SectionNode &sn = sectionNode(sectionIndex);
-      if (!(sn.type & DaySectionMask)) {
-         qWarning("QDateTimeParser::findDay Internal error");
+
+      if (! (sn.type & DaySectionMask)) {
+         qWarning("QDateTimeParser::findDay() Internal error");
          return -1;
       }
+
       const QLocale l = locale();
+
       for (int day = startDay; day <= 7; ++day) {
          const QString dayName = l.dayName(day, sn.count == 4 ? QLocale::LongFormat : QLocale::ShortFormat);
          const QString str2 = dayName.toLower();
 
          const int limit = qMin(str1.size(), str2.size());
          int i = 0;
+
          while (i < limit && str1.at(i) == str2.at(i)) {
             ++i;
          }
+
          if (i > bestCount) {
             bestCount = i;
             bestMatch = day;
          }
       }
+
       if (usedDay && bestMatch != -1) {
          *usedDay = l.dayName(bestMatch, sn.count == 4 ? QLocale::LongFormat : QLocale::ShortFormat);
       }
@@ -1427,25 +1467,16 @@ int QDateTimeParser::findDay(const QString &str1, int startDay, int sectionIndex
 
    return bestMatch;
 }
-#endif // QT_NO_TEXTDATE
 
-/*!
-  \internal
-
-  Returns
-  AM if str == tr("AM")
-  PM if str == tr("PM")
-  PossibleAM if str can become tr("AM")
-  PossiblePM if str can become tr("PM")
-  PossibleBoth if str can become tr("PM") and can become tr("AM")
-  Neither if str can't become anything sensible
-*/
 QDateTimeParser::AmPmFinder QDateTimeParser::findAmPm(QString &str, int sectionIndex, int *used) const
 {
+   static constexpr const int am_index = 0;
+   static constexpr const int pm_index = 1;
+
    const SectionNode &s = sectionNode(sectionIndex);
 
    if (s.type != AmPmSection) {
-      qWarning("QDateTimeParser::findAmPm Internal error");
+      qWarning("QDateTimeParser::findAmPm() Internal error");
       return Neither;
    }
 
@@ -1460,32 +1491,26 @@ QDateTimeParser::AmPmFinder QDateTimeParser::findAmPm(QString &str, int sectionI
    const QChar space(' ');
    int size = sectionMaxSize(sectionIndex);
 
-   enum {
-      amindex = 0,
-      pmindex = 1
-   };
-
    QString ampm[2];
-   ampm[amindex] = getAmPmText(AmText, s.count == 1 ? UpperCase : LowerCase);
-   ampm[pmindex] = getAmPmText(PmText, s.count == 1 ? UpperCase : LowerCase);
+   ampm[am_index] = getAmPmText(AmText, s.count == 1 ? UpperCase : LowerCase);
+   ampm[pm_index] = getAmPmText(PmText, s.count == 1 ? UpperCase : LowerCase);
 
    for (int i = 0; i < 2; ++i) {
       ampm[i].truncate(size);
    }
 
-   QDTPDEBUG << "findAmPm" << str << ampm[0] << ampm[1];
-
-   if (str.indexOf(ampm[amindex], 0, Qt::CaseInsensitive) == 0) {
-      str = ampm[amindex];
+   if (str.indexOf(ampm[am_index], 0, Qt::CaseInsensitive) == 0) {
+      str = ampm[am_index];
       return AM;
 
-   } else if (str.indexOf(ampm[pmindex], 0, Qt::CaseInsensitive) == 0) {
-      str = ampm[pmindex];
+   } else if (str.indexOf(ampm[pm_index], 0, Qt::CaseInsensitive) == 0) {
+      str = ampm[pm_index];
       return PM;
 
    } else if (context == FromString || (str.count(space) == 0 && str.size() >= size)) {
       return Neither;
    }
+
    size = qMin(size, str.size());
 
    bool broken[2] = {false, false};
@@ -1497,28 +1522,19 @@ QDateTimeParser::AmPmFinder QDateTimeParser::findAmPm(QString &str, int sectionI
             if (! broken[j]) {
                int index = ampm[j].indexOf(str.at(i));
 
-               QDTPDEBUG << "looking for" << str.at(i)
-                         << "in" << ampm[j] << "and got" << index;
-
                if (index == -1) {
                   if (str.at(i).category() == QChar::Letter_Uppercase) {
                      index = ampm[j].indexOf(str.at(i).toLower());
 
-                     QDTPDEBUG << "trying with" << str.at(i).toLower()
-                               << "in" << ampm[j] << "and got" << index;
-
                   } else if (str.at(i).category() == QChar::Letter_Lowercase) {
                      index = ampm[j].indexOf(str.at(i).toUpper());
 
-                     QDTPDEBUG << "trying with" << str.at(i).toUpper()
-                               << "in" << ampm[j] << "and got" << index;
                   }
 
                   if (index == -1) {
                      broken[j] = true;
 
-                     if (broken[amindex] && broken[pmindex]) {
-                        QDTPDEBUG << str << "did not work";
+                     if (broken[am_index] && broken[pm_index]) {
                         return Neither;
                      }
 
@@ -1535,47 +1551,49 @@ QDateTimeParser::AmPmFinder QDateTimeParser::findAmPm(QString &str, int sectionI
       }
    }
 
-   if (! broken[pmindex] && !broken[amindex]) {
+   if (! broken[am_index] && ! broken[pm_index]) {
       return PossibleBoth;
    }
 
-   return (!broken[amindex] ? PossibleAM : PossiblePM);
+   return (! broken[am_index] ? PossibleAM : PossiblePM);
 }
-
-/*!
-  \internal
-  Max number of units that can be changed by this section.
-*/
 
 int QDateTimeParser::SectionNode::maxChange() const
 {
    switch (type) {
-      // Time. unit is msec
+      // Time unit is msec
       case MSecSection:
          return 999;
+
       case SecondSection:
          return 59 * 1000;
+
       case MinuteSection:
          return 59 * 60 * 1000;
+
       case Hour24Section:
       case Hour12Section:
          return 59 * 60 * 60 * 1000;
 
-      // Date. unit is day
+      // Date unit is day
       case DayOfWeekSectionShort:
       case DayOfWeekSectionLong:
          return 7;
+
       case DaySection:
          return 30;
+
       case MonthSection:
          return 365 - 31;
+
       case YearSection:
          return 9999 * 365;
+
       case YearSection2Digits:
          return 100 * 365;
+
       default:
-         qWarning("QDateTimeParser::maxChange() Internal error (%s)",
-            csPrintable(name()));
+         qWarning("QDateTimeParser::maxChange() Internal error (%s)", csPrintable(name()));
    }
 
    return -1;
@@ -1599,12 +1617,15 @@ QDateTimeParser::FieldInfo QDateTimeParser::fieldInfo(int index) const
       case YearSection:
       case YearSection2Digits:
          ret |= Numeric;
+
          if (sn.type != YearSection) {
             ret |= AllowPartial;
          }
+
          if (sn.count != 1) {
             ret |= FixedWidth;
          }
+
          break;
 
       case MonthSection:
@@ -1618,6 +1639,7 @@ QDateTimeParser::FieldInfo QDateTimeParser::fieldInfo(int index) const
                ret |= (Numeric | AllowPartial);
                break;
          }
+
          break;
 
       case DayOfWeekSectionShort:
@@ -1625,6 +1647,7 @@ QDateTimeParser::FieldInfo QDateTimeParser::fieldInfo(int index) const
          if (sn.count == 3) {
             ret |= FixedWidth;
          }
+
          break;
 
       case AmPmSection:
@@ -1632,8 +1655,9 @@ QDateTimeParser::FieldInfo QDateTimeParser::fieldInfo(int index) const
          break;
 
       default:
-         qWarning("QDateTimeParser::fieldInfo Internal error 2 (%d %s %d)",
-            index, csPrintable(sn.name()), sn.count);
+         qWarning("QDateTimeParser::fieldInfo() Internal error 2 (%d %s %d)",
+               index, csPrintable(sn.name()), sn.count);
+
          break;
    }
 
@@ -1643,43 +1667,53 @@ QDateTimeParser::FieldInfo QDateTimeParser::fieldInfo(int index) const
 QString QDateTimeParser::SectionNode::format() const
 {
    QChar fillChar;
+
    switch (type) {
       case AmPmSection:
          return count == 1 ? QString("AP") : QString("ap");
+
       case MSecSection:
-         fillChar = QLatin1Char('z');
+         fillChar = QChar('z');
          break;
+
       case SecondSection:
-         fillChar = QLatin1Char('s');
+         fillChar = QChar('s');
          break;
+
       case MinuteSection:
-         fillChar = QLatin1Char('m');
+         fillChar = QChar('m');
          break;
+
       case Hour24Section:
-         fillChar = QLatin1Char('H');
+         fillChar = QChar('H');
          break;
+
       case Hour12Section:
-         fillChar = QLatin1Char('h');
+         fillChar = QChar('h');
          break;
+
       case DayOfWeekSectionShort:
       case DayOfWeekSectionLong:
       case DaySection:
-         fillChar = QLatin1Char('d');
+         fillChar = QChar('d');
          break;
+
       case MonthSection:
-         fillChar = QLatin1Char('M');
+         fillChar = QChar('M');
          break;
+
       case YearSection2Digits:
       case YearSection:
-         fillChar = QLatin1Char('y');
+         fillChar = QChar('y');
          break;
+
       default:
-         qWarning("QDateTimeParser::sectionFormat Internal error (%s)",
-            csPrintable(name(type)));
+         qWarning("QDateTimeParser::sectionFormat() Internal error (%s)", csPrintable(name(type)));
          return QString();
    }
+
    if (fillChar.isNull()) {
-      qWarning("QDateTimeParser::sectionFormat Internal error 2");
+      qWarning("QDateTimeParser::sectionFormat() Internal error 2");
       return QString();
    }
 
@@ -1688,20 +1722,13 @@ QString QDateTimeParser::SectionNode::format() const
    return str;
 }
 
-
-/*!
-  \internal
-
-  Returns \c true if str can be modified to represent a
-  number that is within min and max.
-*/
-
 bool QDateTimeParser::potentialValue(const QString &str, int min, int max, int index,
-   const QDateTime &currentValue, int insert) const
+      const QDateTime &currentValue, int insert) const
 {
    if (str.isEmpty()) {
       return true;
    }
+
    const int size = sectionMaxSize(index);
    int val = (int)locale().toUInt(str, nullptr, 10);
    const SectionNode &sn = sectionNode(index);
@@ -1712,13 +1739,16 @@ bool QDateTimeParser::potentialValue(const QString &str, int min, int max, int i
 
    if (val >= min && val <= max && str.size() == size) {
       return true;
+
    } else if (val > max) {
       return false;
+
    } else if (str.size() == size && val < min) {
       return false;
    }
 
    const int len = size - str.size();
+
    for (int i = 0; i < len; ++i) {
       for (int j = 0; j < 10; ++j) {
          if (potentialValue(str + QChar('0' + j), min, max, index, currentValue, insert)) {
@@ -1747,6 +1777,7 @@ bool QDateTimeParser::skipToNextSection(int index, const QDateTime &current, con
 
    const QDateTime maximum = getMaximum();
    const QDateTime minimum = getMinimum();
+
    QDateTime tmp = current;
    int min = absoluteMin(index);
    setDigit(tmp, index, min);
@@ -1757,11 +1788,13 @@ bool QDateTimeParser::skipToNextSection(int index, const QDateTime &current, con
 
    int max = absoluteMax(index, current);
    setDigit(tmp, index, max);
+
    if (tmp > maximum) {
       max = getDigit(maximum, index);
    }
 
    int pos = cursorPosition() - node.pos;
+
    if (pos < 0 || pos >= text.size()) {
       pos = -1;
    }
@@ -1769,60 +1802,64 @@ bool QDateTimeParser::skipToNextSection(int index, const QDateTime &current, con
    const bool potential = potentialValue(text, min, max, index, current, pos);
    return !potential;
 
-   /* If the value potentially can become another valid entry we
-    * don't want to skip to the next. E.g. In a M field (month
-    * without leading 0 if you type 1 we don't want to autoskip but
-    * if you type 3 we do
-   */
-}
+   // If the value potentially can become another valid entry we do not want to skip
+   // to the next. For example, in a M field (month without leading 0 if you type 1
+   // we do not want to autoskip, but if you type 3 we do skip
 
-/*!
-  \internal
-  For debugging. Returns the name of the section \a s.
-*/
+}
 
 QString QDateTimeParser::SectionNode::name(QDateTimeParser::Section s)
 {
    switch (s) {
       case QDateTimeParser::AmPmSection:
-         return QLatin1String("AmPmSection");
+         return QString("AmPmSection");
+
       case QDateTimeParser::DaySection:
-         return QLatin1String("DaySection");
+         return QString("DaySection");
+
       case QDateTimeParser::DayOfWeekSectionShort:
-         return QLatin1String("DayOfWeekSectionShort");
+         return QString("DayOfWeekSectionShort");
+
       case QDateTimeParser::DayOfWeekSectionLong:
-         return QLatin1String("DayOfWeekSectionLong");
+         return QString("DayOfWeekSectionLong");
+
       case QDateTimeParser::Hour24Section:
-         return QLatin1String("Hour24Section");
+         return QString("Hour24Section");
+
       case QDateTimeParser::Hour12Section:
-         return QLatin1String("Hour12Section");
+         return QString("Hour12Section");
+
       case QDateTimeParser::MSecSection:
-         return QLatin1String("MSecSection");
+         return QString("MSecSection");
+
       case QDateTimeParser::MinuteSection:
-         return QLatin1String("MinuteSection");
+         return QString("MinuteSection");
+
       case QDateTimeParser::MonthSection:
-         return QLatin1String("MonthSection");
+         return QString("MonthSection");
+
       case QDateTimeParser::SecondSection:
-         return QLatin1String("SecondSection");
+         return QString("SecondSection");
+
       case QDateTimeParser::YearSection:
-         return QLatin1String("YearSection");
+         return QString("YearSection");
+
       case QDateTimeParser::YearSection2Digits:
-         return QLatin1String("YearSection2Digits");
+         return QString("YearSection2Digits");
+
       case QDateTimeParser::NoSection:
-         return QLatin1String("NoSection");
+         return QString("NoSection");
+
       case QDateTimeParser::FirstSection:
-         return QLatin1String("FirstSection");
+         return QString("FirstSection");
+
       case QDateTimeParser::LastSection:
-         return QLatin1String("LastSection");
+         return QString("LastSection");
+
       default:
-         return QLatin1String("Unknown section ") + QString::number(int(s));
+         return QString("Unknown section ") + QString::number(int(s));
    }
 }
-
-/*!
-  \internal
-  For debugging. Returns the name of the state \a s.
-*/
 
 QString QDateTimeParser::stateName(State s) const
 {
@@ -1843,30 +1880,34 @@ QString QDateTimeParser::stateName(State s) const
 
 bool QDateTimeParser::fromString(const QString &t, QDate *date, QTime *time) const
 {
-   QDateTime val(QDate(1900, 1, 1), QDATETIMEEDIT_TIME_MIN);
+   QDateTime dt(QDate(1900, 1, 1), QDATETIME_TIME_MIN);
    QString text = t;
 
    int copy = -1;
-   const StateNode tmp = parse(text, copy, val, false);
+   const StateNode tmp = parse(text, copy, dt, false);
 
    if (tmp.state != Acceptable || tmp.conflicts) {
       return false;
    }
 
    if (time) {
-      const QTime t = tmp.value.time();
-      if (!t.isValid()) {
+      const QTime newTime = tmp.value.time();
+
+      if (! newTime.isValid()) {
          return false;
       }
-      *time = t;
+
+      *time = newTime;
    }
 
    if (date) {
-      const QDate d = tmp.value.date();
-      if (!d.isValid()) {
+      const QDate newDate = tmp.value.date();
+
+      if (! newDate.isValid()) {
          return false;
       }
-      *date = d;
+
+      *date = newDate;
    }
 
    return true;
@@ -1874,29 +1915,23 @@ bool QDateTimeParser::fromString(const QString &t, QDate *date, QTime *time) con
 
 QDateTime QDateTimeParser::getMinimum() const
 {
-   return QDateTime(QDATETIMEEDIT_DATE_MIN, QDATETIMEEDIT_TIME_MIN, spec);
+   return QDateTime(QDATETIME_DATE_MIN, QDATETIME_TIME_MIN, m_timeZone);
 }
 
 QDateTime QDateTimeParser::getMaximum() const
 {
-   return QDateTime(QDATETIMEEDIT_DATE_MAX, QDATETIMEEDIT_TIME_MAX, spec);
+   return QDateTime(QDATETIME_DATE_MAX, QDATETIME_TIME_MAX, m_timeZone);
 }
 
 QString QDateTimeParser::getAmPmText(AmPm ap, Case cs) const
 {
    const QLocale loc = locale();
    QString raw = ap == AmText ? loc.amText() : loc.pmText();
+
    return cs == UpperCase ? raw.toUpper() : raw.toLower();
 }
-
-/*
-  \internal
-
-  give arg2 preference because arg1 is always a QDateTime.
-*/
 
 bool operator==(const QDateTimeParser::SectionNode &s1, const QDateTimeParser::SectionNode &s2)
 {
    return (s1.type == s2.type) && (s1.pos == s2.pos) && (s1.count == s2.count);
 }
-

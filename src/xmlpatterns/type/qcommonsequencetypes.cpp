@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -30,8 +30,6 @@
 /* To avoid the static initialization fiasco, we put the builtin types in this compilation unit, since
  * the sequence types depends on them. */
 #include "qbuiltintypes.cpp"
-
-QT_BEGIN_NAMESPACE
 
 using namespace QPatternist;
 
@@ -110,5 +108,3 @@ const EmptySequenceType::Ptr    CommonSequenceTypes::Empty  (new EmptySequenceTy
 const NoneType::Ptr             CommonSequenceTypes::None   (new NoneType());
 const SequenceType::Ptr         CommonSequenceTypes::EBV    (new EBVType());
 
-
-QT_END_NAMESPACE

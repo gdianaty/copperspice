@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -66,11 +66,11 @@ class QEmulationPaintEngine : public QPaintEngineEx
    }
 
    QPainterState *state() {
-      return (QPainterState *)QPaintEngine::state;
+      return (QPainterState *)m_engineState;
    }
 
    const QPainterState *state() const {
-      return (const QPainterState *)QPaintEngine::state;
+      return (const QPainterState *)m_engineState;
    }
 
    QPaintEngineEx *real_engine;

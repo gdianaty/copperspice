@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,12 @@
 #ifndef QWINDOWSBACKINGSTORE_H
 #define QWINDOWSBACKINGSTORE_H
 
-#include <qwin_additional.h>
 #include <qplatform_backingstore.h>
 #include <qscopedpointer.h>
+#include <qwin_additional.h>
 
-class QWindowsWindow;
 class QWindowsNativeImage;
+class QWindowsWindow;
 
 class QWindowsBackingStore : public QPlatformBackingStore
 {

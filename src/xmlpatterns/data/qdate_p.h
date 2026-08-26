@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,8 +26,6 @@
 
 #include <qabstractdatetime_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class Date : public AbstractDateTime
@@ -35,9 +33,6 @@ class Date : public AbstractDateTime
  public:
    typedef AtomicValue::Ptr Ptr;
 
-   /**
-    * Creates an instance from the lexical representation @p string.
-    */
    static Date::Ptr fromLexical(const QString &string);
    static Date::Ptr fromDateTime(const QDateTime &date);
 
@@ -50,8 +45,7 @@ class Date : public AbstractDateTime
 
    Date(const QDateTime &dateTime);
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

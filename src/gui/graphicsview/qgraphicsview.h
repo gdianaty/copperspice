@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,9 +24,9 @@
 #ifndef QGRAPHICSVIEW_H
 #define QGRAPHICSVIEW_H
 
+#include <qgraphicsscene.h>
 #include <qpainter.h>
 #include <qscrollarea.h>
-#include <qgraphicsscene.h>
 
 #if ! defined(QT_NO_GRAPHICSVIEW)
 
@@ -34,6 +34,7 @@ class QGraphicsItem;
 class QPainterPath;
 class QPolygonF;
 class QStyleOptionGraphicsItem;
+
 class QGraphicsViewPrivate;
 
 class Q_GUI_EXPORT QGraphicsView : public QAbstractScrollArea
@@ -252,7 +253,6 @@ class Q_GUI_EXPORT QGraphicsView : public QAbstractScrollArea
    QBrush foregroundBrush() const;
    void setForegroundBrush(const QBrush &brush);
 
- public :
    GUI_CS_SLOT_1(Public, void updateScene(const QList <QRectF> &rects))
    GUI_CS_SLOT_2(updateScene)
 
@@ -268,7 +268,7 @@ class Q_GUI_EXPORT QGraphicsView : public QAbstractScrollArea
    GUI_CS_SIGNAL_2(rubberBandChanged, viewportRect, fromScenePoint, toScenePoint)
 #endif
 
- protected :
+ protected:
    GUI_CS_SLOT_1(Protected, void setupViewport(QWidget *widget) override)
    GUI_CS_SLOT_2(setupViewport)
 

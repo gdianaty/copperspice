@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,15 +29,16 @@
 
 #ifdef QT_SSL
 
-#include <qtcpsocket.h>
 #include <qsslerror.h>
+#include <qtcpsocket.h>
 
 class QDir;
-class QSslCipher;
 class QSslCertificate;
+class QSslCipher;
 class QSslConfiguration;
 class QSslEllipticCurve;
 class QSslPreSharedKeyAuthenticator;
+
 class QSslSocketPrivate;
 
 class Q_NETWORK_EXPORT QSslSocket : public QTcpSocket
@@ -83,8 +84,8 @@ class Q_NETWORK_EXPORT QSslSocket : public QTcpSocket
 
    void disconnectFromHost() override;
 
-   virtual void setSocketOption(QAbstractSocket::SocketOption option, const QVariant &value) override;
-   virtual QVariant socketOption(QAbstractSocket::SocketOption option) override;
+   void setSocketOption(QAbstractSocket::SocketOption option, const QVariant &value) override;
+   QVariant socketOption(QAbstractSocket::SocketOption option) override;
 
    SslMode mode() const;
    bool isEncrypted() const;

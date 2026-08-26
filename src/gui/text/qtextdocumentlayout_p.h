@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,12 +25,12 @@
 #define QTEXTDOCUMENTLAYOUT_P_H
 
 #include <qabstracttextdocumentlayout.h>
-#include <qtextoption.h>
 #include <qtextobject.h>
-
+#include <qtextoption.h>
 
 class QTextListFormat;
 class QTextTableCell;
+
 class QTextDocumentLayoutPrivate;
 
 class QTextDocumentLayout : public QAbstractTextDocumentLayout
@@ -56,10 +56,10 @@ class QTextDocumentLayout : public QAbstractTextDocumentLayout
    void setCursorWidth(int width);
    int cursorWidth() const;
 
-   // internal, to support the ugly FixedColumnWidth wordwrap mode in QTextEdit
+   // support the FixedColumnWidth wordwrap mode in QTextEdit
    void setFixedColumnWidth(int width);
 
-   // internal for QTextEdit's NoWrap mode
+   // QTextEdit NoWrap mode
    void setViewport(const QRectF &viewport);
 
    QRectF frameBoundingRect(QTextFrame *frame) const override;

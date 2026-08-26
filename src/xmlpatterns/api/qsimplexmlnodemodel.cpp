@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,9 +21,9 @@
 *
 ***********************************************************************/
 
-#include <QUrl>
-#include <QVector>
-#include <QXmlNamePool>
+#include <qurl.h>
+#include <qvector.h>
+#include <qxmlnamepool.h>
 
 #include "qabstractxmlnodemodel_p.h"
 #include "qemptyiterator_p.h"
@@ -82,37 +82,20 @@ QXmlNamePool &QSimpleXmlNodeModel::namePool() const
    return d->namePool;
 }
 
-/*!
-  Always returns an empty QVector. This signals that no namespace
-  bindings are in scope for \a node.
- */
 QVector<QXmlName> QSimpleXmlNodeModel::namespaceBindings(const QXmlNodeModelIndex &node) const
 {
    (void) node;
    return QVector<QXmlName>();
 }
 
-/*!
-  Always returns a default constructed QXmlNodeModelIndex instance,
-  regardless of \a id.
-
-  This effectively means the model has no elements that have an id.
- */
 QXmlNodeModelIndex QSimpleXmlNodeModel::elementById(const QXmlName &id) const
 {
    (void) id;
    return QXmlNodeModelIndex();
 }
 
-/*!
-  Always returns an empty vector, regardless of \a idref.
-
-  This effectively means the model has no elements or attributes of
-  type \c IDREF.
- */
 QVector<QXmlNodeModelIndex> QSimpleXmlNodeModel::nodesByIdref(const QXmlName &idref) const
 {
    (void) idref;
    return QVector<QXmlNodeModelIndex>();
 }
-

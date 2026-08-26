@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,19 +22,20 @@
 ***********************************************************************/
 
 #include <qpathclipper_p.h>
-#include <qbezier_p.h>
-#include <qvector.h>
+
 #include <qdebug.h>
-#include <qnumeric_p.h>
 #include <qmath.h>
+#include <qvector.h>
+
+#include <qbezier_p.h>
+#include <qnumeric_p.h>
 
 #include <algorithm>
 
-/**
-  The algorithm is as follows:
-
+/*
   1. Find all intersections between the two paths (including self-intersections),
      and build a winged edge structure of non-intersecting parts.
+
   2. While there are more unhandled edges:
     3. Pick a y-coordinate from an unhandled edge.
     4. Intersect the horizontal line at y-coordinate with all edges.
@@ -42,14 +43,16 @@
     6. If the subpath should be added, traverse the winged-edge structure and add the edges to
        a separate winged edge structure.
     7. Mark all edges in subpaths crossing the horizontal line as handled.
- 8. (Optional) Simplify the resulting winged edge structure by merging shared edges.
- 9. Convert the resulting winged edge structure to a painter path.
- */
 
+ 8. (Optional) Simplify the resulting winged edge structure by merging shared edges.
+
+ 9. Convert the resulting winged edge structure to a painter path.
+
+*/
 
 static inline bool fuzzyIsNull(qreal d)
 {
-   if (sizeof(qreal) == sizeof(double)) {
+   if constexpr (sizeof(qreal) == sizeof(double)) {
       return qAbs(d) <= 1e-12;
    } else {
       return qAbs(d) <= 1e-5f;
@@ -61,7 +64,6 @@ static inline bool comparePoints(const QPointF &a, const QPointF &b)
    return fuzzyIsNull(a.x() - b.x()) && fuzzyIsNull(a.y() - b.y());
 }
 
-//#define QDEBUG_CLIPPER
 static qreal dot(const QPointF &a, const QPointF &b)
 {
    return a.x() * b.x() + a.y() * b.y();
@@ -639,7 +641,7 @@ class QKdPointTree
       return &m_nodes[m_rootNode];
    }
 
-   inline int nextId() {
+   int nextId() {
       return m_id++;
    }
 
@@ -723,7 +725,7 @@ class QKdPointFinder
       pointComponents[1] = segments.pointAt(point).y();
    }
 
-   inline QKdPointTree::Traversal operator()(QKdPointTree::Node &node, int depth) {
+   QKdPointTree::Traversal operator()(QKdPointTree::Node &node, int depth) {
       if (m_result != -1) {
          return QKdPointTree::TraverseNone;
       }
@@ -833,17 +835,18 @@ void QWingedEdge::intersectAndAdd()
 
       std::sort(intersections.begin(), intersections.end());
 
-      int first = m_segments.segmentAt(i).va;
+      int first  = m_segments.segmentAt(i).va;
       int second = m_segments.segmentAt(i).vb;
 
       int last = first;
-      for (int j = 0; j < intersections.size(); ++j) {
-         const QPathSegments::Intersection &isect = intersections.at(j);
 
-         QPathEdge *ep = edge(addEdge(last, isect.vertex));
+      for (int j = 0; j < intersections.size(); ++j) {
+         const QPathSegments::Intersection &span = intersections.at(j);
+
+         QPathEdge *ep = edge(addEdge(last, span.vertex));
 
          if (ep) {
-            const int dir = m_segments.pointAt(last).y() < m_segments.pointAt(isect.vertex).y() ? 1 : -1;
+            const int dir = m_segments.pointAt(last).y() < m_segments.pointAt(span.vertex).y() ? 1 : -1;
 
             if (pathId == 0) {
                ep->windingA += dir;
@@ -852,7 +855,7 @@ void QWingedEdge::intersectAndAdd()
             }
          }
 
-         last = isect.vertex;
+         last = span.vertex;
       }
 
       QPathEdge *ep = edge(addEdge(last, second));
@@ -1242,8 +1245,9 @@ int QWingedEdge::addEdge(int fi, int si)
    QPathVertex *vertices[2] = { fp, sp };
    QPathEdge::Direction dirs[2] = { QPathEdge::Backward, QPathEdge::Forward };
 
-#ifdef QDEBUG_CLIPPER
-   printf("** Adding edge %d / vertices: %.07f %.07f, %.07f %.07f\n", ei, fp->x, fp->y, sp->x, sp->y);
+#if defined(CS_SHOW_DEBUG_GUI_PAINTING)
+   qDebug("QWingedEdge::addEdge() Adding edge %d, vertices = %.07f %.07f, %.07f %.07f",
+         ei, fp->x, fp->y, sp->x, sp->y);
 #endif
 
    for (int i = 0; i < 2; ++i) {
@@ -1693,14 +1697,6 @@ bool QPathClipper::doClip(QWingedEdge &list, ClipperMode mode)
    std::sort(y_coords.begin(), y_coords.end());
    y_coords.erase(std::unique(y_coords.begin(), y_coords.end(), fuzzyCompare), y_coords.end());
 
-#ifdef QDEBUG_CLIPPER
-   printf("sorted y coords:\n");
-
-   for (int i = 0; i < y_coords.size(); ++i) {
-      printf("%.9f\n", y_coords[i]);
-   }
-#endif
-
    bool found;
 
    do {
@@ -1757,10 +1753,6 @@ bool QPathClipper::doClip(QWingedEdge &list, ClipperMode mode)
             }
          }
 
-#ifdef QDEBUG_CLIPPER
-         printf("y: %.9f, gap: %.9f\n", bestY, biggestGap);
-#endif
-
          if (handleCrossingEdges(list, bestY, mode) && mode == CheckMode) {
             return true;
          }
@@ -1788,11 +1780,10 @@ static void traverse(QWingedEdge &list, int edge, QPathEdge::Traversal traversal
       int flag = status.traversal == QPathEdge::LeftTraversal ? 1 : 2;
 
       QPathEdge *ep = list.edge(status.edge);
-
       ep->flag |= (flag | (flag << 4));
 
-#ifdef QDEBUG_CLIPPER
-      qDebug() << "traverse: adding edge " << status.edge << ", mask:" << (flag << 4) << ep->flag;
+#if defined(CS_SHOW_DEBUG_GUI_PAINTING)
+      qDebug() << "traverse() adding edge = " << status.edge << ", mask = " << (flag << 4) << ep->flag;
 #endif
 
       status = list.next(status);
@@ -1800,11 +1791,11 @@ static void traverse(QWingedEdge &list, int edge, QPathEdge::Traversal traversal
 }
 
 struct QCrossingEdge {
-   int edge;
-   qreal x;
+   int m_edge;
+   qreal m_x;
 
    bool operator<(const QCrossingEdge &edge) const {
-      return x < edge.x;
+      return m_x < edge.m_x;
    }
 };
 
@@ -1858,17 +1849,21 @@ bool QWingedEdge::isInside(qreal x, qreal y) const
 static QVector<QCrossingEdge> findCrossings(const QWingedEdge &list, qreal y)
 {
    QVector<QCrossingEdge> crossings;
+
    for (int i = 0; i < list.edgeCount(); ++i) {
-      const QPathEdge *edge = list.edge(i);
-      QPointF a = *list.vertex(edge->first);
-      QPointF b = *list.vertex(edge->second);
+      const QPathEdge *edge_A = list.edge(i);
+
+      QPointF a = *list.vertex(edge_A->first);
+      QPointF b = *list.vertex(edge_A->second);
 
       if ((a.y() < y && b.y() > y) || (a.y() > y && b.y() < y)) {
          const qreal intersection = a.x() + (b.x() - a.x()) * (y - a.y()) / (b.y() - a.y());
-         const QCrossingEdge edge = { i, intersection };
-         crossings << edge;
+
+         const QCrossingEdge edge_B = { i, intersection };
+         crossings << edge_B;
       }
    }
+
    return crossings;
 }
 
@@ -1876,19 +1871,20 @@ bool QPathClipper::handleCrossingEdges(QWingedEdge &list, qreal y, ClipperMode m
 {
    QVector<QCrossingEdge> crossings = findCrossings(list, y);
 
-   Q_ASSERT(!crossings.isEmpty());
+   Q_ASSERT(! crossings.isEmpty());
+
    std::sort(crossings.begin(), crossings.end());
 
    int windingA = 0;
    int windingB = 0;
-
    int windingD = 0;
 
-#ifdef QDEBUG_CLIPPER
-   qDebug() << "crossings:" << crossings.size();
+#if defined(CS_SHOW_DEBUG_GUI_PAINTING)
+   qDebug() << "QPathClipper::handleCrossingEdges() Crossing = " << crossings.size();
 #endif
+
    for (int i = 0; i < crossings.size() - 1; ++i) {
-      int ei = crossings.at(i).edge;
+      int ei = crossings.at(i).m_edge;
       const QPathEdge *edge = list.edge(ei);
 
       windingA += edge->windingA;
@@ -1906,11 +1902,6 @@ bool QPathClipper::handleCrossingEdges(QWingedEdge &list, qreal y, ClipperMode m
       const bool inside = bool_op(inA, inB, op);
       const bool add = inD ^ inside;
 
-#ifdef QDEBUG_CLIPPER
-      printf("y %f, x %f, inA: %d, inB: %d, inD: %d, inside: %d, flag: %x, bezier: %p, edge: %d\n", y, crossings.at(i).x, inA,
-         inB, inD, inside, edge->flag, edge->bezier, ei);
-#endif
-
       if (add) {
          if (mode == CheckMode) {
             return true;
@@ -1920,19 +1911,20 @@ bool QPathClipper::handleCrossingEdges(QWingedEdge &list, qreal y, ClipperMode m
          qreal y1 = list.vertex(edge->second)->y;
 
          if (y0 < y1) {
-            if (!(edge->flag & 1)) {
+            if (! (edge->flag & 1)) {
                traverse(list, ei, QPathEdge::LeftTraversal);
             }
 
-            if (!(edge->flag & 2)) {
+            if (! (edge->flag & 2)) {
                clear(list, ei, QPathEdge::RightTraversal);
             }
+
          } else {
-            if (!(edge->flag & 1)) {
+            if (! (edge->flag & 1)) {
                clear(list, ei, QPathEdge::LeftTraversal);
             }
 
-            if (!(edge->flag & 2)) {
+            if (! (edge->flag & 2)) {
                traverse(list, ei, QPathEdge::RightTraversal);
             }
          }

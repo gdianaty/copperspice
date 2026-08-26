@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,6 +26,8 @@
 
 #include <qpoint.h>
 
+#include <numeric>
+
 class QDataStream;
 class QDebug;
 
@@ -42,6 +44,7 @@ class Q_CORE_EXPORT QLine
       : pt1(QPoint(x1, y1)), pt2(QPoint(x2, y2))
    { }
 
+   inline QPoint center() const;
    inline bool isNull() const;
 
    inline QPoint p1() const;
@@ -68,7 +71,7 @@ class Q_CORE_EXPORT QLine
    inline void setLine(int x1, int y1, int x2, int y2);
 
    inline bool operator==(const QLine &line) const;
-   inline bool operator!=(const QLine &line) const {
+   bool operator!=(const QLine &line) const {
       return !(*this == line);
    }
 
@@ -76,6 +79,11 @@ class Q_CORE_EXPORT QLine
    QPoint pt1;
    QPoint pt2;
 };
+
+inline QPoint QLine::center() const
+{
+   return QPoint( std::midpoint(pt1.x(), pt2.x()), std::midpoint(pt1.y(), pt2.y()) );
+}
 
 inline bool QLine::isNull() const
 {
@@ -108,8 +116,7 @@ inline QPoint QLine::p1() const
 }
 
 inline QPoint QLine::p2() const
-{
-   return pt2;
+{   return pt2;
 }
 
 inline int QLine::dx() const
@@ -178,8 +185,11 @@ Q_CORE_EXPORT QDataStream &operator>>(QDataStream &stream, QLine &line);
 class Q_CORE_EXPORT QLineF
 {
  public:
-
-   enum IntersectType { NoIntersection, BoundedIntersection, UnboundedIntersection };
+   enum IntersectType {
+      NoIntersection,
+      BoundedIntersection,
+      UnboundedIntersection,
+   };
 
    QLineF() = default;
 
@@ -198,9 +208,15 @@ class Q_CORE_EXPORT QLineF
    {
    }
 
-   static QLineF fromPolar(qreal length, qreal angle);
+   qreal angle() const;
+   qreal angle(const QLineF &lineF) const;
 
+   qreal angleTo(const QLineF &lineF) const;
+
+   inline QPointF center() const;
    bool isNull() const;
+
+   qreal length() const;
 
    inline QPointF p1() const;
    inline QPointF p2() const;
@@ -214,20 +230,12 @@ class Q_CORE_EXPORT QLineF
    inline qreal dx() const;
    inline qreal dy() const;
 
-   qreal length() const;
    inline void setLength(qreal length);
-
-   qreal angle() const;
-   qreal angle(const QLineF &lineF) const;
-
-   qreal angleTo(const QLineF &lineF) const;
 
    void setAngle(qreal angle);
 
-   QLineF unitVector() const;
    inline QLineF normalVector() const;
 
-   // ### Qt5 rename intersects() or intersection() and rename IntersectType IntersectionType
    IntersectType intersect(const QLineF &lineF, QPointF *intersectionPoint) const;
 
    inline QPointF pointAt(qreal pos) const;
@@ -242,16 +250,26 @@ class Q_CORE_EXPORT QLineF
    inline void setPoints(const QPointF &point1, const QPointF &point2);
    inline void setLine(qreal x1, qreal y1, qreal x2, qreal y2);
 
+   inline QLine toLine() const;
+
+   QLineF unitVector() const;
+
    inline bool operator==(const QLineF &lineF) const;
-   inline bool operator!=(const QLineF &lineF) const {
+   bool operator!=(const QLineF &lineF) const {
       return !(*this == lineF);
    }
 
-   inline QLine toLine() const;
+   static QLineF fromPolar(qreal length, qreal angle);
 
  private:
-   QPointF pt1, pt2;
+   QPointF pt1;
+   QPointF pt2;
 };
+
+inline QPointF QLineF::center() const
+{
+   return QPointF( std::midpoint(pt1.x(), pt2.x()), std::midpoint(pt1.y(), pt2.y()) );
+}
 
 inline qreal QLineF::x1() const
 {
@@ -341,7 +359,6 @@ inline QLine QLineF::toLine() const
 {
    return QLine(pt1.toPoint(), pt2.toPoint());
 }
-
 
 inline void QLineF::setP1(const QPointF &point)
 {

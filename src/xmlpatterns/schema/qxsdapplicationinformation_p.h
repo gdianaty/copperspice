@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,46 +28,25 @@
 #include <qanyuri_p.h>
 #include <qnamedschemacomponent_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class XsdApplicationInformation : public NamedSchemaComponent
 {
  public:
    typedef QExplicitlySharedDataPointer<XsdApplicationInformation> Ptr;
    typedef QList<XsdApplicationInformation::Ptr> List;
 
-   /**
-    * Sets the @p source of the application information.
-    *
-    * The source points to an URL that contains more
-    * information.
-    */
    void setSource(const AnyURI::Ptr &source);
-
-   /**
-    * Returns the source of the application information.
-    */
    AnyURI::Ptr source() const;
 
-   /**
-    * Sets the @p content of the application information.
-    *
-    * The content can be of abritrary type.
-    */
    void setContent(const QString &content);
-
-   /**
-    * Returns the content of the application information.
-    */
    QString content() const;
 
  private:
    AnyURI::Ptr  m_source;
-   QString      m_content;
+   QString m_content;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

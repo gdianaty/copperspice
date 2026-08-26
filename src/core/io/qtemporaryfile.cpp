@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,6 +22,7 @@
 ***********************************************************************/
 
 #include <qtemporaryfile.h>
+#include <qtemporaryfile_p.h>
 
 #ifndef QT_NO_TEMPORARYFILE
 
@@ -30,7 +31,6 @@
 #include <qregularexpression.h>
 
 #include <qfile_p.h>
-#include <qtemporaryfile_p.h>
 #include <qsystemerror_p.h>
 
 #if ! defined(Q_OS_WIN)
@@ -39,9 +39,9 @@
 #endif
 
 #if defined(Q_OS_WIN)
-   using NativeFileHandle = HANDLE;
+using NativeFileHandle = HANDLE;
 #else
-   using NativeFileHandle = int;
+using NativeFileHandle = int;
 #endif
 
 static QString createFileName(QString fName, size_t pos, size_t length)
@@ -66,7 +66,7 @@ static QString createFileName(QString fName, size_t pos, size_t length)
 }
 
 static bool createFileFromTemplate(NativeFileHandle &fHandle, QString &fName,
-                  size_t pos, size_t length, quint32 mode, QSystemError &error)
+      size_t pos, size_t length, quint32 mode, QSystemError &error)
 {
    for (int cntLimit = 0; cntLimit < 100; ++cntLimit) {
       // create file and obtain handle
@@ -77,8 +77,7 @@ static bool createFileFromTemplate(NativeFileHandle &fHandle, QString &fName,
       (void) mode;
 
       fHandle = CreateFile(&fName.toStdWString()[0], GENERIC_READ | GENERIC_WRITE,
-                        FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, CREATE_NEW,
-                        FILE_ATTRIBUTE_NORMAL, nullptr);
+            FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, nullptr);
 
       if (fHandle != INVALID_HANDLE_VALUE) {
          // opened successfully
@@ -146,7 +145,7 @@ bool QTemporaryFileEngine::isReallyOpen()
 #if defined Q_OS_WIN
          && (INVALID_HANDLE_VALUE == d->fileHandle)
 #endif
-        )) {
+         )) {
 
       return true;
    }
@@ -162,12 +161,12 @@ void QTemporaryFileEngine::setFileName(const QString &file)
    QFSFileEngine::setFileName(file);
 }
 
-void QTemporaryFileEngine::setFileTemplate(const QString &fileTemplate)
+void QTemporaryFileEngine::setFileTemplate(const QString &fileName)
 {
    Q_D(QFSFileEngine);
 
    if (filePathIsTemplate) {
-      d->fileEntry = QFileSystemEntry(fileTemplate);
+      d->fileEntry = QFileSystemEntry(fileName);
    }
 }
 
@@ -258,6 +257,7 @@ bool QTemporaryFileEngine::remove()
       // file path was generated, it will be generated again in the scenario above.
 
       filePathIsTemplate = filePathWasTemplate;
+
       return true;
    }
 
@@ -301,7 +301,7 @@ QTemporaryFilePrivate::~QTemporaryFilePrivate()
 QAbstractFileEngine *QTemporaryFilePrivate::engine() const
 {
    if (fileEngine == nullptr) {
-     resetFileEngine();
+      resetFileEngine();
    }
 
    return fileEngine;
@@ -340,11 +340,11 @@ QTemporaryFile::QTemporaryFile()
    // uses the form "c_temp.XXXXXX"
 }
 
-QTemporaryFile::QTemporaryFile(const QString &templateName)
+QTemporaryFile::QTemporaryFile(const QString &fileName)
    : QFile(*new QTemporaryFilePrivate, nullptr)
 {
    Q_D(QTemporaryFile);
-   d->templateName = templateName;
+   d->templateName = fileName;
 }
 
 QTemporaryFile::QTemporaryFile(QObject *parent)
@@ -356,11 +356,11 @@ QTemporaryFile::QTemporaryFile(QObject *parent)
    // uses the form "cs_temp.XXXXXX"
 }
 
-QTemporaryFile::QTemporaryFile(const QString &templateName, QObject *parent)
+QTemporaryFile::QTemporaryFile(const QString &fileName, QObject *parent)
    : QFile(*new QTemporaryFilePrivate, parent)
 {
    Q_D(QTemporaryFile);
-   d->templateName = templateName;
+   d->templateName = fileName;
 }
 
 QTemporaryFile::~QTemporaryFile()
@@ -402,13 +402,14 @@ QString QTemporaryFile::fileTemplate() const
    return d->templateName;
 }
 
-void QTemporaryFile::setFileTemplate(const QString &name)
+void QTemporaryFile::setFileTemplate(const QString &fileName)
 {
    Q_D(QTemporaryFile);
-   d->templateName = name;
+
+   d->templateName = fileName;
 
    if (d->fileEngine) {
-      static_cast<QTemporaryFileEngine *>(d->fileEngine)->setFileTemplate(name);
+      static_cast<QTemporaryFileEngine *>(d->fileEngine)->setFileTemplate(fileName);
    }
 }
 
@@ -437,9 +438,11 @@ QTemporaryFile *QTemporaryFile::createNativeFile(QFile &file)
 
       while (true) {
          qint64 len = file.read(buffer, 1024);
+
          if (len < 1) {
             break;
          }
+
          ret->write(buffer, len);
       }
 
@@ -470,7 +473,7 @@ bool QTemporaryFile::open(OpenMode flags)
       }
    }
 
-   // reset the engine state so it creates a new, unique file name from the template;
+   // reset the engine state so it creates a new, unique file name from the template
    d->resetFileEngine();
 
    if (QFile::open(flags)) {

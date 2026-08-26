@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,16 +21,16 @@
 *
 ***********************************************************************/
 
-#include "qglframebufferobject.h"
-#include "qglframebufferobject_p.h"
+#include <qglframebufferobject.h>
+#include <qglframebufferobject_p.h>
 
 #include <qdebug.h>
 #include <qimage.h>
 #include <qlibrary.h>
 #include <qwindow.h>
 
-#include <qgl_p.h>
 #include <qfont_p.h>
+#include <qgl_p.h>
 #include <qpaintengineex_opengl2_p.h>
 
 QImage cs_glRead_frameBuffer(const QSize &, bool, bool);
@@ -38,25 +38,29 @@ QImage cs_glRead_frameBuffer(const QSize &, bool, bool);
 #define QGL_FUNC_CONTEXT  const QGLContext *ctx = QGLContext::currentContext();
 #define QGL_FUNCP_CONTEXT const QGLContext *ctx = QGLContext::currentContext();
 
-#ifndef QT_NO_DEBUG
+#if defined(CS_SHOW_DEBUG_OPENGL)
+
 #define QT_RESET_GLERROR()                                \
 {                                                         \
-    while (QOpenGLContext::currentContext()->functions()->glGetError() != GL_NO_ERROR) {} \
+   while (QOpenGLContext::currentContext()->functions()->glGetError() != GL_NO_ERROR) { } \
 }
+
 #define QT_CHECK_GLERROR()                                \
 {                                                         \
-    GLenum err = QOpenGLContext::currentContext()->functions()->glGetError(); \
-    if (err != GL_NO_ERROR) {                             \
-        qDebug("[%s line %d] GL Error: %d",               \
-               __FILE__, __LINE__, (int)err);             \
-    }                                                     \
+   GLenum err = QOpenGLContext::currentContext()->functions()->glGetError();  \
+   if (err != GL_NO_ERROR) {                              \
+      qDebug("[%s line %d] GL Error: %d", __FILE__, __LINE__, (int)err);      \
+   }                                                      \
 }
+
 #else
-#define QT_RESET_GLERROR() {}
-#define QT_CHECK_GLERROR() {}
+
+#define QT_RESET_GLERROR() { }
+#define QT_CHECK_GLERROR() { }
+
 #endif
 
-// ####TODO Properly #ifdef this class to use #define symbols actually defined
+// #### TODO Properly #ifdef this class to use #define symbols actually defined
 // by OpenGL/ES includes
 #ifndef GL_MAX_SAMPLES
 #define GL_MAX_SAMPLES 0x8D57
@@ -98,35 +102,16 @@ void QGLFramebufferObjectFormat::detach()
    }
 }
 
-/*!
-    Creates a QGLFramebufferObjectFormat object for specifying
-    the format of an OpenGL framebuffer object.
-
-    By default the format specifies a non-multisample framebuffer object with no
-    attachments, texture target \c GL_TEXTURE_2D, and internal format \c GL_RGBA8.
-    On OpenGL/ES systems, the default internal format is \c GL_RGBA.
-
-    \sa samples(), attachment(), internalTextureFormat()
-*/
-
 QGLFramebufferObjectFormat::QGLFramebufferObjectFormat()
 {
    d = new QGLFramebufferObjectFormatPrivate;
 }
-
-/*!
-    Constructs a copy of \a other.
-*/
 
 QGLFramebufferObjectFormat::QGLFramebufferObjectFormat(const QGLFramebufferObjectFormat &other)
 {
    d = other.d;
    d->ref.ref();
 }
-
-/*!
-    Assigns \a other to this object.
-*/
 
 QGLFramebufferObjectFormat &QGLFramebufferObjectFormat::operator=(const QGLFramebufferObjectFormat &other)
 {
@@ -140,9 +125,6 @@ QGLFramebufferObjectFormat &QGLFramebufferObjectFormat::operator=(const QGLFrame
    return *this;
 }
 
-/*!
-    Destroys the QGLFramebufferObjectFormat.
-*/
 QGLFramebufferObjectFormat::~QGLFramebufferObjectFormat()
 {
    if (!d->ref.deref()) {
@@ -150,145 +132,61 @@ QGLFramebufferObjectFormat::~QGLFramebufferObjectFormat()
    }
 }
 
-/*!
-    Sets the number of samples per pixel for a multisample framebuffer object
-    to \a samples.  The default sample count of 0 represents a regular
-    non-multisample framebuffer object.
-
-    If the desired amount of samples per pixel is not supported by the hardware
-    then the maximum number of samples per pixel will be used. Note that
-    multisample framebuffer objects can not be bound as textures. Also, the
-    \c{GL_EXT_framebuffer_multisample} extension is required to create a
-    framebuffer with more than one sample per pixel.
-
-    \sa samples()
-*/
 void QGLFramebufferObjectFormat::setSamples(int samples)
 {
    detach();
    d->samples = samples;
 }
 
-/*!
-    Returns the number of samples per pixel if a framebuffer object
-    is a multisample framebuffer object. Otherwise, returns 0.
-    The default value is 0.
-
-    \sa setSamples()
-*/
 int QGLFramebufferObjectFormat::samples() const
 {
    return d->samples;
 }
 
-/*!
-    \since 4.8
-
-    Enables mipmapping if \a enabled is true; otherwise disables it.
-
-    Mipmapping is disabled by default.
-
-    If mipmapping is enabled, additional memory will be allocated for
-    the mipmap levels. The mipmap levels can be updated by binding the
-    texture and calling glGenerateMipmap(). Mipmapping cannot be enabled
-    for multisampled framebuffer objects.
-
-    \sa mipmap(), QGLFramebufferObject::texture()
-*/
 void QGLFramebufferObjectFormat::setMipmap(bool enabled)
 {
    detach();
    d->mipmap = enabled;
 }
 
-/*!
-    \since 4.8
-
-    Returns true if mipmapping is enabled.
-
-    \sa setMipmap()
-*/
 bool QGLFramebufferObjectFormat::mipmap() const
 {
    return d->mipmap;
 }
 
-/*!
-    Sets the attachment configuration of a framebuffer object to \a attachment.
-
-    \sa attachment()
-*/
 void QGLFramebufferObjectFormat::setAttachment(QGLFramebufferObject::Attachment attachment)
 {
    detach();
    d->attachment = attachment;
 }
 
-/*!
-    Returns the configuration of the depth and stencil buffers attached to
-    a framebuffer object.  The default is QGLFramebufferObject::NoAttachment.
-
-    \sa setAttachment()
-*/
 QGLFramebufferObject::Attachment QGLFramebufferObjectFormat::attachment() const
 {
    return d->attachment;
 }
 
-/*!
-    Sets the texture target of the texture attached to a framebuffer object to
-    \a target. Ignored for multisample framebuffer objects.
-
-    \sa textureTarget(), samples()
-*/
 void QGLFramebufferObjectFormat::setTextureTarget(GLenum target)
 {
    detach();
    d->target = target;
 }
 
-/*!
-    Returns the texture target of the texture attached to a framebuffer object.
-    Ignored for multisample framebuffer objects.  The default is
-    \c GL_TEXTURE_2D.
-
-    \sa setTextureTarget(), samples()
-*/
 GLenum QGLFramebufferObjectFormat::textureTarget() const
 {
    return d->target;
 }
 
-/*!
-    Sets the internal format of a framebuffer object's texture or
-    multisample framebuffer object's color buffer to
-    \a internalTextureFormat.
-
-    \sa internalTextureFormat()
-*/
 void QGLFramebufferObjectFormat::setInternalTextureFormat(GLenum internalTextureFormat)
 {
    detach();
    d->internal_format = internalTextureFormat;
 }
 
-/*!
-    Returns the internal format of a framebuffer object's texture or
-    multisample framebuffer object's color buffer.  The default is
-    \c GL_RGBA8 on desktop OpenGL systems, and \c GL_RGBA on
-    OpenGL/ES systems.
-
-    \sa setInternalTextureFormat()
-*/
 GLenum QGLFramebufferObjectFormat::internalTextureFormat() const
 {
    return d->internal_format;
 }
 
-/*!
-    Returns true if all the options of this framebuffer object format
-    are the same as \a other; otherwise returns false.
-*/
 bool QGLFramebufferObjectFormat::operator==(const QGLFramebufferObjectFormat &other) const
 {
    if (d == other.d) {
@@ -298,10 +196,6 @@ bool QGLFramebufferObjectFormat::operator==(const QGLFramebufferObjectFormat &ot
    }
 }
 
-/*!
-    Returns false if all the options of this framebuffer object format
-    are the same as \a other; otherwise returns true.
-*/
 bool QGLFramebufferObjectFormat::operator!=(const QGLFramebufferObjectFormat &other) const
 {
    return !(*this == other);
@@ -348,7 +242,7 @@ QGLContext *QGLFBOGLPaintDevice::context() const
 bool QGLFramebufferObjectPrivate::checkFramebufferStatus() const
 {
    QGL_FUNCP_CONTEXT;
-   if (!ctx) {
+   if (! ctx) {
       return false;   // Context no longer exists.
    }
 
@@ -360,57 +254,78 @@ bool QGLFramebufferObjectPrivate::checkFramebufferStatus() const
          return true;
 
       case GL_FRAMEBUFFER_UNSUPPORTED:
-         qDebug("QGLFramebufferObject: Unsupported framebuffer format.");
+#if defined(CS_SHOW_DEBUG_OPENGL)
+         qDebug("QGLFramebufferObject() Unsupported framebuffer format.");
+#endif
          break;
 
       case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-         qDebug("QGLFramebufferObject: Framebuffer incomplete attachment.");
+#if defined(CS_SHOW_DEBUG_OPENGL)
+         qDebug("QGLFramebufferObject() Framebuffer incomplete attachment.");
+#endif
          break;
 
       case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-         qDebug("QGLFramebufferObject: Framebuffer incomplete, missing attachment.");
+#if defined(CS_SHOW_DEBUG_OPENGL)
+         qDebug("QGLFramebufferObject() Framebuffer incomplete, missing attachment.");
+#endif
          break;
 
 #ifdef GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT
       case GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT:
-         qDebug("QGLFramebufferObject: Framebuffer incomplete, duplicate attachment.");
+#if defined(CS_SHOW_DEBUG_OPENGL)
+         qDebug("QGLFramebufferObject() Framebuffer incomplete, duplicate attachment.");
+#endif
          break;
 #endif
 
 #ifdef GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS
       case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
-         qDebug("QGLFramebufferObject: Framebuffer incomplete, attached images must have same dimensions.");
+#if defined(CS_SHOW_DEBUG_OPENGL)
+         qDebug("QGLFramebufferObject() Framebuffer incomplete, attached images must have same dimensions.");
+#endif
          break;
 #endif
 
 #ifdef GL_FRAMEBUFFER_INCOMPLETE_FORMATS
       case GL_FRAMEBUFFER_INCOMPLETE_FORMATS:
-         qDebug("QGLFramebufferObject: Framebuffer incomplete, attached images must have same format.");
+#if defined(CS_SHOW_DEBUG_OPENGL)
+         qDebug("QGLFramebufferObject() Framebuffer incomplete, attached images must have same format.");
+#endif
          break;
 #endif
 
 #ifdef GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER
       case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-         qDebug("QGLFramebufferObject: Framebuffer incomplete, missing draw buffer.");
+#if defined(CS_SHOW_DEBUG_OPENGL)
+         qDebug("QGLFramebufferObject() Framebuffer incomplete, missing draw buffer.");
+#endif
          break;
 #endif
 
 #ifdef GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER
       case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-         qDebug("QGLFramebufferObject: Framebuffer incomplete, missing read buffer.");
+#if defined(CS_SHOW_DEBUG_OPENGL)
+         qDebug("QGLFramebufferObject() Framebuffer incomplete, missing read buffer.");
+#endif
          break;
 #endif
 
 #ifdef GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE
       case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
-         qDebug("QGLFramebufferObject: Framebuffer incomplete, attachments must have same number of samples per pixel.");
+#if defined(CS_SHOW_DEBUG_OPENGL)
+         qDebug("QGLFramebufferObject() Framebuffer incomplete, attachments must have same number of samples per pixel.");
+#endif
          break;
 #endif
 
       default:
-         qDebug() << "QGLFramebufferObject: An undefined error has occurred: " << status;
+#if defined(CS_SHOW_DEBUG_OPENGL)
+         qDebug() << "QGLFramebufferObject() An undefined error has occurred: " << status;
+#endif
          break;
    }
+
    return false;
 }
 
@@ -431,17 +346,18 @@ void freeTextureFunc(QGLContext *ctx, GLuint id)
 {
    ctx->contextHandle()->functions()->glDeleteTextures(1, &id);
 }
+
 }
+
 void QGLFramebufferObjectPrivate::init(QGLFramebufferObject *q, const QSize &sz,
-   QGLFramebufferObject::Attachment attachment,
-   GLenum texture_target, GLenum internal_format,
-   GLint samples, bool mipmap)
+      QGLFramebufferObject::Attachment attachment, GLenum texture_target,
+      GLenum internal_format, GLint samples, bool mipmap)
 {
    QGLContext *ctx = const_cast<QGLContext *>(QGLContext::currentContext());
 
    funcs.initializeOpenGLFunctions();
 
-   if (!funcs.hasOpenGLFeature(QOpenGLFunctions::Framebuffers)) {
+   if (! funcs.hasOpenGLFeature(QOpenGLFunctions::Framebuffers)) {
       return;
    }
 
@@ -732,12 +648,6 @@ QGLFramebufferObject::QGLFramebufferObject(int width, int height, GLenum target)
    );
 }
 
-/*! \overload
-
-    Constructs an OpenGL framebuffer object of the given \a size based on the
-    supplied \a format.
-*/
-
 QGLFramebufferObject::QGLFramebufferObject(const QSize &size, const QGLFramebufferObjectFormat &format)
    : d_ptr(new QGLFramebufferObjectPrivate)
 {
@@ -745,12 +655,6 @@ QGLFramebufferObject::QGLFramebufferObject(const QSize &size, const QGLFramebuff
    d->init(this, size, format.attachment(), format.textureTarget(), format.internalTextureFormat(),
       format.samples(), format.mipmap());
 }
-
-/*! \overload
-
-    Constructs an OpenGL framebuffer object of the given \a width and \a height
-    based on the supplied \a format.
-*/
 
 QGLFramebufferObject::QGLFramebufferObject(int width, int height, const QGLFramebufferObjectFormat &format)
    : d_ptr(new QGLFramebufferObjectPrivate)
@@ -760,10 +664,8 @@ QGLFramebufferObject::QGLFramebufferObject(int width, int height, const QGLFrame
       format.internalTextureFormat(), format.samples(), format.mipmap());
 }
 
-
-
 QGLFramebufferObject::QGLFramebufferObject(int width, int height, Attachment attachment,
-   GLenum target, GLenum internal_format)
+      GLenum target, GLenum internal_format)
    : d_ptr(new QGLFramebufferObjectPrivate)
 {
    Q_D(QGLFramebufferObject);
@@ -777,19 +679,19 @@ QGLFramebufferObject::QGLFramebufferObject(int width, int height, Attachment att
    d->init(this, QSize(width, height), attachment, target, internal_format);
 }
 
-
-
 QGLFramebufferObject::QGLFramebufferObject(const QSize &size, Attachment attachment,
-   GLenum target, GLenum internal_format)
+      GLenum target, GLenum internal_format)
    : d_ptr(new QGLFramebufferObjectPrivate)
 {
    Q_D(QGLFramebufferObject);
+
    if (!internal_format)
 #ifdef QT_OPENGL_ES_2
       internal_format = GL_RGBA;
 #else
       internal_format = QOpenGLContext::currentContext()->isOpenGLES() ? GL_RGBA : GL_RGBA8;
 #endif
+
    d->init(this, size, attachment, target, internal_format);
 }
 
@@ -816,47 +718,42 @@ QGLFramebufferObject::~QGLFramebufferObject()
    }
 }
 
-
 bool QGLFramebufferObject::isValid() const
 {
    Q_D(const QGLFramebufferObject);
    return d->valid && d->fbo_guard && d->fbo_guard->id();
 }
 
-/*!
-    \fn bool QGLFramebufferObject::bind()
-
-    Switches rendering from the default, windowing system provided
-    framebuffer to this framebuffer object.
-    Returns true upon success, false otherwise.
-
-    \sa release()
-*/
 bool QGLFramebufferObject::bind()
 {
    if (!isValid()) {
       return false;
    }
+
    Q_D(QGLFramebufferObject);
    QGL_FUNC_CONTEXT;
+
    if (!ctx) {
       return false;   // Context no longer exists.
    }
+
    const QGLContext *current = QGLContext::currentContext();
-#ifdef QT_DEBUG
-   if (!current ||
-      QGLContextPrivate::contextGroup(current) != QGLContextPrivate::contextGroup(ctx)) {
-      qWarning("QGLFramebufferObject::bind() called from incompatible context");
+
+#if defined(CS_SHOW_DEBUG_OPENGL)
+   if (! current || QGLContextPrivate::contextGroup(current) != QGLContextPrivate::contextGroup(ctx)) {
+      qDebug("QGLFramebufferObject::bind() Called from incompatible context");
    }
 #endif
+
    d->funcs.glBindFramebuffer(GL_FRAMEBUFFER, d->fbo());
    d->valid = d->checkFramebufferStatus();
+
    if (d->valid && current) {
       current->d_ptr->setCurrentFbo(d->fbo());
    }
+
    return d->valid;
 }
-
 
 bool QGLFramebufferObject::release()
 {
@@ -873,10 +770,9 @@ bool QGLFramebufferObject::release()
 
    const QGLContext *current = QGLContext::currentContext();
 
-#ifdef QT_DEBUG
-   if (!current ||
-      QGLContextPrivate::contextGroup(current) != QGLContextPrivate::contextGroup(ctx)) {
-      qWarning("QGLFramebufferObject::release() called from incompatible context");
+#if defined(CS_SHOW_DEBUG_OPENGL)
+   if (! current || QGLContextPrivate::contextGroup(current) != QGLContextPrivate::contextGroup(ctx)) {
+      qDebug("QGLFramebufferObject::release() Called from incompatible context");
    }
 #endif
 
@@ -888,48 +784,24 @@ bool QGLFramebufferObject::release()
    return true;
 }
 
-/*!
-    \fn GLuint QGLFramebufferObject::texture() const
-
-    Returns the texture id for the texture attached as the default
-    rendering target in this framebuffer object. This texture id can
-    be bound as a normal texture in your own GL code.
-
-    If a multisample framebuffer object is used then the value returned
-    from this function will be invalid.
-*/
 GLuint QGLFramebufferObject::texture() const
 {
    Q_D(const QGLFramebufferObject);
    return d->texture_guard ? d->texture_guard->id() : 0;
 }
 
-/*!
-    \fn QSize QGLFramebufferObject::size() const
-
-    Returns the size of the texture attached to this framebuffer
-    object.
-*/
 QSize QGLFramebufferObject::size() const
 {
    Q_D(const QGLFramebufferObject);
    return d->size;
 }
 
-/*!
-    Returns the format of this framebuffer object.
-*/
 QGLFramebufferObjectFormat QGLFramebufferObject::format() const
 {
    Q_D(const QGLFramebufferObject);
    return d->format;
 }
 
-/*!
-    \fn QImage QGLFramebufferObject::toImage() const
-
-    Returns the contents of this framebuffer object as a QImage.
-*/
 QImage QGLFramebufferObject::toImage() const
 {
    Q_D(const QGLFramebufferObject);
@@ -996,10 +868,11 @@ bool QGLFramebufferObject::bindDefault()
       ctx->d_ptr->setCurrentFbo(ctx->d_ptr->default_fbo);
       functions.glBindFramebuffer(GL_FRAMEBUFFER, ctx->d_ptr->default_fbo);
 
-#ifdef QT_DEBUG
+#if defined(CS_SHOW_DEBUG_OPENGL)
    } else {
-      qWarning("QGLFramebufferObject::bindDefault() called without current context.");
+      qDebug("QGLFramebufferObject::bindDefault() Called without current context.");
 #endif
+
    }
 
    return ctx != nullptr;

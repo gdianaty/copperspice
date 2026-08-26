@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -40,61 +40,41 @@ class OrderBy : public SingleContainer
       UnstableOrder
    };
 
-   /**
-    * This class is value based.
-    */
-   class OrderSpec : public ComparisonPlatform<OrderBy::OrderSpec,
-      true, /* Yes, issue errors. */
-      AtomicComparator::AsValueComparison>
+   class OrderSpec : public ComparisonPlatform<OrderBy::OrderSpec, true, AtomicComparator::AsValueComparison>
    {
     public:
-      /**
-       * We want this guy to be public.
-       */
-      using ComparisonPlatform<OrderBy::OrderSpec, true, AtomicComparator::AsValueComparison>::detailedFlexibleCompare;
-
-      typedef QVector<OrderSpec> Vector;
-
       enum Direction {
          Ascending,
          Descending
       };
 
-      /**
-       * @short Default constructor, which is needed by QVector.
-       */
-      inline OrderSpec() {
-      }
+      using ComparisonPlatform<OrderBy::OrderSpec, true, AtomicComparator::AsValueComparison>::detailedFlexibleCompare;
+      using Vector = QVector<OrderSpec>;
 
-      inline OrderSpec(const Direction dir,
-                       const StaticContext::OrderingEmptySequence orderingEmpty) : direction(dir),
+      OrderSpec()
+      { }
+
+      OrderSpec(const Direction dir, const StaticContext::OrderingEmptySequence orderingEmpty) : direction(dir),
          orderingEmptySequence(orderingEmpty) {
       }
 
-      void prepare(const Expression::Ptr &source,
-                   const StaticContext::Ptr &context);
+      void prepare(const Expression::Ptr &source, const StaticContext::Ptr &context);
 
       const SourceLocationReflection *actualReflection() const {
          return m_expr.data();
       }
 
-    private:
-      Expression::Ptr m_expr;
-
-    public:
-      /**
-       * We place these afterwards, such that m_expr gets aligned at the
-       * start of the address.
-       */
       Direction direction;
 
       StaticContext::OrderingEmptySequence orderingEmptySequence;
 
-      inline AtomicComparator::Operator operatorID() const {
+      AtomicComparator::Operator operatorID() const {
          return orderingEmptySequence == StaticContext::Least ? AtomicComparator::OperatorLessThanNaNLeast
                 : AtomicComparator::OperatorLessThanNaNGreatest;
       }
 
+    private:
+      Expression::Ptr m_expr;
    };
 
    OrderBy(const Stability stability,
@@ -113,9 +93,6 @@ class OrderBy : public SingleContainer
    Properties properties() const override;
 
  private:
-   /**
-    * Needed when calling makeSequenceMappingIterator().
-    */
    typedef QExplicitlySharedDataPointer<const OrderBy> ConstPtr;
 
    const Stability             m_stability;

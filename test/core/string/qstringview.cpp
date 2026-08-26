@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -94,21 +94,7 @@ TEST_CASE("QStringView8 chop", "[qstringview8]")
    }
 }
 
-TEST_CASE("QStringView8 contains", "[qstringview8]")
-{
-   QString8 str      = "A wacky fox and sizeable pig jumped halfway over a blue moon";
-   QStringView8 view = str;
-
-   REQUIRE(view.contains("jumped"));
-   REQUIRE(! view.contains("lunch"));
-
-   REQUIRE(view.contains('x'));
-   REQUIRE(! view.contains('q'));
-
-   REQUIRE(view.contains("jUmpeD", Qt::CaseInsensitive));
-}
-
-TEST_CASE("QStringView8 compare", "[qstringview8]")
+TEST_CASE("QStringView8 comparison_case", "[qstringview8]")
 {
    QString str1 = "apple";
    QString str2 = "APPLE";
@@ -118,6 +104,54 @@ TEST_CASE("QStringView8 compare", "[qstringview8]")
 
    REQUIRE(view1.compare(view2, Qt::CaseInsensitive) == 0);
    REQUIRE(view1.compare(view2, Qt::CaseSensitive) == 1);
+}
+
+TEST_CASE("QStringView8 constructor", "[qstringview8]")
+{
+   {
+      QString str = "A wacky fox and sizeable pig";
+      QStringView8 view = str;
+
+      REQUIRE(view.isEmpty() == false);
+      REQUIRE(view.size() == str.size());
+   }
+
+   {
+      QString str = u8"Apple";
+      QStringView view = str;
+
+      REQUIRE(view.isEmpty() == false);
+   }
+}
+
+TEST_CASE("QStringView8 contains", "[qstringview8]")
+{
+   QString8 str      = "A wacky fox and sizeable pig jumped halfway over a blue moon";
+   QStringView8 view = str;
+
+   REQUIRE(view.contains("jumped") == true);
+   REQUIRE(view.contains("lunch")  == false);
+
+   REQUIRE(view.contains('x') == true);
+   REQUIRE(view.contains('q') == false);
+
+   REQUIRE(view.contains("jUmpeD", Qt::CaseInsensitive) == true);
+}
+
+TEST_CASE("QStringView8 conversion", "[qstringview8]")
+{
+    QString str = "Apple";
+    QStringView view(str);
+
+    SECTION("Convert to QString") {
+        QString copy = view.toString();
+        REQUIRE(copy == str);
+    }
+
+    SECTION("Implicit conversion to QString") {
+        QString copy = QString(view);
+        REQUIRE(copy == str);
+    }
 }
 
 TEST_CASE("QStringView8 count", "[qstringview8]")
@@ -135,7 +169,8 @@ TEST_CASE("QStringView8 empty", "[qstringview8]")
 {
    QStringView8 view;
 
-   REQUIRE(view.isEmpty());
+   REQUIRE(view.isEmpty() == true);
+   REQUIRE(view.size() == 0);
 
    REQUIRE(view.constBegin() == view.constEnd());
    REQUIRE(view.cbegin() == view.cend());
@@ -151,25 +186,25 @@ TEST_CASE("QStringView8 ends_with", "[qstringview8]")
    QStringView8 view2 = str2;
 
    {
-      REQUIRE(view1.endsWith('e', Qt::CaseInsensitive));
-      REQUIRE(view1.endsWith('e', Qt::CaseSensitive));
-      REQUIRE(! view1.endsWith('E', Qt::CaseSensitive));
+      REQUIRE(view1.endsWith('e', Qt::CaseInsensitive) == true);
+      REQUIRE(view1.endsWith('e', Qt::CaseSensitive) == true);
+      REQUIRE(view1.endsWith('E', Qt::CaseSensitive) == false);
 
-      REQUIRE(! view1.endsWith('t', Qt::CaseInsensitive));
+      REQUIRE(view1.endsWith('t', Qt::CaseInsensitive) == false);
 
-      REQUIRE(view2.endsWith('e', Qt::CaseInsensitive));
-      REQUIRE(! view2.endsWith('e', Qt::CaseSensitive));
-      REQUIRE(view2.endsWith('E', Qt::CaseSensitive));
+      REQUIRE(view2.endsWith('e', Qt::CaseInsensitive) == true);
+      REQUIRE(view2.endsWith('e', Qt::CaseSensitive) == false);
+      REQUIRE(view2.endsWith('E', Qt::CaseSensitive) == true);
    }
 
    {
-      REQUIRE(view1.endsWith("le", Qt::CaseInsensitive));
-      REQUIRE(view1.endsWith("le", Qt::CaseSensitive));
-      REQUIRE(! view1.endsWith("LE", Qt::CaseSensitive));
+      REQUIRE(view1.endsWith("le", Qt::CaseInsensitive) == true);
+      REQUIRE(view1.endsWith("le", Qt::CaseSensitive) == true);
+      REQUIRE(view1.endsWith("LE", Qt::CaseSensitive) == false);
 
-      REQUIRE(view2.endsWith("le", Qt::CaseInsensitive));
-      REQUIRE(! view2.endsWith("le", Qt::CaseSensitive));
-      REQUIRE(view2.endsWith("LE", Qt::CaseSensitive));
+      REQUIRE(view2.endsWith("le", Qt::CaseInsensitive) == true);
+      REQUIRE(view2.endsWith("le", Qt::CaseSensitive) == false);
+      REQUIRE(view2.endsWith("LE", Qt::CaseSensitive) == true);
    }
 }
 
@@ -205,6 +240,7 @@ TEST_CASE("QStringView8 left", "[qstringview8]")
    QStringView8 view = str;
 
    REQUIRE(view.left(11) == "A wacky fox");
+   REQUIRE(view.left(0).isEmpty() == true);
 }
 
 TEST_CASE("QStringView8 length", "[qstringview8]")
@@ -220,15 +256,25 @@ TEST_CASE("QStringView8 mid", "[qstringview8]")
    QString8 str      = "On a clear day you can see forever";
    QStringView8 view = str;
 
-   REQUIRE(view.mid(11, 3) == "day");
+   REQUIRE(view.mid(11, 3)  == "day");
+   REQUIRE(view.mid(30, 10) == "ever");
+   REQUIRE(view.mid(40, 8).isEmpty() == true);
 }
 
-TEST_CASE("QStringView8 operator", "[qstringview8]")
+TEST_CASE("QStringView8 operator_bracket", "[qstringview8]")
 {
    QString8 str      = "On a clear day you can see forever";
    QStringView8 view = str;
 
    REQUIRE(view[11] == "d");
+}
+
+TEST_CASE("QStringView8 remaining", "[qstringview8]")
+{
+   QString8 str      = "A wacky fox and sizeable pig jumped halfway over a blue moon";
+   QStringView8 view = str;
+
+   REQUIRE(view.remaining(36)  == "halfway over a blue moon");
 }
 
 TEST_CASE("QStringView8 right", "[qstringview8]")
@@ -237,6 +283,7 @@ TEST_CASE("QStringView8 right", "[qstringview8]")
    QStringView8 view = str;
 
    REQUIRE(view.right(9) == "blue moon");
+   REQUIRE(view.right(0).isEmpty() == true);
 }
 
 TEST_CASE("QStringView8 starts_with", "[qstringview8]")
@@ -248,6 +295,14 @@ TEST_CASE("QStringView8 starts_with", "[qstringview8]")
    REQUIRE(view.startsWith("on a clear") == false);
 
    REQUIRE(view.startsWith("on a clear", Qt::CaseInsensitive) == true);
+}
+
+TEST_CASE("QStringView8 toUtf8", "[qstringview8]")
+{
+   QString8 str      = "On a clear day you can see forever";
+   QStringView8 view = str;
+
+   REQUIRE(view.toUtf8() == "On a clear day you can see forever");
 }
 
 TEST_CASE("QStringView8 trimmed", "[qstringview8]")

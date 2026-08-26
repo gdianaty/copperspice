@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -30,6 +30,7 @@
 
 class QTextCursor;
 class QTextTable;
+
 class QTextTablePrivate;
 
 class Q_GUI_EXPORT QTextTableCell
@@ -65,7 +66,7 @@ class Q_GUI_EXPORT QTextTableCell
    int rowSpan() const;
    int columnSpan() const;
 
-   inline bool isValid() const {
+   bool isValid() const {
       return table != nullptr;
    }
 
@@ -74,10 +75,11 @@ class Q_GUI_EXPORT QTextTableCell
    int firstPosition() const;
    int lastPosition() const;
 
-   inline bool operator==(const QTextTableCell &other) const {
+   bool operator==(const QTextTableCell &other) const {
       return table == other.table && fragment == other.fragment;
    }
-   inline bool operator!=(const QTextTableCell &other) const {
+
+   bool operator!=(const QTextTableCell &other) const {
       return !operator==(other);
    }
 
@@ -89,7 +91,8 @@ class Q_GUI_EXPORT QTextTableCell
  private:
    friend class QTextTable;
    QTextTableCell(const QTextTable *t, int f)
-      : table(t), fragment(f) {}
+      : table(t), fragment(f)
+   { }
 
    const QTextTable *table;
    int fragment;

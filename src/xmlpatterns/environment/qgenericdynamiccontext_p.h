@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -41,10 +41,7 @@ class GenericDynamicContext : public StackContextBase<DynamicContext>
    GenericDynamicContext(const NamePool::Ptr &np, QAbstractMessageHandler *const messageHandler, const LocationHash &locations);
 
    xsInteger contextPosition() const override;
-   /**
-    * @returns always @c null, the focus is always undefined when an GenericDynamicContext
-    * is used.
-    */
+
    Item contextItem() const override;
    xsInteger contextSize() override;
 
@@ -74,15 +71,8 @@ class GenericDynamicContext : public StackContextBase<DynamicContext>
    ItemSequenceCacheCell::Vector &globalItemSequenceCacheCells(const VariableSlotID slot) override;
 
    void setUriResolver(const QAbstractUriResolver *const resolver);
-
-   /**
-    * We return a null item, we have no focus.
-    */
    Item currentItem() const override;
 
-   /**
-    * @short Returns always @c null, since we are always a top-level context.
-    */
    DynamicContext::Ptr previousContext() const override;
 
    QExplicitlySharedDataPointer<TemplateMode> currentTemplateMode() const override;

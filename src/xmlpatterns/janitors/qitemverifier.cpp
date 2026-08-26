@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,14 +21,12 @@
 *
 ***********************************************************************/
 
-#include "qcommonsequencetypes_p.h"
-#include "qgenericsequencetype_p.h"
-#include "qitemmappingiterator_p.h"
-#include "qpatternistlocale_p.h"
+#include <qitemverifier_p.h>
 
-#include "qitemverifier_p.h"
-
-QT_BEGIN_NAMESPACE
+#include <qcommonsequencetypes_p.h>
+#include <qgenericsequencetype_p.h>
+#include <qitemmappingiterator_p.h>
+#include <qpatternistlocale_p.h>
 
 using namespace QPatternist;
 
@@ -96,5 +94,3 @@ ExpressionVisitorResult::Ptr ItemVerifier::accept(const ExpressionVisitor::Ptr &
 {
    return visitor->visit(this);
 }
-
-QT_END_NAMESPACE

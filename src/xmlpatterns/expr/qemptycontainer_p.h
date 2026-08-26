@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,37 +26,21 @@
 
 #include <qexpression_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class EmptyContainer : public Expression
 {
  public:
-   /**
-    * @returns always an empty list.
-    */
    Expression::List operands() const override;
 
-   /**
-    * Does nothing, since sub-classes has no operands. Calling
-    * it makes hence no sense, and it also results in an assert crash.
-    */
    void setOperands(const Expression::List &) override;
 
  protected:
-   /**
-    * @returns always @c true
-    */
    bool compressOperands(const StaticContext::Ptr &context) override;
 
-   /**
-    * @returns always an empty list since it has no operands.
-    */
    SequenceType::List expectedOperandTypes() const override;
-
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

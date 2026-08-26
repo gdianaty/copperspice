@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,21 +24,19 @@
 #ifndef QGSTREAMERPLAYERCONTROL_H
 #define QGSTREAMERPLAYERCONTROL_H
 
+#include <qmediaplayer.h>
+#include <qmediaplayercontrol.h>
 #include <qobject.h>
 #include <qstack.h>
 
-#include <qmediaplayercontrol.h>
-#include <qmediaplayer.h>
-
 #include <limits.h>
 
+class QGstreamerPlayerService;
+class QGstreamerPlayerSession;
 class QMediaPlayerResourceSetInterface;
 class QMediaPlaylist;
 class QMediaPlaylistNavigator;
 class QSocketNotifier;
-
-class QGstreamerPlayerSession;
-class QGstreamerPlayerService;
 
 class QGstreamerPlayerControl : public QMediaPlayerControl
 {

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,10 +21,9 @@
 *
 ***********************************************************************/
 
-#include <qpixmap.h>
-
-#include <qglobal.h>
 #include <qbitmap.h>
+#include <qglobal.h>
+#include <qpixmap.h>
 #include <qplatform_pixmap.h>
 #include <qscopedarraypointer.h>
 #include <qt_windows.h>
@@ -211,11 +210,14 @@ Q_GUI_EXPORT QPixmap qt_pixmapFromWinHBITMAP(HBITMAP bitmap, int hbitmapFormat =
    const QImage::Format imageFormat = hbitmapFormat == HBitmapNoAlpha ?
       QImage::Format_RGB32 : QImage::Format_ARGB32_Premultiplied;
 
-   // Create image and copy data into image.
+   // Create image and copy data into image
    QImage image(w, h, imageFormat);
-   if (image.isNull()) { // failed to alloc?
+
+   if (image.isNull()) {
+      // failed to alloc?
       ReleaseDC(nullptr, display_dc);
-      qWarning("%s, failed create image of %dx%d", __FUNCTION__, w, h);
+      qWarning("QPixmap::qt_pixmapFromWinHBITMAP() Failed to create image of %d x %d", w, h);
+
       return QPixmap();
    }
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,8 +25,8 @@
 
 #ifndef QT_NO_STACKEDWIDGET
 
-#include <qstackedlayout.h>
 #include <qevent.h>
+#include <qstackedlayout.h>
 
 #include <qframe_p.h>
 
@@ -50,8 +50,8 @@ QStackedWidget::QStackedWidget(QWidget *parent)
    Q_D(QStackedWidget);
    d->layout = new QStackedLayout(this);
 
-   connect(d->layout, SIGNAL(widgetRemoved(int)),  this, SLOT(widgetRemoved(int)));
-   connect(d->layout, SIGNAL(currentChanged(int)), this, SLOT(currentChanged(int)));
+   connect(d->layout, &QStackedLayout::widgetRemoved,  this, &QStackedWidget::widgetRemoved);
+   connect(d->layout, &QStackedLayout::currentChanged, this, &QStackedWidget::currentChanged);
 }
 
 QStackedWidget::~QStackedWidget()
@@ -93,7 +93,7 @@ void QStackedWidget::setCurrentWidget(QWidget *widget)
    Q_D(QStackedWidget);
 
    if (d->layout->indexOf(widget) == -1) {
-      qWarning("QStackedWidget::setCurrentWidget() Current widget (%p) is not in this stack", widget);
+      qWarning("QStackedWidget::setCurrentWidget() Current widget (%p) is not in this stack", static_cast<void *>(widget));
       return;
    }
 

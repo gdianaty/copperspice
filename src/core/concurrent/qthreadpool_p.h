@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,9 +25,9 @@
 #define QTHREADPOOL_P_H
 
 #include <qmutex.h>
-#include <qwaitcondition.h>
-#include <qset.h>
 #include <qqueue.h>
+#include <qset.h>
+#include <qwaitcondition.h>
 
 class QThreadPoolThread;
 
@@ -56,7 +56,7 @@ class QThreadPoolPrivate
    QSet<QThreadPoolThread *> allThreads;
    QQueue<QThreadPoolThread *> waitingThreads;
    QQueue<QThreadPoolThread *> expiredThreads;
-   QVector<QPair<QRunnable *, int> > queue;
+   QVector<QPair<QRunnable *, int>> queue;
    QWaitCondition noActiveThreads;
 
    bool isExiting;
@@ -72,6 +72,5 @@ class QThreadPoolPrivate
    Q_DECLARE_PUBLIC(QThreadPool)
    friend class QThreadPoolThread;
 };
-
 
 #endif

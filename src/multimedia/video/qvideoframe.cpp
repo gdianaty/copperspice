@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,16 +22,16 @@
 ***********************************************************************/
 
 #include <qvideoframe.h>
+#include <qvideoframe_p.h>
 
+#include <qdebug.h>
 #include <qimage.h>
+#include <qmutex.h>
 #include <qpair.h>
 #include <qsize.h>
 #include <qvariant.h>
 #include <qvector.h>
-#include <qmutex.h>
-#include <qdebug.h>
 
-#include <qvideoframe_p.h>
 #include <qimagevideobuffer_p.h>
 #include <qmemoryvideobuffer_p.h>
 #include <qvideoframeconversionhelper_p.h>
@@ -48,8 +48,8 @@ class QVideoFramePrivate : public QSharedData
       memset(bytesPerLine, 0, sizeof(bytesPerLine));
    }
 
-   QVideoFramePrivate(const QSize &size, QVideoFrame::PixelFormat format)
-      : size(size), startTime(-1), endTime(-1), mappedBytes(0), planeCount(0),
+   QVideoFramePrivate(const QSize &newSize, QVideoFrame::PixelFormat format)
+      : size(newSize), startTime(-1), endTime(-1), mappedBytes(0), planeCount(0),
         pixelFormat(format), fieldType(QVideoFrame::ProgressiveFrame),
         buffer(nullptr), mappedCount(0)
    {
@@ -521,8 +521,6 @@ QImage::Format QVideoFrame::imageFormatFromPixelFormat(PixelFormat format)
       default:
          return QImage::Format_Invalid;
    }
-
-   return QImage::Format_Invalid;
 }
 
 extern void qt_convert_BGRA32_to_ARGB32(const QVideoFrame &, uchar *);
@@ -633,7 +631,7 @@ QImage qt_imageFromVideoFrame(const QVideoFrame &f)
 
       VideoFrameConvertFunc convert = qConvertFuncs[frame.pixelFormat()];
       if (! convert) {
-         qWarning() << Q_FUNC_INFO << ": unsupported pixel format" << frame.pixelFormat();
+         qWarning() << "qt_imageFromVideoFrame() Unsupported pixel format" << frame.pixelFormat();
       } else {
          result = QImage(frame.width(), frame.height(), QImage::Format_ARGB32);
          convert(frame, result.bits());

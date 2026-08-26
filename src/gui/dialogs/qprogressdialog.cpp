@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -30,11 +30,11 @@
 #include <qdrawutil.h>
 #include <qelapsedtimer.h>
 #include <qlabel.h>
+#include <qpainter.h>
 #include <qprogressbar.h>
 #include <qpushbutton.h>
-#include <qpainter.h>
-#include <qstyle.h>
 #include <qshortcut.h>
+#include <qstyle.h>
 #include <qtimer.h>
 #include <qvboxlayout.h>
 
@@ -43,10 +43,10 @@
 #include <limits.h>
 
 // wait at least the minWaitTime long before attempting to make a prediction
-static const int minWaitTime         = 50;
-static const int LABEL_INDEX         = 0;
-static const int PROGRESS_BAR_INDEX  = 1;
-static const int CANCEL_BUTTON_INDEX = 2;
+static constexpr const int minWaitTime         = 50;
+static constexpr const int LABEL_INDEX         = 0;
+static constexpr const int PROGRESS_BAR_INDEX  = 1;
+static constexpr const int CANCEL_BUTTON_INDEX = 2;
 
 QProgressDialog::QProgressDialog(QWidget *parent, Qt::WindowFlags flags)
    : QDialog(parent, flags)
@@ -98,8 +98,8 @@ void QProgressDialog::init(const QString &labelText, const QString &cancelButton
 
    }
 
-   connect(m_cancelButton, SIGNAL(clicked()),  this, SLOT(canceled()));
-   QObject::connect(this,  SIGNAL(canceled()), this, SLOT(cancel()));
+   connect(m_cancelButton, &QPushButton::clicked,      this, &QProgressDialog::canceled);
+   QObject::connect(this,  &QProgressDialog::canceled, this, &QProgressDialog::cancel);
 
    m_layout = new QVBoxLayout();
    m_layout->addWidget(m_label);
@@ -116,7 +116,7 @@ void QProgressDialog::init(const QString &labelText, const QString &cancelButton
    forceTimer = new QTimer(this);
    forceTimer->start(showTime);
 
-   QObject::connect(forceTimer, SIGNAL(timeout()), this, SLOT(forceShow()));
+   QObject::connect(forceTimer, &QTimer::timeout, this, &QProgressDialog::forceShow);
 }
 
 void QProgressDialog::cancel()
@@ -191,7 +191,7 @@ void QProgressDialog::setCancelButton(QPushButton *newButton)
 {
    if (m_cancelButton == newButton) {
       if (newButton) {
-         qWarning("QProgressDialog::setCancelButton: Attempt to set the same button twice");
+         qWarning("QProgressDialog::setCancelButton() Current button was already set");
       }
 
       return;
@@ -202,7 +202,7 @@ void QProgressDialog::setCancelButton(QPushButton *newButton)
 
    if (m_cancelButton) {
       m_layout->insertWidget(CANCEL_BUTTON_INDEX, m_cancelButton);
-      connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(canceled()));
+      connect(m_cancelButton, &QPushButton::clicked, this, &QProgressDialog::canceled);
 
 #ifndef QT_NO_SHORTCUT
       escapeShortcut = new QShortcut(QKeySequence::Cancel, this, SLOT(canceled()));
@@ -248,7 +248,7 @@ void QProgressDialog::setLabel(QLabel *newLabel)
 {
    if (newLabel == m_label) {
       if (newLabel) {
-         qWarning("QProgressDialog::setLabel: Attempt to set the same label twice");
+         qWarning("QProgressDialog::setLabel() Current label was already set");
       }
 
       return;
@@ -287,12 +287,12 @@ void QProgressDialog::setCancelButtonText(const QString &cancelButtonText)
 void QProgressDialog::setBar(QProgressBar *newBar)
 {
    if (! m_progressBar) {
-      qWarning("QProgressDialog::setBar() Can not set a null progress bar");
+      qWarning("QProgressDialog::setBar() Unable to set an invalid progress bar (nullptr)");
       return;
    }
 
    if (newBar == m_progressBar) {
-      qWarning("QProgressDialog::setBar: Attempt to set the same progress bar twice");
+      qWarning("QProgressDialog::setBar() Current progress bar was already set");
       return;
    }
 

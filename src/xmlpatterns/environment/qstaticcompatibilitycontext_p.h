@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,21 +26,16 @@
 
 #include <qdelegatingstaticcontext_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class StaticCompatibilityContext : public DelegatingStaticContext
 {
  public:
    StaticCompatibilityContext(const StaticContext::Ptr &context);
 
-   /**
-    * Returns always @c true.
-    */
    bool compatModeEnabled() const override;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

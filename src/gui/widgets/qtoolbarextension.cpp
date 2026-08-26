@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,17 +22,18 @@
 ***********************************************************************/
 
 #include <qtoolbarextension_p.h>
+
 #include <qpixmap.h>
 #include <qstyle.h>
-#include <qstylepainter.h>
 #include <qstyleoption.h>
+#include <qstylepainter.h>
 
 #ifndef QT_NO_TOOLBUTTON
 
 QToolBarExtension::QToolBarExtension(QWidget *parent)
    : QToolButton(parent)
 {
-   setObjectName(QLatin1String("qt_toolbar_ext_button"));
+   setObjectName("qt_toolbar_ext_button");
    setAutoRaise(true);
    setOrientation(Qt::Horizontal);
    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);

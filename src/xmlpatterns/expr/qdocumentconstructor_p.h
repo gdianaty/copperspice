@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,9 @@
 #ifndef QDocumentConstructor_P_H
 #define QDocumentConstructor_P_H
 
-#include <QUrl>
-#include <qsinglecontainer_p.h>
+#include <qurl.h>
 
-QT_BEGIN_NAMESPACE
+#include <qsinglecontainer_p.h>
 
 namespace QPatternist {
 
@@ -39,9 +38,6 @@ class DocumentConstructor : public SingleContainer
    Item evaluateSingleton(const DynamicContext::Ptr &context) const override;
    void evaluateToSequenceReceiver(const DynamicContext::Ptr &context) const override;
 
-   /**
-    * The first operand must be exactly one @c xs:string.
-    */
    SequenceType::List expectedOperandTypes() const override;
 
    ExpressionVisitorResult::Ptr accept(const ExpressionVisitor::Ptr &visitor) const override;
@@ -53,8 +49,7 @@ class DocumentConstructor : public SingleContainer
  private:
    QUrl m_staticBaseURI;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

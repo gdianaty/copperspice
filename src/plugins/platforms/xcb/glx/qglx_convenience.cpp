@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -33,14 +33,14 @@
 #include <GL/glxext.h>
 
 enum {
-    XFocusOut = FocusOut,
-    XFocusIn = FocusIn,
-    XKeyPress = KeyPress,
-    XKeyRelease = KeyRelease,
-    XNone = None,
+    XFocusOut       = FocusOut,
+    XFocusIn        = FocusIn,
+    XKeyPress       = KeyPress,
+    XKeyRelease     = KeyRelease,
+    XNone           = None,
     XRevertToParent = RevertToParent,
-    XGrayScale = GrayScale,
-    XCursorShape = CursorShape
+    XGrayScale      = GrayScale,
+    XCursorShape    = CursorShape
 };
 
 #undef FocusOut
@@ -99,10 +99,11 @@ QVector<int> qglx_buildSpec(const QSurfaceFormat &format, int drawableBit)
 
 GLXFBConfig qglx_findConfig(Display *display, int screen , const QSurfaceFormat &format, int drawableBit)
 {
-    // Allow forcing LIBGL_ALWAYS_SOFTWARE for Qt 5 applications only.
+    // Allow forcing LIBGL_ALWAYS_SOFTWARE for applications.
     // This is most useful with drivers that only support OpenGL 1.
     // We need OpenGL 2, but the user probably doesn't want
     // LIBGL_ALWAYS_SOFTWARE in OpenGL 1 apps.
+
     static bool checkedForceSoftwareOpenGL = false;
     static bool forceSoftwareOpenGL = false;
 

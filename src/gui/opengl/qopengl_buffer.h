@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2013 Klarälvdalens Datakonsult AB, a KDAB Group company
 * Copyright (c) 2015 The Qt Company Ltd.
@@ -106,7 +106,10 @@ public:
     void write(int offset, const void *data, int count);
 
     void allocate(const void *data, int count);
-    inline void allocate(int count) { allocate(nullptr, count); }
+
+    void allocate(int count) {
+       allocate(nullptr, count);
+    }
 
     void *map(QOpenGLBuffer::Access access);
     void *mapRange(int offset, int count, QOpenGLBuffer::RangeAccessFlags access);

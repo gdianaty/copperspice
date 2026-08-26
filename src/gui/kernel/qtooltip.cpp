@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -76,7 +76,7 @@ class QTipLabel : public QLabel
 
 #ifndef QT_NO_STYLE_STYLESHEET
  public:
-   // internal, Cleanup the _q_stylesheet_parent propery
+   // cleanup the _q_stylesheet_parent propery
    GUI_CS_SLOT_1(Public, void styleSheetParentDestroyed())
    GUI_CS_SLOT_2(styleSheetParentDestroyed)
 
@@ -127,7 +127,7 @@ void QTipLabel::reuseTip(const QString &text, int msecDisplayTime)
 {
 #ifndef QT_NO_STYLE_STYLESHEET
    if (styleSheetParent) {
-      disconnect(styleSheetParent, SIGNAL(destroyed()), QTipLabel::instance, SLOT(styleSheetParentDestroyed()));
+      disconnect(styleSheetParent, &QWidget::destroyed, QTipLabel::instance, &QTipLabel::styleSheetParentDestroyed);
       styleSheetParent = nullptr;
    }
 #endif
@@ -206,7 +206,7 @@ void QTipLabel::hideTipImmediately()
 void QTipLabel::setTipRect(QWidget *w, const QRect &r)
 {
    if (! r.isNull() && ! w) {
-      qWarning("QToolTip::setTipRect: Cannot pass null widget if rect is set");
+      qWarning("QToolTip::setTipRect() Current widget must be valid when a rectangle is specified");
 
    } else {
       widget = w;
@@ -271,13 +271,13 @@ void QTipLabel::placeTip(const QPoint &pos, QWidget *w)
       QTipLabel::instance->setProperty("_q_stylesheet_parent", QVariant::fromValue(w));
 
       //we force the style to be the QStyleSheetStyle, and force to clear the cache as well.
-      QTipLabel::instance->setStyleSheet(QLatin1String("/* */"));
+      QTipLabel::instance->setStyleSheet(QString("/* */"));
 
       // Set up for cleaning up this later...
       QTipLabel::instance->styleSheetParent = w;
 
       if (w) {
-         connect(w, SIGNAL(destroyed()), QTipLabel::instance, SLOT(styleSheetParentDestroyed()));
+         connect(w, &QWidget::destroyed, QTipLabel::instance, &QTipLabel::styleSheetParentDestroyed);
       }
    }
 #endif
@@ -358,7 +358,7 @@ void QToolTip::showText(const QPoint &pos, const QString &text, QWidget *w, cons
 
       QTipLabel::instance->setTipRect(w, rect);
       QTipLabel::instance->placeTip(pos, w);
-      QTipLabel::instance->setObjectName(QLatin1String("qtooltip_label"));
+      QTipLabel::instance->setObjectName("qtooltip_label");
 
 #if ! defined(QT_NO_EFFECTS)
       if (QApplication::isEffectEnabled(Qt::UI_FadeTooltip)) {

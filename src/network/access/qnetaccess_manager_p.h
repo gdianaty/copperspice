@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -32,12 +32,12 @@
 #include <qnetworkconfigmanager.h>
 #endif
 
-#include <qnetaccess_cache_p.h>
-#include <qnetaccess_backend_p.h>
 #include <qnetaccess_authenticationmanager_p.h>
+#include <qnetaccess_backend_p.h>
+#include <qnetaccess_cache_p.h>
 
-class QAuthenticator;
 class QAbstractNetworkCache;
+class QAuthenticator;
 class QNetworkAuthenticationCredential;
 class QNetworkCookieJar;
 class QSslPreSharedKeyAuthenticator;
@@ -158,7 +158,7 @@ class QNetworkAccessManagerPrivate
    // and use the connections for multiple requests
    QNetworkAccessCache objectCache;
 
-   static inline QNetworkAccessCache *getObjectCache(QNetworkAccessBackend *backend) {
+   static QNetworkAccessCache *getObjectCache(QNetworkAccessBackend *backend) {
       return &backend->manager->objectCache;
    }
 

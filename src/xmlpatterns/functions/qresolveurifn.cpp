@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,16 +21,13 @@
 *
 ***********************************************************************/
 
-#include <QUrl>
+#include <qurl.h>
 
 #include "qanyuri_p.h"
 #include "qliteral_p.h"
 #include "qpatternistlocale_p.h"
 #include "qatomicstring_p.h"
-
 #include "qresolveurifn_p.h"
-
-QT_BEGIN_NAMESPACE
 
 using namespace QPatternist;
 
@@ -63,5 +60,3 @@ Expression::Ptr ResolveURIFN::typeCheck(const StaticContext::Ptr &context,
 
    return FunctionCall::typeCheck(context, reqType);
 }
-
-QT_END_NAMESPACE

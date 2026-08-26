@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,55 +26,29 @@
 
 #include <qatomictype_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class AnyItemType : public ItemType
 {
  public:
-   /**
-    * @returns always "item()"
-    */
    QString displayName(const NamePool::Ptr &np) const override;
 
-   /**
-    * @returns always @c true
-    */
    bool itemMatches(const Item &item) const override;
 
-   /**
-    * @returns always 0, item() is the super type in the
-    * XPath Data Model hierarchy
-    */
    ItemType::Ptr xdtSuperType() const override;
 
-   /**
-    * @returns always @c false
-    */
    bool isNodeType() const override;
-
-   /**
-    * @returns always @c false
-    */
    bool isAtomicType() const override;
 
-   /**
-    * @returns always @c true
-    */
    bool xdtTypeMatches(const ItemType::Ptr &type) const override;
 
-   /**
-    * @returns xs:anyAtomicType
-    */
    ItemType::Ptr atomizedType() const override;
 
  protected:
    friend class BuiltinTypes;
    AnyItemType();
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

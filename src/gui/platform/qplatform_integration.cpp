@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,8 +29,8 @@
 #include <qplatform_theme.h>
 
 #include <qapplication_p.h>
-#include <qpixmap_raster_p.h>
 #include <qdnd_p.h>
+#include <qpixmap_raster_p.h>
 #include <qsimpledrag_p.h>
 
 #ifndef QT_NO_SESSIONMANAGER
@@ -99,14 +99,14 @@ QPlatformOpenGLContext *QPlatformIntegration::createPlatformOpenGLContext(QOpenG
 {
    (void) context;
 
-   qWarning("This plugin does not support createPlatformOpenGLContext");
+   qWarning("QPlatformIntegration::createPlatformOpenGLContext() Plugin does not support OpenGL");
    return nullptr;
 }
 #endif
 
 QPlatformSharedGraphicsCache *QPlatformIntegration::createPlatformSharedGraphicsCache(const char *cacheId) const
 {
-   qWarning("This plugin does not support createPlatformSharedGraphicsBuffer for cacheId: %s", cacheId);
+   qWarning("QPlatformIntegration::createPlatformSharedGraphicsCache() Plugin does not support cacheId %s", cacheId);
    return nullptr;
 }
 
@@ -287,7 +287,7 @@ void QPlatformIntegration::sync()
 #ifndef QT_NO_OPENGL
 QOpenGLContext::OpenGLModuleType QPlatformIntegration::openGLModuleType()
 {
-   qWarning("This plugin does not support dynamic OpenGL loading");
+   qWarning("QPlatformIntegration::openGLModuleType() Plugin does not support dynamic OpenGL loading");
    return QOpenGLContext::LibGL;
 }
 #endif

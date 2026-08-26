@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,22 +24,23 @@
 #ifndef QPLAINTEXTEDIT_P_H
 #define QPLAINTEXTEDIT_P_H
 
-#include <qabstractscrollarea_p.h>
-#include <qtextdocumentfragment.h>
-#include <qscrollbar.h>
-#include <qtextcursor.h>
-#include <qtextformat.h>
-#include <qmenu.h>
+#include <qplaintextedit.h>
+
 #include <qabstracttextdocumentlayout.h>
 #include <qbasictimer.h>
+#include <qmenu.h>
+#include <qscrollbar.h>
+#include <qtextcursor.h>
+#include <qtextdocumentfragment.h>
+#include <qtextformat.h>
+
+#include <qabstractscrollarea_p.h>
 #include <qtextcontrol_p.h>
-#include <qplaintextedit.h>
 
 #ifndef QT_NO_TEXTEDIT
 
-class QMimeData;
-class QPlainTextEdit;
 class ExtraArea;
+class QMimeData;
 
 class QPlainTextEditControl : public QTextControl
 {
@@ -89,7 +90,7 @@ class QPlainTextEditPrivate : public QAbstractScrollAreaPrivate
    void init(const QString &txt = QString());
    void _q_repaintContents(const QRectF &contentsRect);
 
-   inline QPoint mapToContents(const QPoint &point) const {
+   QPoint mapToContents(const QPoint &point) const {
       return QPoint(point.x() + horizontalOffset(), point.y() + verticalOffset());
    }
 
@@ -100,14 +101,14 @@ class QPlainTextEditPrivate : public QAbstractScrollAreaPrivate
 
    void pageUpDown(QTextCursor::MoveOperation op, QTextCursor::MoveMode moveMode, bool moveCursor = true);
 
-   inline int horizontalOffset() const {
+   int horizontalOffset() const {
       return (q_func()->isRightToLeft() ? (hbar->maximum() - hbar->value()) : hbar->value());
    }
 
    qreal verticalOffset(int topBlock, int topLine) const;
    qreal verticalOffset() const;
 
-   inline void sendControlEvent(QEvent *e) {
+   void sendControlEvent(QEvent *e) {
       control->processEvent(e, QPointF(horizontalOffset(), verticalOffset()), viewport);
    }
 
@@ -129,7 +130,7 @@ class QPlainTextEditPrivate : public QAbstractScrollAreaPrivate
    uint inDrag : 1;
    uint clickCausedFocus : 1;
 
-   int topLine;
+   int m_topLine;
    qreal topLineFracture; // for non-int sized fonts
 
    void setTopLine(int visualTopLine, int dx = 0);

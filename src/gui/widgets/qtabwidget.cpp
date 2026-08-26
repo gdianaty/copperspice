@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,8 +25,6 @@
 
 #ifndef QT_NO_TABWIDGET
 
-#include <qwidget_p.h>
-#include <qtabbar_p.h>
 #include <qapplication.h>
 #include <qbitmap.h>
 #include <qdesktopwidget.h>
@@ -38,6 +36,9 @@
 #include <qstylepainter.h>
 #include <qtabbar.h>
 #include <qtoolbutton.h>
+
+#include <qwidget_p.h>
+#include <qtabbar_p.h>
 
 class QTabWidgetPrivate : public QWidgetPrivate
 {

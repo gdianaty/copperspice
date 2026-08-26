@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,38 +26,25 @@
 
 #include <qexpression_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class Validate
 {
  public:
-
-   /**
-    * Represents the validation mode.
-    */
    enum Mode {
       Lax = 1,
       Strict
    };
 
-   /**
-    * Creates the necessary Expression instances
-    * that validates the operand node @p operandNode in mode @p validationMode,
-    * and returns it.
-    */
-   static Expression::Ptr create(const Expression::Ptr &operandNode,
-                                 const Mode validationMode,
-                                 const StaticContext::Ptr &context);
+   static Expression::Ptr create(const Expression::Ptr &operandNode, const Mode validationMode,  const StaticContext::Ptr &context);
+
  private:
    Validate();
 
    Validate(const Validate &) = delete;
    Validate &operator=(const Validate &) = delete;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

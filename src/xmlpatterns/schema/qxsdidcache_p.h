@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,13 +24,12 @@
 #ifndef QXsdIdCache_P_H
 #define QXsdIdCache_P_H
 
-#include <qschemacomponent_p.h>
-#include <QExplicitlySharedDataPointer>
-#include <QReadWriteLock>
-#include <QSet>
-#include <QString>
+#include <qexplicitlyshareddatapointer.h>
+#include <qreadwritelock.h>
+#include <qset.h>
+#include <qstring.h>
 
-QT_BEGIN_NAMESPACE
+#include <qschemacomponent_p.h>
 
 namespace QPatternist {
 
@@ -39,22 +38,14 @@ class XsdIdCache : public QSharedData
  public:
    typedef QExplicitlySharedDataPointer<XsdIdCache> Ptr;
 
-   /**
-    * Adds an @p id to the id cache.
-    */
    void addId(const QString &id);
-
-   /**
-    * Returns whether the id cache contains the given @p id already.
-    */
    bool hasId(const QString &id) const;
 
  private:
-   QSet<QString>          m_ids;
+   QSet<QString> m_ids;
    mutable QReadWriteLock m_lock;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

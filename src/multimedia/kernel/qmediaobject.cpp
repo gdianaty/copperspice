@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,12 +23,12 @@
 
 #include <qmediaobject_p.h>
 
-#include <qmetaobject.h>
 #include <qdebug.h>
+#include <qmediaavailabilitycontrol.h>
+#include <qmediabindableinterface.h>
 #include <qmediaservice.h>
 #include <qmetadatareadercontrol.h>
-#include <qmediabindableinterface.h>
-#include <qmediaavailabilitycontrol.h>
+#include <qmetaobject.h>
 
 void QMediaObjectPrivate::_q_notify()
 {

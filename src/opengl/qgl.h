@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,19 +24,20 @@
 #ifndef QGL_H
 #define QGL_H
 
-#include <qopengl.h>
-#include <qwidget.h>
-#include <qpaintengine.h>
 #include <qglcolormap.h>
 #include <qmap.h>
+#include <qopengl.h>
+#include <qpaintengine.h>
 #include <qscopedpointer.h>
 #include <qsurfaceformat.h>
+#include <qwidget.h>
 
-class QPixmap;
-class QGLWidgetPrivate;
-class QGLContextPrivate;
 class QGLFunctions;
+class QPixmap;
+
+class QGLContextPrivate;
 class QGLFormatPrivate;
+class QGLWidgetPrivate;
 
 namespace QGL {
 
@@ -244,13 +245,14 @@ class Q_OPENGL_EXPORT QGLContext
       PremultipliedAlphaBindOption            = 0x0004,
       LinearFilteringBindOption               = 0x0008,
 
-      MemoryManagedBindOption                 = 0x0010, // internal flag
-      CanFlipNativePixmapBindOption           = 0x0020, // internal flag
-      TemporarilyCachedBindOption             = 0x0040, // internal flag
+      MemoryManagedBindOption                 = 0x0010,
+      CanFlipNativePixmapBindOption           = 0x0020,
+      TemporarilyCachedBindOption             = 0x0040,
 
       DefaultBindOption                       = LinearFilteringBindOption
          | InvertedYBindOption
          | MipmapBindOption,
+
       InternalBindOption                      = MemoryManagedBindOption
          | PremultipliedAlphaBindOption
    };

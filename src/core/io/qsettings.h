@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,17 +25,13 @@
 #define QSETTINGS_H
 
 #include <qobject.h>
-#include <qvariant.h>
-#include <qstring.h>
 #include <qscopedpointer.h>
+#include <qstring.h>
+#include <qvariant.h>
 
 #ifndef QT_NO_SETTINGS
 
 #include <ctype.h>
-
-#ifdef Status // we seem to pick up a macro Status --> int somewhere
-#undef Status
-#endif
 
 class QIODevice;
 class QSettingsPrivate;
@@ -45,7 +41,7 @@ class Q_CORE_EXPORT QSettings : public QObject
    CORE_CS_OBJECT(QSettings)
 
  public:
-   enum Status {
+   enum SettingsStatus {
       NoError = 0,
       AccessError,
       FormatError
@@ -80,13 +76,13 @@ class Q_CORE_EXPORT QSettings : public QObject
    };
 
    explicit QSettings(const QString &organization,
-                  const QString &application = QString(), QObject *parent = nullptr);
+         const QString &application = QString(), QObject *parent = nullptr);
 
    QSettings(Scope scope, const QString &organization,
-                  const QString &application = QString(), QObject *parent = nullptr);
+         const QString &application = QString(), QObject *parent = nullptr);
 
    QSettings(Format format, Scope scope, const QString &organization,
-                  const QString &application = QString(), QObject *parent = nullptr);
+         const QString &application = QString(), QObject *parent = nullptr);
 
    QSettings(const QString &fileName, Format format, QObject *parent = nullptr);
    explicit QSettings(QObject *parent = nullptr);
@@ -98,7 +94,7 @@ class Q_CORE_EXPORT QSettings : public QObject
 
    void clear();
    void sync();
-   Status status() const;
+   SettingsStatus status() const;
 
    void beginGroup(const QString &prefix);
    void endGroup();
@@ -141,12 +137,12 @@ class Q_CORE_EXPORT QSettings : public QObject
    static void setUserIniPath(const QString &dir);   // ### remove in 5.0 (use setPath() instead)
    static void setPath(Format format, Scope scope, const QString &path);
 
-   typedef QMap<QString, QVariant> SettingsMap;
-   typedef bool (*ReadFunc)(QIODevice &device, SettingsMap &map);
-   typedef bool (*WriteFunc)(QIODevice &device, const SettingsMap &map);
+   using SettingsMap = QMap<QString, QVariant>;
+   using ReadFunc    = bool (*)(QIODevice &device, SettingsMap &map);
+   using WriteFunc   = bool (*)(QIODevice &device, const SettingsMap &map);
 
    static Format registerFormat(const QString &extension, ReadFunc readFunc, WriteFunc writeFunc,
-                                Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
+         Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
 
  protected:
    bool event(QEvent *event) override;

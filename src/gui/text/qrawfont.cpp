@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,11 +21,11 @@
 *
 ***********************************************************************/
 
+#include <qrawfont.h>
 #include <qrawfont_p.h>
 
 #include <qglobal.h>
 #include <qendian.h>
-#include <qrawfont.h>
 #include <qplatform_fontdatabase.h>
 #include <qplatform_integration.h>
 
@@ -84,7 +84,7 @@ void QRawFont::loadFromData(const QByteArray &fontData, qreal pixelSize, QFont::
    }
 
    m_fontPrivate->cleanUp();
-   m_fontPrivate->hintingPreference = hintingPreference;
+   m_fontPrivate->m_hintingPreference = hintingPreference;
    m_fontPrivate->loadFromData(fontData, pixelSize, hintingPreference);
 }
 
@@ -150,7 +150,7 @@ qreal QRawFont::maxCharWidth() const
 
 qreal QRawFont::pixelSize() const
 {
-   return m_fontPrivate->isValid() ? m_fontPrivate->fontEngine->fontDef.pixelSize : 0.0;
+   return m_fontPrivate->isValid() ? m_fontPrivate->fontEngine->m_fontDef.pixelSize : 0.0;
 }
 
 qreal QRawFont::unitsPerEm() const
@@ -162,28 +162,30 @@ qreal QRawFont::lineThickness() const
 {
    return m_fontPrivate->isValid() ? m_fontPrivate->fontEngine->lineThickness().toReal() : 0.0;
 }
+
 qreal QRawFont::underlinePosition() const
 {
    return m_fontPrivate->isValid() ? m_fontPrivate->fontEngine->underlinePosition().toReal() : 0.0;
 }
+
 QString QRawFont::familyName() const
 {
-   return m_fontPrivate->isValid() ? m_fontPrivate->fontEngine->fontDef.family : QString();
+   return m_fontPrivate->isValid() ? m_fontPrivate->fontEngine->m_fontDef.family : QString();
 }
 
 QString QRawFont::styleName() const
 {
-   return m_fontPrivate->isValid() ? m_fontPrivate->fontEngine->fontDef.styleName : QString();
+   return m_fontPrivate->isValid() ? m_fontPrivate->fontEngine->m_fontDef.styleName : QString();
 }
 
 QFont::Style QRawFont::style() const
 {
-   return m_fontPrivate->isValid() ? QFont::Style(m_fontPrivate->fontEngine->fontDef.style) : QFont::StyleNormal;
+   return m_fontPrivate->isValid() ? QFont::Style(m_fontPrivate->fontEngine->m_fontDef.style) : QFont::StyleNormal;
 }
 
 int QRawFont::weight() const
 {
-   return m_fontPrivate->isValid() ? int(m_fontPrivate->fontEngine->fontDef.weight) : -1;
+   return m_fontPrivate->isValid() ? int(m_fontPrivate->fontEngine->m_fontDef.weight) : -1;
 }
 
 QVector<quint32> QRawFont::glyphIndexesForString(const QString &text) const
@@ -263,7 +265,7 @@ bool QRawFont::advancesForGlyphIndexes(const quint32 *glyphIndexes, QPointF *adv
 
 QFont::HintingPreference QRawFont::hintingPreference() const
 {
-   return m_fontPrivate->isValid() ? m_fontPrivate->hintingPreference : QFont::PreferDefaultHinting;
+   return m_fontPrivate->isValid() ? m_fontPrivate->m_hintingPreference : QFont::PreferDefaultHinting;
 }
 
 QByteArray QRawFont::fontTable(const char *tagName) const
@@ -343,7 +345,7 @@ QRawFont QRawFont::fromFont(const QFont &font, QFontDatabase::WritingSystem writ
 
    if (fe != nullptr) {
       rawFont.m_fontPrivate->setFontEngine(fe);
-      rawFont.m_fontPrivate->hintingPreference = font.hintingPreference();
+      rawFont.m_fontPrivate->m_hintingPreference = font.hintingPreference();
    }
 
    return rawFont;
@@ -351,7 +353,7 @@ QRawFont QRawFont::fromFont(const QFont &font, QFontDatabase::WritingSystem writ
 
 void QRawFont::setPixelSize(qreal pixelSize)
 {
-   if (! m_fontPrivate->isValid() || qFuzzyCompare(m_fontPrivate->fontEngine->fontDef.pixelSize, pixelSize)) {
+   if (! m_fontPrivate->isValid() || qFuzzyCompare(m_fontPrivate->fontEngine->m_fontDef.pixelSize, pixelSize)) {
       return;
    }
 

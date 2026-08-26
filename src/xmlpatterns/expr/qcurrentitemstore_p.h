@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,8 +26,6 @@
 
 #include <qsinglecontainer_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class CurrentItemStore : public SingleContainer
@@ -45,9 +43,6 @@ class CurrentItemStore : public SingleContainer
 
    Properties properties() const override;
 
-   /**
-    * @returns the staticType() of its operand.
-    */
    SequenceType::Ptr staticType() const override;
    ExpressionVisitorResult::Ptr accept(const ExpressionVisitor::Ptr &visitor) const override;
    const SourceLocationReflection *actualReflection() const override;
@@ -56,8 +51,7 @@ class CurrentItemStore : public SingleContainer
    static inline StaticContext::Ptr newStaticContext(const StaticContext::Ptr &context);
    inline DynamicContext::Ptr createContext(const DynamicContext::Ptr &old) const;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,9 +21,12 @@
 *
 ***********************************************************************/
 
+// do not move these two includes
 #include <qobject.h>
 #include <csmeta.h>
+
 #include <qmetaobject.h>
+#include <qset.h>
 #include <qstringlist.h>
 #include <qstringparser.h>
 
@@ -53,13 +56,12 @@ const QString &QMetaEnum::key(int index) const
 {
    if (index < 0 || index >= m_data.size() ) {
 
-#if defined(CS_SHOW_DEBUG)
       if (m_data.isEmpty()) {
-         qDebug("QMetaEnum::key() Enum %s may not be registered", csPrintable(m_name));
+         qWarning("QMetaEnum::key() Enum %s may not be registered", csPrintable(m_name));
       }
-#endif
 
       static QString retval;
+
       return retval;
    }
 
@@ -112,7 +114,6 @@ const QString &QMetaEnum::name() const
    return m_name;
 }
 
-// internal
 void QMetaEnum::setData(QMap<QString, int> valueMap)
 {
    m_data = valueMap;
@@ -153,15 +154,27 @@ QString QMetaEnum::valueToKeys(int value) const
 {
    QString keys;
 
+   // has this enum value been used
+   QSet<int> valueUsed;
+
    for (auto elem = m_data.begin(); elem != m_data.end(); ++elem) {
 
-      if (elem.value() & value) {
+      auto elementValue = elem.value();
+      const auto &elementKey = elem.key();
+
+      if ((elementValue & value) == elementValue) {
+
+         if (valueUsed.contains(elementValue )) {
+            continue;
+         }
+
+         valueUsed.insert(elementValue);
 
          if (keys.isEmpty()) {
-            keys = elem.key();
+            keys = elementKey;
 
          } else  {
-            keys = keys + '|' + elem.key();
+            keys = keys + '|' + elementKey;
 
          }
       }
@@ -169,4 +182,3 @@ QString QMetaEnum::valueToKeys(int value) const
 
    return keys;
 }
-

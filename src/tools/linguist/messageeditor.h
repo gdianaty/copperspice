@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,21 +24,21 @@
 #ifndef MESSAGEEDITOR_H
 #define MESSAGEEDITOR_H
 
-#include "messagemodel.h"
+#include <messagemodel.h>
 
-#include <qlocale.h>
-#include <qtimer.h>
 #include <qframe.h>
+#include <qlocale.h>
 #include <qscrollarea.h>
+#include <qtimer.h>
 
 class QBoxLayout;
 class QMainWindow;
 class QTextEdit;
 
-class MessageEditor;
-class FormatTextEdit;
-class FormWidget;
 class FormMultiWidget;
+class FormWidget;
+class FormatTextEdit;
+class MessageEditor;
 
 struct MessageEditorData {
    QWidget *container;
@@ -153,23 +153,31 @@ class MessageEditor : public QScrollArea
 
    CS_SLOT_1(Private, void resetHoverSelection())
    CS_SLOT_2(resetHoverSelection)
+
    CS_SLOT_1(Private, void emitTranslationChanged(QTextEdit *editor))
    CS_SLOT_2(emitTranslationChanged)
 
    CS_SLOT_1(Private, void emitTranslatorCommentChanged(QTextEdit *editor))
    CS_SLOT_2(emitTranslatorCommentChanged)
+
    CS_SLOT_1(Private, void updateCanPaste())
    CS_SLOT_2(updateCanPaste)
+
    CS_SLOT_1(Private, void clipboardChanged())
    CS_SLOT_2(clipboardChanged)
+
    CS_SLOT_1(Private, void messageModelAppended())
    CS_SLOT_2(messageModelAppended)
+
    CS_SLOT_1(Private, void messageModelDeleted(int model))
    CS_SLOT_2(messageModelDeleted)
+
    CS_SLOT_1(Private, void allModelsDeleted())
    CS_SLOT_2(allModelsDeleted)
+
    CS_SLOT_1(Private, void setTargetLanguage(int model))
    CS_SLOT_2(setTargetLanguage)
+
    CS_SLOT_1(Private, void reallyFixTabOrder())
    CS_SLOT_2(reallyFixTabOrder)
 

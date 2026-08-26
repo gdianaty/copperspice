@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,8 +27,8 @@
 
 #include <qgraphicswidget.h>
 
-#include <qgraphics_layoutitem_p.h>
 #include <qgraphics_layout_p.h>
+#include <qgraphics_layoutitem_p.h>
 #include <qgraphics_widget_p.h>
 
 bool QGraphicsGridLayoutEngineItem::isHidden() const
@@ -40,8 +40,7 @@ bool QGraphicsGridLayoutEngineItem::isHidden() const
    return false;
 }
 
-// internal
-// Qt6: Move to QGraphicsLayoutItem and make virtual
+// TODO: Move to QGraphicsLayoutItem and make virtual
 bool QGraphicsGridLayoutEngineItem::isIgnored() const
 {
    return isHidden() && ! q_layoutItem->sizePolicy().retainSizeWhenHidden();

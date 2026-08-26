@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -34,6 +34,8 @@ class Q_CORE_EXPORT QEasingCurve
    CORE_CS_GADGET(QEasingCurve)
 
  public:
+   using EasingFunction = qreal (*)(qreal progress);
+
    enum Type {
       Linear,
       InQuad, OutQuad, InOutQuad, OutInQuad,
@@ -52,13 +54,33 @@ class Q_CORE_EXPORT QEasingCurve
 
    CORE_CS_ENUM(Type)
 
-   QEasingCurve(Type type = Linear);
+   QEasingCurve(Type type = Type::Linear);
    QEasingCurve(const QEasingCurve &other);
+
+   QEasingCurve(QEasingCurve &&other)
+      : d_ptr(other.d_ptr)
+   {
+      other.d_ptr = nullptr;
+   }
+
    ~QEasingCurve();
 
-   QEasingCurve &operator=(const QEasingCurve &other);
+   QEasingCurve &operator=(const QEasingCurve &other) {
+      if (this != &other) {
+         QEasingCurve tmp(other);
+         swap(tmp);
+      }
+
+      return *this;
+   }
+
+   QEasingCurve &operator=(QEasingCurve &&other) {
+      swap(other);
+      return *this;
+   }
+
    bool operator==(const QEasingCurve &other) const;
-   inline bool operator!=(const QEasingCurve &other) const {
+   bool operator!=(const QEasingCurve &other) const {
       return !(this->operator==(other));
    }
 
@@ -71,9 +93,13 @@ class Q_CORE_EXPORT QEasingCurve
    qreal overshoot() const;
    void setOvershoot(qreal overshoot);
 
+   void swap(QEasingCurve &other) {
+      qSwap(d_ptr, other.d_ptr);
+   }
+
    Type type() const;
    void setType(Type type);
-   typedef qreal (*EasingFunction)(qreal progress);
+
    void setCustomType(EasingFunction func);
    EasingFunction customType() const;
 

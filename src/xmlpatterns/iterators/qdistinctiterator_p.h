@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,31 +24,20 @@
 #ifndef QDistinctIterator_P_H
 #define QDistinctIterator_P_H
 
-#include <QList>
+#include <qlist.h>
+
 #include <qexpression_p.h>
 #include <qitem_p.h>
 #include <qatomiccomparator_p.h>
 #include <qcomparisonplatform_p.h>
 #include <qsourcelocationreflection_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
-class DistinctIterator : public Item::Iterator
-   , public ComparisonPlatform<DistinctIterator, false>, public SourceLocationReflection
+class DistinctIterator : public Item::Iterator, public ComparisonPlatform<DistinctIterator, false>,
+      public SourceLocationReflection
 {
  public:
-   /**
-    * Creates a DistinctIterator.
-    * @param comp the AtomicComparator to be used for comparing values. This may be @c null,
-    * meaning the IndexOfIterator iterator will dynamically determine what comparator to use
-    * @param seq the sequence whose duplicates should be filtered out
-    * @param context the usual context, used for error reporting and by AtomicComparators.
-    * @param expression the Expression that this DistinctIterator is
-    * evaluating for. It is used for error reporting, via
-    * actualReflection().
-    */
    DistinctIterator(const Item::Iterator::Ptr &seq, const AtomicComparator::Ptr &comp,
                     const Expression::ConstPtr &expression, const DynamicContext::Ptr &context);
 
@@ -71,7 +60,5 @@ class DistinctIterator : public Item::Iterator
    Item::List                  m_processed;
 };
 }
-
-QT_END_NAMESPACE
 
 #endif

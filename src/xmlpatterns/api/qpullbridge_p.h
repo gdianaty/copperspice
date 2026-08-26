@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,20 +24,21 @@
 #ifndef QPULLBRIDGE_P_H
 #define QPULLBRIDGE_P_H
 
-#include <QPair>
-#include <QStack>
+#include <qpair.h>
+#include <qstack.h>
 
 #include <qabstractxmlforwarditerator_p.h>
 #include <qabstractxmlpullprovider_p.h>
 #include <qitem_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class PullBridge : public AbstractXmlPullProvider
 {
  public:
-   inline PullBridge(const QXmlNodeModelIndex::Iterator::Ptr &it) : m_current(StartOfInput) {
+   PullBridge(const QXmlNodeModelIndex::Iterator::Ptr &it)
+      : m_current(StartOfInput)
+   {
       Q_ASSERT(it);
       m_iterators.push(qMakePair(StartOfInput, it));
    }
@@ -45,9 +46,7 @@ class PullBridge : public AbstractXmlPullProvider
    Event next() override;
    Event current() const override;
    QXmlName name() const override;
-   /**
-    * Returns always an empty QVariant.
-    */
+
    QVariant atomicValue() const override;
    QString stringValue() const override;
    QHash<QXmlName, QString> attributes() override;
@@ -63,7 +62,5 @@ class PullBridge : public AbstractXmlPullProvider
    Event              m_current;
 };
 }
-
-QT_END_NAMESPACE
 
 #endif

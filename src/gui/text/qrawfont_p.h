@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,9 +25,11 @@
 #define QRAWFONT_P_H
 
 #include <qrawfont.h>
-#include <qfontengine_p.h>
+
 #include <qthread.h>
 #include <qthreadstorage.h>
+
+#include <qfontengine_p.h>
 
 namespace {
 class CustomFontFileLoader;
@@ -37,12 +39,12 @@ class QRawFontPrivate
 {
  public:
    QRawFontPrivate()
-      : fontEngine(nullptr), hintingPreference(QFont::PreferDefaultHinting), thread(nullptr)
+      : fontEngine(nullptr), m_hintingPreference(QFont::PreferDefaultHinting), thread(nullptr)
    {
    }
 
    QRawFontPrivate(const QRawFontPrivate &other)
-      : fontEngine(other.fontEngine), hintingPreference(other.hintingPreference), thread(other.thread)
+      : fontEngine(other.fontEngine), m_hintingPreference(other.m_hintingPreference), thread(other.thread)
    {
       if (fontEngine != nullptr) {
          fontEngine->m_refCount.ref();
@@ -53,17 +55,17 @@ class QRawFontPrivate
       cleanUp();
    }
 
-   inline void cleanUp() {
+   void cleanUp() {
       setFontEngine(nullptr);
-      hintingPreference = QFont::PreferDefaultHinting;
+      m_hintingPreference = QFont::PreferDefaultHinting;
    }
 
-   inline bool isValid() const {
+   bool isValid() const {
       Q_ASSERT(fontEngine == nullptr || thread == QThread::currentThread());
       return fontEngine != nullptr;
    }
 
-   inline void setFontEngine(QFontEngine *engine) {
+   void setFontEngine(QFontEngine *engine) {
       Q_ASSERT(fontEngine == nullptr || thread == QThread::currentThread());
 
       if (fontEngine == engine) {
@@ -95,7 +97,7 @@ class QRawFontPrivate
    }
 
    QFontEngine *fontEngine;
-   QFont::HintingPreference hintingPreference;
+   QFont::HintingPreference m_hintingPreference;
 
  private:
    QThread *thread;

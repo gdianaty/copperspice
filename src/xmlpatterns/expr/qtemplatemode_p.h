@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,11 +24,10 @@
 #ifndef QTemplateMode_P_H
 #define QTemplateMode_P_H
 
-#include <QSharedData>
-#include <QXmlName>
-#include <qtemplatepattern_p.h>
+#include <qshareddata.h>
+#include <qxmlname.h>
 
-QT_BEGIN_NAMESPACE
+#include <qtemplatepattern_p.h>
 
 namespace QPatternist {
 
@@ -37,8 +36,9 @@ class TemplateMode : public QSharedData
  public:
    typedef QExplicitlySharedDataPointer<TemplateMode> Ptr;
 
-   inline TemplateMode(const QXmlName &modeName) : m_modeName(modeName) {
-   }
+   TemplateMode(const QXmlName &modeName)
+      : m_modeName(modeName)
+   { }
 
    TemplatePattern::Vector templatePatterns;
 
@@ -53,9 +53,6 @@ class TemplateMode : public QSharedData
    TemplateMode(const TemplateMode &) = delete;
    TemplateMode &operator=(const TemplateMode &) = delete;
 
-   /**
-    * Operator for std::sort()
-    */
    static inline bool lessThanByPriority(const TemplatePattern::Ptr &t1, const TemplatePattern::Ptr &t2);
 };
 
@@ -70,7 +67,5 @@ void TemplateMode::addMode(const TemplateMode::Ptr &mode)
 }
 
 }
-
-QT_END_NAMESPACE
 
 #endif

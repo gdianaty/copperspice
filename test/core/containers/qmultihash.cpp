@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -18,7 +18,6 @@
 ***********************************************************************/
 
 #include <qmultihash.h>
-#include <qhash.h>
 
 #include <cs_catch2.h>
 
@@ -46,57 +45,7 @@ TEST_CASE("QMultiHash clear", "[qmultihash]")
    REQUIRE(hash.size() == 0);
 }
 
-TEST_CASE("QMultiHash contains", "[qmultihash]")
-{
-   QMultiHash<int, QString> hash = { { 1, "watermelon"},
-                                     { 2, "apple"},
-                                     { 3, "pear"},
-                                     { 3, "quince"},
-                                     { 4, "grapefruit"} };
-
-   REQUIRE(hash.contains(2));
-   REQUIRE(! hash.contains(9));
-}
-
-TEST_CASE("QMultiHash count", "[qmultihash]")
-{
-   QMultiHash<int, QString> hash = { { 1, "watermelon"},
-                                     { 2, "apple"},
-                                     { 3, "pear"},
-                                     { 3, "quince"},
-                                     { 4, "grapefruit"} };
-
-   REQUIRE(hash.count() == 5);
-   REQUIRE(hash.size() == 5);
-}
-
-TEST_CASE("QMultiHash empty", "[qmultihash]")
-{
-   QMultiHash<int, QString> hash;
-
-   REQUIRE(hash.isEmpty());
-}
-
-TEST_CASE("QMultiHash erase", "[qmultihash]")
-{
-   QMultiHash<int, QString> hash = { { 1, "watermelon"},
-                                     { 2, "apple"},
-                                     { 3, "pear"},
-                                     { 3, "quince"},
-                                     { 4, "grapefruit"} };
-
-   auto iter = hash.find(2);
-   hash.erase(iter);
-
-   REQUIRE(hash.value(2) == "");
-
-   REQUIRE(hash.value(1) == "watermelon");
-   REQUIRE(hash.value(4) == "grapefruit");
-
-   REQUIRE(hash.size() == 4);
-}
-
-TEST_CASE("QMultiHash equality", "[qmultihash]")
+TEST_CASE("QMultiHash comparison", "[qmultihash]")
 {
    QMultiHash<int, QString> hash1 = { { 1, "watermelon"},
                                       { 2, "apple"},
@@ -122,6 +71,109 @@ TEST_CASE("QMultiHash equality", "[qmultihash]")
    }
 }
 
+TEST_CASE("QMultiHash contains", "[qmultihash]")
+{
+   QMultiHash<int, QString> hash = { { 1, "watermelon"},
+                                     { 2, "apple"},
+                                     { 3, "pear"},
+                                     { 3, "quince"},
+                                     { 4, "grapefruit"} };
+
+   REQUIRE(hash.contains(2) == true);
+   REQUIRE(hash.contains(9) == false);
+}
+
+TEST_CASE("QMultiHash copy_assign", "[qmultihash]")
+{
+   QMultiHash<QString, int> hash_a = { { "watermelon", 10},
+                                       { "apple",      20},
+                                       { "pear",       30},
+                                       { "grapefruit", 40} };
+
+   QMultiHash<QString, int> hash_b(hash_a);
+
+   REQUIRE(hash_a.size() == 4);
+   REQUIRE(hash_b.size() == 4);
+
+   REQUIRE(hash_a["watermelon"] == 10);
+   REQUIRE(hash_a["grapefruit"] == 40);
+
+   REQUIRE(hash_b["watermelon"] == 10);
+   REQUIRE(hash_b["grapefruit"] == 40);
+
+   REQUIRE(hash_a == hash_b);
+
+   //
+   QMultiHash<QString, int> hash_c;
+   hash_c = hash_a;
+
+   REQUIRE(hash_a.size() == 4);
+   REQUIRE(hash_c.size() == 4);
+
+   REQUIRE(hash_a["watermelon"] == 10);
+   REQUIRE(hash_a["grapefruit"] == 40);
+
+   REQUIRE(hash_c["watermelon"] == 10);
+   REQUIRE(hash_c["grapefruit"] == 40);
+
+   REQUIRE(hash_a == hash_c);
+}
+
+TEST_CASE("QMultiHash count", "[qmultihash]")
+{
+   QMultiHash<int, QString> hash = { { 1, "watermelon"},
+                                     { 2, "apple"},
+                                     { 3, "pear"},
+                                     { 3, "quince"},
+                                     { 4, "grapefruit"} };
+
+   REQUIRE(hash.count() == 5);
+   REQUIRE(hash.size()  == 5);
+}
+
+TEST_CASE("QMultiHash empty", "[qmultihash]")
+{
+   QMultiHash<int, QString> hash;
+
+   REQUIRE(hash.isEmpty() == true);
+}
+
+TEST_CASE("QMultiHash erase", "[qmultihash]")
+{
+   QMultiHash<int, QString> hash = { { 1, "watermelon"},
+                                     { 2, "apple"},
+                                     { 3, "pear"},
+                                     { 3, "quince"},
+                                     { 4, "grapefruit"} };
+   SECTION ("iterator") {
+      auto iter = hash.find(2);
+      hash.erase(iter);
+
+      REQUIRE(hash.value(2) == "");
+
+      REQUIRE(hash.value(1) == "watermelon");
+      REQUIRE(hash.value(4) == "grapefruit");
+
+      REQUIRE(hash.size() == 4);
+   }
+
+   SECTION ("key") {
+      auto count = hash.erase(3);
+
+      REQUIRE(hash.value(3) == "");
+      REQUIRE(count == 2);
+
+      REQUIRE(hash.value(1) == "watermelon");
+      REQUIRE(hash.value(2) == "apple");
+      REQUIRE(hash.value(4) == "grapefruit");
+
+      REQUIRE(hash.size() == 3);
+
+      count = hash.erase(3);
+      REQUIRE(count == 0);
+   }
+}
+
 TEST_CASE("QMultiHash equal_range", "[qmultihash]")
 {
    QMultiHash<int, QString> hash = { { 1, "watermelon"},
@@ -137,7 +189,7 @@ TEST_CASE("QMultiHash equal_range", "[qmultihash]")
    REQUIRE(data.second == "apple");
 }
 
-TEST_CASE("QMultiHash insert", "[qmultihash]")
+TEST_CASE("QMultiHash insert_copy", "[qmultihash]")
 {
    QMultiHash<int, QString> hash = { { 1, "watermelon"},
                                      { 2, "apple"},
@@ -151,12 +203,49 @@ TEST_CASE("QMultiHash insert", "[qmultihash]")
    REQUIRE(hash.size() == 6);
 }
 
+TEST_CASE("QMultiHash insert_move", "[qmultihash]")
+{
+   QMultiHash<int, QUniquePointer<QString> > hash;
+
+   hash.insert(1, QMakeUnique<QString>("watermelon"));
+   hash.insert(2, QMakeUnique<QString>("apple"));
+   hash.insert(3, QMakeUnique<QString>("pear"));
+   hash.insert(4, QMakeUnique<QString>("grapefruit"));
+
+   REQUIRE(*(hash[3]) == "pear");
+   REQUIRE(hash.size() == 4);
+}
+
+TEST_CASE("QMultiHash move_assign", "[qmultihash]")
+{
+   QMultiHash<QString, int> hash_a = { { "watermelon", 10},
+                                       { "apple",      20},
+                                       { "pear",       30},
+                                       { "grapefruit", 40} };
+
+   QMultiHash<QString, int> hash_b = std::move(hash_a);
+
+   REQUIRE(hash_b.size() == 4);
+
+   REQUIRE(hash_b["watermelon"] == 10);
+   REQUIRE(hash_b["grapefruit"] == 40);
+
+   //
+   QMultiHash<QString, int> hash_c;
+   hash_c = std::move(hash_b);
+
+   REQUIRE(hash_c.size() == 4);
+
+   REQUIRE(hash_c["watermelon"] == 10);
+   REQUIRE(hash_c["grapefruit"] == 40);
+}
+
 TEST_CASE("QMultiHash operator_bracket", "[qmultihash]")
 {
    QMultiHash<int, QString> hash = { { 1, "watermelon"},
-                                   { 2, "apple"},
-                                   { 3, "pear"},
-                                   { 4, "grapefruit"} };
+                                     { 2, "apple"},
+                                     { 3, "pear"},
+                                     { 4, "grapefruit"} };
 
    REQUIRE(hash[4] == "grapefruit");
    REQUIRE(hash[5] == "");
@@ -199,6 +288,6 @@ TEST_CASE("QMultiHash swap", "[qmultihash]")
    hash1.swap(hash2);
 
    REQUIRE(hash1.value(2) == ("orange"));
-   REQUIRE(hash2.contains(4));
+   REQUIRE(hash2.contains(4) == true);
 }
 

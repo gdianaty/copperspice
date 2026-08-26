@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -213,10 +213,12 @@ void QWindowPrivate::emitScreenChangedRecursion(QScreen *newScreen)
 void QWindowPrivate::setTopLevelScreen(QScreen *newScreen, bool recreate)
 {
    Q_Q(QWindow);
+
    if (parentWindow) {
-      qWarning() << q << '(' << newScreen << "): Attempt to set a screen on a child window.";
+      qWarning("QWindow::setTopLevelScreen() Unable to connect the current (child) window since it already has a parent");
       return;
    }
+
    if (newScreen != topLevelScreen) {
       const bool shouldRecreate = recreate && windowRecreationRequired(newScreen);
       const bool shouldShow = visibilityOnDestroy && !topLevelScreen;
@@ -244,7 +246,7 @@ void QWindowPrivate::create(bool recursive)
    Q_ASSERT(platformWindow);
 
    if (!platformWindow) {
-      qWarning() << "Failed to create platform window for" << q << "with flags" << q->flags();
+      qWarning("QWindow::create() Failed to create a platform window");
       return;
    }
 
@@ -396,7 +398,7 @@ void QWindow::setParent(QWindow *parent)
 
    QScreen *newScreen = parent ? parent->screen() : screen();
    if (d->windowRecreationRequired(newScreen)) {
-      qWarning() << this << '(' << parent << "): Cannot change screens (" << screen() << newScreen << ')';
+      qWarning("QWindow::setParent() Unable to move current window to a new screen");
       return;
    }
 
@@ -609,7 +611,7 @@ void QWindow::requestActivate()
 {
    Q_D(QWindow);
    if (flags() & Qt::WindowDoesNotAcceptFocus) {
-      qWarning() << "requestActivate() called for " << this << " which has Qt::WindowDoesNotAcceptFocus set.";
+      qWarning("QWindow::requestActivate() Unable to activate a window with Qt::WindowDoesNotAcceptFocus set");
       return;
    }
    if (d->platformWindow) {
@@ -684,7 +686,7 @@ qreal QWindow::devicePixelRatio() const
 void QWindow::setWindowState(Qt::WindowState state)
 {
    if (state == Qt::WindowActive) {
-      qWarning() << "QWindow::setWindowState does not accept Qt::WindowActive";
+      qWarning("QWindow::setWindowState() Unable to set the state to Qt::WindowActive");
       return;
    }
 
@@ -707,7 +709,7 @@ void QWindow::setTransientParent(QWindow *parent)
 {
    Q_D(QWindow);
    if (parent && !parent->isTopLevel()) {
-      qWarning() << parent << "must be a top level window.";
+      qWarning("QWindow::setTransientParent() New parent must be a top level window");
       return;
    }
 
@@ -776,37 +778,39 @@ void QWindow::setMinimumSize(const QSize &size)
    }
 }
 
-void QWindow::setX(int arg)
+void QWindow::setX(int newX)
 {
    Q_D(QWindow);
-   if (x() != arg) {
-      setGeometry(QRect(arg, y(), width(), height()));
+
+   if (x() != newX) {
+      setGeometry(QRect(newX, y(), width(), height()));
    } else {
       d->positionAutomatic = false;
    }
 }
 
-void QWindow::setY(int arg)
+void QWindow::setY(int newY)
 {
    Q_D(QWindow);
-   if (y() != arg) {
-      setGeometry(QRect(x(), arg, width(), height()));
+
+   if (y() != newY) {
+      setGeometry(QRect(x(), newY, width(), height()));
    } else {
       d->positionAutomatic = false;
    }
 }
 
-void QWindow::setWidth(int arg)
+void QWindow::setWidth(int newWidth)
 {
-   if (width() != arg) {
-      resize(arg, height());
+   if (width() != newWidth) {
+      resize(newWidth, height());
    }
 }
 
-void QWindow::setHeight(int arg)
+void QWindow::setHeight(int newHeight)
 {
-   if (height() != arg) {
-      resize(width(), arg);
+   if (height() != newHeight) {
+      resize(width(), newHeight);
    }
 }
 
@@ -874,9 +878,9 @@ void QWindow::setSizeIncrement(const QSize &size)
    }
 }
 
-void QWindow::setGeometry(int posx, int posy, int w, int h)
+void QWindow::setGeometry(int x_pos, int y_pos, int w, int h)
 {
-   setGeometry(QRect(posx, posy, w, h));
+   setGeometry(QRect(x_pos, y_pos, w, h));
 }
 
 void QWindow::setGeometry(const QRect &rect)
@@ -997,9 +1001,9 @@ void QWindow::setPosition(const QPoint &pt)
    setGeometry(QRect(pt, size()));
 }
 
-void QWindow::setPosition(int posx, int posy)
+void QWindow::setPosition(int x_pos, int y_pos)
 {
-   setPosition(QPoint(posx, posy));
+   setPosition(QPoint(x_pos, y_pos));
 }
 
 void QWindow::resize(int w, int h)
@@ -1542,7 +1546,7 @@ QWindow *QWindowPrivate::topLevelWindow() const
 QWindow *QWindow::fromWinId(WId id)
 {
    if (!QGuiApplicationPrivate::platformIntegration()->hasCapability(QPlatformIntegration::ForeignWindows)) {
-      qWarning() << "QWindow::fromWinId(): platform plugin does not support foreign windows.";
+      qWarning("QWindow::fromWinId() Platform plugin does not support foreign windows");
       return nullptr;
    }
 
@@ -1668,42 +1672,40 @@ QDebug operator<<(QDebug debug, const QWindow *window)
          debug << ", Name = " << window->objectName();
       }
 
-      if (debug.verbosity() > 2) {
-         const QRect geometry = window->geometry();
+      const QRect geometry = window->geometry();
 
-         if (window->isVisible()) {
-            debug << ", visible";
-         }
+      if (window->isVisible()) {
+         debug << ", visible";
+      }
 
-         if (window->isExposed()) {
-            debug << ", exposed";
-         }
-         debug << ", State = " << window->windowState()
-               << ", Type = " << window->type() << ", Flags =" << window->flags()
-               << ", Surface Type = " << window->surfaceType();
+      if (window->isExposed()) {
+         debug << ", exposed";
+      }
+      debug << ", State = " << window->windowState()
+            << ", Type = " << window->type() << ", Flags =" << window->flags()
+            << ", Surface Type = " << window->surfaceType();
 
-         if (window->isTopLevel()) {
-            debug << ", toplevel";
-         }
+      if (window->isTopLevel()) {
+         debug << ", toplevel";
+      }
 
-         debug << ", " << geometry.width() << 'x' << geometry.height()
-            << forcesign << geometry.x() << geometry.y() << noforcesign;
+      debug << ", " << geometry.width() << 'x' << geometry.height()
+         << forcesign << geometry.x() << geometry.y() << noforcesign;
 
-         const QMargins margins = window->frameMargins();
+      const QMargins margins = window->frameMargins();
 
-         if (! margins.isNull()) {
-            debug << ", Margins = " << margins;
-         }
+      if (! margins.isNull()) {
+         debug << ", Margins = " << margins;
+      }
 
-         debug << ", DP Ratio = " << window->devicePixelRatio();
+      debug << ", DP Ratio = " << window->devicePixelRatio();
 
-         if (const QPlatformWindow *platformWindow = window->handle()) {
-            debug << ", winId = 0x" << hex << platformWindow->winId() << dec;
-         }
+      if (const QPlatformWindow *platformWindow = window->handle()) {
+         debug << ", winId = 0x" << hex << platformWindow->winId() << dec;
+      }
 
-         if (const QScreen *screen = window->screen()) {
-            debug << ", On = " << screen->name();
-         }
+      if (const QScreen *screen = window->screen()) {
+         debug << ", On = " << screen->name();
       }
 
       debug << ')';

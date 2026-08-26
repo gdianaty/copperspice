@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,22 +23,15 @@
 
 #include <qsharedmemory.h>
 #include <qsharedmemory_p.h>
-#include <qsystemsemaphore.h>
-#include <qdir.h>
+
 #include <qcryptographichash.h>
-#include <qregularexpression.h>
-
 #include <qdebug.h>
+#include <qdir.h>
+#include <qregularexpression.h>
+#include <qsystemsemaphore.h>
 
-#if !(defined(QT_NO_SHAREDMEMORY) && defined(QT_NO_SYSTEMSEMAPHORE))
-/*!
-    \internal
+#if ! (defined(QT_NO_SHAREDMEMORY) && defined(QT_NO_SYSTEMSEMAPHORE))
 
-    Generate a string from the key which can be any unicode string into
-    the subset that the win/unix kernel allows.
-
-    On Unix this will be a file name.
-  */
 QString QSharedMemoryPrivate::makePlatformSafeKey(const QString &key, const QString &prefix)
 {
    if (key.isEmpty()) {
@@ -77,7 +70,6 @@ QSharedMemory::QSharedMemory(QObject *parent)
    d_ptr->q_ptr = this;
 }
 
-
 QSharedMemory::QSharedMemory(const QString &key, QObject *parent)
    : QObject(parent), d_ptr(new QSharedMemoryPrivate)
 {
@@ -93,6 +85,7 @@ QSharedMemory::~QSharedMemory()
 void QSharedMemory::setKey(const QString &key)
 {
    Q_D(QSharedMemory);
+
    if (key == d->key && d->makePlatformSafeKey(key) == d->nativeKey) {
       return;
    }
@@ -140,42 +133,38 @@ bool QSharedMemoryPrivate::initKey()
          case QSystemSemaphore::PermissionDenied:
             error = QSharedMemory::PermissionDenied;
             break;
+
          case QSystemSemaphore::KeyError:
             error = QSharedMemory::KeyError;
             break;
+
          case QSystemSemaphore::AlreadyExists:
             error = QSharedMemory::AlreadyExists;
             break;
+
          case QSystemSemaphore::NotFound:
             error = QSharedMemory::NotFound;
             break;
+
          case QSystemSemaphore::OutOfResources:
             error = QSharedMemory::OutOfResources;
             break;
+
          case QSystemSemaphore::UnknownError:
          default:
             error = QSharedMemory::UnknownError;
             break;
       }
+
       return false;
    }
+
 #endif
    errorString.clear();
    error = QSharedMemory::NoError;
    return true;
 }
 
-/*!
-  Returns the key assigned with setKey() to this shared memory, or a null key
-  if no key has been assigned, or if the segment is using a nativeKey(). The
-  key is the identifier used by Qt applications to identify the shared memory
-  segment.
-
-  You can find the native, platform specific, key used by the operating system
-  by calling nativeKey().
-
-  \sa setKey() setNativeKey()
- */
 QString QSharedMemory::key() const
 {
    Q_D(const QSharedMemory);
@@ -215,6 +204,7 @@ bool QSharedMemory::create(int size, AccessMode mode)
    if (! d->key.isEmpty() && ! d->tryLocker(&lock, "QSharedMemory::create")) {
       return false;
    }
+
 #endif
 
    if (!d->create(size)) {
@@ -224,12 +214,6 @@ bool QSharedMemory::create(int size, AccessMode mode)
    return d->attach(mode);
 }
 
-/*!
-  Returns the size of the attached shared memory segment. If no shared
-  memory segment is attached, 0 is returned.
-
-  \sa create() attach()
- */
 int QSharedMemory::size() const
 {
    Q_D(const QSharedMemory);
@@ -243,12 +227,14 @@ bool QSharedMemory::attach(AccessMode mode)
    if (isAttached() || !d->initKey()) {
       return false;
    }
+
 #ifndef QT_NO_SYSTEMSEMAPHORE
    QSharedMemoryLocker lock(this);
 
    if (! d->key.isEmpty() && !d->tryLocker(&lock, "QSharedMemory::attach")) {
       return false;
    }
+
 #endif
 
    if (isAttached() || !d->handle()) {
@@ -258,32 +244,16 @@ bool QSharedMemory::attach(AccessMode mode)
    return d->attach(mode);
 }
 
-/*!
-  Returns true if this process is attached to the shared memory
-  segment.
-
-  \sa attach(), detach()
- */
 bool QSharedMemory::isAttached() const
 {
    Q_D(const QSharedMemory);
    return (d->memory != nullptr);
 }
-
-/*!
-  Detaches the process from the shared memory segment. If this was the
-  last process attached to the shared memory segment, then the shared
-  memory segment is released by the system, i.e., the contents are
-  destroyed. The function returns true if it detaches the shared
-  memory segment. If it returns false, it usually means the segment
-  either isn't attached, or it is locked by another process.
-
-  \sa attach(), isAttached()
- */
 bool QSharedMemory::detach()
 {
    Q_D(QSharedMemory);
-   if (!isAttached()) {
+
+   if (! isAttached()) {
       return false;
    }
 
@@ -293,44 +263,23 @@ bool QSharedMemory::detach()
    if (! d->key.isEmpty() && !d->tryLocker(&lock, "QSharedMemory::detach")) {
       return false;
    }
+
 #endif
 
    return d->detach();
 }
-
-/*!
-  Returns a pointer to the contents of the shared memory segment, if
-  one is attached. Otherwise it returns null. Remember to lock the
-  shared memory with lock() before reading from or writing to the
-  shared memory, and remember to release the lock with unlock() after
-  you are done.
-
-  \sa attach()
- */
 void *QSharedMemory::data()
 {
    Q_D(QSharedMemory);
    return d->memory;
 }
 
-/*!
-  Returns a const pointer to the contents of the shared memory
-  segment, if one is attached. Otherwise it returns null. Remember to
-  lock the shared memory with lock() before reading from or writing to
-  the shared memory, and remember to release the lock with unlock()
-  after you are done.
-
-  \sa attach() create()
- */
 const void *QSharedMemory::constData() const
 {
    Q_D(const QSharedMemory);
    return d->memory;
 }
 
-/*!
-  \overload data()
- */
 const void *QSharedMemory::data() const
 {
    Q_D(const QSharedMemory);
@@ -338,24 +287,16 @@ const void *QSharedMemory::data() const
 }
 
 #ifndef QT_NO_SYSTEMSEMAPHORE
-/*!
-  This is a semaphore that locks the shared memory segment for access
-  by this process and returns true. If another process has locked the
-  segment, this function blocks until the lock is released. Then it
-  acquires the lock and returns true. If this function returns false,
-  it means that you have ignored a false return from create() or attach(),
-  that you have set the key with setNativeKey() or that
-  QSystemSemaphore::acquire() failed due to an unknown system error.
 
-  \sa unlock(), data(), QSystemSemaphore::acquire()
- */
 bool QSharedMemory::lock()
 {
    Q_D(QSharedMemory);
+
    if (d->lockedByMe) {
-      qWarning("QSharedMemory::lock: already locked");
+      qWarning("QSharedMemory::lock() Memory already locked");
       return true;
    }
+
    if (d->systemSemaphore.acquire()) {
       d->lockedByMe = true;
       return true;
@@ -368,23 +309,16 @@ bool QSharedMemory::lock()
    return false;
 }
 
-/*!
-  Releases the lock on the shared memory segment and returns true, if
-  the lock is currently held by this process. If the segment is not
-  locked, or if the lock is held by another process, nothing happens
-  and false is returned.
-
-  \sa lock()
- */
 bool QSharedMemory::unlock()
 {
    Q_D(QSharedMemory);
 
-   if (!d->lockedByMe) {
+   if (! d->lockedByMe) {
       return false;
    }
 
    d->lockedByMe = false;
+
    if (d->systemSemaphore.release()) {
       return true;
    }
@@ -410,4 +344,3 @@ QString QSharedMemory::errorString() const
 }
 
 #endif // QT_NO_SHAREDMEMORY
-

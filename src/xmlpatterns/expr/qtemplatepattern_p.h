@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,8 +26,6 @@
 
 #include <qtemplate_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class TemplatePattern : public QSharedData
@@ -48,20 +46,6 @@ class TemplatePattern : public QSharedData
    inline const Template::Ptr &templateTarget() const;
    inline ID id() const;
 
-   /**
-    * This ID is used to ensure that, as 6.4 Conflict Resolution for
-    * Template Rules reads:
-    *
-    * "If the pattern contains multiple alternatives separated by |, then
-    * the template rule is treated equivalently to a set of template
-    * rules, one for each alternative. However, it is not an error if a
-    * node matches more than one of the alternatives."
-    *
-    * For patterns separated by @c |, we have one Template instance for
-    * each alternative, but they all have the same ID, hence if several
-    * alternatives match, we don't flag it as an error if they have the
-    * same ID.
-    */
  private:
    Expression::Ptr m_matchPattern;
    PatternPriority m_priority;
@@ -72,13 +56,9 @@ class TemplatePattern : public QSharedData
    TemplatePattern &operator=(const TemplatePattern &) = delete;
 };
 
-TemplatePattern::TemplatePattern(const Expression::Ptr &matchPattern,
-                                 const PatternPriority pri,
-                                 const ID id,
-                                 const Template::Ptr templ) : m_matchPattern(matchPattern)
-   , m_priority(pri)
-   , m_id(id)
-   , m_templateTarget(templ)
+TemplatePattern::TemplatePattern(const Expression::Ptr &matchPattern, const PatternPriority pri,
+      const ID id, const Template::Ptr templ) : m_matchPattern(matchPattern)
+   , m_priority(pri), m_id(id), m_templateTarget(templ)
 
 {
    Q_ASSERT(m_matchPattern);
@@ -111,8 +91,6 @@ const Template::Ptr &TemplatePattern::templateTarget() const
 }
 
 }
-
-QT_END_NAMESPACE
 
 #endif
 

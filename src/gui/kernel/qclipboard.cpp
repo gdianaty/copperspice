@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,16 +25,16 @@
 
 #ifndef QT_NO_CLIPBOARD
 
-#include <qpixmap.h>
-#include "qmimedata.h"
-#include <qvariant.h>
 #include <qbuffer.h>
 #include <qimage.h>
+#include <qmimedata.h>
+#include <qpixmap.h>
 #include <qtextcodec.h>
+#include <qvariant.h>
 
-#include <qguiapplication_p.h>
-#include <qplatform_integration.h>
+#include <qapplication_p.h>
 #include <qplatform_clipboard.h>
+#include <qplatform_integration.h>
 
 QClipboard::QClipboard(QObject *parent)
    : QObject(parent)
@@ -55,31 +55,37 @@ QString QClipboard::text(QString &subtype, Mode mode) const
    const QStringList formats = data->formats();
 
    if (subtype.isEmpty()) {
-      if (formats.contains(QLatin1String("text/plain"))) {
-         subtype = QLatin1String("plain");
+      if (formats.contains("text/plain")) {
+         subtype = "plain";
+
       } else {
-         for (int i = 0; i < formats.size(); ++i)
-            if (formats.at(i).startsWith(QLatin1String("text/"))) {
+         for (int i = 0; i < formats.size(); ++i) {
+            if (formats.at(i).startsWith("text/")) {
                subtype = formats.at(i).mid(5);
                break;
             }
+         }
+
          if (subtype.isEmpty()) {
             return QString();
          }
       }
-   } else if (!formats.contains(QLatin1String("text/") + subtype)) {
+
+   } else if (!formats.contains("text/" + subtype)) {
       return QString();
    }
 
-   const QByteArray rawData = data->data(QLatin1String("text/") + subtype);
+   const QByteArray rawData = data->data("text/" + subtype);
 
 #ifndef QT_NO_TEXTCODEC
    QTextCodec *codec = QTextCodec::codecForMib(106); // utf-8 is default
-   if (subtype == QLatin1String("html")) {
+
+   if (subtype == "html") {
       codec = QTextCodec::codecForHtml(rawData, codec);
    } else {
       codec = QTextCodec::codecForUtfText(rawData, codec);
    }
+
    return codec->toUnicode(rawData);
 
 #else
@@ -146,7 +152,7 @@ void QClipboard::setMimeData(QMimeData *src, Mode mode)
    QPlatformClipboard *clipboard = QGuiApplicationPrivate::platformIntegration()->clipboard();
    if (!clipboard->supportsMode(mode)) {
       if (src != nullptr) {
-         qWarning("Data set on unsupported clipboard mode. QMimeData object will be deleted.");
+         qWarning("QClipboard::setMimeData() Unsupported clipboard mode, QMimeData will be deleted.");
          src->deleteLater();
       }
    } else {

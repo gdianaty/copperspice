@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,11 +24,11 @@
 #ifndef QDATAURL_P_H
 #define QDATAURL_P_H
 
-#include <qurl.h>
 #include <qbytearray.h>
-#include <qstring.h>
 #include <qpair.h>
+#include <qstring.h>
+#include <qurl.h>
 
 Q_CORE_EXPORT QPair<QString, QByteArray> qDecodeDataUrl(const QUrl &url);
 
-#endif // QDATAURL_P_H
+#endif

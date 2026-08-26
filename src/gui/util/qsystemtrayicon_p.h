@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -31,13 +31,13 @@
 #include <qmenu.h>
 #include <qpixmap.h>
 #include <qplatform_systemtrayicon.h>
-#include <qstring.h>
 #include <qpointer.h>
+#include <qstring.h>
 
-class QSystemTrayIconSys;
-class QPlatformSystemTrayIcon;
-class QToolButton;
 class QLabel;
+class QPlatformSystemTrayIcon;
+class QSystemTrayIconSys;
+class QToolButton;
 
 class QSystemTrayIconPrivate
 {
@@ -59,8 +59,9 @@ class QSystemTrayIconPrivate
    static bool supportsMessages_sys();
 
    void _q_emitActivated(QPlatformSystemTrayIcon::ActivationReason reason);
-   QPointer<QMenu> menu;
-   QIcon icon;
+
+   QPointer<QMenu> m_trayIconMenu;
+   QIcon m_trayIcon;
    QString toolTip;
    QSystemTrayIconSys *sys;
    QPlatformSystemTrayIcon *qpa_sys;
@@ -87,8 +88,8 @@ class QBalloonTip : public QWidget
 
  public:
    static void showBalloon(QSystemTrayIcon::MessageIcon icon, const QString &title,
-      const QString &msg, QSystemTrayIcon *trayIcon,
-      const QPoint &pos, int timeout, bool showArrow = true);
+         const QString &msg, QSystemTrayIcon *trayIcon,
+         const QPoint &pos, int timeout, bool showArrow = true);
 
    static void hideBalloon();
    static bool isBalloonVisible();
@@ -96,7 +97,7 @@ class QBalloonTip : public QWidget
 
  private:
    QBalloonTip(QSystemTrayIcon::MessageIcon icon, const QString &title,
-      const QString &msg, QSystemTrayIcon *trayIcon);
+         const QString &msg, QSystemTrayIcon *trayIcon);
 
    ~QBalloonTip();
    void balloon(const QPoint &, int, bool);
@@ -112,10 +113,9 @@ class QBalloonTip : public QWidget
    QPixmap pixmap;
    int timerId;
 
-   bool showArrow;
+   bool m_showArrow;
 };
 
 #endif // QT_NO_SYSTEMTRAYICON
 
 #endif // QSYSTEMTRAYICON_P_H
-

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -49,19 +49,18 @@ bool QGstreamerAudioProbeControl::probeBuffer(GstBuffer *buffer)
       : -1;
 
    QByteArray data;
-#if GST_CHECK_VERSION(1,0,0)
+
    GstMapInfo info;
+
    if (gst_buffer_map(buffer, &info, GST_MAP_READ)) {
       data = QByteArray(reinterpret_cast<const char *>(info.data), info.size);
       gst_buffer_unmap(buffer, &info);
    } else {
       return true;
    }
-#else
-   data = QByteArray(reinterpret_cast<const char *>(buffer->data), buffer->size);
-#endif
 
    QMutexLocker locker(&m_bufferMutex);
+
    if (m_format.isValid()) {
       if (!m_pendingBuffer.isValid()) {
          QMetaObject::invokeMethod(this, "bufferProbed", Qt::QueuedConnection);

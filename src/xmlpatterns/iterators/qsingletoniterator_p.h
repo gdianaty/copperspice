@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,22 +27,13 @@
 #include <qabstractxmlforwarditerator_p.h>
 #include <qprimitives_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 template<typename T>
 class SingletonIterator : public QAbstractXmlForwardIterator<T>
 {
  public:
-   /**
-    * Creates an iterator over @p item.
-    *
-    * @note item may not be @c null. Use the EmptyIterator for
-    * the empty sequence
-    */
-   SingletonIterator(const T &item) : m_item(item),
-      m_position(0) {
+   SingletonIterator(const T &item) : m_item(item), m_position(0) {
       Q_ASSERT(!qIsForwardIteratorEnd(item));
    }
 
@@ -75,16 +66,10 @@ class SingletonIterator : public QAbstractXmlForwardIterator<T>
       return m_position;
    }
 
-   /**
-    * @returns a copy of this instance, rewinded to the beginning.
-    */
    typename QAbstractXmlForwardIterator<T>::Ptr toReversed() override {
       return typename QAbstractXmlForwardIterator<T>::Ptr(new SingletonIterator<T>(m_item));
    }
 
-   /**
-    * @returns always 1
-    */
    xsInteger count() override {
       return 1;
    }
@@ -98,22 +83,12 @@ class SingletonIterator : public QAbstractXmlForwardIterator<T>
    qint8 m_position;
 };
 
-/**
- * @short An object generator for SingletonIterator.
- *
- * makeSingletonIterator() is a convenience function for avoiding specifying
- * the full template instantiation for SingletonIterator. Conceptually, it
- * is identical to Qt's qMakePair().
- *
- * @relates SingletonIterator
- */
 template<typename T>
 inline typename SingletonIterator<T>::Ptr makeSingletonIterator(const T &item)
 {
    return typename SingletonIterator<T>::Ptr(new SingletonIterator<T>(item));
 }
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

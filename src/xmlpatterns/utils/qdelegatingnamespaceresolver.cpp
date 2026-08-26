@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,11 +21,9 @@
 *
 ***********************************************************************/
 
-#include "qnamepool_p.h"
+#include <qdelegatingnamespaceresolver_p.h>
 
-#include "qdelegatingnamespaceresolver_p.h"
-
-QT_BEGIN_NAMESPACE
+#include <qnamepool_p.h>
 
 using namespace QPatternist;
 
@@ -74,5 +72,3 @@ void DelegatingNamespaceResolver::addBinding(const QXmlName nb)
       m_bindings.insert(nb.prefix(), nb.namespaceURI());
    }
 }
-
-QT_END_NAMESPACE

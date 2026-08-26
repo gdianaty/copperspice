@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -30,6 +30,7 @@
 #include "avfvideorenderercontrol.h"
 #include "avfvideowidgetcontrol.h"
 #include "avfvideowindowcontrol.h"
+#include <qdebug.h>
 
 #import <AVFoundation/AVFoundation.h>
 
@@ -53,15 +54,12 @@ AVFMediaPlayerService::AVFMediaPlayerService(QObject *parent)
 
 AVFMediaPlayerService::~AVFMediaPlayerService()
 {
-#ifdef QT_DEBUG_AVF
-   qDebug() << Q_FUNC_INFO;
-#endif
    delete m_session;
 }
 
 QMediaControl *AVFMediaPlayerService::requestControl(const QString &name)
 {
-#ifdef QT_DEBUG_AVF
+#if defined(CS_SHOW_DEBUG_PLUGINS_AVF)
    qDebug() << Q_FUNC_INFO << name;
 #endif
 
@@ -105,7 +103,7 @@ QMediaControl *AVFMediaPlayerService::requestControl(const QString &name)
 
 void AVFMediaPlayerService::releaseControl(QMediaControl *control)
 {
-#ifdef QT_DEBUG_AVF
+#if defined(CS_SHOW_DEBUG_PLUGINS_AVF)
    qDebug() << Q_FUNC_INFO << control;
 #endif
 

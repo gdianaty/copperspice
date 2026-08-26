@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,15 +28,13 @@
 
 #ifndef QT_NO_BLITTABLE
 
+class QBlittable;
+class QBlittablePlatformPixmap;
 
 class QBlitterPaintEnginePrivate;
-class QBlittablePlatformPixmap;
-class QBlittable;
 
 class Q_GUI_EXPORT QBlitterPaintEngine : public QRasterPaintEngine
 {
-   Q_DECLARE_PRIVATE(QBlitterPaintEngine)
-
  public:
    QBlitterPaintEngine(QBlittablePlatformPixmap *p);
 
@@ -90,9 +88,12 @@ class Q_GUI_EXPORT QBlitterPaintEngine : public QRasterPaintEngine
    void drawStaticTextItem(QStaticTextItem *) override;
 
    bool drawCachedGlyphs(int numGlyphs, const glyph_t *glyphs, const QFixedPoint *positions, QFontEngine *fontEngine) override;
+
+ private:
+   Q_DECLARE_PRIVATE(QBlitterPaintEngine)
 };
 
-
 #endif // QT_NO_BLITTABLE
+
 #endif // QPAINTENGINE_BLITTER_P_H
 

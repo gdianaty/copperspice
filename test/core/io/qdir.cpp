@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -142,10 +142,10 @@ TEST_CASE("QDir exists", "[qdir]")
 {
    QDir path;
 
-   REQUIRE(path.exists());
+   REQUIRE(path.exists() == true);
 }
 
-TEST_CASE("QDir set_path", "[qdir]")
+TEST_CASE("QDir setPath", "[qdir]")
 {
    QString str1(".");
    QString str2("..");
@@ -171,11 +171,10 @@ TEST_CASE("QDir set_path", "[qdir]")
    }
 }
 
-TEST_CASE("QDir temp_path", "[qdir]")
+TEST_CASE("QDir tempPath", "[qdir]")
 {
    QString str = QDir::tempPath();
    QDir path   = QDir::temp();
 
    REQUIRE(str == path.absolutePath());
 }
-

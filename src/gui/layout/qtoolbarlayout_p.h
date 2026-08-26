@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,14 +25,15 @@
 #define QTOOLBARLAYOUT_P_H
 
 #include <qlayout.h>
+#include <qvector.h>
+
 #include <qlayoutengine_p.h>
-#include <QVector>
 
 #ifndef QT_NO_TOOLBAR
 
 class QAction;
-class QToolBarExtension;
 class QMenu;
+class QToolBarExtension;
 
 class QToolBarItem : public QWidgetItem
 {
@@ -76,7 +77,7 @@ class QToolBarLayout : public QLayout
    QSize expandedSize(const QSize &size) const;
    bool expanded, animating;
 
-   void setUsePopupMenu(bool set);    // there's no getter, this is internal but public
+   void setUsePopupMenu(bool set);
    void checkUsePopupMenu();
 
    bool movable() const;
@@ -84,23 +85,30 @@ class QToolBarLayout : public QLayout
    bool hasExpandFlag() const;
 
    void updateMacBorderMetrics();
+
    GUI_CS_SLOT_1(Public, void setExpanded(bool b))
    GUI_CS_SLOT_2(setExpanded)
 
  private:
-   QList<QToolBarItem *> items;
-   QSize hint, minSize;
-   bool dirty, expanding, empty, expandFlag;
-   QVector<QLayoutStruct> geomArray;
-   QRect handRect;
-   QToolBarExtension *extension;
-
    void updateGeomArray() const;
    QToolBarItem *createItem(QAction *action);
+
+   QSize m_toolBarLayoutHint;
+   QSize minSize;
+
+   bool dirty;
+   bool expanding;
+   bool empty;
+   bool expandFlag;
+
+   QVector<QLayoutStruct> geomArray;
+   QRect handRect;
+
+   QList<QToolBarItem *> items;
+   QToolBarExtension *extension;
    QMenu *popupMenu;
 };
 
 #endif // QT_NO_TOOLBAR
-
 
 #endif // QTOOLBARLAYOUT_P_H

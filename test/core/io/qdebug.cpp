@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -73,7 +73,7 @@ void messageOperator(QtMsgType, QStringView msg) {
    fflush(handle);
 }
 
-TEST_CASE("QDebug basic", "[qdebug]")
+TEST_CASE("QDebug custom_message", "[qdebug]")
 {
    QString str(QDir::tempPath() + "/DebugTest.txt");
 
@@ -158,5 +158,3 @@ TEST_CASE("QDebug operators", "[qdebug]")
       REQUIRE(data.trimmed() == "End of test");
    }
 }
-
-

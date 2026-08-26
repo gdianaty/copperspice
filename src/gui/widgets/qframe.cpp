@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,20 +22,19 @@
 ***********************************************************************/
 
 #include <qframe.h>
+#include <qframe_p.h>
+
+#include <qapplication.h>
 #include <qbitmap.h>
 #include <qdrawutil.h>
 #include <qevent.h>
 #include <qpainter.h>
 #include <qstyle.h>
 #include <qstyleoption.h>
-#include <qapplication.h>
-
-#include <qframe_p.h>
 
 QFramePrivate::QFramePrivate()
-   : frect(0, 0, 0, 0), frameStyle(QFrame::NoFrame | QFrame::Plain), lineWidth(1),
-     midLineWidth(0), frameWidth(0), leftFrameWidth(0), rightFrameWidth(0),
-     topFrameWidth(0), bottomFrameWidth(0)
+   : frect(0, 0, 0, 0), frameStyle(cs_enum_cast(QFrame::NoFrame) | cs_enum_cast(QFrame::Plain)), lineWidth(1),
+     midLineWidth(0), frameWidth(0), leftFrameWidth(0), rightFrameWidth(0), topFrameWidth(0), bottomFrameWidth(0)
 {
 }
 
@@ -119,13 +118,6 @@ void QFrame::setFrameShape(QFrame::Shape s)
    setFrameStyle((d->frameStyle & Shadow_Mask) | s);
 }
 
-
-/*!
-    \property QFrame::frameShadow
-    \brief the frame shadow value from the frame style
-
-    \sa frameStyle(), frameShape()
-*/
 QFrame::Shadow QFrame::frameShadow() const
 {
    Q_D(const QFrame);
@@ -138,10 +130,10 @@ void QFrame::setFrameShadow(QFrame::Shadow s)
    setFrameStyle((d->frameStyle & Shape_Mask) | s);
 }
 
-
 void QFrame::setFrameStyle(int style)
 {
    Q_D(QFrame);
+
    if (!testAttribute(Qt::WA_WState_OwnSizePolicy)) {
       QSizePolicy sp;
 
@@ -163,18 +155,6 @@ void QFrame::setFrameStyle(int style)
    d->updateFrameWidth();
 }
 
-/*!
-    \property QFrame::lineWidth
-    \brief the line width
-
-    Note that the \e total line width for frames used as separators
-    (\l HLine and \l VLine) is specified by \l frameWidth.
-
-    The default value is 1.
-
-    \sa midLineWidth, frameWidth
-*/
-
 void QFrame::setLineWidth(int w)
 {
    Q_D(QFrame);
@@ -190,15 +170,6 @@ int QFrame::lineWidth() const
    Q_D(const QFrame);
    return d->lineWidth;
 }
-
-/*!
-    \property QFrame::midLineWidth
-    \brief the width of the mid-line
-
-    The default value is 0.
-
-    \sa lineWidth, frameWidth
-*/
 
 void QFrame::setMidLineWidth(int w)
 {
@@ -218,10 +189,6 @@ int QFrame::midLineWidth() const
    return d->midLineWidth;
 }
 
-/*!
-  \internal
-  Updates the frame widths from the style.
-*/
 void QFramePrivate::updateStyledFrameWidths()
 {
    Q_Q(const QFrame);
@@ -236,11 +203,6 @@ void QFramePrivate::updateStyledFrameWidths()
    bottomFrameWidth = opt.rect.bottom() - cr.bottom();
    frameWidth = qMax(qMax(leftFrameWidth, rightFrameWidth), qMax(topFrameWidth, bottomFrameWidth));
 }
-
-/*!
-  \internal
-  Updated the frameWidth parameter.
-*/
 
 void QFramePrivate::updateFrameWidth()
 {
@@ -273,8 +235,6 @@ void QFrame::setFrameRect(const QRect &r)
    setContentsMargins(cr.left(), cr.top(), rect().right() - cr.right(), rect().bottom() - cr.bottom());
 }
 
-/*!\reimp
-*/
 QSize QFrame::sizeHint() const
 {
    Q_D(const QFrame);
@@ -293,18 +253,12 @@ QSize QFrame::sizeHint() const
    }
 }
 
-/*!\reimp
-*/
-
 void QFrame::paintEvent(QPaintEvent *)
 {
    QPainter paint(this);
    drawFrame(&paint);
 }
 
-/*!
-    \internal
-*/
 void QFrame::drawFrame(QPainter *p)
 {
    QStyleOptionFrame opt;
@@ -312,9 +266,6 @@ void QFrame::drawFrame(QPainter *p)
    style()->drawControl(QStyle::CE_ShapedFrame, &opt, p, this);
 }
 
-
-/*!\reimp
- */
 void QFrame::changeEvent(QEvent *ev)
 {
    Q_D(QFrame);
@@ -329,7 +280,6 @@ void QFrame::changeEvent(QEvent *ev)
    QWidget::changeEvent(ev);
 }
 
-/*! \reimp */
 bool QFrame::event(QEvent *e)
 {
    if (e->type() == QEvent::ParentChange) {
@@ -344,4 +294,3 @@ bool QFrame::event(QEvent *e)
    }
    return result;
 }
-

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,10 +21,11 @@
 *
 ***********************************************************************/
 
+#include <qformlayout.h>
+
 #include <qalgorithms.h>
 #include <qapplication.h>
 #include <qdebug.h>
-#include <qformlayout.h>
 #include <qlabel.h>
 #include <qrect.h>
 #include <qvector.h>
@@ -126,9 +127,9 @@ void FixedColumnMatrix<T, NumColumns>::storageIndexToPosition(int idx, int *rowP
 // special values for unset fields; must not clash with values of FieldGrowthPolicy or
 // RowWrapPolicy
 const uint DefaultFieldGrowthPolicy = 255;
-const uint DefaultRowWrapPolicy = 255;
+const uint DefaultRowWrapPolicy     = 255;
 
-enum { ColumnCount = 2 };
+static constexpr const int ColumnCount = 2;
 
 // -- our data structure for our items
 // This owns the QLayoutItem
@@ -231,7 +232,7 @@ class QFormLayoutPrivate : public QLayoutPrivate
 
    QStyle *getStyle() const;
 
-   inline bool haveHfwCached(int width) const {
+   bool haveHfwCached(int width) const {
       return (hfw_width == width) || (width == sh_width && hfw_sh_height >= 0);
    }
 
@@ -241,36 +242,37 @@ class QFormLayoutPrivate : public QLayoutPrivate
    uint fieldGrowthPolicy : 8;
    uint rowWrapPolicy : 8;
    uint has_hfw : 2;
-   uint dirty : 2; // have we laid out yet?
-   uint sizesDirty : 2; // have we (not) gathered layout item sizes?
-   uint expandVertical : 1; // Do we expand vertically?
-   uint expandHorizontal : 1; // Do we expand horizonally?
-   Qt::Alignment labelAlignment;
-   Qt::Alignment formAlignment;
+   uint dirty : 2;               // have we laid out yet?
+   uint sizesDirty : 2;          // have we (not) gathered layout item sizes?
+   uint expandVertical : 1;      // Do we expand vertically?
+   uint expandHorizontal : 1;    // Do we expand horizonally?
+
+   Qt::Alignment m_labelAlignment;
+   Qt::Alignment m_formAlignment;
 
    ItemMatrix m_matrix;
    QList<QFormLayoutItem *> m_things;
 
-   int layoutWidth;    // the last width that we called setupVerticalLayoutData on (for vLayouts)
+   int layoutWidth;              // the last width that we called setupVerticalLayoutData on (for vLayouts)
 
-   int hfw_width;  // the last width we calculated HFW for
-   int hfw_height; // what that height was
-   int hfw_minheight;  // what that minheight was
+   int hfw_width;                // the last width we calculated HFW for
+   int hfw_height;               // what that height was
+   int hfw_minheight;            // what that minheight was
 
-   int hfw_sh_height;  // the hfw for sh_width
-   int hfw_sh_minheight;   // the minhfw for sh_width
+   int hfw_sh_height;            // the hfw for sh_width
+   int hfw_sh_minheight;         // the minhfw for sh_width
 
-   int min_width;  // the width that gets turned into minSize (from updateSizes)
-   int sh_width;   // the width that gets turned into prefSize (from updateSizes)
-   int thresh_width; // the width that we start splitting label/field pairs at (from updateSizes)
+   int min_width;                // the width that gets turned into minSize (from updateSizes)
+   int sh_width;                 // the width that gets turned into prefSize (from updateSizes)
+   int thresh_width;             // the width that we start splitting label/field pairs at (from updateSizes)
    QSize minSize;
    QSize prefSize;
    int formMaxWidth;
    void calcSizeHints();
 
    QVector<QLayoutStruct> vLayouts; // set by setupVerticalLayoutData;
-   int vLayoutCount;               // Number of rows we calculated in setupVerticalLayoutData
-   int maxLabelWidth;              // the label width we calculated in setupVerticalLayoutData
+   int vLayoutCount;                // Number of rows we calculated in setupVerticalLayoutData
+   int maxLabelWidth;               // the label width we calculated in setupVerticalLayoutData
 
    QVector<QLayoutStruct> hfwLayouts;
 
@@ -282,7 +284,7 @@ class QFormLayoutPrivate : public QLayoutPrivate
 QFormLayoutPrivate::QFormLayoutPrivate()
    : fieldGrowthPolicy(DefaultFieldGrowthPolicy),
      rowWrapPolicy(DefaultRowWrapPolicy), has_hfw(false), dirty(true), sizesDirty(true),
-     expandVertical(0), expandHorizontal(0), labelAlignment(Qt::EmptyFlag), formAlignment(Qt::EmptyFlag),
+     expandVertical(0), expandHorizontal(0), m_labelAlignment(Qt::EmptyFlag), m_formAlignment(Qt::EmptyFlag),
      layoutWidth(-1), hfw_width(-1), hfw_sh_height(-1), min_width(-1),
      sh_width(-1), thresh_width(QLAYOUTSIZE_MAX), hSpacing(-1), vSpacing(-1)
 {
@@ -328,12 +330,6 @@ static void updateFormLayoutItem(QFormLayoutItem *item, int userVSpacing,
    item->vSpace = userVSpacing;
 }
 
-/*
-   Iterate over all the controls and gather their size information
-   (min, sizeHint and max). Also work out what the spacing between
-   pairs of controls should be, and figure out the min and sizeHint
-   widths.
-*/
 void QFormLayoutPrivate::updateSizes()
 {
    Q_Q(QFormLayout);
@@ -719,10 +715,12 @@ void QFormLayoutPrivate::setupVerticalLayoutData(int width)
 
    layoutWidth = width;
 
-   int rr = m_matrix.rowCount();
+   int rr   = m_matrix.rowCount();
    int vidx = 1;
-   QFormLayout::RowWrapPolicy rowWrapPolicy = q->rowWrapPolicy();
-   bool wrapAllRows = (rowWrapPolicy == QFormLayout::WrapAllRows);
+
+   QFormLayout::RowWrapPolicy current_rowPolicy = q->rowWrapPolicy();
+
+   bool wrapAllRows = (current_rowPolicy == QFormLayout::WrapAllRows);
    bool addTopBottomStretch = true;
 
    vLayouts.clear();
@@ -747,10 +745,11 @@ void QFormLayoutPrivate::setupVerticalLayoutData(int width)
    // are split.
    maxLabelWidth = 0;
 
-   if (!wrapAllRows) {
+   if (! wrapAllRows) {
       for (int i = 0; i < rr; ++i) {
          const QFormLayoutItem *label = m_matrix(i, 0);
          const QFormLayoutItem *field = m_matrix(i, 1);
+
          if (label && (label->sizeHint.width() + (field ? field->minSize.width() : 0) <= width)) {
             maxLabelWidth = qMax(maxLabelWidth, label->sizeHint.width());
          }
@@ -788,8 +787,8 @@ void QFormLayoutPrivate::setupVerticalLayoutData(int width)
 
       // In separate lines, we make a vLayout for everything that isn't null
       // in side by side, we only separate label/field if we're going to wrap it
-      bool splitSideBySide = (rowWrapPolicy == QFormLayout::WrapLongRows)
-         && ((maxLabelWidth < sh1.width()) || (width < (maxLabelWidth + min2.width())));
+      bool splitSideBySide = (current_rowPolicy == QFormLayout::WrapLongRows)
+            && ((maxLabelWidth < sh1.width()) || (width < (maxLabelWidth + min2.width())));
 
       if (wrapAllRows || splitSideBySide) {
          if (label) {
@@ -1030,7 +1029,7 @@ bool QFormLayoutPrivate::setItem(int row, QFormLayout::ItemRole role, QLayoutIte
    const int column   = role == QFormLayout::SpanningRole ? 1 : static_cast<int>(role);
 
    if (uint(row) >= uint(m_matrix.rowCount()) || uint(column) > 1U) {
-      qWarning("QFormLayoutPrivate::setItem: Invalid cell (%d, %d)", row, column);
+      qWarning("QFormLayout::setItem() Invalid cell (%d, %d)", row, column);
       return false;
    }
 
@@ -1039,7 +1038,7 @@ bool QFormLayoutPrivate::setItem(int row, QFormLayout::ItemRole role, QLayoutIte
    }
 
    if (m_matrix(row, column)) {
-      qWarning("QFormLayoutPrivate::setItem: Cell (%d, %d) already occupied", row, column);
+      qWarning("QFormLayout::setItem() Cell (%d, %d) already has an item", row, column);
       return false;
    }
 
@@ -1096,8 +1095,7 @@ QLayoutItem *QFormLayoutPrivate::replaceAt(int index, QLayoutItem *newitem)
 
    const int storageIndex = storageIndexFromLayoutItem(m_matrix, m_things.value(index));
    if (storageIndex == -1) {
-      // ### Qt6 - fix warning too when this class becomes public
-      qWarning("QFormLayoutPrivate::replaceAt: Invalid index %d", index);
+      qWarning("QFormLayout::replaceAt() Invalid index %d", index);
       return nullptr;
    }
 
@@ -1129,6 +1127,7 @@ QFormLayout::~QFormLayout()
        m_things so that QLayout and the rest of the world know that we don't babysit
        the layout items anymore and don't care if they are destroyed.
    */
+
    d->m_things.clear();
    qDeleteAll(d->m_matrix.storage());
    d->m_matrix.clear();
@@ -1139,66 +1138,31 @@ void QFormLayout::addRow(QWidget *label, QWidget *field)
    insertRow(-1, label, field);
 }
 
-/*!
-    \overload
-*/
 void QFormLayout::addRow(QWidget *label, QLayout *field)
 {
    insertRow(-1, label, field);
 }
 
-/*!
-    \overload
-
-    This overload automatically creates a QLabel behind the scenes
-    with \a labelText as its text. The \a field is set as the new
-    QLabel's \l{QLabel::setBuddy()}{buddy}.
-*/
 void QFormLayout::addRow(const QString &labelText, QWidget *field)
 {
    insertRow(-1, labelText, field);
 }
 
-/*!
-    \overload
-
-    This overload automatically creates a QLabel behind the scenes
-    with \a labelText as its text.
-*/
 void QFormLayout::addRow(const QString &labelText, QLayout *field)
 {
    insertRow(-1, labelText, field);
 }
 
-/*!
-    \overload
-
-    Adds the specified \a widget at the end of this form layout. The
-    \a widget spans both columns.
-*/
 void QFormLayout::addRow(QWidget *widget)
 {
    insertRow(-1, widget);
 }
 
-/*!
-    \overload
-
-    Adds the specified \a layout at the end of this form layout. The
-    \a layout spans both columns.
-*/
 void QFormLayout::addRow(QLayout *layout)
 {
    insertRow(-1, layout);
 }
 
-/*!
-    Inserts a new row at position \a row in this form layout, with
-    the given \a label and \a field. If \a row is out of bounds, the
-    new row is added at the end.
-
-    \sa addRow()
-*/
 void QFormLayout::insertRow(int row, QWidget *label, QWidget *field)
 {
    Q_D(QFormLayout);
@@ -1217,9 +1181,6 @@ void QFormLayout::insertRow(int row, QWidget *label, QWidget *field)
    invalidate();
 }
 
-/*!
-    \overload
-*/
 void QFormLayout::insertRow(int row, QWidget *label, QLayout *field)
 {
    Q_D(QFormLayout);
@@ -1238,13 +1199,6 @@ void QFormLayout::insertRow(int row, QWidget *label, QLayout *field)
    invalidate();
 }
 
-/*!
-    \overload
-
-    This overload automatically creates a QLabel behind the scenes
-    with \a labelText as its text. The \a field is set as the new
-    QLabel's \l{QLabel::setBuddy()}{buddy}.
-*/
 void QFormLayout::insertRow(int row, const QString &labelText, QWidget *field)
 {
    Q_D(QFormLayout);
@@ -1262,6 +1216,7 @@ void QFormLayout::insertRow(int row, const QString &labelText, QWidget *field)
 #endif
 
    }
+
    insertRow(row, label, field);
 }
 
@@ -1287,13 +1242,6 @@ void QFormLayout::insertRow(int row, QWidget *widget)
    invalidate();
 }
 
-/*!
-    \overload
-
-    Inserts the specified \a layout at position \a row in this form
-    layout. The \a layout spans both columns. If \a row is out of
-    bounds, the widget is added at the end.
-*/
 void QFormLayout::insertRow(int row, QLayout *layout)
 {
    Q_D(QFormLayout);
@@ -1307,9 +1255,6 @@ void QFormLayout::insertRow(int row, QLayout *layout)
    invalidate();
 }
 
-/*!
-    \reimp
-*/
 void QFormLayout::addItem(QLayoutItem *item)
 {
    Q_D(QFormLayout);
@@ -1319,18 +1264,12 @@ void QFormLayout::addItem(QLayoutItem *item)
    invalidate();
 }
 
-/*!
-    \reimp
-*/
 int QFormLayout::count() const
 {
    Q_D(const QFormLayout);
    return d->m_things.count();
 }
 
-/*!
-    \reimp
-*/
 QLayoutItem *QFormLayout::itemAt(int index) const
 {
    Q_D(const QFormLayout);
@@ -1342,16 +1281,13 @@ QLayoutItem *QFormLayout::itemAt(int index) const
    return nullptr;
 }
 
-/*!
-    \reimp
-*/
 QLayoutItem *QFormLayout::takeAt(int index)
 {
    Q_D(QFormLayout);
 
    const int storageIndex = storageIndexFromLayoutItem(d->m_matrix, d->m_things.value(index));
    if (storageIndex == -1) {
-      qWarning("QFormLayout::takeAt: Invalid index %d", index);
+      qWarning("QFormLayout::takeAt() Invalid index %d", index);
       return nullptr;
    }
 
@@ -1381,9 +1317,6 @@ QLayoutItem *QFormLayout::takeAt(int index)
    return i;
 }
 
-/*!
-    \reimp
-*/
 Qt::Orientations QFormLayout::expandingDirections() const
 {
    Q_D(const QFormLayout);
@@ -1392,6 +1325,7 @@ Qt::Orientations QFormLayout::expandingDirections() const
    e->updateSizes();
 
    Qt::Orientations o = Qt::EmptyFlag;
+
    if (e->expandHorizontal) {
       o = Qt::Horizontal;
    }
@@ -1403,24 +1337,21 @@ Qt::Orientations QFormLayout::expandingDirections() const
    return o;
 }
 
-/*!
-    \reimp
-*/
 bool QFormLayout::hasHeightForWidth() const
 {
    Q_D(const QFormLayout);
+
    QFormLayoutPrivate *e = const_cast<QFormLayoutPrivate *>(d);
    e->updateSizes();
+
    return (d->has_hfw || rowWrapPolicy() == WrapLongRows);
 }
 
-/*!
-    \reimp
-*/
 int QFormLayout::heightForWidth(int width) const
 {
    Q_D(const QFormLayout);
-   if (!hasHeightForWidth()) {
+
+   if (! hasHeightForWidth()) {
       return -1;
    }
 
@@ -1442,24 +1373,30 @@ int QFormLayout::heightForWidth(int width) const
    }
 }
 
-/*!
-    \reimp
-*/
 void QFormLayout::setGeometry(const QRect &rect)
 {
    Q_D(QFormLayout);
+
    if (d->dirty || rect != geometry()) {
       QRect cr = rect;
-      int leftMargin, topMargin, rightMargin, bottomMargin;
+
+      int leftMargin;
+      int topMargin;
+      int rightMargin;
+      int bottomMargin;
+
       getContentsMargins(&leftMargin, &topMargin, &rightMargin, &bottomMargin);
       cr.adjust(+leftMargin, +topMargin, -rightMargin, -bottomMargin);
 
       bool hfw = hasHeightForWidth();
+
       d->setupVerticalLayoutData(cr.width());
       d->setupHorizontalLayoutData(cr.width());
+
       if (hfw && (!d->haveHfwCached(cr.width()) || d->hfwLayouts.size() != d->vLayoutCount)) {
          d->recalcHFW(cr.width());
       }
+
       if (hfw) {
          qGeomCalc(d->hfwLayouts, 0, d->vLayoutCount, cr.y(), cr.height());
          d->arrangeWidgets(d->hfwLayouts, cr);
@@ -1467,43 +1404,40 @@ void QFormLayout::setGeometry(const QRect &rect)
          qGeomCalc(d->vLayouts, 0, d->vLayoutCount, cr.y(), cr.height());
          d->arrangeWidgets(d->vLayouts, cr);
       }
+
       QLayout::setGeometry(rect);
    }
 }
 
-/*!
-    \reimp
-*/
 QSize QFormLayout::sizeHint() const
 {
    Q_D(const QFormLayout);
+
    if (!d->prefSize.isValid()) {
       QFormLayoutPrivate *dat = const_cast<QFormLayoutPrivate *>(d);
       dat->calcSizeHints();
    }
+
    return d->prefSize;
 }
 
-/*!
-    \reimp
-*/
 QSize QFormLayout::minimumSize() const
 {
    // ### fix minimumSize if hfw
    Q_D(const QFormLayout);
+
    if (!d->minSize.isValid()) {
       QFormLayoutPrivate *dat = const_cast<QFormLayoutPrivate *>(d);
       dat->calcSizeHints();
    }
+
    return d->minSize;
 }
 
-/*!
-    \reimp
-*/
 void QFormLayout::invalidate()
 {
    Q_D(QFormLayout);
+
    d->dirty = true;
    d->sizesDirty = true;
    d->minSize = QSize();
@@ -1513,14 +1447,10 @@ void QFormLayout::invalidate()
    d->sh_width = -1;
    d->layoutWidth = -1;
    d->hfw_sh_height = -1;
+
    QLayout::invalidate();
 }
 
-/*!
-    Returns the number of rows in the form.
-
-    \sa QLayout::count()
-*/
 int QFormLayout::rowCount() const
 {
    Q_D(const QFormLayout);
@@ -1530,6 +1460,7 @@ int QFormLayout::rowCount() const
 QLayoutItem *QFormLayout::itemAt(int row, ItemRole role) const
 {
    Q_D(const QFormLayout);
+
    if (uint(row) >= uint(d->m_matrix.rowCount())) {
       return nullptr;
    }
@@ -1556,6 +1487,7 @@ QLayoutItem *QFormLayout::itemAt(int row, ItemRole role) const
 void QFormLayout::getItemPosition(int index, int *rowPtr, ItemRole *rolePtr) const
 {
    Q_D(const QFormLayout);
+
    int col = -1;
    int row = -1;
 
@@ -1567,8 +1499,10 @@ void QFormLayout::getItemPosition(int index, int *rowPtr, ItemRole *rolePtr) con
    if (rowPtr) {
       *rowPtr = row;
    }
+
    if (rolePtr && col != -1) {
       const bool spanning = col == 1 && d->m_matrix(row, col)->fullRow;
+
       if (spanning) {
          *rolePtr = SpanningRole;
       } else {
@@ -1577,12 +1511,6 @@ void QFormLayout::getItemPosition(int index, int *rowPtr, ItemRole *rolePtr) con
    }
 }
 
-/*!
-    Retrieves the row and role (column) of the specified child \a
-    layout. If \a layout is not in the form layout, *\a rowPtr is set
-    to -1; otherwise the row is stored in *\a rowPtr and the role is stored
-    in *\a rolePtr.
-*/
 void QFormLayout::getLayoutPosition(QLayout *layout, int *rowPtr, ItemRole *rolePtr) const
 {
    int n = count();
@@ -1594,29 +1522,15 @@ void QFormLayout::getLayoutPosition(QLayout *layout, int *rowPtr, ItemRole *role
       }
       ++index;
    }
+
    getItemPosition(index, rowPtr, rolePtr);
 }
 
-/*!
-    Retrieves the row and role (column) of the specified \a widget in
-    the layout. If \a widget is not in the layout, *\a rowPtr is set
-    to -1; otherwise the row is stored in *\a rowPtr and the role is stored
-    in *\a rolePtr.
-
-    \sa getItemPosition(), itemAt()
-*/
 void QFormLayout::getWidgetPosition(QWidget *widget, int *rowPtr, ItemRole *rolePtr) const
 {
    getItemPosition(indexOf(widget), rowPtr, rolePtr);
 }
 
-// ### eliminate labelForField()
-
-/*!
-    Returns the label associated with the given \a field.
-
-    \sa itemAt()
-*/
 QWidget *QFormLayout::labelForField(QWidget *field) const
 {
    Q_D(const QFormLayout);
@@ -1635,9 +1549,6 @@ QWidget *QFormLayout::labelForField(QWidget *field) const
    return nullptr;
 }
 
-/*!
-    \overload
-*/
 QWidget *QFormLayout::labelForField(QLayout *field) const
 {
    Q_D(const QFormLayout);
@@ -1659,6 +1570,7 @@ QWidget *QFormLayout::labelForField(QLayout *field) const
 void QFormLayout::setFieldGrowthPolicy(FieldGrowthPolicy policy)
 {
    Q_D(QFormLayout);
+
    if (FieldGrowthPolicy(d->fieldGrowthPolicy) != policy) {
       d->fieldGrowthPolicy = policy;
       invalidate();
@@ -1668,6 +1580,7 @@ void QFormLayout::setFieldGrowthPolicy(FieldGrowthPolicy policy)
 QFormLayout::FieldGrowthPolicy QFormLayout::fieldGrowthPolicy() const
 {
    Q_D(const QFormLayout);
+
    if (d->fieldGrowthPolicy == DefaultFieldGrowthPolicy) {
       return QFormLayout::FieldGrowthPolicy(d->getStyle()->styleHint(QStyle::SH_FormLayoutFieldGrowthPolicy));
    } else {
@@ -1678,6 +1591,7 @@ QFormLayout::FieldGrowthPolicy QFormLayout::fieldGrowthPolicy() const
 void QFormLayout::setRowWrapPolicy(RowWrapPolicy policy)
 {
    Q_D(QFormLayout);
+
    if (RowWrapPolicy(d->rowWrapPolicy) != policy) {
       d->rowWrapPolicy = policy;
       invalidate();
@@ -1687,6 +1601,7 @@ void QFormLayout::setRowWrapPolicy(RowWrapPolicy policy)
 QFormLayout::RowWrapPolicy QFormLayout::rowWrapPolicy() const
 {
    Q_D(const QFormLayout);
+
    if (d->rowWrapPolicy == DefaultRowWrapPolicy) {
       return QFormLayout::RowWrapPolicy(d->getStyle()->styleHint(QStyle::SH_FormLayoutWrapPolicy));
    } else {
@@ -1697,8 +1612,9 @@ QFormLayout::RowWrapPolicy QFormLayout::rowWrapPolicy() const
 void QFormLayout::setLabelAlignment(Qt::Alignment alignment)
 {
    Q_D(QFormLayout);
-   if (d->labelAlignment != alignment) {
-      d->labelAlignment = alignment;
+
+   if (d->m_labelAlignment != alignment) {
+      d->m_labelAlignment = alignment;
       invalidate();
    }
 }
@@ -1706,18 +1622,20 @@ void QFormLayout::setLabelAlignment(Qt::Alignment alignment)
 Qt::Alignment QFormLayout::labelAlignment() const
 {
    Q_D(const QFormLayout);
-   if (!d->labelAlignment) {
+
+   if (! d->m_labelAlignment) {
       return Qt::Alignment(d->getStyle()->styleHint(QStyle::SH_FormLayoutLabelAlignment));
    } else {
-      return d->labelAlignment;
+      return d->m_labelAlignment;
    }
 }
 
 void QFormLayout::setFormAlignment(Qt::Alignment alignment)
 {
    Q_D(QFormLayout);
-   if (d->formAlignment != alignment) {
-      d->formAlignment = alignment;
+
+   if (d->m_formAlignment != alignment) {
+      d->m_formAlignment = alignment;
       invalidate();
    }
 }
@@ -1725,17 +1643,18 @@ void QFormLayout::setFormAlignment(Qt::Alignment alignment)
 Qt::Alignment QFormLayout::formAlignment() const
 {
    Q_D(const QFormLayout);
-   if (!d->formAlignment) {
+
+   if (! d->m_formAlignment) {
       return Qt::Alignment(d->getStyle()->styleHint(QStyle::SH_FormLayoutFormAlignment));
    } else {
-      return d->formAlignment;
+      return d->m_formAlignment;
    }
 }
-
 
 void QFormLayout::setHorizontalSpacing(int spacing)
 {
    Q_D(QFormLayout);
+
    if (spacing != d->hSpacing) {
       d->hSpacing = spacing;
       invalidate();
@@ -1745,6 +1664,7 @@ void QFormLayout::setHorizontalSpacing(int spacing)
 int QFormLayout::horizontalSpacing() const
 {
    Q_D(const QFormLayout);
+
    if (d->hSpacing >= 0) {
       return d->hSpacing;
    } else {
@@ -1755,6 +1675,7 @@ int QFormLayout::horizontalSpacing() const
 void QFormLayout::setVerticalSpacing(int spacing)
 {
    Q_D(QFormLayout);
+
    if (spacing != d->vSpacing) {
       d->vSpacing = spacing;
       invalidate();
@@ -1764,6 +1685,7 @@ void QFormLayout::setVerticalSpacing(int spacing)
 int QFormLayout::verticalSpacing() const
 {
    Q_D(const QFormLayout);
+
    if (d->vSpacing >= 0) {
       return d->vSpacing;
    } else {
@@ -1771,28 +1693,18 @@ int QFormLayout::verticalSpacing() const
    }
 }
 
-/*!
-    This function sets both the vertical and horizontal spacing to
-    \a spacing.
-
-    \sa setVerticalSpacing(), setHorizontalSpacing()
-*/
 void QFormLayout::setSpacing(int spacing)
 {
    Q_D(QFormLayout);
+
    d->vSpacing = d->hSpacing = spacing;
    invalidate();
 }
 
-/*!
-    If the vertical spacing is equal to the horizontal spacing,
-    this function returns that value; otherwise it returns -1.
-
-    \sa setSpacing(), verticalSpacing(), horizontalSpacing()
-*/
 int QFormLayout::spacing() const
 {
    int hSpacing = horizontalSpacing();
+
    if (hSpacing == verticalSpacing()) {
       return hSpacing;
    } else {
@@ -1810,8 +1722,10 @@ void QFormLayoutPrivate::arrangeWidgets(const QVector<QLayoutStruct> &layouts, Q
    Qt::LayoutDirection layoutDirection = w ? w->layoutDirection() : QApplication::layoutDirection();
 
    Qt::Alignment formAlignment = fixedAlignment(q->formAlignment(), layoutDirection);
+
    int leftOffset = 0;
    int delta = rect.width() - formMaxWidth;
+
    if (formAlignment & (Qt::AlignHCenter | Qt::AlignRight) && delta > 0) {
       leftOffset = delta;
       if (formAlignment & Qt::AlignHCenter) {
@@ -1832,16 +1746,17 @@ void QFormLayoutPrivate::arrangeWidgets(const QVector<QLayoutStruct> &layouts, Q
                 much. So we introduce a 7 / 4 factor so that it
                 gets some extra pixels at the top.
             */
-            height = qMin(height,
-                  qMin(label->sizeHint.height() * 7 / 4,
-                     label->maxSize.height()));
+
+            height = qMin(height, qMin(label->sizeHint.height() * 7 / 4, label->maxSize.height()));
          }
 
          QSize sz(qMin(label->layoutWidth, label->sizeHint.width()), height);
          int x = leftOffset + rect.x() + label->layoutPos;
+
          if (fixedAlignment(q->labelAlignment(), layoutDirection) & Qt::AlignRight) {
             x += label->layoutWidth - sz.width();
          }
+
          QPoint p(x, layouts.at(label->vLayoutIndex).pos);
          // ### expansion & sizepolicy stuff
 
@@ -1852,11 +1767,13 @@ void QFormLayoutPrivate::arrangeWidgets(const QVector<QLayoutStruct> &layouts, Q
          QSize sz(field->layoutWidth, layouts.at(field->vLayoutIndex).size);
          QPoint p(field->layoutPos + leftOffset + rect.x(), layouts.at(field->vLayoutIndex).pos);
          /*
-                     if ((field->widget() && field->widget()->sizePolicy().horizontalPolicy() & (QSizePolicy::GrowFlag | QSizePolicy::ExpandFlag | QSizePolicy::IgnoreFlag))
-                         || (field->layout() && sz.width() < field->maxSize.width())) {
-                         sz.rwidth() = field->layoutWidth;
-                     }
+            if ((field->widget() && field->widget()->sizePolicy().horizontalPolicy() & (QSizePolicy::GrowFlag
+                  | QSizePolicy::ExpandFlag | QSizePolicy::IgnoreFlag))
+                  || (field->layout() && sz.width() < field->maxSize.width())) {
+                sz.rwidth() = field->layoutWidth;
+            }
          */
+
          if (field->maxSize.isValid()) {
             sz = sz.boundedTo(field->maxSize);
          }
@@ -1866,74 +1783,44 @@ void QFormLayoutPrivate::arrangeWidgets(const QVector<QLayoutStruct> &layouts, Q
    }
 }
 
-/*!
-    Sets the widget in the given \a row for the given \a role to \a widget, extending the
-    layout with empty rows if necessary.
-
-    If the cell is already occupied, the \a widget is not inserted and an error message is
-    sent to the console.
-
-    \bold{Note:} For most applications, addRow() or insertRow() should be used instead of setWidget().
-
-    \sa setLayout()
-*/
 void QFormLayout::setWidget(int row, ItemRole role, QWidget *widget)
 {
    Q_D(QFormLayout);
+
    int rowCnt = rowCount();
+
    if (row >= rowCnt) {
       d->insertRows(rowCnt, row - rowCnt + 1);
    }
+
    d->setWidget(row, role, widget);
 }
 
-/*!
-    Sets the sub-layout in the given \a row for the given \a role to \a layout, extending the
-    form layout with empty rows if necessary.
-
-    If the cell is already occupied, the \a layout is not inserted and an error message is
-    sent to the console.
-
-    \bold{Note:} For most applications, addRow() or insertRow() should be used instead of setLayout().
-
-    \sa setWidget()
-*/
 void QFormLayout::setLayout(int row, ItemRole role, QLayout *layout)
 {
    Q_D(QFormLayout);
+
    int rowCnt = rowCount();
+
    if (row >= rowCnt) {
       d->insertRows(rowCnt, row - rowCnt + 1);
    }
+
    d->setLayout(row, role, layout);
 }
 
-/*!
-    Sets the item in the given \a row for the given \a role to \a item, extending the
-    layout with empty rows if necessary.
-
-    If the cell is already occupied, the \a item is not inserted and an error message is
-    sent to the console.
-    The \a item spans both columns.
-
-    \warning Do not use this function to add child layouts or child
-    widget items. Use setLayout() or setWidget() instead.
-
-    \sa setLayout()
-*/
 void QFormLayout::setItem(int row, ItemRole role, QLayoutItem *item)
 {
    Q_D(QFormLayout);
+
    int rowCnt = rowCount();
+
    if (row >= rowCnt) {
       d->insertRows(rowCnt, row - rowCnt + 1);
    }
+
    d->setItem(row, role, item);
 }
-
-/*!
-     \internal
- */
 
 void QFormLayout::resetFieldGrowthPolicy()
 {
@@ -1941,32 +1828,20 @@ void QFormLayout::resetFieldGrowthPolicy()
    d->fieldGrowthPolicy = DefaultFieldGrowthPolicy;
 }
 
-/*!
-     \internal
- */
-
 void QFormLayout::resetRowWrapPolicy()
 {
    Q_D(QFormLayout);
    d->rowWrapPolicy = DefaultRowWrapPolicy;
 }
 
-/*!
-     \internal
- */
-
 void QFormLayout::resetFormAlignment()
 {
    Q_D(QFormLayout);
-   d->formAlignment = Qt::EmptyFlag;
+   d->m_formAlignment = Qt::EmptyFlag;
 }
-
-/*!
-     \internal
- */
 
 void QFormLayout::resetLabelAlignment()
 {
    Q_D(QFormLayout);
-   d->labelAlignment = Qt::EmptyFlag;
+   d->m_labelAlignment = Qt::EmptyFlag;
 }

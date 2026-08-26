@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,8 +24,6 @@
 #ifndef WRITE_INITIALIZATION_H
 #define WRITE_INITIALIZATION_H
 
-#include <treewalker.h>
-
 #include <qhash.h>
 #include <qmap.h>
 #include <qpair.h>
@@ -33,13 +31,15 @@
 #include <qstack.h>
 #include <qtextstream.h>
 
-class Driver;
-class Uic;
+#include <treewalker.h>
+
 class DomBrush;
 class DomFont;
 class DomResourceIcon;
 class DomSizePolicy;
 class DomStringList;
+class Driver;
+class Uic;
 
 struct Option;
 
@@ -108,16 +108,16 @@ inline bool operator <(const SizePolicyHandle &f1, const SizePolicyHandle &f2)
    return f1.compare(f2) < 0;
 }
 
-struct WriteInitialization : public TreeWalker {
+struct WriteInitialization : public TreeWalker
+{
    using DomPropertyList = QList<DomProperty *>;
    using DomPropertyMap  = QHash<QString, DomProperty *>;
 
-   WriteInitialization(Uic *uic, bool activateScripts);
+   WriteInitialization(Uic *uic);
 
    // widgets
    void acceptUI(DomUI *node) override;
    void acceptWidget(DomWidget *node) override;
-   void acceptWidgetScripts(const DomScripts &, DomWidget *node, const  DomWidgets &childWidgets) override;
 
    void acceptLayout(DomLayout *node) override;
    void acceptSpacer(DomSpacer *node) override;
@@ -158,6 +158,12 @@ struct WriteInitialization : public TreeWalker {
    };
 
  private:
+   enum {
+      WritePropertyIgnoreMargin     = 1,
+      WritePropertyIgnoreSpacing    = 2,
+      WritePropertyIgnoreObjectName = 4
+   };
+
    static QString domColor2QString(const DomColor *c);
 
    QString iconCall(const DomProperty *prop);
@@ -176,8 +182,6 @@ struct WriteInitialization : public TreeWalker {
    // Apply a comma-separated list of values using a function "setSomething(int idx, value)"
    void writePropertyList(const QString &varName, const QString &setFunction, const QString &value,
       const QString &defaultValue);
-
-   enum { WritePropertyIgnoreMargin = 1, WritePropertyIgnoreSpacing = 2, WritePropertyIgnoreObjectName = 4 };
 
    QString writeStringListProperty(const DomStringList *list) const;
    void writeProperties(const QString &varName, const QString &className, const DomPropertyList &lst, unsigned flags = 0);
@@ -215,25 +219,34 @@ struct WriteInitialization : public TreeWalker {
       }
 
     private:
-      struct ItemData {
-         ItemData() : policy(DontGenerate) {}
-         QMultiMap<QString, QString> setters;       // directive to setter
+      struct ItemData
+      {
+         ItemData()
+            : policy(DontGenerate)
+         { }
+
+         QMultiMap<QString, QString> setters;
          QSet<QString> directives;
 
-         enum TemporaryVariableGeneratorPolicy {   // policies with priority, number describes the priority
+         // policies with priority, number describes the priority
+         enum TemporaryVariableGeneratorPolicy {
             DontGenerate = 1,
             GenerateWithMultiDirective = 2,
             Generate = 3
-         } policy;
+         };
+
+         TemporaryVariableGeneratorPolicy policy;
       };
 
       ItemData m_setupUiData;
       ItemData m_retranslateUiData;
+
       QList<Item *> m_children;
       Item *m_parent;
 
       const QString m_itemClassName;
       const QString m_indent;
+
       QTextStream &m_setupUiStream;
       QTextStream &m_retranslateUiStream;
       Driver *m_driver;
@@ -271,7 +284,6 @@ struct WriteInitialization : public TreeWalker {
 
    bool isValidObject(const QString &name) const;
 
- private:
    QString writeFontProperties(const DomFont *f);
    QString writeIconProperties(const DomResourceIcon *i);
    QString writeSizePolicy(const DomSizePolicy *sp);
@@ -287,11 +299,11 @@ struct WriteInitialization : public TreeWalker {
    QString m_dindent;
    bool m_stdsetdef;
 
-   struct Buddy {
+   struct Buddy
+   {
       Buddy(const QString &oN, const QString &b)
          : objName(oN), buddy(b)
-      {
-      }
+      { }
 
       QString objName;
       QString buddy;
@@ -303,19 +315,20 @@ struct WriteInitialization : public TreeWalker {
    QList<Buddy> m_buddies;
 
    QSet<QString> m_buttonGroups;
+
    QHash<QString, DomWidget *> m_registeredWidgets;
    QHash<QString, DomImage *> m_registeredImages;
    QHash<QString, DomAction *> m_registeredActions;
 
-   typedef QHash<uint, QString> ColorBrushHash;
+   using ColorBrushHash = QHash<uint, QString>;
    ColorBrushHash m_colorBrushHash;
 
    // Map from font properties to  font variable name for reuse
    // Map from size policy to  variable for reuse
 
-   typedef QMap<FontHandle, QString> FontPropertiesNameMap;
-   typedef QMap<IconHandle, QString> IconPropertiesNameMap;
-   typedef QMap<SizePolicyHandle, QString> SizePolicyNameMap;
+   using FontPropertiesNameMap = QMap<FontHandle, QString>;
+   using IconPropertiesNameMap = QMap<IconHandle, QString>;
+   using SizePolicyNameMap     = QMap<SizePolicyHandle, QString>;
 
    FontPropertiesNameMap m_fontPropertiesNameMap;
    IconPropertiesNameMap m_iconPropertiesNameMap;
@@ -337,8 +350,17 @@ struct WriteInitialization : public TreeWalker {
          const QString &propertyName, const QString &setter, int defaultStyleValue,
          bool suppressDefault, QTextStream &str) const;
 
-      enum Properties { Margin, Spacing, NumProperties };
-      enum StateFlags { HasDefaultValue = 1, HasDefaultFunction = 2};
+      enum Properties {
+         Margin,
+         Spacing,
+         NumProperties
+      };
+
+      enum StateFlags {
+         HasDefaultValue = 1,
+         HasDefaultFunction = 2
+      };
+
       unsigned m_state[NumProperties];
       int m_defaultValues[NumProperties];
       QString m_functions[NumProperties];
@@ -360,12 +382,11 @@ struct WriteInitialization : public TreeWalker {
 
    QString m_delayedActionInitialization;
    QTextStream m_actionOut;
-   const bool m_activateScripts;
 
    bool m_layoutWidget;
    bool m_firstThemeIcon;
 };
 
-} // namespace CPP
+}   // namespace
 
 #endif

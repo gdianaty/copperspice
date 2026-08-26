@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,10 +25,7 @@
 #include "qcommonvalues_p.h"
 #include "qitemmappingiterator_p.h"
 #include "qpatternistlocale_p.h"
-
 #include "qtracefn_p.h"
-
-QT_BEGIN_NAMESPACE
 
 using namespace QPatternist;
 
@@ -38,17 +35,15 @@ class TraceCallback : public QSharedData
  public:
    typedef QExplicitlySharedDataPointer<TraceCallback> Ptr;
 
-   inline TraceCallback(const QString &msg) : m_position(0),
-      m_msg(msg) {
+   TraceCallback(const QString &msg)
+      : m_position(0), m_msg(msg)
+   {
    }
 
-   /**
-    * Performs the actual tracing.
-    */
-   Item mapToItem(const Item &item,
-                  const DynamicContext::Ptr &context) {
+   Item mapToItem(const Item &item, const DynamicContext::Ptr &context) {
       QTextStream out(stderr);
       ++m_position;
+
       if (m_position == 1) {
          if (item) {
             out << csPrintable(m_msg)
@@ -98,5 +93,3 @@ SequenceType::Ptr TraceFN::staticType() const
 {
    return m_operands.first()->staticType();
 }
-
-QT_END_NAMESPACE

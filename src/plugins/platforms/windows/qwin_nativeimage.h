@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,8 +24,8 @@
 #ifndef QWINDOWSNATIVEIMAGE_H
 #define QWINDOWSNATIVEIMAGE_H
 
-#include <qwin_additional.h>
 #include <qimage.h>
+#include <qwin_additional.h>
 
 class QWindowsNativeImage
 {

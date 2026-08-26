@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,10 @@
 #ifndef QCOLOR_H
 #define QCOLOR_H
 
-#include <qrgb.h>
 #include <qnamespace.h>
-#include <qstringlist.h>
+#include <qrgb.h>
 #include <qrgba64.h>
+#include <qstringlist.h>
 
 class QColor;
 class QColormap;
@@ -61,7 +61,7 @@ class Q_GUI_EXPORT QColor
 
    static QStringList colorNames();
 
-   inline Spec spec() const {
+   Spec spec() const {
       return cspec;
    }
 
@@ -99,15 +99,15 @@ class Q_GUI_EXPORT QColor
    QRgb rgb() const;
    void setRgb(QRgb rgb);
 
-   int hue() const; // 0 <= hue < 360
+   int hue() const;                    // 0 <= hue < 360
    int saturation() const;
-   int hsvHue() const; // 0 <= hue < 360
+   int hsvHue() const;                 // 0 <= hue < 360
    int hsvSaturation() const;
    int value() const;
 
-   qreal hueF() const; // 0.0 <= hueF < 360.0
+   qreal hueF() const;                 // 0.0 <= hueF < 360.0
    qreal saturationF() const;
-   qreal hsvHueF() const; // 0.0 <= hueF < 360.0
+   qreal hsvHueF() const;              // 0.0 <= hueF < 360.0
    qreal hsvSaturationF() const;
    qreal valueF() const;
 
@@ -133,11 +133,11 @@ class Q_GUI_EXPORT QColor
    void getCmykF(qreal *c, qreal *m, qreal *y, qreal *k, qreal *a = nullptr);
    void setCmykF(qreal c, qreal m, qreal y, qreal k, qreal a = 1.0);
 
-   int hslHue() const; // 0 <= hue < 360
+   int hslHue() const;                 // 0 <= hue < 360
    int hslSaturation() const;
    int lightness() const;
 
-   qreal hslHueF() const; // 0.0 <= hueF < 360.0
+   qreal hslHueF() const;              // 0.0 <= hueF < 360.0
    qreal hslSaturationF() const;
    qreal lightnessF() const;
 
@@ -189,7 +189,6 @@ class Q_GUI_EXPORT QColor
    Spec cspec;
 
 #ifndef CS_DOXYPRESS
-
    union {
       struct {
          ushort alpha;
@@ -230,7 +229,6 @@ class Q_GUI_EXPORT QColor
    friend class QColormap;
    friend Q_GUI_EXPORT QDataStream &operator<<(QDataStream &stream, const QColor &color);
    friend Q_GUI_EXPORT QDataStream &operator>>(QDataStream &stream, QColor &color);
-
 };
 
 inline QColor::QColor()

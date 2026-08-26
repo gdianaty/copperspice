@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,31 +24,20 @@
 #ifndef QGenericStaticContext_P_H
 #define QGenericStaticContext_P_H
 
-#include <QUrl>
-#include <QXmlQuery>
-#include <qstaticcontext_p.h>
+#include <qurl.h>
+#include <qxmlquery.h>
+
 #include <qfunctionfactory_p.h>
 #include <qschematypefactory_p.h>
-
-QT_BEGIN_NAMESPACE
+#include <qstaticcontext_p.h>
 
 namespace QPatternist {
+
 class GenericStaticContext : public StaticContext
 {
  public:
    typedef QExplicitlySharedDataPointer<GenericStaticContext> Ptr;
-   /**
-    * Constructs a GenericStaticContext. The components are initialized as per
-    * the recommended default values in XQuery 1.0. <tt>Default order for empty sequences</tt>,
-    * orderingEmptySequence(), is initialized to Greatest.
-    *
-    * @see <a href="http://www.w3.org/TR/xquery/#id-xq-static-context-components">XQuery
-    * 1.0: An XML Query Language, C.1 Static Context Components</a>
-    * @param errorHandler the error handler. May be null.
-    * @param np the NamePool. May not be null.
-    * @param aBaseURI the base URI in the static context. Must be absolute
-    * and valid.
-    */
+
    GenericStaticContext(const NamePool::Ptr &np, QAbstractMessageHandler *const errorHandler,
                   const QUrl &aBaseURI, const FunctionFactory::Ptr &factory, const QXmlQuery::QueryLanguage lang);
 
@@ -58,11 +47,6 @@ class GenericStaticContext : public StaticContext
    FunctionFactory::Ptr functionSignatures() const override;
    SchemaTypeFactory::Ptr schemaDefinitions() const override;
 
-   /**
-    * Returns a DynamicContext used for evaluation at compile time.
-    *
-    * @bug The DynamicContext isn't stable. It should be cached privately.
-    */
    DynamicContext::Ptr dynamicContext() const override;
 
    QUrl baseURI() const override;
@@ -71,9 +55,6 @@ class GenericStaticContext : public StaticContext
    bool compatModeEnabled() const override;
    void setCompatModeEnabled(const bool newVal) override;
 
-   /**
-    * @returns always the Unicode codepoint collation URI
-    */
    QUrl defaultCollation() const override;
 
    QAbstractMessageHandler *messageHandler() const override;
@@ -150,8 +131,7 @@ class GenericStaticContext : public StaticContext
    VariableSlotID              m_rangeSlot;
    bool                        m_compatModeEnabled;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,11 +24,11 @@
 #ifndef QWINDOWSCONTEXT_H
 #define QWINDOWSCONTEXT_H
 
-#include <qwin_global.h>
-#include <qwin_additional.h>
+#include <qlist.h>
 #include <qscopedpointer.h>
 #include <qsharedpointer.h>
-#include <qlist.h>
+#include <qwin_additional.h>
+#include <qwin_global.h>
 
 #define STRICT_TYPED_ITEMIDS
 #include <shlobj.h>
@@ -37,14 +37,14 @@
 struct IBindCtx;
 struct _SHSTOCKICONINFO;
 
-class QWindow;
+class QKeyEvent;
 class QPlatformScreen;
+class QPoint;
+class QTouchDevice;
+class QWindow;
+class QWindowsMimeConverter;
 class QWindowsScreenManager;
 class QWindowsWindow;
-class QWindowsMimeConverter;
-class QPoint;
-class QKeyEvent;
-class QTouchDevice;
 
 struct QWindowCreationContext;
 struct QWindowsContextPrivate;
@@ -140,7 +140,7 @@ class QWindowsContext
  public:
    enum SystemInfoFlags {
       SI_RTL_Extensions = 0x1,
-      SI_SupportsTouch = 0x2
+      SI_SupportsTouch  = 0x2
    };
 
    explicit QWindowsContext();
@@ -149,9 +149,6 @@ class QWindowsContext
    QWindowsContext &operator=(const QWindowsContext &) = delete;
 
    ~QWindowsContext();
-
-   // Verbose flag set by environment variable QT_QPA_VERBOSE
-   static int verbose;
 
    bool initTouch();
    bool initTouch(unsigned integrationOptions); // For calls from QWindowsIntegration::QWindowsIntegration() only.

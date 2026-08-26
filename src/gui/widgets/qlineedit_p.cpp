@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,8 +29,8 @@
 #include <qabstractitemview.h>
 #include <qclipboard.h>
 #include <qdrag.h>
-#include <qpropertyanimation.h>
 #include <qmimedata.h>
+#include <qpropertyanimation.h>
 #include <qvariant.h>
 #include <qwidgetaction.h>
 
@@ -267,10 +267,6 @@ void QLineEditPrivate::resetInputMethod()
    }
 }
 
-/*!
-  This function is not intended as polymorphic usage. Just a shared code
-  fragment that calls QInputContext::mouseHandler for this class.
-*/
 bool QLineEditPrivate::sendMouseEventToInputContext( QMouseEvent *e )
 {
 #if !defined QT_NO_IM

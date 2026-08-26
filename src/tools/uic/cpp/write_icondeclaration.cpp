@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,11 +23,11 @@
 
 #include <write_icondeclaration.h>
 
+#include <qtextstream.h>
+
 #include <driver.h>
 #include <ui4.h>
 #include <uic.h>
-
-#include <qtextstream.h>
 
 namespace CPP {
 
@@ -57,5 +57,5 @@ void WriteIconDeclaration::acceptImage(DomImage *image)
    output << option.indent << option.indent << name << "_ID,\n";
 }
 
-} // namespace CPP
+}   // namespace
 

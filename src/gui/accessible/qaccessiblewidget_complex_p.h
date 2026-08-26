@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,19 +24,19 @@
 #ifndef COMPLEXWIDGETS_H
 #define COMPLEXWIDGETS_H
 
-#include <qpointer.h>
-#include <qaccessiblewidget.h>
 #include <qabstractitemview.h>
+#include <qaccessiblewidget.h>
+#include <qpointer.h>
 
 #ifndef QT_NO_ACCESSIBILITY
 
 class QAbstractButton;
-class QHeaderView;
-class QTabBar;
-class QComboBox;
-class QTitleBar;
 class QAbstractScrollArea;
+class QComboBox;
+class QHeaderView;
 class QScrollArea;
+class QTabBar;
+class QTitleBar;
 
 #ifndef QT_NO_SCROLLAREA
 class QAccessibleAbstractScrollArea : public QAccessibleWidget

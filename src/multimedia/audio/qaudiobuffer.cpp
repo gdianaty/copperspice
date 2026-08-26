@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,15 @@
 #include <qaudiobuffer.h>
 #include <qaudiobuffer_p.h>
 
-#include <qobject.h>
 #include <qdebug.h>
+#include <qobject.h>
 
 class QAudioBufferPrivate : public QSharedData
 {
  public:
    QAudioBufferPrivate(QAbstractAudioBuffer *provider)
-      : mProvider(provider), mCount(1) {
+      : mProvider(provider), mCount(1)
+   {
    }
 
    ~QAudioBufferPrivate() {
@@ -112,27 +113,31 @@ class QMemoryAudioBufferProvider : public QAbstractAudioBuffer
       }
    }
 
-   void release() {
+   void release() override {
       delete this;
    }
-   QAudioFormat format() const {
+
+   QAudioFormat format() const override {
       return mFormat;
    }
-   qint64 startTime() const {
+
+   qint64 startTime() const override {
       return mStartTime;
    }
-   int frameCount() const {
+
+   int frameCount() const override {
       return mFrameCount;
    }
 
-   void *constData() const {
+   void *constData() const override {
       return mBuffer;
    }
 
-   void *writableData() {
+   void *writableData() override {
       return mBuffer;
    }
-   QAbstractAudioBuffer *clone() const {
+
+   QAbstractAudioBuffer *clone() const override {
       return new QMemoryAudioBufferProvider(mBuffer, mFrameCount, mFormat, mStartTime);
    }
 
@@ -173,9 +178,7 @@ QAudioBuffer::QAudioBuffer(QAbstractAudioBuffer *provider)
    : d(new QAudioBufferPrivate(provider))
 {
 }
-/*!
-    Generally this will have copy-on-write semantics - a copy will only be made when it has to be.
- */
+
 QAudioBuffer::QAudioBuffer(const QAudioBuffer &other)
 {
    d = QAudioBufferPrivate::acquire(other.d);

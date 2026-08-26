@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,26 +29,25 @@
 #include <qmutex.h>
 #include <qobject.h>
 #include <qthread.h>
-#include <qvector.h>
 #include <qvarlengtharray.h>
+#include <qvector.h>
 #include <qwindowsysteminterface.h>
 #include <qxcb_export.h>
+
+#ifndef QT_NO_TABLETEVENT
+#include <qtabletevent.h>
+#endif
 
 #include <xcb/xcb.h>
 #include <xcb/randr.h>
 
-// required since  xkb.h is using a variable called 'explicit'
+// required since xkb.h is using a variable called 'explicit'
 #ifndef QT_NO_XKB
 #define explicit dont_use_cxx_explicit
 #include <xcb/xkb.h>
 #undef explicit
 #endif
 
-#ifndef QT_NO_TABLETEVENT
-#include <QTabletEvent>
-#endif
-
-#if XCB_USE_XINPUT2
 #include <X11/extensions/XI2.h>
 
 #ifdef XIScrollClass
@@ -61,25 +60,20 @@
 #endif
 
 struct XInput2TouchDeviceData;
-#endif // XCB_USE_XINPUT2
-
 struct xcb_randr_get_output_info_reply_t;
 
-//#define Q_XCB_DEBUG
-
-class QXcbVirtualDesktop;
-class QXcbScreen;
-class QXcbWindow;
-class QXcbDrag;
-class QXcbKeyboard;
-class QXcbClipboard;
-class QXcbWMSupport;
-class QXcbNativeInterface;
-class QXcbSystemTrayTracker;
-class QXcbGlIntegration;
-
 class QAbstractEventDispatcher;
+class QXcbClipboard;
 class QXcbConnection;
+class QXcbDrag;
+class QXcbGlIntegration;
+class QXcbKeyboard;
+class QXcbNativeInterface;
+class QXcbScreen;
+class QXcbSystemTrayTracker;
+class QXcbVirtualDesktop;
+class QXcbWMSupport;
+class QXcbWindow;
 class QXcbWindowEventListener;
 
 using QXcbEventArray = QVarLengthArray<xcb_generic_event_t *, 64>;
@@ -344,10 +338,8 @@ class QXcbWindowEventListener
    virtual void handleFocusOutEvent(const xcb_focus_out_event_t *) {}
    virtual void handlePropertyNotifyEvent(const xcb_property_notify_event_t *) {}
 
-#ifdef XCB_USE_XINPUT22
    virtual void handleXIMouseEvent(xcb_ge_event_t *, Qt::MouseEventSource = Qt::MouseEventNotSynthesized) {}
    virtual void handleXIEnterLeave(xcb_ge_event_t *) {}
-#endif
 
    virtual QXcbWindow *toWindow() {
       return nullptr;
@@ -454,29 +446,15 @@ class QXcbConnection : public QObject
    void *createVisualInfoForDefaultVisualId() const;
 #endif
 
-#if defined(XCB_USE_XINPUT2)
    void xi2Select(xcb_window_t window);
-#endif
 
-#ifdef XCB_USE_XINPUT21
    bool isAtLeastXI21() const {
       return m_xi2Enabled && m_xi2Minor >= 1;
    }
-#else
-   bool isAtLeastXI21() const {
-      return false;
-   }
-#endif
 
-#ifdef XCB_USE_XINPUT22
    bool isAtLeastXI22() const {
       return m_xi2Enabled && m_xi2Minor >= 2;
    }
-#else
-   bool isAtLeastXI22() const {
-      return false;
-   }
-#endif
 
    void sync();
 
@@ -591,13 +569,8 @@ class QXcbConnection : public QObject
    static bool xEmbedSystemTrayAvailable();
    static bool xEmbedSystemTrayVisualHasAlphaChannel();
 
-#ifdef XCB_USE_XINPUT21
    void handleEnterEvent();
-#endif
-
-#ifdef XCB_USE_XINPUT22
    bool xi2SetMouseGrabEnabled(xcb_window_t w, bool grab);
-#endif
 
    Qt::MouseButton xiToQtMouseButton(uint32_t b);
 
@@ -613,9 +586,7 @@ class QXcbConnection : public QObject
       return m_glIntegration;
    }
 
-#ifdef XCB_USE_XINPUT22
    bool xi2MouseEvents() const;
-#endif
 
    CS_SLOT_1(Public, void flush() { xcb_flush(m_connection); } )
    CS_SLOT_2(flush)
@@ -651,7 +622,6 @@ class QXcbConnection : public QObject
    void initializeScreens();
    bool compressEvent(xcb_generic_event_t *event, int currentIndex, QXcbEventArray *eventqueue) const;
 
-#ifdef XCB_USE_XINPUT2
    void initializeXInput2();
    void finalizeXInput2();
    void xi2SetupDevices();
@@ -667,9 +637,7 @@ class QXcbConnection : public QObject
    int m_xiEventBase;
    int m_xiErrorBase;
 
-#ifdef XCB_USE_XINPUT22
    void xi2ProcessTouch(void *xiDevEvent, QXcbWindow *platformWindow);
-#endif
 
 #ifndef QT_NO_TABLETEVENT
    struct TabletData {
@@ -726,7 +694,6 @@ class QXcbConnection : public QObject
 
    static bool xi2GetValuatorValueIfSet(void *event, int valuatorNum, double *value);
    static void xi2PrepareXIGenericDeviceEvent(xcb_ge_event_t *event);
-#endif
 
    xcb_connection_t *m_connection;
    const xcb_setup_t *m_setup;
@@ -762,12 +729,9 @@ class QXcbConnection : public QObject
 #endif
 
    QXcbEventReader *m_reader;
-
-#if defined(XCB_USE_XINPUT2)
    QHash<int, XInput2TouchDeviceData *> m_touchDevices;
-#endif
 
-#ifdef Q_XCB_DEBUG
+#if defined(CS_SHOW_DEBUG_PLATFORM)
    struct CallInfo {
       int sequence;
       QByteArray file;
@@ -859,18 +823,24 @@ union q_padded_xcb_event {
     q_padded_xcb_event<event_type> store = q_padded_xcb_event<event_type>(); \
     auto &event_var = store.event;
 
-#ifdef Q_XCB_DEBUG
+#if defined(CS_SHOW_DEBUG_PLATFORM)
 
 template <typename cookie_t>
 cookie_t q_xcb_call_template(const cookie_t &cookie, QXcbConnection *connection, const char *file, int line)
 {
-   connection->log(file, line, cookie.sequence);
+   if constexpr(std::is_pointer_v<cookie_t>) {
+      connection->log(file, line, cookie->sequence);
+   } else {
+      connection->log(file, line, cookie.sequence);
+   }
+
    return cookie;
 }
 
 #define Q_XCB_CALL(x) q_xcb_call_template(x, connection(), __FILE__, __LINE__)
 #define Q_XCB_CALL2(x, connection) q_xcb_call_template(x, connection, __FILE__, __LINE__)
 #define Q_XCB_NOOP(c) q_xcb_call_template(xcb_no_operation(c->xcb_connection()), c, __FILE__, __LINE__);
+
 #else
 
 #define Q_XCB_CALL(x) x

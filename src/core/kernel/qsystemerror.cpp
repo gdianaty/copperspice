@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,11 +21,12 @@
 *
 ***********************************************************************/
 
-#include <errno.h>
-
 #include <qglobal.h>
 #include <qlog.h>
+
 #include <qsystemerror_p.h>
+
+#include <errno.h>
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -35,16 +36,17 @@
 
 namespace {
 
-static inline QString fromstrerror_helper(int, const QByteArray &buf)
+[[maybe_unused]] static inline QString fromstrerror_helper(int, const QByteArray &buffer)
 {
-   return QString::fromUtf8(buf);
+   return QString::fromUtf8(buffer);
 }
 
-static inline QString fromstrerror_helper(const char *str, const QByteArray &)
+[[maybe_unused]] static inline QString fromstrerror_helper(const char *str, const QByteArray &)
 {
    return QString::fromUtf8(str);
 }
-}
+
+}   // end namespace
 #endif
 
 #ifdef Q_OS_WIN
@@ -54,7 +56,7 @@ static QString windowsErrorString(int errorCode)
    wchar_t *buffer = nullptr;
 
    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-                 nullptr, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&buffer, 0, nullptr);
+         nullptr, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&buffer, 0, nullptr);
 
    if (buffer != nullptr) {
       ret = QString::fromStdWString(std::wstring(buffer));
@@ -130,11 +132,10 @@ QString QSystemError::toString()
          return standardLibraryErrorString(errorCode);
 
       case NoError:
-         return QLatin1String("No error");
+         return QString("No error");
 
       default:
-         qWarning("Invalid error scope");
-         return QLatin1String("Unrecognized error");
+         qWarning("QSystemError::toString() Invalid error scope");
+         return QString("Unrecognized error");
    }
 }
-

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,9 +24,9 @@
 #ifndef QXCB_WM_SUPPORT_H
 #define QXCB_WM_SUPPORT_H
 
-#include <qxcb_object.h>
-#include <qxcb_connection.h>
 #include <qvector.h>
+#include <qxcb_connection.h>
+#include <qxcb_object.h>
 
 class QXcbWMSupport : public QXcbObject
 {

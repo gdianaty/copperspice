@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,9 +27,8 @@
 #include "qexpression_p.h"
 #include "qatomictype_p.h"
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class PairContainer : public Expression
 {
  public:
@@ -43,8 +42,7 @@ class PairContainer : public Expression
    Expression::Ptr m_operand1;
    Expression::Ptr m_operand2;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

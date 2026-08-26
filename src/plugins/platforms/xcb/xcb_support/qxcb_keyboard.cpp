@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,27 +22,25 @@
 ***********************************************************************/
 
 #include <qxcb_keyboard.h>
-#include <qxcb_window.h>
-#include <qxcb_screen.h>
 
-#include <qwindowsysteminterface.h>
+#include <qdir.h>
+#include <qmetamethod.h>
+#include <qplatform_cursor.h>
 #include <qplatform_inputcontext.h>
 #include <qplatform_integration.h>
-#include <qplatform_cursor.h>
 #include <qtextcodec.h>
-#include <qmetamethod.h>
-#include <qdir.h>
+#include <qwindowsysteminterface.h>
+#include <qxcb_screen.h>
+#include <qxcb_window.h>
 
 #include <qapplication_p.h>
 
 #include <stdio.h>
 #include <X11/keysym.h>
 
-#ifdef XCB_USE_XINPUT22
 #include <X11/extensions/XI2proto.h>
 #undef KeyPress
 #undef KeyRelease
-#endif
 
 #ifndef XK_ISO_Left_Tab
 #define XK_ISO_Left_Tab         0xFE20
@@ -433,7 +431,7 @@ static const unsigned int KeyTbl[] = {
    XF86XK_AudioRecord,         Qt::Key_MediaRecord,
    XF86XK_AudioPause,          Qt::Key_MediaPause,
    XF86XK_Mail,                Qt::Key_LaunchMail,
-   XF86XK_MyComputer,          Qt::Key_Launch0,  // ### Qt 6: remap properly
+   XF86XK_MyComputer,          Qt::Key_Launch0,       // TODO: remap properly
    XF86XK_Calculator,          Qt::Key_Launch1,
    XF86XK_Memo,                Qt::Key_Memo,
    XF86XK_ToDoList,            Qt::Key_ToDoList,
@@ -542,7 +540,7 @@ static const unsigned int KeyTbl[] = {
    XF86XK_TouchpadOn,          Qt::Key_TouchpadOn,
    XF86XK_TouchpadOff,         Qt::Key_TouchpadOff,
    XF86XK_AudioMicMute,        Qt::Key_MicMute,
-   XF86XK_Launch0,             Qt::Key_Launch2, // ### Qt 6: remap properly
+   XF86XK_Launch0,             Qt::Key_Launch2,       // TODO: remap properly
    XF86XK_Launch1,             Qt::Key_Launch3,
    XF86XK_Launch2,             Qt::Key_Launch4,
    XF86XK_Launch3,             Qt::Key_Launch5,
@@ -818,7 +816,6 @@ void QXcbKeyboard::updateXKBStateFromCore(quint16 state)
    }
 }
 
-#ifdef XCB_USE_XINPUT22
 void QXcbKeyboard::updateXKBStateFromXI(void *modInfo, void *groupInfo)
 {
    if (m_config && !connection()->hasXKB()) {
@@ -837,7 +834,6 @@ void QXcbKeyboard::updateXKBStateFromXI(void *modInfo, void *groupInfo)
       }
    }
 }
-#endif
 
 quint32 QXcbKeyboard::xkbModMask(quint16 state)
 {

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,6 +22,7 @@
 ***********************************************************************/
 
 #include <qtextcodecplugin.h>
+
 #include <qstringlist.h>
 #include <qstringparser.h>
 
@@ -42,6 +43,7 @@ QStringList QTextCodecPlugin::keys() const
    keys += aliases();
 
    QList<int> mibs = mibEnums();
+
    for (int i = 0; i < mibs.count(); ++i) {
       keys += "MIB: " + QString::number(mibs.at(i));
    }

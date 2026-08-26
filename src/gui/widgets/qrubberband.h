@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,15 +28,19 @@
 
 #ifndef QT_NO_RUBBERBAND
 
-class QRubberBandPrivate;
 class QStyleOptionRubberBand;
+
+class QRubberBandPrivate;
 
 class Q_GUI_EXPORT QRubberBand : public QWidget
 {
    GUI_CS_OBJECT(QRubberBand)
 
  public:
-   enum Shape { Line, Rectangle };
+   enum Shape {
+      Line,
+      Rectangle
+   };
 
    explicit QRubberBand(Shape shape, QWidget *parent = nullptr);
 
@@ -49,15 +53,15 @@ class Q_GUI_EXPORT QRubberBand : public QWidget
    inline void setGeometry(int x, int y, int width, int height);
    inline void move(int x, int y);
 
-   inline void move(const QPoint &point) {
+   void move(const QPoint &point) {
       move(point.x(), point.y());
    }
 
-   inline void resize(int width, int height) {
+   void resize(int width, int height) {
       setGeometry(geometry().x(), geometry().y(), width, height);
    }
 
-   inline void resize(const QSize &size) {
+   void resize(const QSize &size) {
       resize(size.width(), size.height());
    }
 

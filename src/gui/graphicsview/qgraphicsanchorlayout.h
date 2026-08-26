@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -30,9 +30,10 @@
 
 #if ! defined(QT_NO_GRAPHICSVIEW)
 
-class QGraphicsAnchorPrivate;
 class QGraphicsAnchorLayout;
+
 class QGraphicsAnchorLayoutPrivate;
+class QGraphicsAnchorPrivate;
 
 class Q_GUI_EXPORT QGraphicsAnchor : public QObject
 {

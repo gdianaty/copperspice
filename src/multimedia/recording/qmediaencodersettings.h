@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,14 +21,14 @@
 *
 ***********************************************************************/
 
-#ifndef QMEDIAENCODERSETTINGS_H
-#define QMEDIAENCODERSETTINGS_H
+#ifndef QMEDIA_ENCODERSETTINGS_H
+#define QMEDIA_ENCODERSETTINGS_H
 
-#include <qsharedpointer.h>
-#include <qstring.h>
-#include <qsize.h>
-#include <qvariant.h>
 #include <qmultimedia.h>
+#include <qsharedpointer.h>
+#include <qsize.h>
+#include <qstring.h>
+#include <qvariant.h>
 
 class QAudioEncoderSettingsPrivate;
 class QImageEncoderSettingsPrivate;

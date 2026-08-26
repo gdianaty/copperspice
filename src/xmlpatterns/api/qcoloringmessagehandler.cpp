@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -97,7 +97,7 @@ void ColoringMessageHandler::handleMessage(QtMsgType type,
          }
 
          if (hasLine) {
-            writeUncolored(QXmlPatternistCLI::tr("Error %1 in %2, at line %3, column %4 \n   Description: %5")
+            writeUncolored(QXmlPatternistCLI::tr("Error %1 in %2, at line %3, column %4\n   Description: %5")
                   .formatArgs(colorify(errorId, ErrorCode),
                   colorify(location, Location),
                   colorify(QString::number(sourceLocation.line()), Location),
@@ -105,7 +105,7 @@ void ColoringMessageHandler::handleMessage(QtMsgType type,
                   colorifyDescription(description)));
 
          } else {
-            writeUncolored(QXmlPatternistCLI::tr("Error %1 in \"%2\" \n   Description: %3")
+            writeUncolored(QXmlPatternistCLI::tr("Error %1 in %2\n   Description: %3")
                   .formatArgs(colorify(errorId, ErrorCode), colorify(location, Location),
                   colorifyDescription(description)));
          }

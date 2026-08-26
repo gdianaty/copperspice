@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,17 +25,17 @@
 #define QPLATFORM_FONTDATABASE_H
 
 #include <qfontdatabase.h>
-
 #include <qlist.h>
 #include <qstring.h>
 #include <qstringlist.h>
 
-#include <qfontengine_p.h>
 #include <qfont_p.h>
+#include <qfontengine_p.h>
 
-class QWritingSystemsPrivate;
-class QFontRequestPrivate;
 class QFontEngineMulti;
+
+class QFontRequestPrivate;
+class QWritingSystemsPrivate;
 
 class Q_GUI_EXPORT QSupportedWritingSystems
 {

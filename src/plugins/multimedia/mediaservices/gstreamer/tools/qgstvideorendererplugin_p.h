@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,9 +24,9 @@
 #ifndef QGSTVIDEORENDERERPLUGIN_P_H
 #define QGSTVIDEORENDERERPLUGIN_P_H
 
+#include <qabstractvideobuffer.h>
 #include <qobject.h>
 #include <qplugin.h>
-#include <qabstractvideobuffer.h>
 #include <qvideosurfaceformat.h>
 
 #include <gst/gst.h>

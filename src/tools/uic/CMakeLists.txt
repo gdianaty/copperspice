@@ -3,7 +3,6 @@ add_executable(CopperSpice::uic ALIAS uic${TOOLS_SUFFIX})
 
 add_definitions(
    -DQT_UIC
-   -DQT_UIC_CPP_GENERATOR
 )
 
 set(EXTRA_UIC_LIBS
@@ -33,7 +32,6 @@ target_sources(uic${TOOLS_SUFFIX}
    ${CMAKE_CURRENT_SOURCE_DIR}/customwidgetsinfo.h
    ${CMAKE_CURRENT_SOURCE_DIR}/databaseinfo.h
    ${CMAKE_CURRENT_SOURCE_DIR}/driver.h
-   ${CMAKE_CURRENT_SOURCE_DIR}/globaldefs.h
    ${CMAKE_CURRENT_SOURCE_DIR}/option.h
    ${CMAKE_CURRENT_SOURCE_DIR}/qclass_lib_map.h
    ${CMAKE_CURRENT_SOURCE_DIR}/treewalker.h
@@ -86,9 +84,13 @@ target_link_libraries(uic${TOOLS_SUFFIX}
    ${EXTRA_UIC_LIBS}
 )
 
+target_compile_options(uic${TOOLS_SUFFIX}
+   PRIVATE
+   $<$<COMPILE_LANGUAGE:CXX>:SHELL:${EXTRA_UIC_CXXFLAGS}>
+)
+
 set_target_properties(uic${TOOLS_SUFFIX}
    PROPERTIES
-   COMPILE_FLAGS ${EXTRA_UIC_CXXFLAGS}
    LINK_FLAGS ${EXTRA_UIC_LDFLAGS}
    EXPORT_NAME uic
 )

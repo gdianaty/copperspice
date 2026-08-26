@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -32,9 +32,7 @@
 
 #ifndef QT_NO_FTP
 
-enum {
-   DefaultFtpPort = 21
-};
+static constexpr const int DefaultFtpPort = 21;
 
 static QByteArray makeCacheKey(const QUrl &url)
 {
@@ -128,7 +126,7 @@ void QNetworkAccessFtpBackend::open()
    QUrl url = this->url();
 
    if (url.path().isEmpty()) {
-      url.setPath(QLatin1String("/"));
+      url.setPath("/");
       setUrl(url);
    }
 
@@ -304,7 +302,7 @@ void QNetworkAccessFtpBackend::ftpDone()
          // send help command to find out if server supports "SIZE" and "MDTM"
          QString command = url().path();
          command.prepend("%1 ");
-         helpId = ftp->rawCommand(QLatin1String("HELP")); // get supported commands
+         helpId = ftp->rawCommand("HELP"); // get supported commands
 
       } else {
          ftpDone();
@@ -315,16 +313,18 @@ void QNetworkAccessFtpBackend::ftpDone()
       if (operation() == QNetworkAccessManager::GetOperation) {
          // logged in successfully, send the stat requests (if supported)
          QString command = url().path();
-         command.prepend(QLatin1String("%1 "));
+         command.prepend("%1 ");
+
          if (supportsSize) {
-            ftp->rawCommand(QLatin1String("TYPE I"));
-            sizeId = ftp->rawCommand(command.formatArg(QLatin1String("SIZE"))); // get size
+            ftp->rawCommand("TYPE I");
+            sizeId = ftp->rawCommand(command.formatArg("SIZE")); // get size
          }
 
          if (supportsMdtm) {
-            mdtmId = ftp->rawCommand(command.formatArg(QLatin1String("MDTM")));   // get modified time
+            mdtmId = ftp->rawCommand(command.formatArg("MDTM"));   // get modified time
          }
-         if (!supportsSize && !supportsMdtm) {
+
+         if (! supportsSize && !supportsMdtm) {
             ftpDone();   // no commands sent, move to the next state
          }
 
@@ -365,7 +365,6 @@ void QNetworkAccessFtpBackend::ftpReadyRead()
 
 void QNetworkAccessFtpBackend::ftpRawCommandReply(int code, const QString &text)
 {
-   //qDebug() << "FTP reply:" << code << text;
    int id = ftp->currentId();
 
    if ((id == helpId) && ((code == 200) || (code == 214))) {     // supported commands

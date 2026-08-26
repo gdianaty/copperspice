@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,8 +28,6 @@
 #include <qatomiccomparatorlocators_p.h>
 #include <qbuiltinatomictype_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class AnyAtomicType : public BuiltinAtomicType
@@ -46,25 +44,9 @@ class AnyAtomicType : public BuiltinAtomicType
    QXmlName name(const NamePool::Ptr &np) const override;
    QString displayName(const NamePool::Ptr &np) const override;
 
-   /**
-    * Overridden to return <tt>item()</tt>.
-    *
-    * @returns BuiltinTypes::item
-    */
    ItemType::Ptr xdtSuperType() const override;
-
-   /**
-    * Overridden to return @c xs:anySimpleType.
-    *
-    * @returns BuiltinTypes::xsAnySimpleType
-    */
    SchemaType::Ptr wxsSuperType() const override;
 
-   /**
-    * Overridden to return @c true, @c xs:anyAtomicType is abstract.
-    *
-    * @returns always @c true
-    */
    bool isAbstract() const override;
 
  protected:
@@ -99,7 +81,7 @@ class DateTimeType : public BuiltinAtomicType
    AtomicTypeVisitorResult::Ptr accept(const AtomicTypeVisitor::Ptr &visitor,
          const SourceLocationReflection *const reflection) const override;
 
-   AtomicTypeVisitorResult::Ptr accept(const ParameterizedAtomicTypeVisitor::Ptr &visitor, 
+   AtomicTypeVisitorResult::Ptr accept(const ParameterizedAtomicTypeVisitor::Ptr &visitor,
          const qint16 op, const SourceLocationReflection *const reflection) const override;
 
    QXmlName name(const NamePool::Ptr &np) const override;
@@ -231,7 +213,7 @@ class FloatType : public BuiltinAtomicType
    typedef QExplicitlySharedDataPointer<FloatType> Ptr;
 
    AtomicTypeVisitorResult::Ptr accept(const AtomicTypeVisitor::Ptr &visitor,
-         const SourceLocationReflection *const reflection) const override; 
+         const SourceLocationReflection *const reflection) const override;
 
    AtomicTypeVisitorResult::Ptr accept(const ParameterizedAtomicTypeVisitor::Ptr &visitor,
          const qint16 op, const SourceLocationReflection *const reflection) const override;
@@ -601,7 +583,6 @@ class DerivedStringType : public StringType
 
 };
 
-
 class NOTATIONType : public BuiltinAtomicType
 {
  public:
@@ -615,20 +596,13 @@ class NOTATIONType : public BuiltinAtomicType
 
    QXmlName name(const NamePool::Ptr &np) const override;
    QString displayName(const NamePool::Ptr &np) const override;
-
-   /**
-    * Overridden to return @c true, xs:NOTATION is abstract.
-    *
-    * @returns always @c true
-    */
    bool isAbstract() const override;
 
  protected:
    friend class BuiltinTypes;
    NOTATIONType();
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

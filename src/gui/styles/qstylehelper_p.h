@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,11 +21,11 @@
 *
 ***********************************************************************/
 
+#include <qaccessible.h>
 #include <qglobal.h>
 #include <qpoint.h>
-#include <qstring.h>
 #include <qpolygon.h>
-#include <qaccessible.h>
+#include <qstring.h>
 
 #ifndef QSTYLEHELPER_P_H
 #define QSTYLEHELPER_P_H
@@ -34,8 +34,8 @@
 
 class QPainter;
 class QPixmap;
-class QStyleOptionSlider;
 class QStyleOption;
+class QStyleOptionSlider;
 class QWindow;
 
 namespace QStyleHelper {

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,21 +23,21 @@
 
 #include <qmediarecorder.h>
 
+#include <qaudioencodersettingscontrol.h>
+#include <qaudioformat.h>
 #include <qcamera.h>
 #include <qcameracontrol.h>
+#include <qdebug.h>
+#include <qmediaavailabilitycontrol.h>
+#include <qmediacontainercontrol.h>
 #include <qmediarecordercontrol.h>
 #include <qmediaservice.h>
 #include <qmediaserviceprovider_p.h>
 #include <qmetadatawritercontrol.h>
-#include <qaudioencodersettingscontrol.h>
-#include <qvideoencodersettingscontrol.h>
-#include <qmediacontainercontrol.h>
-#include <qmediaavailabilitycontrol.h>
-#include <qdebug.h>
-#include <qurl.h>
-#include <qstringlist.h>
 #include <qmetaobject.h>
-#include <qaudioformat.h>
+#include <qstringlist.h>
+#include <qurl.h>
+#include <qvideoencodersettingscontrol.h>
 
 #include <qmediaobject_p.h>
 #include <qmediarecorder_p.h>
@@ -61,7 +61,6 @@ void QMediaRecorderPrivate::_q_stateChanged(QMediaRecorder::State newState)
       notifyTimer->stop();
    }
 
-   //  qDebug() << "Recorder state changed:" << ENUM_NAME(QMediaRecorder,"State", newState);
    if (m_state != newState) {
       emit q->stateChanged(newState);
    }
@@ -161,9 +160,6 @@ QMediaRecorder::QMediaRecorder(QMediaObject *mediaObject, QObject *parent)
    setMediaObject(mediaObject);
 }
 
-/*!
-    \internal
-*/
 QMediaRecorder::QMediaRecorder(QMediaRecorderPrivate &dd, QMediaObject *mediaObject, QObject *parent)
    : QObject(parent), d_ptr(&dd)
 {
@@ -187,7 +183,6 @@ QMediaObject *QMediaRecorder::mediaObject() const
    return d_func()->mediaObject;
 }
 
-// internal
 bool QMediaRecorder::setMediaObject(QMediaObject *object)
 {
    Q_D(QMediaRecorder);
@@ -357,6 +352,7 @@ QUrl QMediaRecorder::outputLocation() const
 bool QMediaRecorder::setOutputLocation(const QUrl &location)
 {
    Q_D(QMediaRecorder);
+
    d->actualLocation.clear();
    return d->control ? d->control->setOutputLocation(location) : false;
 }
@@ -579,6 +575,7 @@ void QMediaRecorder::record()
 void QMediaRecorder::pause()
 {
    Q_D(QMediaRecorder);
+
    if (d->control) {
       d->control->setState(PausedState);
    }
@@ -597,8 +594,7 @@ bool QMediaRecorder::isMetaDataAvailable() const
    Q_D(const QMediaRecorder);
 
    return d->metaDataControl
-      ? d->metaDataControl->isMetaDataAvailable()
-      : false;
+      ? d->metaDataControl->isMetaDataAvailable() : false;
 }
 
 bool QMediaRecorder::isMetaDataWritable() const
@@ -606,8 +602,7 @@ bool QMediaRecorder::isMetaDataWritable() const
    Q_D(const QMediaRecorder);
 
    return d->metaDataControl
-      ? d->metaDataControl->isWritable()
-      : false;
+      ? d->metaDataControl->isWritable() : false;
 }
 
 QVariant QMediaRecorder::metaData(const QString &key) const
@@ -615,8 +610,7 @@ QVariant QMediaRecorder::metaData(const QString &key) const
    Q_D(const QMediaRecorder);
 
    return d->metaDataControl
-      ? d->metaDataControl->metaData(key)
-      : QVariant();
+      ? d->metaDataControl->metaData(key) : QVariant();
 }
 
 void QMediaRecorder::setMetaData(const QString &key, const QVariant &value)
@@ -633,8 +627,7 @@ QStringList QMediaRecorder::availableMetaData() const
    Q_D(const QMediaRecorder);
 
    return d->metaDataControl
-      ? d->metaDataControl->availableMetaData()
-      : QStringList();
+      ? d->metaDataControl->availableMetaData() : QStringList();
 }
 
 void QMediaRecorder::_q_stateChanged(QMediaRecorder::State state)

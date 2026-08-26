@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,14 @@
 #ifndef QDNSLOOKUP_P_H
 #define QDNSLOOKUP_P_H
 
+#include <qdnslookup.h>
+
+#include <qhostaddress.h>
 #include <qmutex.h>
 #include <qrunnable.h>
 #include <qsharedpointer.h>
 #include <qthreadpool.h>
-#include <qdnslookup.h>
-#include <qhostaddress.h>
 
-//#define QDNSLOOKUP_DEBUG
 class QDnsLookupRunnable;
 
 class QDnsLookupReply
@@ -82,8 +82,8 @@ class QDnsLookupRunnable : public QObject, public QRunnable
     NET_CS_OBJECT(QDnsLookupRunnable)
 
  public:
-    QDnsLookupRunnable(QDnsLookup::Type type, const QByteArray &name, const QHostAddress &nameserver)
-        : requestType(type), requestName(name) , nameserver(nameserver)
+    QDnsLookupRunnable(QDnsLookup::Type type, const QByteArray &name, const QHostAddress &server)
+        : requestType(type), requestName(name) , nameserver(server)
     { }
 
     void run() override;

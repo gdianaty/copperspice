@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,18 +21,18 @@
 *
 ***********************************************************************/
 
-#ifndef QAUDIORECORDER_H
-#define QAUDIORECORDER_H
+#ifndef QAUDIO_RECORDER_H
+#define QAUDIO_RECORDER_H
 
-#include <qstring.h>
-#include <qpair.h>
-#include <qmediarecorder.h>
-#include <qmediaobject.h>
 #include <qmediaencodersettings.h>
+#include <qmediaobject.h>
+#include <qmediarecorder.h>
+#include <qpair.h>
+#include <qstring.h>
 
-class QSize;
 class QAudioFormat;
 class QAudioRecorderPrivate;
+class QSize;
 
 class Q_MULTIMEDIA_EXPORT QAudioRecorder : public QMediaRecorder
 {

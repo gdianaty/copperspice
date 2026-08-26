@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,16 +21,17 @@
 *
 ***********************************************************************/
 
-#include <qimage.h>
-#include <qglobal.h>
-#include <qopengl_framebufferobject.h>
-#include <qglframebufferobject.h>
 #include <qglpixelbuffer.h>
 
+#include <qglframebufferobject.h>
+#include <qglobal.h>
+#include <qimage.h>
+#include <qopengl_framebufferobject.h>
+
+#include <qfont_p.h>
+#include <qglpixelbuffer_p.h>
 #include <qopengl_extensions_p.h>
 #include <qpaintengineex_opengl2_p.h>
-#include <qglpixelbuffer_p.h>
-#include <qfont_p.h>
 
 QImage cs_glRead_frameBuffer(const QSize &, bool, bool);
 
@@ -350,10 +351,6 @@ QGLFormat QGLPixelBuffer::format() const
    Q_D(const QGLPixelBuffer);
    return d->format;
 }
-
-/*! \fn int QGLPixelBuffer::devType() const
-    \internal
-*/
 
 bool QGLPixelBufferPrivate::init(const QSize &, const QGLFormat &f, QGLWidget *shareWidget)
 {

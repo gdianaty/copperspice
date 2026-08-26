@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,18 +26,17 @@
 
 #include <qpaintengine.h>
 
-
 #include <qpaintengine_p.h>
-#include <qstroker_p.h>
 #include <qpainter_p.h>
+#include <qstroker_p.h>
 #include <qvectorpath_p.h>
 
 class QPainterState;
-class QPaintEngineExPrivate;
 class QStaticTextItem;
 
-struct StrokeHandler;
+class QPaintEngineExPrivate;
 
+struct StrokeHandler;
 
 QDebug Q_GUI_EXPORT &operator<<(QDebug &, const QVectorPath &path);
 
@@ -109,18 +108,18 @@ class Q_GUI_EXPORT QPaintEngineEx : public QPaintEngine
    virtual void drawStaticTextItem(QStaticTextItem *);
 
    virtual void setState(QPainterState *s);
-   inline QPainterState *state() {
-      return static_cast<QPainterState *>(QPaintEngine::state);
+
+   QPainterState *state() {
+      return static_cast<QPainterState *>(m_engineState);
    }
 
-   inline const QPainterState *state() const {
-      return static_cast<const QPainterState *>(QPaintEngine::state);
+   const QPainterState *state() const {
+      return static_cast<const QPainterState *>(m_engineState);
    }
 
    virtual void sync() {}
    virtual void beginNativePainting() {}
    virtual void endNativePainting() {}
-
 
    // These flags are needed in the implementation of paint buffers.
    enum Flags {

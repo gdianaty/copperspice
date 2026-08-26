@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,11 +24,11 @@
 #ifndef QGRAPHICSSCENE_H
 #define QGRAPHICSSCENE_H
 
-#include <qobject.h>
 #include <qbrush.h>
 #include <qcontainerfwd.h>
 #include <qfont.h>
 #include <qmatrix.h>
+#include <qobject.h>
 #include <qpalette.h>
 #include <qpen.h>
 #include <qpoint.h>
@@ -55,13 +55,13 @@ class QGraphicsSceneDragDropEvent;
 class QGraphicsSceneEvent;
 class QGraphicsSceneHelpEvent;
 class QGraphicsSceneHoverEvent;
+class QGraphicsSceneIndex;
 class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
 class QGraphicsSimpleTextItem;
 class QGraphicsTextItem;
 class QGraphicsView;
 class QGraphicsWidget;
-class QGraphicsSceneIndex;
 class QHelpEvent;
 class QInputMethodEvent;
 class QKeyEvent;
@@ -74,6 +74,7 @@ class QRectF;
 class QSizeF;
 class QStyle;
 class QStyleOptionGraphicsItem;
+
 class QGraphicsScenePrivate;
 
 class Q_GUI_EXPORT QGraphicsScene : public QObject
@@ -240,11 +241,11 @@ class Q_GUI_EXPORT QGraphicsScene : public QObject
 
    QList <QGraphicsView *> views() const;
 
-   inline void update(qreal x, qreal y, qreal w, qreal h) {
+   void update(qreal x, qreal y, qreal w, qreal h) {
       update(QRectF(x, y, w, h));
    }
 
-   inline void invalidate(qreal x, qreal y, qreal w, qreal h, SceneLayers layers = AllLayers) {
+   void invalidate(qreal x, qreal y, qreal w, qreal h, SceneLayers layers = AllLayers) {
       invalidate(QRectF(x, y, w, h), layers);
    }
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,12 +25,11 @@
 #define QMULTITOUCH_MAC_P_H
 
 #include <qglobal.h>
-
-#import <Cocoa/Cocoa.h>
-
-#include <qwindowsysteminterface.h>
 #include <qhash.h>
 #include <qlist.h>
+#include <qwindowsysteminterface.h>
+
+#import <Cocoa/Cocoa.h>
 
 class QCocoaTouch
 {

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,17 +21,18 @@
 *
 ***********************************************************************/
 
-#include <atomic>
-#include <winsock2.h>
-#include <ws2tcpip.h>
-
 #include <qhostinfo_p.h>
+
+#include <qformat.h>
+#include <qurl.h>
+
 #include <qmutexpool_p.h>
 #include <qnativesocketengine_p.h>
 #include <qsystemlibrary_p.h>
-#include <qurl.h>
 
-//#define QHOSTINFO_DEBUG
+#include <atomic>
+#include <winsock2.h>
+#include <ws2tcpip.h>
 
 // Older SDKs do not include the addrinfo struct declaration, so we
 // include a copy of it here.
@@ -63,9 +64,9 @@ static void resolveLibraryInternal()
    // Attempt to resolve getaddrinfo(); without it we'll have to fall
    // back to gethostbyname(), which has no IPv6 support.
 
-   local_getaddrinfo  = (getaddrinfoProto) QSystemLibrary::resolve(QLatin1String("ws2_32"), "getaddrinfo");
-   local_freeaddrinfo = (freeaddrinfoProto) QSystemLibrary::resolve(QLatin1String("ws2_32"), "freeaddrinfo");
-   local_getnameinfo  = (getnameinfoProto) QSystemLibrary::resolve(QLatin1String("ws2_32"), "getnameinfo");
+   local_getaddrinfo  = (getaddrinfoProto) QSystemLibrary::resolve("ws2_32", "getaddrinfo");
+   local_freeaddrinfo = (freeaddrinfoProto) QSystemLibrary::resolve("ws2_32", "freeaddrinfo");
+   local_getnameinfo  = (getnameinfoProto) QSystemLibrary::resolve("ws2_32", "getnameinfo");
 
 }
 
@@ -241,9 +242,9 @@ QHostInfo QHostInfoAgent::fromName(const QString &hostName)
       }
    }
 
-#if defined(QHOSTINFO_DEBUG)
+#if defined(CS_SHOW_DEBUG_NETWORK)
    if (results.error() != QHostInfo::NoError) {
-      qDebug("QHostInfoAgent::run(): error (%s)", results.errorString().toLatin1().constData());
+      qDebug("QHostInfoAgent::run() Error (%s)", csPrintable(results.errorString()));
 
    } else {
       QString tmp;
@@ -254,11 +255,9 @@ QHostInfo QHostInfoAgent::fromName(const QString &hostName)
          tmp += addresses.at(i).toString();
       }
 
-      qDebug("QHostInfoAgent::run(): found %i entries: {%s}",
-             addresses.count(), tmp.toLatin1().constData());
+      formatDebug("QHostInfoAgent::run() Found {:d} entries for: {:s}", addresses.count(), tmp);
    }
 #endif
 
    return results;
 }
-

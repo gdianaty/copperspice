@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,29 +28,27 @@
 #include <qabstractspinbox.h>
 #include <qalgorithms.h>
 #include <qapplication.h>
-#include <qdebug.h>
 #include <qboxlayout.h>
-#include <qlayoutitem.h>
+#include <qdebug.h>
 #include <qdesktopwidget.h>
 #include <qevent.h>
 #include <qframe.h>
 #include <qlabel.h>
+#include <qlayoutitem.h>
 #include <qlineedit.h>
 #include <qpainter.h>
 #include <qpushbutton.h>
-
 #include <qset.h>
 #include <qstyle.h>
 #include <qvarlengtharray.h>
 #include <qwindow.h>
 
 #if defined(Q_OS_DARWIN)
-
 #include <qplatform_nativeinterface.h>
 
 #elif ! defined(QT_NO_STYLE_WINDOWSVISTA)
-#include <qwizard_win_p.h>
 #include <qtimer.h>
+#include <qwizard_win_p.h>
 
 #endif
 
@@ -61,20 +59,23 @@
 
 // These terms were needed a few places to obtain pixel-perfect results
 const int GapBetweenLogoAndRightEdge = 5;
-const int ModernHeaderTopMargin = 2;
-const int ClassicHMargin = 4;
-const int MacButtonTopMargin = 13;
-const int MacLayoutLeftMargin = 20;
-//const int MacLayoutTopMargin = 14; // Unused. Save some space and avoid warning.
-const int MacLayoutRightMargin = 20;
+const int ModernHeaderTopMargin      = 2;
+const int ClassicHMargin             = 4;
+const int MacButtonTopMargin         = 13;
+const int MacLayoutLeftMargin        = 20;
+
+//const int MacLayoutTopMargin  = 14;       // Unused, Save some space and avoid warning.
+const int MacLayoutRightMargin  = 20;
 const int MacLayoutBottomMargin = 17;
 
 static void changeSpacerSize(QLayout *layout, int index, int width, int height)
 {
    QSpacerItem *spacer = layout->itemAt(index)->spacerItem();
+
    if (! spacer) {
       return;
    }
+
    spacer->changeSize(width, height);
 }
 
@@ -119,8 +120,6 @@ static bool objectInheritsXAndXIsCloserThanY(const QObject *object, const QStrin
    return false;
 }
 
-
-// If you modify this list, make sure to update the documentation (and the auto test)
 const size_t NFallbackDefaultProperties = 7;
 
 struct FallbackData {
@@ -185,54 +184,57 @@ static QString changed_signal(int which)
 class QWizardDefaultProperty
 {
  public:
-   QString className;
-   QString property;
-   QString changedSignal;
+   QWizardDefaultProperty()
+   { }
 
-   inline QWizardDefaultProperty() {}
-   inline QWizardDefaultProperty(const QString &className, const QString &property, const QString &changedSignal)
-      : className(className), property(property), changedSignal(changedSignal) {}
+   QWizardDefaultProperty(const QString &className, const QString &property, const QString &changedSignal)
+      : m_className(className), m_property(property), m_changedSignal(changedSignal)
+   { }
+
+   QString m_className;
+   QString m_property;
+   QString m_changedSignal;
 };
 
 class QWizardField
 {
  public:
-   QWizardField() {}
+   QWizardField()
+   { }
 
    QWizardField(QWizardPage *page, const QString &spec, QObject *object, const QString &property, const QString &changedSignal);
 
    void resolve(const QVector<QWizardDefaultProperty> &defaultPropertyTable);
    void findProperty(const QWizardDefaultProperty *properties, int propertyCount);
 
-   QWizardPage *page;
-   QObject *object;
+   QWizardPage *m_page;
+   QObject *m_object;
 
-   bool mandatory;
+   bool m_mandatory;
 
-   QString  name;
-   QString  property;
-   QString  changedSignal;
-   QVariant initialValue;
+   QString  m_name;
+   QString  m_property;
+   QString  m_changedSignal;
+   QVariant m_initialValue;
 };
 
 QWizardField::QWizardField(QWizardPage *page, const QString &spec, QObject *object,
-   const QString &property, const QString &changedSignal)
-
-   : page(page), object(object), mandatory(false), name(spec), property(property), changedSignal(changedSignal)
+      const QString &property, const QString &changedSignal)
+   : m_page(page), m_object(object), m_mandatory(false), m_name(spec), m_property(property), m_changedSignal(changedSignal)
 {
-   if (name.endsWith('*')) {
-      name.chop(1);
-      mandatory = true;
+   if (m_name.endsWith('*')) {
+      m_name.chop(1);
+      m_mandatory = true;
    }
 }
 
 void QWizardField::resolve(const QVector<QWizardDefaultProperty> &defaultPropertyTable)
 {
-   if (property.isEmpty()) {
+   if (m_property.isEmpty()) {
       findProperty(defaultPropertyTable.constData(), defaultPropertyTable.count());
    }
 
-   initialValue = object->property(property);
+   m_initialValue = m_object->property(m_property);
 }
 
 void QWizardField::findProperty(const QWizardDefaultProperty *properties, int propertyCount)
@@ -240,10 +242,11 @@ void QWizardField::findProperty(const QWizardDefaultProperty *properties, int pr
    QString className;
 
    for (int i = 0; i < propertyCount; ++i) {
-      if (objectInheritsXAndXIsCloserThanY(object, properties[i].className, className)) {
-         className    = properties[i].className;
-         property      = properties[i].property;
-         changedSignal = properties[i].changedSignal;
+      if (objectInheritsXAndXIsCloserThanY(m_object, properties[i].m_className, className)) {
+         className = properties[i].m_className;
+
+         m_property      = properties[i].m_property;
+         m_changedSignal = properties[i].m_changedSignal;
       }
    }
 }
@@ -251,12 +254,13 @@ void QWizardField::findProperty(const QWizardDefaultProperty *properties, int pr
 class QWizardLayoutInfo
 {
  public:
-   inline QWizardLayoutInfo()
+   QWizardLayoutInfo()
       : topLevelMarginLeft(-1), topLevelMarginRight(-1), topLevelMarginTop(-1),
         topLevelMarginBottom(-1), childMarginLeft(-1), childMarginRight(-1),
         childMarginTop(-1), childMarginBottom(-1), hspacing(-1), vspacing(-1),
         wizStyle(QWizard::ClassicStyle), header(false), watermark(false), title(false),
-        subTitle(false), extension(false), sideWidget(false) {}
+        subTitle(false), extension(false), sideWidget(false)
+   { }
 
    int topLevelMarginLeft;
    int topLevelMarginRight;
@@ -279,7 +283,7 @@ class QWizardLayoutInfo
 
    bool operator==(const QWizardLayoutInfo &other);
 
-   inline bool operator!=(const QWizardLayoutInfo &other) {
+   bool operator!=(const QWizardLayoutInfo &other) {
       return !operator==(other);
    }
 };
@@ -309,11 +313,13 @@ bool QWizardLayoutInfo::operator==(const QWizardLayoutInfo &other)
 class QWizardHeader : public QWidget
 {
  public:
-   enum RulerType { Ruler };
+   enum RulerType {
+      Ruler
+   };
 
-   inline QWizardHeader(RulerType ruler, QWidget *parent = nullptr)
-      : QWidget(parent) {
-
+   QWizardHeader(RulerType ruler, QWidget *parent = nullptr)
+      : QWidget(parent)
+   {
       (void) ruler;
       setFixedHeight(2);
    }
@@ -447,6 +453,7 @@ void QWizardHeader::setup(const QWizardLayoutInfo &info, const QString &title,
       QSize size = layout->totalMinimumSize();
       setMinimumSize(size);
       setMaximumSize(QWIDGETSIZE_MAX, size.height());
+
    } else {
       subTitleLabel->setMinimumSize(0, 0);
       setFixedSize(banner.size() + QSize(0, 2));
@@ -454,7 +461,7 @@ void QWizardHeader::setup(const QWizardLayoutInfo &info, const QString &title,
    updateGeometry();
 }
 
-void QWizardHeader::paintEvent(QPaintEvent * /* event */)
+void QWizardHeader::paintEvent(QPaintEvent *)
 {
    QPainter painter(this);
    painter.drawPixmap(0, 0, bannerPixmap);
@@ -469,12 +476,13 @@ void QWizardHeader::paintEvent(QPaintEvent * /* event */)
    painter.drawLine(0, y + 1, x + 1, y + 1);
 }
 
-// We save one vtable by basing QWizardRuler on QWizardHeader
+// save one vtable by basing QWizardRuler on QWizardHeader
 class QWizardRuler : public QWizardHeader
 {
  public:
-   inline QWizardRuler(QWidget *parent = nullptr)
-      : QWizardHeader(Ruler, parent) {}
+   QWizardRuler(QWidget *parent = nullptr)
+      : QWizardHeader(Ruler, parent)
+   { }
 };
 
 class QWatermarkLabel : public QLabel
@@ -507,6 +515,7 @@ class QWatermarkLabel : public QLabel
          m_layout->addWidget(m_sideWidget);
       }
    }
+
    QWidget *sideWidget() const {
       return m_sideWidget;
    }
@@ -521,13 +530,18 @@ class QWizardPagePrivate : public QWidgetPrivate
    Q_DECLARE_PUBLIC(QWizardPage)
 
  public:
-   enum TriState { Tri_Unknown = -1, Tri_False, Tri_True };
+   enum TriState {
+      Tri_Unknown = -1,
+      Tri_False,
+      Tri_True
+   };
 
-   inline QWizardPagePrivate()
-      : wizard(nullptr), completeState(Tri_Unknown), explicitlyFinal(false), commit(false) {}
+   QWizardPagePrivate()
+      : wizard(nullptr), completeState(Tri_Unknown), explicitlyFinal(false), commit(false)
+   { }
 
    bool cachedIsComplete() const;
-   void _q_maybeEmitCompleteChanged();
+   void _q_changedSignal();
    void _q_updateCachedCompleteState();
 
    QWizard *wizard;
@@ -550,10 +564,12 @@ bool QWizardPagePrivate::cachedIsComplete() const
    return completeState == Tri_True;
 }
 
-void QWizardPagePrivate::_q_maybeEmitCompleteChanged()
+void QWizardPagePrivate::_q_changedSignal()
 {
    Q_Q(QWizardPage);
+
    TriState newState = q->isComplete() ? Tri_True : Tri_False;
+
    if (newState != completeState) {
       emit q->completeChanged();
    }
@@ -567,23 +583,22 @@ void QWizardPagePrivate::_q_updateCachedCompleteState()
 
 class QWizardAntiFlickerWidget : public QWidget
 {
-
 #if ! defined(QT_NO_STYLE_WINDOWSVISTA)
  public:
-   QWizardPrivate *wizardPrivate;
+   QWizardAntiFlickerWidget(QWizard *wizard_a, QWizardPrivate *wizard_b)
+      : QWidget(wizard_a), m_flickerWizard(wizard_b)
+   { }
 
-   QWizardAntiFlickerWidget(QWizard *wizard, QWizardPrivate *wizardPrivate)
-      : QWidget(wizard), wizardPrivate(wizardPrivate)
-   {}
+   QWizardPrivate *m_flickerWizard;
 
  protected:
-   void paintEvent(QPaintEvent *);
+   void paintEvent(QPaintEvent *) override;
 
 #else
  public:
-   QWizardAntiFlickerWidget(QWizard *wizard, QWizardPrivate *)
-      : QWidget(wizard)
-   {}
+   QWizardAntiFlickerWidget(QWizard *wizard_a, QWizardPrivate *)
+      : QWidget(wizard_a)
+   { }
 
 #endif
 
@@ -594,46 +609,26 @@ class QWizardPrivate : public QDialogPrivate
    Q_DECLARE_PUBLIC(QWizard)
 
  public:
-   typedef QMap<int, QWizardPage *> PageMap;
+   using PageMap = QMap<int, QWizardPage *>;
 
    enum Direction {
       Backward,
       Forward
    };
 
-   inline QWizardPrivate()
-      : start(-1)
-      , startSetByUser(false)
-      , current(-1)
-      , canContinue(false)
-      , canFinish(false)
-      , disableUpdatesCount(0)
-      , wizStyle(QWizard::ClassicStyle)
-      , opts(Qt::EmptyFlag)
-      , buttonsHaveCustomLayout(false)
-      , titleFmt(Qt::AutoText)
-      , subTitleFmt(Qt::AutoText)
-      , placeholderWidget1(nullptr)
-      , placeholderWidget2(nullptr)
-      , headerWidget(nullptr)
-      , watermarkLabel(nullptr)
-      , sideWidget(nullptr)
-      , pageFrame(nullptr)
-      , titleLabel(nullptr)
-      , subTitleLabel(nullptr)
-      , bottomRuler(nullptr)
-#if ! defined(QT_NO_STYLE_WINDOWSVISTA)
-      , vistaHelper(nullptr)
-      , vistaInitPending(false)
-      , vistaState(QVistaHelper::Dirty)
-      , vistaStateChanged(false)
-      , inHandleAeroStyleChange(false)
-#endif
-      , minimumWidth(0)
-      , minimumHeight(0)
-      , maximumWidth(QWIDGETSIZE_MAX)
-      , maximumHeight(QWIDGETSIZE_MAX)
+   QWizardPrivate()
+      : start(-1), startSetByUser(false), current(-1), canContinue(false), canFinish(false),
+        disableUpdatesCount(0), wizStyle(QWizard::ClassicStyle), opts(Qt::EmptyFlag),
+        buttonsHaveCustomLayout(false), titleFmt(Qt::AutoText), subTitleFmt(Qt::AutoText),
+        placeholderWidget1(nullptr), placeholderWidget2(nullptr), headerWidget(nullptr),
+        watermarkLabel(nullptr), sideWidget(nullptr), pageFrame(nullptr), titleLabel(nullptr),
+        subTitleLabel(nullptr), bottomRuler(nullptr),
 
+#if ! defined(QT_NO_STYLE_WINDOWSVISTA)
+        vistaHelper(nullptr), vistaInitPending(false), vistaState(QVistaHelper::VistaState::Dirty),
+        vistaStateChanged(false), inHandleAeroStyleChange(false),
+#endif
+        minimumWidth(0), minimumHeight(0), maximumWidth(QWIDGETSIZE_MAX) , maximumHeight(QWIDGETSIZE_MAX)
    {
       std::fill(btns, btns + QWizard::NButtons, static_cast<QAbstractButton *>(nullptr));
 
@@ -650,7 +645,9 @@ class QWizardPrivate : public QDialogPrivate
    void addField(const QWizardField &field);
    void removeFieldAt(int index);
    void switchToPage(int newId, Direction direction);
+
    QWizardLayoutInfo layoutInfoForCurrentPage();
+
    void recreateLayout(const QWizardLayoutInfo &info);
    void updateLayout();
    void updateMinMaxSizes(const QWizardLayoutInfo &info);
@@ -659,7 +656,7 @@ class QWizardPrivate : public QDialogPrivate
    void connectButton(QWizard::WizardButton which) const;
    void updateButtonTexts();
    void updateButtonLayout();
-   void setButtonLayout(const QWizard::WizardButton *array, int size);
+   void setButtonLayout(const QWizard::WizardButton *array, int maxSize);
    bool buttonLayoutContains(QWizard::WizardButton which);
    void updatePixmap(QWizard::WizardPixmap which);
 
@@ -759,6 +756,7 @@ static QString buttonDefaultText(int wstyle, int which, const QWizardPrivate *wi
    switch (which) {
       case QWizard::BackButton:
          return macStyle ? QWizard::tr("Go Back") : QWizard::tr("< &Back");
+
       case QWizard::NextButton:
          if (macStyle) {
             return QWizard::tr("Continue");
@@ -769,12 +767,16 @@ static QString buttonDefaultText(int wstyle, int which, const QWizardPrivate *wi
 
       case QWizard::CommitButton:
          return QWizard::tr("Commit");
+
       case QWizard::FinishButton:
          return macStyle ? QWizard::tr("Done") : QWizard::tr("&Finish");
+
       case QWizard::CancelButton:
          return QWizard::tr("Cancel");
+
       case QWizard::HelpButton:
          return macStyle ? QWizard::tr("Help") : QWizard::tr("&Help");
+
       default:
          return QString();
    }
@@ -786,6 +788,7 @@ void QWizardPrivate::init()
 
    antiFlickerWidget = new QWizardAntiFlickerWidget(q, this);
    wizStyle = QWizard::WizardStyle(q->style()->styleHint(QStyle::SH_WizardStyle, nullptr, q));
+
    if (wizStyle == QWizard::MacStyle) {
       opts = (QWizard::NoDefaultButton | QWizard::NoCancelButton);
    } else if (wizStyle == QWizard::ModernStyle) {
@@ -865,19 +868,19 @@ void QWizardPrivate::addField(const QWizardField &field)
    QWizardField myField = field;
    myField.resolve(defaultPropertyTable);
 
-   if (fieldIndexMap.contains(myField.name)) {
-      qWarning("QWizardPage::addField: Duplicate field '%s'", csPrintable(myField.name));
+   if (fieldIndexMap.contains(myField.m_name)) {
+      qWarning("QWizardPage::addField() Duplicate field %s", csPrintable(myField.m_name));
       return;
    }
 
-   fieldIndexMap.insert(myField.name, fields.count());
+   fieldIndexMap.insert(myField.m_name, fields.count());
    fields += myField;
 
-   if (myField.mandatory && !myField.changedSignal.isEmpty()) {
-      QObject::connect(myField.object, myField.changedSignal, myField.page, SLOT(_q_maybeEmitCompleteChanged()));
+   if (myField.m_mandatory && ! myField.m_changedSignal.isEmpty()) {
+      QObject::connect(myField.m_object, myField.m_changedSignal, myField.m_page, SLOT(_q_changedSignal()));
    }
 
-   QObject::connect(myField.object, &QObject::destroyed, q, &QWizard::_q_handleFieldObjectDestroyed);
+   QObject::connect(myField.m_object, &QObject::destroyed, q, &QWizard::_q_handleFieldObjectDestroyed);
 }
 
 void QWizardPrivate::removeFieldAt(int index)
@@ -885,13 +888,13 @@ void QWizardPrivate::removeFieldAt(int index)
    Q_Q(QWizard);
 
    const QWizardField &field = fields.at(index);
-   fieldIndexMap.remove(field.name);
+   fieldIndexMap.remove(field.m_name);
 
-   if (field.mandatory && !field.changedSignal.isEmpty()) {
-      QObject::disconnect(field.object, field.changedSignal, field.page, SLOT(_q_maybeEmitCompleteChanged()));
+   if (field.m_mandatory && ! field.m_changedSignal.isEmpty()) {
+      QObject::disconnect(field.m_object, field.m_changedSignal, field.m_page, SLOT(_q_changedSignal()));
    }
 
-   QObject::disconnect(field.object, &QObject::destroyed, q, &QWizard::_q_handleFieldObjectDestroyed);
+   QObject::disconnect(field.m_object, &QObject::destroyed, q, &QWizard::_q_handleFieldObjectDestroyed);
    fields.remove(index);
 }
 
@@ -906,12 +909,14 @@ void QWizardPrivate::switchToPage(int newId, Direction direction)
       oldPage->hide();
 
       if (direction == Backward) {
-         if (!(opts & QWizard::IndependentPages)) {
+         if (! (opts & QWizard::IndependentPages)) {
             q->cleanupPage(oldId);
             initialized.remove(oldId);
          }
+
          Q_ASSERT(history.last() == oldId);
          history.removeLast();
+
          Q_ASSERT(history.last() == newId);
       }
    }
@@ -919,14 +924,16 @@ void QWizardPrivate::switchToPage(int newId, Direction direction)
    current = newId;
 
    QWizardPage *newPage = q->currentPage();
+
    if (newPage) {
       if (direction == Forward) {
-         if (!initialized.contains(current)) {
+         if (! initialized.contains(current)) {
             initialized.insert(current);
             q->initializePage(current);
          }
          history.append(current);
       }
+
       newPage->show();
    }
 
@@ -1091,22 +1098,21 @@ void QWizardPrivate::recreateLayout(const QWizardLayoutInfo &info)
       mainLayout->setRowMinimumHeight(i, 0);
    }
 
-   /*
-       Now, recreate it.
-   */
-
-   bool mac = (info.wizStyle == QWizard::MacStyle);
+   // recreate it
+   bool mac     = (info.wizStyle == QWizard::MacStyle);
    bool classic = (info.wizStyle == QWizard::ClassicStyle);
-   bool modern = (info.wizStyle == QWizard::ModernStyle);
-   bool aero = (info.wizStyle == QWizard::AeroStyle);
-   int deltaMarginLeft = info.topLevelMarginLeft - info.childMarginLeft;
-   int deltaMarginRight = info.topLevelMarginRight - info.childMarginRight;
-   int deltaMarginTop = info.topLevelMarginTop - info.childMarginTop;
+   bool modern  = (info.wizStyle == QWizard::ModernStyle);
+   bool aero    = (info.wizStyle == QWizard::AeroStyle);
+
+   int deltaMarginLeft   = info.topLevelMarginLeft - info.childMarginLeft;
+   int deltaMarginRight  = info.topLevelMarginRight - info.childMarginRight;
+   int deltaMarginTop    = info.topLevelMarginTop - info.childMarginTop;
    int deltaMarginBottom = info.topLevelMarginBottom - info.childMarginBottom;
-   int deltaVSpacing = info.topLevelMarginBottom - info.vspacing;
+   int deltaVSpacing     = info.topLevelMarginBottom - info.vspacing;
 
    int row = 0;
    int numColumns;
+
    if (mac) {
       numColumns = 3;
    } else if (info.watermark || info.sideWidget) {
@@ -1121,17 +1127,22 @@ void QWizardPrivate::recreateLayout(const QWizardLayoutInfo &info)
       mainLayout->setSpacing(0);
       buttonLayout->setContentsMargins(MacLayoutLeftMargin, MacButtonTopMargin, MacLayoutRightMargin, MacLayoutBottomMargin);
       pageVBoxLayout->setMargin(7);
+
    } else {
       if (modern) {
          mainLayout->setMargin(0);
          mainLayout->setSpacing(0);
+
          pageVBoxLayout->setContentsMargins(deltaMarginLeft, deltaMarginTop,
             deltaMarginRight, deltaMarginBottom);
+
          buttonLayout->setContentsMargins(info.topLevelMarginLeft, info.topLevelMarginTop,
             info.topLevelMarginRight, info.topLevelMarginBottom);
+
       } else {
          mainLayout->setContentsMargins(info.topLevelMarginLeft, info.topLevelMarginTop,
             info.topLevelMarginRight, info.topLevelMarginBottom);
+
          mainLayout->setHorizontalSpacing(info.hspacing);
          mainLayout->setVerticalSpacing(info.vspacing);
          pageVBoxLayout->setContentsMargins(0, 0, 0, 0);
@@ -1147,6 +1158,7 @@ void QWizardPrivate::recreateLayout(const QWizardLayoutInfo &info)
       headerWidget->setAutoFillBackground(modern);
       mainLayout->addWidget(headerWidget, row++, 0, 1, numColumns);
    }
+
    if (headerWidget) {
       headerWidget->setVisible(info.header);
    }
@@ -1158,7 +1170,7 @@ void QWizardPrivate::recreateLayout(const QWizardLayoutInfo &info)
    }
 
    if (info.title) {
-      if (!titleLabel) {
+      if (! titleLabel) {
          titleLabel = new QLabel(antiFlickerWidget);
          titleLabel->setBackgroundRole(QPalette::Base);
          titleLabel->setWordWrap(true);
@@ -1179,6 +1191,7 @@ void QWizardPrivate::recreateLayout(const QWizardLayoutInfo &info)
 
       titleLabel->setFont(titleFont);
       const int aeroTitleIndent = 25; // ### hardcoded for now - should be calculated somehow
+
       if (aero) {
          titleLabel->setIndent(aeroTitleIndent);
       } else if (mac) {
@@ -1188,6 +1201,7 @@ void QWizardPrivate::recreateLayout(const QWizardLayoutInfo &info)
       } else {
          titleLabel->setIndent(info.topLevelMarginLeft);
       }
+
       if (modern) {
          if (!placeholderWidget1) {
             placeholderWidget1 = new QWidget(antiFlickerWidget);
@@ -1196,6 +1210,7 @@ void QWizardPrivate::recreateLayout(const QWizardLayoutInfo &info)
          placeholderWidget1->setFixedHeight(info.topLevelMarginLeft + 2);
          mainLayout->addWidget(placeholderWidget1, row++, pageColumn);
       }
+
       mainLayout->addWidget(titleLabel, row++, pageColumn);
       if (modern) {
          if (!placeholderWidget2) {
@@ -1205,13 +1220,16 @@ void QWizardPrivate::recreateLayout(const QWizardLayoutInfo &info)
          placeholderWidget2->setFixedHeight(5);
          mainLayout->addWidget(placeholderWidget2, row++, pageColumn);
       }
+
       if (mac) {
          mainLayout->setRowMinimumHeight(row++, 7);
       }
    }
+
    if (placeholderWidget1) {
       placeholderWidget1->setVisible(info.title && modern);
    }
+
    if (placeholderWidget2) {
       placeholderWidget2->setVisible(info.title && modern);
    }
@@ -1228,13 +1246,20 @@ void QWizardPrivate::recreateLayout(const QWizardLayoutInfo &info)
       }
    }
 
-   // ### try to replace with margin.
+   // ### try to replace with margin
    changeSpacerSize(pageVBoxLayout, 0, 0, info.subTitle ? info.childMarginLeft : 0);
 
    int hMargin = mac ? 1 : 0;
    int vMargin = hMargin;
 
-   pageFrame->setFrameStyle(mac ? (QFrame::Box | QFrame::Raised) : QFrame::NoFrame);
+   if (mac) {
+      pageFrame->setFrameStyle(cs_enum_cast(QFrame::Box) | cs_enum_cast(QFrame::Raised));
+
+   } else {
+      pageFrame->setFrameStyle(QFrame::NoFrame);
+
+   }
+
    pageFrame->setLineWidth(0);
    pageFrame->setMidLineWidth(hMargin);
 
@@ -1249,9 +1274,9 @@ void QWizardPrivate::recreateLayout(const QWizardLayoutInfo &info)
    }
 
    if (aero) {
-      int leftMargin   = 18; // ### hardcoded for now - should be calculated somehow
+      int leftMargin   = 18;        // ### hardcoded for now - should be calculated somehow
       int topMargin    = vMargin;
-      int rightMargin  = hMargin; // ### for now
+      int rightMargin  = hMargin;   // ### for now
       int bottomMargin = vMargin;
       pageFrame->setContentsMargins(leftMargin, topMargin, rightMargin, bottomMargin);
    } else {
@@ -1269,18 +1294,22 @@ void QWizardPrivate::recreateLayout(const QWizardLayoutInfo &info)
    //bool wasSemiTransparent = pageFrame->testAttribute(Qt::WA_SetPalette);
    const bool wasSemiTransparent =
       pageFrame->palette().brush(QPalette::Window).color().alpha() < 255
-      || pageFrame->palette().brush(QPalette::Base).color().alpha() < 255;
+            || pageFrame->palette().brush(QPalette::Base).color().alpha() < 255;
+
    if (mac) {
-      if (!wasSemiTransparent) {
+      if (! wasSemiTransparent) {
          QPalette pal = pageFrame->palette();
          pal.setBrush(QPalette::Window, QColor(255, 255, 255, 153));
+
          // ### The next line is required to ensure visual semitransparency when
          // ### switching from ModernStyle to MacStyle. See TAG1 below.
+
          pal.setBrush(QPalette::Base, QColor(255, 255, 255, 153));
          pageFrame->setPalette(pal);
          pageFrame->setAutoFillBackground(true);
          antiFlickerWidget->setAutoFillBackground(false);
       }
+
    } else {
       if (wasSemiTransparent) {
          pageFrame->setPalette(QPalette());
@@ -1292,13 +1321,16 @@ void QWizardPrivate::recreateLayout(const QWizardLayoutInfo &info)
       if (titleLabel) {
          titleLabel->setAutoFillBackground(baseBackground);
       }
+
       pageFrame->setAutoFillBackground(baseBackground);
       if (watermarkLabel) {
          watermarkLabel->setAutoFillBackground(baseBackground);
       }
+
       if (placeholderWidget1) {
          placeholderWidget1->setAutoFillBackground(baseBackground);
       }
+
       if (placeholderWidget2) {
          placeholderWidget2->setAutoFillBackground(baseBackground);
       }
@@ -1359,15 +1391,19 @@ void QWizardPrivate::recreateLayout(const QWizardLayoutInfo &info)
    if (headerWidget) {
       headerWidget->setVisible(info.header);
    }
+
    if (titleLabel) {
       titleLabel->setVisible(info.title);
    }
+
    if (subTitleLabel) {
       subTitleLabel->setVisible(info.subTitle);
    }
+
    if (bottomRuler) {
       bottomRuler->setVisible(classic || modern);
    }
+
    if (watermarkLabel) {
       watermarkLabel->setVisible(info.watermark || info.sideWidget);
    }
@@ -1446,7 +1482,7 @@ void QWizardPrivate::updateMinMaxSizes(const QWizardLayoutInfo &info)
 
    int extraHeight = 0;
 
-#if !defined(QT_NO_STYLE_WINDOWSVISTA)
+#if ! defined(QT_NO_STYLE_WINDOWSVISTA)
    if (isVistaThemeEnabled()) {
       extraHeight = vistaHelper->titleBarSize() + vistaHelper->topOffset();
    }
@@ -1454,25 +1490,31 @@ void QWizardPrivate::updateMinMaxSizes(const QWizardLayoutInfo &info)
 
    QSize minimumSize = mainLayout->totalMinimumSize() + QSize(0, extraHeight);
    QSize maximumSize = mainLayout->totalMaximumSize();
+
    if (info.header && headerWidget->maximumWidth() != QWIDGETSIZE_MAX) {
       minimumSize.setWidth(headerWidget->maximumWidth());
       maximumSize.setWidth(headerWidget->maximumWidth());
    }
+
    if (info.watermark && !info.sideWidget) {
       minimumSize.setHeight(mainLayout->totalSizeHint().height());
    }
+
    if (q->minimumWidth() == minimumWidth) {
       minimumWidth = minimumSize.width();
       q->setMinimumWidth(minimumWidth);
    }
+
    if (q->minimumHeight() == minimumHeight) {
       minimumHeight = minimumSize.height();
       q->setMinimumHeight(minimumHeight);
    }
+
    if (q->maximumWidth() == maximumWidth) {
       maximumWidth = maximumSize.width();
       q->setMaximumWidth(maximumWidth);
    }
+
    if (q->maximumHeight() == maximumHeight) {
       maximumHeight = maximumSize.height();
       q->setMaximumHeight(maximumHeight);
@@ -1568,7 +1610,7 @@ void QWizardPrivate::connectButton(QWizard::WizardButton which) const
    if (which < QWizard::NStandardButtons) {
       QObject::connect(btns[which], SIGNAL(clicked()), q, buttonSlots(which));
    } else {
-      QObject::connect(btns[which], SIGNAL(clicked()), q, SLOT(_q_emitCustomButtonClicked()));
+      QObject::connect(btns[which], &QAbstractButton::clicked, q, &QWizard::_q_emitCustomButtonClicked);
    }
 }
 
@@ -1587,7 +1629,6 @@ void QWizardPrivate::updateButtonTexts()
          } else if (i < QWizard::NStandardButtons) {
             btns[i]->setText(buttonDefaultText(wizStyle, i, this));
          }
-
       }
    }
 
@@ -1604,12 +1645,15 @@ void QWizardPrivate::updateButtonLayout()
       for (int i = 0; i < buttonsCustomLayout.count(); ++i) {
          array[i] = buttonsCustomLayout.at(i);
       }
+
       setButtonLayout(array.constData(), array.count());
+
    } else {
       // Positions:
-      //     Help Stretch Custom1 Custom2 Custom3 Cancel Back Next Commit Finish Cancel Help
+      // Help Stretch Custom1 Custom2 Custom3 Cancel Back Next Commit Finish Cancel Help
 
       const int ArraySize = 12;
+
       QWizard::WizardButton array[ArraySize];
       memset(array, -1, sizeof(array));
       Q_ASSERT(array[0] == QWizard::NoButton);
@@ -1618,13 +1662,16 @@ void QWizardPrivate::updateButtonLayout()
          int i = (opts & QWizard::HelpButtonOnRight) ? 11 : 0;
          array[i] = QWizard::HelpButton;
       }
+
       array[1] = QWizard::Stretch;
       if (opts & QWizard::HaveCustomButton1) {
          array[2] = QWizard::CustomButton1;
       }
+
       if (opts & QWizard::HaveCustomButton2) {
          array[3] = QWizard::CustomButton2;
       }
+
       if (opts & QWizard::HaveCustomButton3) {
          array[4] = QWizard::CustomButton3;
       }
@@ -1642,22 +1689,26 @@ void QWizardPrivate::updateButtonLayout()
    }
 }
 
-void QWizardPrivate::setButtonLayout(const QWizard::WizardButton *array, int size)
+void QWizardPrivate::setButtonLayout(const QWizard::WizardButton *array, int maxSize)
 {
    QWidget *prev = pageFrame;
 
    for (int i = buttonLayout->count() - 1; i >= 0; --i) {
       QLayoutItem *item = buttonLayout->takeAt(i);
+
       if (QWidget *widget = item->widget()) {
          widget->hide();
       }
+
       delete item;
    }
 
-   for (int i = 0; i < size; ++i) {
+   for (int i = 0; i < maxSize; ++i) {
       QWizard::WizardButton which = array[i];
+
       if (which == QWizard::Stretch) {
          buttonLayout->addStretch(1);
+
       } else if (which != QWizard::NoButton) {
          ensureButton(which);
          buttonLayout->addWidget(btns[which]);
@@ -1686,6 +1737,7 @@ bool QWizardPrivate::buttonLayoutContains(QWizard::WizardButton which)
 void QWizardPrivate::updatePixmap(QWizard::WizardPixmap which)
 {
    Q_Q(QWizard);
+
    if (which == QWizard::BackgroundPixmap) {
       if (wizStyle == QWizard::MacStyle) {
          q->update();
@@ -1884,15 +1936,17 @@ void QWizardPrivate::_q_updateButtonStates()
 void QWizardPrivate::_q_handleFieldObjectDestroyed(QObject *object)
 {
    int destroyed_index = -1;
+
    QVector<QWizardField>::iterator it = fields.begin();
 
    while (it != fields.end()) {
       const QWizardField &field = *it;
 
-      if (field.object == object) {
-         destroyed_index = fieldIndexMap.value(field.name, -1);
-         fieldIndexMap.remove(field.name);
+      if (field.m_object == object) {
+         destroyed_index = fieldIndexMap.value(field.m_name, -1);
+         fieldIndexMap.remove(field.m_name);
          it = fields.erase(it);
+
       } else {
          ++it;
       }
@@ -1929,56 +1983,61 @@ void QWizardPrivate::setStyle(QStyle *style)
 QPixmap QWizardPrivate::findDefaultBackgroundPixmap()
 {
    QGuiApplication *app = qobject_cast<QGuiApplication *>(QCoreApplication::instance());
+
    if (!app) {
       return QPixmap();
    }
+
    QPlatformNativeInterface *platformNativeInterface = app->platformNativeInterface();
+
    int at = platformNativeInterface->metaObject()->indexOfMethod("defaultBackgroundPixmapForQWizard()");
    if (at == -1) {
       return QPixmap();
    }
+
    QMetaMethod defaultBackgroundPixmapForQWizard = platformNativeInterface->metaObject()->method(at);
    QPixmap result;
-   if (!defaultBackgroundPixmapForQWizard.invoke(platformNativeInterface, Q_RETURN_ARG(QPixmap, result))) {
+
+   if (! defaultBackgroundPixmapForQWizard.invoke(platformNativeInterface, Q_RETURN_ARG(QPixmap, result))) {
       return QPixmap();
    }
+
    return result;
 }
 
 #endif
 
-#if !defined(QT_NO_STYLE_WINDOWSVISTA)
+#if ! defined(QT_NO_STYLE_WINDOWSVISTA)
+
 void QWizardAntiFlickerWidget::paintEvent(QPaintEvent *)
 {
-   if (wizardPrivate->isVistaThemeEnabled()) {
+   if (m_flickerWizard->isVistaThemeEnabled()) {
       int leftMargin, topMargin, rightMargin, bottomMargin;
-      wizardPrivate->buttonLayout->getContentsMargins(
+
+      m_flickerWizard->buttonLayout->getContentsMargins(
          &leftMargin, &topMargin, &rightMargin, &bottomMargin);
-      const int buttonLayoutTop = wizardPrivate->buttonLayout->contentsRect().top() - topMargin;
+
+      const int buttonLayoutTop = m_flickerWizard->buttonLayout->contentsRect().top() - topMargin;
+
       QPainter painter(this);
-      const QBrush brush(QColor(240, 240, 240)); // ### hardcoded for now
+
+      const QBrush brush(QColor(240, 240, 240));                      // ### hardcoded for now
       painter.fillRect(0, buttonLayoutTop, width(), height() - buttonLayoutTop, brush);
-      painter.setPen(QPen(QBrush(QColor(223, 223, 223)), 0)); // ### hardcoded for now
+      painter.setPen(QPen(QBrush(QColor(223, 223, 223)), 0));         // ### hardcoded for now
       painter.drawLine(0, buttonLayoutTop, width(), buttonLayoutTop);
 
-      if (wizardPrivate->isVistaThemeEnabled(QVistaHelper::VistaBasic)) {
+      if (m_flickerWizard->isVistaThemeEnabled(QVistaHelper::VistaBasic)) {
          if (window()->isActiveWindow()) {
             painter.setPen(QPen(QBrush(QColor(169, 191, 214)), 0));   // ### hardcoded for now
          } else {
             painter.setPen(QPen(QBrush(QColor(182, 193, 204)), 0));   // ### hardcoded for now
          }
+
          painter.drawLine(0, 0, width(), 0);
       }
    }
 }
 #endif
-
-
-
-
-
-
-
 
 QWizard::QWizard(QWidget *parent, Qt::WindowFlags flags)
    : QDialog(*new QWizardPrivate, parent, flags)
@@ -1987,23 +2046,12 @@ QWizard::QWizard(QWidget *parent, Qt::WindowFlags flags)
    d->init();
 }
 
-/*!
-    Destroys the wizard and its pages, releasing any allocated resources.
-*/
 QWizard::~QWizard()
 {
    Q_D(QWizard);
    delete d->buttonLayout;
 }
 
-/*!
-    Adds the given \a page to the wizard, and returns the page's ID.
-
-    The ID is guaranteed to be larger than any other ID in the
-    QWizard so far.
-
-    \sa setPage(), page(), pageAdded()
-*/
 int QWizard::addPage(QWizardPage *page)
 {
    Q_D(QWizard);
@@ -2020,17 +2068,17 @@ void QWizard::setPage(int theid, QWizardPage *page)
    Q_D(QWizard);
 
    if (! page) {
-      qWarning("QWizard::setPage: Cannot insert null page");
+      qWarning("QWizard::setPage() Unable to insert invalid page (nullptr)");
       return;
    }
 
    if (theid == -1) {
-      qWarning("QWizard::setPage: Cannot insert page with ID -1");
+      qWarning("QWizard::setPage() Unable to insert page with ID -1");
       return;
    }
 
    if (d->pageMap.contains(theid)) {
-      qWarning("QWizard::setPage: Page with duplicate ID %d ignored", theid);
+      qWarning("QWizard::setPage() Duplicate page ID %d ignored", theid);
       return;
    }
 
@@ -2065,14 +2113,6 @@ void QWizard::setPage(int theid, QWizardPage *page)
    emit pageAdded(theid);
 }
 
-/*!
-    Removes the page with the given \a id. cleanupPage() will be called if necessary.
-
-    \note Removing a page may influence the value of the startId property.
-
-    \since 4.5
-    \sa addPage(), setPage(), pageRemoved(), startId()
-*/
 void QWizard::removePage(int id)
 {
    Q_D(QWizard);
@@ -2080,18 +2120,24 @@ void QWizard::removePage(int id)
    QWizardPage *removedPage = nullptr;
 
    // update startItem accordingly
-   if (d->pageMap.count() > 0) { // only if we have any pages
+
+   if (d->pageMap.count() > 0) {
+      // only if we have any pages
       if (d->start == id) {
          const int firstId = d->pageMap.constBegin().key();
+
          if (firstId == id) {
             if (d->pageMap.count() > 1) {
                d->start = (++d->pageMap.constBegin()).key();   // secondId
             } else {
                d->start = -1;   // removing the last page
             }
-         } else { // startSetByUser has to be "true" here
+
+         } else {
+            // startSetByUser has to be "true" here
             d->start = firstId;
          }
+
          d->startSetByUser = false;
       }
    }
@@ -2100,24 +2146,29 @@ void QWizard::removePage(int id)
       emit pageRemoved(id);
    }
 
-   if (!d->history.contains(id)) {
+   if (! d->history.contains(id)) {
       // Case 1: removing a page not in the history
       removedPage = d->pageMap.take(id);
       d->updateCurrentPage();
+
    } else if (id != d->current) {
       // Case 2: removing a page in the history before the current page
       removedPage = d->pageMap.take(id);
+
       d->history.removeOne(id);
       d->_q_updateButtonStates();
+
    } else if (d->history.count() == 1) {
       // Case 3: removing the current page which is the first (and only) one in the history
       d->reset();
       removedPage = d->pageMap.take(id);
+
       if (d->pageMap.isEmpty()) {
          d->updateCurrentPage();
       } else {
          restart();
       }
+
    } else {
       // Case 4: removing the current page which is not the first one in the history
       back();
@@ -2134,7 +2185,7 @@ void QWizard::removePage(int id)
       d->pageVBoxLayout->removeWidget(removedPage);
 
       for (int i = d->fields.count() - 1; i >= 0; --i) {
-         if (d->fields.at(i).page == removedPage) {
+         if (d->fields.at(i).m_page == removedPage) {
             removedPage->d_func()->pendingFields += d->fields.at(i);
             d->removeFieldAt(i);
          }
@@ -2142,13 +2193,11 @@ void QWizard::removePage(int id)
    }
 }
 
-
 QWizardPage *QWizard::page(int theid) const
 {
    Q_D(const QWizard);
    return d->pageMap.value(theid);
 }
-
 
 bool QWizard::hasVisitedPage(int theid) const
 {
@@ -2161,7 +2210,6 @@ QList<int> QWizard::visitedPages() const
    Q_D(const QWizard);
    return d->history;
 }
-
 
 QList<int> QWizard::pageIds() const
 {
@@ -2182,10 +2230,11 @@ void QWizard::setStartId(int theid)
       return;
    }
 
-   if (!d->pageMap.contains(newStart)) {
-      qWarning("QWizard::setStartId: Invalid page ID %d", newStart);
+   if (! d->pageMap.contains(newStart)) {
+      qWarning("QWizard::setStartId() Invalid page ID %d", newStart);
       return;
    }
+
    d->start = newStart;
    d->startSetByUser = theid != -1;
 }
@@ -2196,67 +2245,37 @@ int QWizard::startId() const
    return d->start;
 }
 
-/*!
-    Returns a pointer to the current page, or 0 if there is no current
-    page (e.g., before the wizard is shown).
-
-    This is equivalent to calling page(currentId()).
-
-    \sa page(), currentId(), restart()
-*/
 QWizardPage *QWizard::currentPage() const
 {
    Q_D(const QWizard);
    return page(d->current);
 }
 
-/*!
-    \property QWizard::currentId
-    \brief the ID of the current page
-
-    This property cannot be set directly. To change the current page,
-    call next(), back(), or restart().
-
-    By default, this property has a value of -1, indicating that no page is
-    currently shown.
-
-    \sa currentIdChanged(), currentPage()
-*/
 int QWizard::currentId() const
 {
    Q_D(const QWizard);
    return d->current;
 }
 
-/*!
-    Sets the value of the field called \a name to \a value.
-
-    This function can be used to set fields on any page of the wizard.
-
-    \sa QWizardPage::registerField(), QWizardPage::setField(), field()
-*/
 void QWizard::setField(const QString &name, const QVariant &value)
 {
    Q_D(QWizard);
 
    int index = d->fieldIndexMap.value(name, -1);
+
    if (index != -1) {
       const QWizardField &field = d->fields.at(index);
-      if (!field.object->setProperty(field.property, value))
-         qWarning("QWizard::setField: Unable to write to property '%s'", field.property.constData());
+
+      if (! field.m_object->setProperty(field.m_property, value)) {
+         qWarning("QWizard::setField() Unable to write to property '%s'", field.m_property.constData());
+      }
+
       return;
    }
 
-   qWarning("QWizard::setField: No such field '%s'", csPrintable(name));
+   qWarning("QWizard::setField() Field '%s' does not exist", csPrintable(name));
 }
 
-/*!
-    Returns the value of the field called \a name.
-
-    This function can be used to access fields on any page of the wizard.
-
-    \sa QWizardPage::registerField(), QWizardPage::field(), setField()
-*/
 QVariant QWizard::field(const QString &name) const
 {
    Q_D(const QWizard);
@@ -2264,40 +2283,30 @@ QVariant QWizard::field(const QString &name) const
    int index = d->fieldIndexMap.value(name, -1);
    if (index != -1) {
       const QWizardField &field = d->fields.at(index);
-      return field.object->property(field.property);
+      return field.m_object->property(field.m_property);
    }
 
-   qWarning("QWizard::field: No such field '%s'", csPrintable(name));
+   qWarning("QWizard::field() Field '%s' does not exist", csPrintable(name));
+
    return QVariant();
 }
 
-/*!
-    \property QWizard::wizardStyle
-    \brief the look and feel of the wizard
-
-    By default, QWizard uses the AeroStyle on a Windows Vista system with alpha compositing
-    enabled, regardless of the current widget style. If this is not the case, the default
-    wizard style depends on the current widget style as follows: MacStyle is the default if
-    the current widget style is QMacStyle, ModernStyle is the default if the current widget
-    style is QWindowsStyle, and ClassicStyle is the default in all other cases.
-
-    \sa {Wizard Look and Feel}, options
-*/
 void QWizard::setWizardStyle(WizardStyle style)
 {
    Q_D(QWizard);
 
    const bool styleChange = style != d->wizStyle;
 
-#if !defined(QT_NO_STYLE_WINDOWSVISTA)
-   const bool aeroStyleChange =
-      d->vistaInitPending || d->vistaStateChanged || (styleChange && (style == AeroStyle || d->wizStyle == AeroStyle));
+#if ! defined(QT_NO_STYLE_WINDOWSVISTA)
+   const bool aeroStyleChange = d->vistaInitPending || d->vistaStateChanged ||
+         (styleChange && (style == AeroStyle || d->wizStyle == AeroStyle));
+
    d->vistaStateChanged = false;
    d->vistaInitPending = false;
 #endif
 
    if (styleChange
-#if !defined(QT_NO_STYLE_WINDOWSVISTA)
+#if ! defined(QT_NO_STYLE_WINDOWSVISTA)
       || aeroStyleChange
 #endif
    ) {
@@ -2305,10 +2314,10 @@ void QWizard::setWizardStyle(WizardStyle style)
       d->wizStyle = style;
       d->updateButtonTexts();
 
-#if !defined(QT_NO_STYLE_WINDOWSVISTA)
+#if ! defined(QT_NO_STYLE_WINDOWSVISTA)
       if (aeroStyleChange) {
-         //Send a resizeevent since the antiflicker widget probably needs a new size
-         //because of the backbutton in the window title
+         // Send a resizeevent since the antiflicker widget probably needs a new size
+         // because of the backbutton in the window title
          QResizeEvent ev(geometry().size(), geometry().size());
          QApplication::sendEvent(this, &ev);
       }
@@ -2318,7 +2327,7 @@ void QWizard::setWizardStyle(WizardStyle style)
       updateGeometry();
       d->enableUpdates();
 
-#if !defined(QT_NO_STYLE_WINDOWSVISTA)
+#if ! defined(QT_NO_STYLE_WINDOWSVISTA)
       // Delay initialization when activating Aero style fails due to missing native window.
       if (aeroStyleChange && !d->handleAeroStyleChange() && d->wizStyle == AeroStyle) {
          d->vistaInitPending = true;
@@ -2333,46 +2342,21 @@ QWizard::WizardStyle QWizard::wizardStyle() const
    return d->wizStyle;
 }
 
-/*!
-    Sets the given \a option to be enabled if \a on is true;
-    otherwise, clears the given \a option.
-
-    \sa options, testOption(), setWizardStyle()
-*/
 void QWizard::setOption(WizardOption option, bool on)
 {
    Q_D(QWizard);
+
    if (!(d->opts & option) != !on) {
       setOptions(d->opts ^ option);
    }
 }
 
-/*!
-    Returns true if the given \a option is enabled; otherwise, returns
-    false.
-
-    \sa options, setOption(), setWizardStyle()
-*/
 bool QWizard::testOption(WizardOption option) const
 {
    Q_D(const QWizard);
    return (d->opts & option) != 0;
 }
 
-/*!
-    \property QWizard::options
-    \brief the various options that affect the look and feel of the wizard
-
-    By default, the following options are set (depending on the platform):
-
-    \list
-    \o Windows: HelpButtonOnRight.
-    \o Mac OS X: NoDefaultButton and NoCancelButton.
-    \o X11 and QWS (Qt for Embedded Linux): none.
-    \endlist
-
-    \sa wizardStyle
-*/
 void QWizard::setOptions(WizardOptions options)
 {
    Q_D(QWizard);
@@ -2445,7 +2429,6 @@ QString QWizard::buttonText(WizardButton which) const
    return d->btns[which]->text();
 }
 
-
 void QWizard::setButtonLayout(const QList<WizardButton> &layout)
 {
    Q_D(QWizard);
@@ -2464,7 +2447,7 @@ void QWizard::setButtonLayout(const QList<WizardButton> &layout)
       for (int j = 0; j < i; ++j) {
          WizardButton button2 = layout.at(j);
          if (button2 == button1) {
-            qWarning("QWizard::setButtonLayout: Duplicate button in layout");
+            qWarning("QWizard::setButtonLayout() Duplicate button in layout");
             return;
          }
       }
@@ -2475,16 +2458,6 @@ void QWizard::setButtonLayout(const QList<WizardButton> &layout)
    d->updateButtonLayout();
 }
 
-/*!
-    Sets the button corresponding to role \a which to \a button.
-
-    To add extra buttons to the wizard (e.g., a \gui Print button),
-    one way is to call setButton() with CustomButton1 to
-    CustomButton3, and make the buttons visible using the
-    HaveCustomButton1 to HaveCustomButton3 options.
-
-    \sa setButtonText(), setButtonLayout(), options
-*/
 void QWizard::setButton(WizardButton which, QAbstractButton *button)
 {
    Q_D(QWizard);
@@ -2510,7 +2483,6 @@ void QWizard::setButton(WizardButton which, QAbstractButton *button)
 
    d->updateButtonLayout();
 }
-
 
 QAbstractButton *QWizard::button(WizardButton which) const
 {
@@ -2541,7 +2513,6 @@ Qt::TextFormat QWizard::titleFormat() const
    return d->titleFmt;
 }
 
-
 void QWizard::setSubTitleFormat(Qt::TextFormat format)
 {
    Q_D(QWizard);
@@ -2555,23 +2526,15 @@ Qt::TextFormat QWizard::subTitleFormat() const
    return d->subTitleFmt;
 }
 
-
 void QWizard::setPixmap(WizardPixmap which, const QPixmap &pixmap)
 {
    Q_D(QWizard);
+
    Q_ASSERT(uint(which) < NPixmaps);
    d->defaultPixmaps[which] = pixmap;
    d->updatePixmap(which);
 }
 
-/*!
-    Returns the pixmap set for role \a which.
-
-    By default, the only pixmap that is set is the BackgroundPixmap on
-    Mac OS X.
-
-    \sa QWizardPage::pixmap(), {Elements of a Wizard Page}
-*/
 QPixmap QWizard::pixmap(WizardPixmap which) const
 {
    Q_D(const QWizard);
@@ -2590,7 +2553,7 @@ void QWizard::setDefaultProperty(const QString &className, const QString &proper
    Q_D(QWizard);
 
    for (int i = d->defaultPropertyTable.count() - 1; i >= 0; --i) {
-      if (d->defaultPropertyTable.at(i).className == className) {
+      if (d->defaultPropertyTable.at(i).m_className == className) {
          d->defaultPropertyTable.remove(i);
          break;
       }
@@ -2604,19 +2567,13 @@ void QWizard::setSideWidget(QWidget *widget)
    Q_D(QWizard);
 
    d->sideWidget = widget;
+
    if (d->watermarkLabel) {
       d->watermarkLabel->setSideWidget(widget);
       d->updateLayout();
    }
 }
 
-/*!
-    \since 4.7
-
-    Returns the widget on the left side of the wizard or 0.
-
-    By default, no side widget is present.
-*/
 QWidget *QWizard::sideWidget() const
 {
    Q_D(const QWizard);
@@ -2624,23 +2581,19 @@ QWidget *QWizard::sideWidget() const
    return d->sideWidget;
 }
 
-/*!
-    \reimp
-*/
 void QWizard::setVisible(bool visible)
 {
    Q_D(QWizard);
+
    if (visible) {
       if (d->current == -1) {
          restart();
       }
    }
+
    QDialog::setVisible(visible);
 }
 
-/*!
-    \reimp
-*/
 QSize QWizard::sizeHint() const
 {
    Q_D(const QWizard);
@@ -2664,28 +2617,22 @@ QSize QWizard::sizeHint() const
          }
       }
    }
+
    return result.expandedTo(extra);
 }
-
-
 
 void QWizard::back()
 {
    Q_D(QWizard);
+
    int n = d->history.count() - 2;
+
    if (n < 0) {
       return;
    }
    d->switchToPage(d->history.at(n), QWizardPrivate::Backward);
 }
 
-/*!
-    Advances to the next page.
-
-    This is equivalent to pressing the \gui Next or \gui Commit button.
-
-    \sa nextId(), back(), accept(), reject(), restart()
-*/
 void QWizard::next()
 {
    Q_D(QWizard);
@@ -2698,18 +2645,18 @@ void QWizard::next()
       int next = nextId();
       if (next != -1) {
          if (d->history.contains(next)) {
-            qWarning("QWizard::next: Page %d already met", next);
+            qWarning("QWizard::next() Page %d already exists", next);
             return;
          }
+
          if (!d->pageMap.contains(next)) {
-            qWarning("QWizard::next: No such page %d", next);
+            qWarning("QWizard::next() No such page with the value of %d", next);
             return;
          }
          d->switchToPage(next, QWizardPrivate::Forward);
       }
    }
 }
-
 
 void QWizard::restart()
 {
@@ -2720,9 +2667,6 @@ void QWizard::restart()
    d->enableUpdates();
 }
 
-/*!
-    \reimp
-*/
 bool QWizard::event(QEvent *event)
 {
    Q_D(QWizard);
@@ -2858,7 +2802,6 @@ void QWizard::done(int result)
    QDialog::done(result);
 }
 
-
 void QWizard::initializePage(int theid)
 {
    QWizardPage *page = this->page(theid);
@@ -2922,7 +2865,6 @@ QString QWizardPage::title() const
    return d->title;
 }
 
-
 void QWizardPage::setSubTitle(const QString &subTitle)
 {
    Q_D(QWizardPage);
@@ -2973,12 +2915,15 @@ void QWizardPage::initializePage()
 void QWizardPage::cleanupPage()
 {
    Q_D(QWizardPage);
+
    if (d->wizard) {
       QVector<QWizardField> &fields = d->wizard->d_func()->fields;
+
       for (int i = 0; i < fields.count(); ++i) {
          const QWizardField &field = fields.at(i);
-         if (field.page == this) {
-            field.object->setProperty(field.property, field.initialValue);
+
+         if (field.m_page == this) {
+            field.m_object->setProperty(field.m_property, field.m_initialValue);
          }
       }
    }
@@ -2989,49 +2934,55 @@ bool QWizardPage::validatePage()
    return true;
 }
 
-
 bool QWizardPage::isComplete() const
 {
    Q_D(const QWizardPage);
 
-   if (!d->wizard) {
+   if (! d->wizard) {
       return true;
    }
 
    const QVector<QWizardField> &wizardFields = d->wizard->d_func()->fields;
+
    for (int i = wizardFields.count() - 1; i >= 0; --i) {
       const QWizardField &field = wizardFields.at(i);
-      if (field.page == this && field.mandatory) {
-         QVariant value = field.object->property(field.property);
-         if (value == field.initialValue) {
+
+      if (field.m_page == this && field.m_mandatory) {
+         QVariant value = field.m_object->property(field.m_property);
+
+         if (value == field.m_initialValue) {
             return false;
          }
 
 #ifndef QT_NO_LINEEDIT
-         if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(field.object)) {
-            if (!lineEdit->hasAcceptableInput()) {
+         if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(field.m_object)) {
+            if (! lineEdit->hasAcceptableInput()) {
                return false;
             }
          }
 #endif
+
 #ifndef QT_NO_SPINBOX
-         if (QAbstractSpinBox *spinBox = qobject_cast<QAbstractSpinBox *>(field.object)) {
-            if (!spinBox->hasAcceptableInput()) {
+         if (QAbstractSpinBox *spinBox = qobject_cast<QAbstractSpinBox *>(field.m_object)) {
+            if (! spinBox->hasAcceptableInput()) {
                return false;
             }
          }
 #endif
       }
    }
+
    return true;
 }
-
 
 void QWizardPage::setFinalPage(bool finalPage)
 {
    Q_D(QWizardPage);
+
    d->explicitlyFinal = finalPage;
+
    QWizard *wizard = this->wizard();
+
    if (wizard && wizard->currentPage() == this) {
       wizard->d_func()->updateCurrentPage();
    }
@@ -3040,11 +2991,13 @@ void QWizardPage::setFinalPage(bool finalPage)
 bool QWizardPage::isFinalPage() const
 {
    Q_D(const QWizardPage);
+
    if (d->explicitlyFinal) {
       return true;
    }
 
    QWizard *wizard = this->wizard();
+
    if (wizard && wizard->currentPage() == this) {
       // try to use the QWizard implementation if possible
       return wizard->nextId() == -1;
@@ -3074,7 +3027,9 @@ bool QWizardPage::isCommitPage() const
 void QWizardPage::setButtonText(QWizard::WizardButton which, const QString &text)
 {
    Q_D(QWizardPage);
+
    d->buttonCustomTexts.insert(which, text);
+
    if (wizard() && wizard()->currentPage() == this && wizard()->d_func()->btns[which]) {
       wizard()->d_func()->btns[which]->setText(text);
    }
@@ -3099,7 +3054,7 @@ int QWizardPage::nextId() const
 {
    Q_D(const QWizardPage);
 
-   if (!d->wizard) {
+   if (! d->wizard) {
       return -1;
    }
 
@@ -3124,9 +3079,10 @@ void QWizardPage::setField(const QString &name, const QVariant &value)
 {
    Q_D(QWizardPage);
 
-   if (!d->wizard) {
+   if (! d->wizard) {
       return;
    }
+
    d->wizard->setField(name, value);
 }
 
@@ -3137,12 +3093,14 @@ QVariant QWizardPage::field(const QString &name) const
    if (! d->wizard) {
       return QVariant();
    }
+
    return d->wizard->field(name);
 }
 
 void QWizardPage::registerField(const QString &name, QWidget *widget, const QString &property, const QString &changedSignal)
 {
    Q_D(QWizardPage);
+
    QWizardField field(this, name, widget, property, changedSignal);
 
    if (d->wizard) {
@@ -3176,10 +3134,10 @@ void QWizard::_q_handleFieldObjectDestroyed(QObject *obj)
    d->_q_handleFieldObjectDestroyed(obj);
 }
 
-void QWizardPage::_q_maybeEmitCompleteChanged()
+void QWizardPage::_q_changedSignal()
 {
    Q_D(QWizardPage);
-   d->_q_maybeEmitCompleteChanged();
+   d->_q_changedSignal();
 }
 
 void QWizardPage::_q_updateCachedCompleteState()

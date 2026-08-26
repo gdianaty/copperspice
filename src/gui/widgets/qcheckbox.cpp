@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,13 +22,15 @@
 ***********************************************************************/
 
 #include <qcheckbox.h>
+
 #include <qapplication.h>
 #include <qbitmap.h>
+#include <qevent.h>
 #include <qicon.h>
-#include <qstylepainter.h>
 #include <qstyle.h>
 #include <qstyleoption.h>
-#include <qevent.h>
+#include <qstylepainter.h>
+
 #include <qabstractbutton_p.h>
 
 class QCheckBoxPrivate : public QAbstractButtonPrivate

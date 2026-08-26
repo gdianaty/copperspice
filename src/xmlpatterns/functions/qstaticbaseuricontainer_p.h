@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,17 +24,17 @@
 #ifndef QStaticBaseUriContainer_P_H
 #define QStaticBaseUriContainer_P_H
 
-#include <QUrl>
+#include <qurl.h>
+
 #include <qfunctioncall_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class StaticBaseUriContainer : public FunctionCall
 {
  protected:
-   inline StaticBaseUriContainer() {
-   }
+   StaticBaseUriContainer()
+   { }
 
    void prepareStaticBaseURI(const StaticContext::Ptr &context) {
       m_staticBaseURI = context->baseURI();
@@ -44,10 +44,6 @@ class StaticBaseUriContainer : public FunctionCall
       return m_staticBaseURI;
    }
 
-   /**
-    * Calls prepareStaticBaseURI(), and return the return value of
-    * FunctionCall::typeCheck(), forwarding the arguments.
-    */
    Expression::Ptr typeCheck(const StaticContext::Ptr &context, const SequenceType::Ptr &reqType) override {
       prepareStaticBaseURI(context);
       return FunctionCall::typeCheck(context, reqType);
@@ -59,8 +55,7 @@ class StaticBaseUriContainer : public FunctionCall
 
    QUrl m_staticBaseURI;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

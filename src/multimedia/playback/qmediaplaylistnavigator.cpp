@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -32,14 +32,20 @@
 class QMediaPlaylistNullProvider : public QMediaPlaylistProvider
 {
  public:
-   QMediaPlaylistNullProvider() : QMediaPlaylistProvider() {}
-   virtual ~QMediaPlaylistNullProvider() {}
+   QMediaPlaylistNullProvider()
+      : QMediaPlaylistProvider()
+   {
+   }
 
-   virtual int mediaCount() const {
+   virtual ~QMediaPlaylistNullProvider()
+   {
+   }
+
+   int mediaCount() const override {
       return 0;
    }
 
-   virtual QMediaContent media(int) const {
+   QMediaContent media(int) const override {
       return QMediaContent();
    }
 };
@@ -78,7 +84,6 @@ class QMediaPlaylistNavigatorPrivate
 
    QMediaPlaylistNavigator *q_ptr;
 };
-
 
 int QMediaPlaylistNavigatorPrivate::nextItemPos(int steps) const
 {
@@ -143,20 +148,26 @@ int QMediaPlaylistNavigatorPrivate::previousItemPos(int steps) const
 
    switch (playbackMode) {
       case QMediaPlaylist::CurrentItemOnce:
-         return /*currentPos == -1 ? lastValidPos :*/ -1;
+         return -1;
+
       case QMediaPlaylist::CurrentItemInLoop:
          return currentPos;
+
       case QMediaPlaylist::Sequential: {
          int prevPos = currentPos == -1 ? playlist->mediaCount() - steps : currentPos - steps;
          return prevPos >= 0 ? prevPos : -1;
       }
+
       case QMediaPlaylist::Loop: {
          int prevPos = currentPos - steps;
+
          while (prevPos < 0) {
             prevPos += playlist->mediaCount();
          }
+
          return prevPos;
       }
+
       case QMediaPlaylist::Random: {
          //TODO: limit the history size
 
@@ -248,9 +259,9 @@ void QMediaPlaylistNavigator::setPlaylist(QMediaPlaylistProvider *playlist)
       d->playlist = _q_nullMediaPlaylist();
    }
 
-   connect(d->playlist, SIGNAL(mediaInserted(int, int)), SLOT(_q_mediaInserted(int, int)));
-   connect(d->playlist, SIGNAL(mediaRemoved(int, int)), SLOT(_q_mediaRemoved(int, int)));
-   connect(d->playlist, SIGNAL(mediaChanged(int, int)), SLOT(_q_mediaChanged(int, int)));
+   connect(d->playlist, &QMediaPlaylistProvider::mediaInserted, this, &QMediaPlaylistNavigator::_q_mediaInserted);
+   connect(d->playlist, &QMediaPlaylistProvider::mediaRemoved,  this, &QMediaPlaylistNavigator::_q_mediaRemoved);
+   connect(d->playlist, &QMediaPlaylistProvider::mediaChanged,  this, &QMediaPlaylistNavigator::_q_mediaChanged);
 
    d->randomPositionsOffset = -1;
    d->randomModePositions.clear();
@@ -260,7 +271,7 @@ void QMediaPlaylistNavigator::setPlaylist(QMediaPlaylistProvider *playlist)
       emit currentIndexChanged(-1);
    }
 
-   if (!d->currentItem.isNull()) {
+   if (! d->currentItem.isNull()) {
       d->currentItem = QMediaContent();
       emit activated(d->currentItem); //stop playback
    }
@@ -424,4 +435,3 @@ void QMediaPlaylistNavigator::_q_mediaChanged(int start, int end)
    Q_D(QMediaPlaylistNavigator);
    d->_q_mediaChanged(start, end);
 }
-

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -32,9 +32,8 @@
 #include <qnumerictype_p.h>
 #include <quntyped_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class BuiltinTypes
 {
  public:
@@ -51,10 +50,6 @@ class BuiltinTypes
    static const AtomicType::Ptr        xsYearMonthDuration;
    static const AtomicType::Ptr        xsDayTimeDuration;
 
-   /**
-    * An artificial type for implementation purposes
-    * that represents the XPath type @c numeric.
-    */
    static const AtomicType::Ptr        numeric;
    static const AtomicType::Ptr        xsFloat;
    static const AtomicType::Ptr        xsDouble;
@@ -102,15 +97,7 @@ class BuiltinTypes
 
    static const AnyNodeType::Ptr       node;
 
-   /**
-    * When the node test node() is used without axes in a pattern in
-    * XSL-T, it doesn't match document nodes. See 5.5.3 The Meaning of a
-    * Pattern.
-    *
-    * This node test does that.
-    */
    static const ItemType::Ptr          xsltNodeTest;
-
    static const ItemType::Ptr          attribute;
    static const ItemType::Ptr          comment;
    static const ItemType::Ptr          document;
@@ -119,18 +106,13 @@ class BuiltinTypes
    static const ItemType::Ptr          text;
 
  private:
-   /**
-    * The constructor is protected because this class is not meant to be instantiated,
-    * but should only be used via its static const members.
-    */
    BuiltinTypes();
 
    BuiltinTypes(const BuiltinTypes &) = delete;
    BuiltinTypes &operator=(const BuiltinTypes &) = delete;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif
 

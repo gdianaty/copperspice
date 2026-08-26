@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -58,7 +58,9 @@
 #include <runtime/Error.h>
 #include <runtime_array.h>
 #include <runtime_object.h>
+
 #include <qstring16.h>
+#include <qtimezone.h>
 
 using namespace WebCore;
 
@@ -547,7 +549,7 @@ QVariant convertValueToQVariant(ExecState* exec, JSValue value, QVariant::Type h
                 msToGregorianDateTime(exec, date->internalNumber(), true, gdt);
 
                 if (hint == QVariant::DateTime) {
-                    ret = QDateTime(QDate(gdt.year + 1900, gdt.month + 1, gdt.monthDay), QTime(gdt.hour, gdt.minute, gdt.second), Qt::UTC);
+                    ret = QDateTime(QDate(gdt.year + 1900, gdt.month + 1, gdt.monthDay), QTime(gdt.hour, gdt.minute, gdt.second), QTimeZone::utc());
                     dist = 0;
 
                 } else if (hint == QVariant::Date) {
@@ -564,7 +566,7 @@ QVariant convertValueToQVariant(ExecState* exec, JSValue value, QVariant::Type h
                 msToGregorianDateTime(exec, b, true, gdt);
 
                 if (hint == QVariant::DateTime) {
-                    ret = QDateTime(QDate(gdt.year + 1900, gdt.month + 1, gdt.monthDay), QTime(gdt.hour, gdt.minute, gdt.second), Qt::UTC);
+                    ret = QDateTime(QDate(gdt.year + 1900, gdt.month + 1, gdt.monthDay), QTime(gdt.hour, gdt.minute, gdt.second), QTimeZone::utc());
                     dist = 6;
                 } else if (hint == QVariant::Date) {
                     ret = QDate(gdt.year + 1900, gdt.month + 1, gdt.monthDay);
@@ -994,7 +996,7 @@ JSValue convertQVariantToValue(ExecState* exec, PassRefPtr<RootObject> root, con
         if (!obj)
             return jsNull();
 
-        return QtInstance::getQtInstance(obj, root, QScriptEngine::QtOwnership)->createRuntimeObject(exec);
+        return QtInstance::getQtInstance(obj, root)->createRuntimeObject(exec);
     }
 
     if (QtPixmapInstance::canHandle(variant.type())) {
@@ -1975,7 +1977,7 @@ void QtConnectionObject::execute(void **argv)
                     if (m_funcObject->inherits(&JSFunction::s_info)) {
                         fimp = static_cast<JSFunction*>(m_funcObject.get());
 
-                        JSObject* qt_sender = QtInstance::getQtInstance(sender(), ro, QScriptEngine::QtOwnership)->createRuntimeObject(exec);
+                        JSObject* qt_sender = QtInstance::getQtInstance(sender(), ro)->createRuntimeObject(exec);
                         JSObject* wrapper = constructEmptyObject(exec, createEmptyObjectStructure(exec->globalData(), jsNull()));
                         PutPropertySlot slot;
                         wrapper->put(exec, Identifier(exec, "__qt_sender__"), qt_sender, slot);

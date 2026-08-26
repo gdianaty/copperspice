@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,12 +22,12 @@
 ***********************************************************************/
 
 #include <qsqldriver.h>
+#include <qsqldriver_p.h>
 
 #include <qdatetime.h>
 #include <qsqlerror.h>
 #include <qsqlfield.h>
 #include <qsqlindex.h>
-#include <qsqldriver_p.h>
 
 static QString prepareIdentifier(const QString &identifier, QSqlDriver::IdentifierType type, const QSqlDriver *driver)
 {
@@ -115,7 +115,7 @@ QSqlIndex QSqlDriver::primaryIndex(const QString &) const
    return QSqlIndex();
 }
 
-QSqlRecord QSqlDriver::record(const QString & /* tableName */) const
+QSqlRecord QSqlDriver::record(const QString &) const
 {
    return QSqlRecord();
 }
@@ -172,22 +172,21 @@ QString QSqlDriver::sqlStatement(StatementType type, const QString &tableName,
 
       case WhereStatement: {
          const QString tableNamePrefix = tableName.isEmpty()
-            ? QString()
-            : prepareIdentifier(tableName, QSqlDriver::TableName, this) + QChar('.');
+            ? QString() : prepareIdentifier(tableName, QSqlDriver::TableName, this) + QChar('.');
 
-         for (int i = 0; i < rec.count(); ++i) {
-            s.append(i ? QString(" AND ") : QString("WHERE "));
+         for (int j = 0; j < rec.count(); ++j) {
+            s.append(j ? QString(" AND ") : QString("WHERE "));
             s.append(tableNamePrefix);
-            s.append(prepareIdentifier(rec.fieldName(i), QSqlDriver::FieldName, this));
+            s.append(prepareIdentifier(rec.fieldName(j), QSqlDriver::FieldName, this));
 
-            if (rec.isNull(i)) {
+            if (rec.isNull(j)) {
                s.append(QString(" IS NULL"));
 
             } else if (preparedStatement) {
                s.append(QString(" = ?"));
 
             } else {
-               s.append(QString(" = ")).append(formatValue(rec.field(i)));
+               s.append(QString(" = ")).append(formatValue(rec.field(j)));
             }
          }
          break;

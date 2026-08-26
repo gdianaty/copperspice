@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -37,10 +37,12 @@ class Q_CORE_EXPORT QUrlQuery
 {
  public:
    QUrlQuery();
-   QUrlQuery(const QUrlQuery &other);
 
    explicit QUrlQuery(const QUrl &url);
    explicit QUrlQuery(const QString &str);
+
+   QUrlQuery(const QUrlQuery &other);
+   QUrlQuery(QUrlQuery &&other);
 
    ~QUrlQuery();
 
@@ -73,7 +75,7 @@ class Q_CORE_EXPORT QUrlQuery
 
    void setQuery(const QString &str);
    void setQueryDelimiters(QChar valueDelimiter, QChar pairDelimiter);
-   void setQueryItems(const QList<QPair<QString, QString> > &query);
+   void setQueryItems(const QList<QPair<QString, QString>> &query);
 
    void swap(QUrlQuery &other) {
       qSwap(d, other.d);
@@ -86,9 +88,9 @@ class Q_CORE_EXPORT QUrlQuery
       return query(encoding);
    }
 
+   using DataPtr = QSharedDataPointer<QUrlQueryPrivate>;
 
-   typedef QSharedDataPointer<QUrlQueryPrivate> DataPtr;
-   inline DataPtr &data_ptr() {
+   DataPtr &data_ptr() {
       return d;
    }
 
@@ -115,7 +117,7 @@ class Q_CORE_EXPORT QUrlQuery
 
 Q_DECLARE_SHARED(QUrlQuery)
 
-inline void QUrl::setQueryItems(const QList<QPair<QString, QString> > &query)
+inline void QUrl::setQueryItems(const QList<QPair<QString, QString>> &query)
 {
    QUrlQuery q(*this);
    q.setQueryItems(query);
@@ -129,7 +131,7 @@ inline void QUrl::addQueryItem(const QString &key, const QString &value)
    setQuery(q);
 }
 
-inline QList<QPair<QString, QString> > QUrl::queryItems() const
+inline QList<QPair<QString, QString>> QUrl::queryItems() const
 {
    return QUrlQuery(*this).queryItems();
 }
@@ -194,7 +196,7 @@ inline void QUrl::removeAllEncodedQueryItems(const QByteArray &key)
    setQuery(q);
 }
 
-inline void QUrl::setEncodedQueryItems(const QList<QPair<QByteArray, QByteArray> > &query)
+inline void QUrl::setEncodedQueryItems(const QList<QPair<QByteArray, QByteArray>> &query)
 {
    QUrlQuery q;
 
@@ -207,15 +209,16 @@ inline void QUrl::setEncodedQueryItems(const QList<QPair<QByteArray, QByteArray>
    setQuery(q);
 }
 
-inline QList<QPair<QByteArray, QByteArray> > QUrl::encodedQueryItems() const
+inline QList<QPair<QByteArray, QByteArray>> QUrl::encodedQueryItems() const
 {
-   QList<QPair<QString, QString> > items = QUrlQuery(*this).queryItems(QUrl::FullyEncoded);
-   QList<QPair<QString, QString> >::const_iterator it = items.constBegin();
-   QList<QPair<QByteArray, QByteArray> > result;
+   QList<QPair<QString, QString>> items = QUrlQuery(*this).queryItems(QUrl::FullyEncoded);
+   QList<QPair<QString, QString>>::const_iterator it = items.constBegin();
+   QList<QPair<QByteArray, QByteArray>> result;
 
    for ( ; it != items.constEnd(); ++it) {
       result << qMakePair(it->first.toLatin1(), it->second.toLatin1());
    }
+
    return result;
 }
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -80,12 +80,15 @@ QList<QNetworkProxy> QNetworkProxyFactory::systemProxyForQuery(const QNetworkPro
    const QString queryProtocol = query.protocolTag().toLower();
    QByteArray proxy_env;
 
-   if (queryProtocol == QLatin1String("http")) {
+   if (queryProtocol == "http") {
       proxy_env = qgetenv("http_proxy");
-   } else if (queryProtocol == QLatin1String("https")) {
+
+   } else if (queryProtocol == "https") {
       proxy_env = qgetenv("https_proxy");
-   } else if (queryProtocol == QLatin1String("ftp")) {
+
+   } else if (queryProtocol == "ftp") {
       proxy_env = qgetenv("ftp_proxy");
+
    } else {
       proxy_env = qgetenv("all_proxy");
    }
@@ -98,24 +101,25 @@ QList<QNetworkProxy> QNetworkProxyFactory::systemProxyForQuery(const QNetworkPro
    if (! proxy_env.isEmpty()) {
       QUrl url = QUrl(QString::fromUtf8(proxy_env));
 
-      if (url.scheme() == QLatin1String("socks5")) {
+      if (url.scheme() == "socks5") {
          QNetworkProxy proxy(QNetworkProxy::Socks5Proxy, url.host(),
-                             url.port() ? url.port() : 1080, url.userName(), url.password());
+               url.port() ? url.port() : 1080, url.userName(), url.password());
+
          proxyList << proxy;
 
-      } else if (url.scheme() == QLatin1String("socks5h")) {
+      } else if (url.scheme() == "socks5h") {
          QNetworkProxy proxy(QNetworkProxy::Socks5Proxy, url.host(),
-                             url.port() ? url.port() : 1080, url.userName(), url.password());
+               url.port() ? url.port() : 1080, url.userName(), url.password());
 
          proxy.setCapabilities(QNetworkProxy::HostNameLookupCapability);
          proxyList << proxy;
 
-      } else if ((url.scheme() == QLatin1String("http") || url.scheme().isEmpty())
-                 && query.queryType() != QNetworkProxyQuery::UdpSocket
-                 && query.queryType() != QNetworkProxyQuery::TcpServer) {
+      } else if ((url.scheme() == "http" || url.scheme().isEmpty()) && query.queryType() != QNetworkProxyQuery::UdpSocket
+            && query.queryType() != QNetworkProxyQuery::TcpServer) {
 
          QNetworkProxy proxy(QNetworkProxy::HttpProxy, url.host(),
-                             url.port() ? url.port() : 8080, url.userName(), url.password());
+               url.port() ? url.port() : 8080, url.userName(), url.password());
+
          proxyList << proxy;
       }
    }

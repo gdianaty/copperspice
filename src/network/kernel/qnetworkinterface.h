@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,23 +24,24 @@
 #ifndef QNETWORKINTERFACE_H
 #define QNETWORKINTERFACE_H
 
-#include <qshareddata.h>
-#include <qscopedpointer.h>
 #include <qhostaddress.h>
+#include <qscopedpointer.h>
+#include <qshareddata.h>
 
 #ifndef QT_NO_NETWORKINTERFACE
 
 template <typename T>
 class QList;
 
-class QNetworkInterfacePrivate;
 class QNetworkAddressEntryPrivate;
+class QNetworkInterfacePrivate;
 
 class Q_NETWORK_EXPORT QNetworkAddressEntry
 {
  public:
    QNetworkAddressEntry();
    QNetworkAddressEntry(const QNetworkAddressEntry &other);
+
    ~QNetworkAddressEntry();
 
    QNetworkAddressEntry &operator=(const QNetworkAddressEntry &other);
@@ -52,7 +53,7 @@ class Q_NETWORK_EXPORT QNetworkAddressEntry
 
    bool operator==(const QNetworkAddressEntry &other) const;
 
-   inline bool operator!=(const QNetworkAddressEntry &other) const {
+   bool operator!=(const QNetworkAddressEntry &other) const {
       return !(*this == other);
    }
 

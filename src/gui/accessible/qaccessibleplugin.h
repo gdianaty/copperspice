@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,12 +29,12 @@
 
 #ifndef QT_NO_ACCESSIBILITY
 
-class QStringList;
 class QAccessibleInterface;
-
-#define QAccessibleInterface_ID "com.copperspice.CS.AccessibleInterface"
+class QStringList;
 
 class QAccessiblePluginPrivate;
+
+#define QAccessibleInterface_ID "com.copperspice.CS.AccessibleInterface"
 
 class Q_GUI_EXPORT QAccessiblePlugin : public QObject
 {

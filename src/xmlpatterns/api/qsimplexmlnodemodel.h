@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,8 @@
 #ifndef QSIMPLEXMLNODEMODEL_H
 #define QSIMPLEXMLNODEMODEL_H
 
-#include <QAbstractXmlNodeModel>
-#include <QXmlQuery>
-
-QT_BEGIN_NAMESPACE
+#include <qabstractxmlnodemodel.h>
+#include <qxmlquery.h>
 
 template<typename T> class QExplicitlySharedDataPointer;
 class QSimpleXmlNodeModelPrivate;
@@ -47,7 +45,5 @@ class Q_XMLPATTERNS_EXPORT QSimpleXmlNodeModel : public QAbstractXmlNodeModel
  private:
    Q_DECLARE_PRIVATE(QSimpleXmlNodeModel)
 };
-
-QT_END_NAMESPACE
 
 #endif

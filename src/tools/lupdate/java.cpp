@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,8 +22,9 @@
 ***********************************************************************/
 
 #include <lupdate.h>
-
 #include <translator.h>
+
+#include <qcoreapplication.h>
 #include <qdebug.h>
 #include <qfile.h>
 #include <qregularexpression.h>
@@ -31,7 +32,6 @@
 #include <qstack.h>
 #include <qstring.h>
 #include <qtextcodec.h>
-#include <qcoreapplication.h>
 
 #include <iostream>
 
@@ -50,11 +50,13 @@ class Scope
  public:
    enum Type {Clazz, Function, Other};
 
-   Scope(const QString &name, Type type, int line)
-      : name(name), type(type), line(line) {
+   Scope(const QString &newName, Type newType, int newLine)
+      : name(newName), type(newType), line(newLine)
+   {
    }
 
-   ~Scope() {
+   ~Scope()
+   {
    }
 
    QString name;
@@ -62,11 +64,7 @@ class Scope
    int line;
 };
 
-/*
-  The tokenizer maintains the following global variables. The names
-  should be self-explanatory.
-*/
-
+// tokenizer maintains the following global variables
 static QString yyFileName;
 static QChar yyCh;
 static QString yyIdent;
@@ -80,7 +78,7 @@ static int yyCurLineNo;
 static int yyParenLineNo;
 static int yyTok;
 
-// the string to read from and current position in the string
+// string to read from and current position in the string
 static QString yyInStr;
 static int yyInPos;
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,27 +21,27 @@
 *
 ***********************************************************************/
 
-#include <qwin_integration.h>
 #include <qwin_fontengine.h>
-#include <qwin_nativeimage.h>
-#include <qwin_context.h>
-#include <qwin_fontdatabase.h>
-#include <qwin_additional.h>
 
-#include <qdebug.h>
-#include <qpaintdevice.h>
 #include <qbitmap.h>
-#include <qpainter.h>
+#include <qdebug.h>
 #include <qendian.h>
 #include <qmath.h>
-#include <qthreadstorage.h>
+#include <qpaintdevice.h>
 #include <qpaintengine.h>
+#include <qpainter.h>
+#include <qthreadstorage.h>
+#include <qwin_additional.h>
+#include <qwin_context.h>
+#include <qwin_fontdatabase.h>
+#include <qwin_integration.h>
+#include <qwin_nativeimage.h>
 
-#include <qtextengine_p.h>
 #include <qapplication_p.h>
-#include <qpainter_p.h>
 #include <qpaintengine_raster_p.h>
+#include <qpainter_p.h>
 #include <qsystemlibrary_p.h>
+#include <qtextengine_p.h>
 
 #include <limits.h>
 
@@ -170,7 +170,7 @@ void QWindowsFontEngine::getCMap()
       OUTLINETEXTMETRIC *otm = getOutlineTextMetric(hdc);
       unitsPerEm = int(otm->otmEMSquare);
       const QFixed unitsPerEmF(unitsPerEm);
-      designToDevice = unitsPerEmF / QFixed::fromReal(fontDef.pixelSize);
+      designToDevice = unitsPerEmF / QFixed::fromReal(m_fontDef.pixelSize);
       x_height = int(otm->otmsXHeight);
       loadKerningPairs(unitsPerEmF / int(otm->otmTextMetrics.tmHeight));
 
@@ -231,35 +231,36 @@ int QWindowsFontEngine::getGlyphIndexes(QStringView strView, QGlyphLayout *glyph
 }
 
 QWindowsFontEngine::QWindowsFontEngine(const QString &name, LOGFONT lf,
-   const QSharedPointer<QWindowsFontEngineData> &fontEngineData)
-
+      const QSharedPointer<QWindowsFontEngineData> &fontEngineData)
    : QFontEngine(Win), m_fontEngineData(fontEngineData), _name(name), hfont(nullptr),
      m_logfont(lf), ttf(0), hasOutline(0), cmap(nullptr), cmapSize(0), lbearing(SHRT_MIN),
      rbearing(SHRT_MIN), x_height(-1), synthesized_flags(-1), lineWidth(-1),
      widthCache(nullptr), widthCacheSize(0), designAdvances(nullptr), designAdvancesSize(0)
 {
 
-#if defined(CS_SHOW_DEBUG)
+#if defined(CS_SHOW_DEBUG_PLATFORM)
    // emerald - saw fontSize as negative, why?
-   qDebug() << "QWindowsFontEngine():  FontName = " << name << " FontSize =" << lf.lfHeight;
+   qDebug() << "QWindowsFontEngine() FontName = " << name << " FontSize =" << lf.lfHeight;
 #endif
 
    hfont = CreateFontIndirect(&m_logfont);
+
    if (! hfont) {
-      qErrnoWarning("QWindowsFontEngine(): CreateFontIndirect failed for family '%s'", csPrintable(name));
+      qErrnoWarning("QWindowsFontEngine() CreateFontIndirect failed for family %s", csPrintable(name));
       hfont = QWindowsFontDatabase::systemFont();
    }
 
    HDC hdc = m_fontEngineData->hdc;
    SelectObject(hdc, hfont);
    const BOOL res = GetTextMetrics(hdc, &tm);
+
    if (! res) {
-      qErrnoWarning("QWindowsFontEngine(): GetTextMetrics failed");
+      qErrnoWarning("QWindowsFontEngine() GetTextMetrics failed");
       ZeroMemory(&tm, sizeof(TEXTMETRIC));
    }
 
-   fontDef.pixelSize = -lf.lfHeight;
-   fontDef.fixedPitch = !(tm.tmPitchAndFamily & TMPF_FIXED_PITCH);
+   m_fontDef.pixelSize = -lf.lfHeight;
+   m_fontDef.fixedPitch = !(tm.tmPitchAndFamily & TMPF_FIXED_PITCH);
 
    cache_cost = tm.tmHeight * tm.tmAveCharWidth * 2000;
    getCMap();
@@ -292,7 +293,7 @@ QWindowsFontEngine::~QWindowsFontEngine()
    SelectObject(m_fontEngineData->hdc, QWindowsFontDatabase::systemFont());
 
    if (! DeleteObject(hfont)) {
-      qErrnoWarning("~QWindowsFontEngine(): Failed to delete font");
+      qErrnoWarning("~QWindowsFontEngine() Failed to delete font");
    }
 
    if (! uniqueFamilyName.isEmpty()) {
@@ -380,8 +381,8 @@ void QWindowsFontEngine::recalcAdvances(QGlyphLayout *glyphs, QFontEngine::Shape
             designAdvances = reinterpret_cast<QFixed *>(realloc(designAdvances, size_t(newSize) * sizeof(QFixed)));
             Q_CHECK_PTR(designAdvances);
 
-            for (int i = designAdvancesSize; i < newSize; ++i) {
-               designAdvances[i] = -1000000;
+            for (int j = designAdvancesSize; j < newSize; ++j) {
+               designAdvances[j] = -1000000;
             }
             designAdvancesSize = newSize;
          }
@@ -577,7 +578,8 @@ qreal QWindowsFontEngine::maxCharWidth() const
    return tm.tmMaxCharWidth;
 }
 
-enum { max_font_count = 256 };
+static constexpr const int max_font_count = 256;
+
 static const ushort char_table[] = {
    40,
    67,
@@ -832,7 +834,7 @@ static bool addGlyphToPath(glyph_t glyph, const QFixedPoint &position, HDC hdc,
             }
 
             default:
-               qWarning("QFontEngineWin::addOutlineToPath, unhandled switch case");
+               qWarning("QFontEngineWin::addOutlineToPath() Unhandled switch case");
          }
          offset += sizeof(TTPOLYCURVE) + (curve->cpfx - 1) * sizeof(POINTFX);
       }
@@ -863,7 +865,7 @@ void QWindowsFontEngine::addGlyphsToPath(glyph_t *glyphs, QFixedPoint *positions
 
    for (int i = 0; i < nglyphs; ++i) {
       if (!addGlyphToPath(glyphs[i], positions[i], hdc, path, ttf, nullptr,
-            qreal(fontDef.pixelSize) / unitsPerEm)) {
+            qreal(m_fontDef.pixelSize) / unitsPerEm)) {
 
          // Some windows fonts, like "Modern", are vector stroke
          // fonts, which are reported as TMPF_VECTOR but do not
@@ -912,14 +914,14 @@ int QWindowsFontEngine::synthesized() const
          if (tm.tmItalic && !(macStyle & 2)) {
             synthesized_flags = SynthesizedItalic;
          }
-         if (fontDef.stretch != 100 && ttf) {
+
+         if (m_fontDef.stretch != 100 && ttf) {
             synthesized_flags |= SynthesizedStretch;
          }
+
          if (tm.tmWeight >= 500 && !(macStyle & 1)) {
             synthesized_flags |= SynthesizedBold;
          }
-         //qDebug() << "font is" << _name <<
-         //    "it=" << (macStyle & 2) << fontDef.style << "flags=" << synthesized_flags;
       }
    }
    return synthesized_flags;
@@ -1203,25 +1205,27 @@ QImage QWindowsFontEngine::alphaRGBMapForGlyph(glyph_t glyph, QFixed, const QTra
 
 QFontEngine *QWindowsFontEngine::cloneWithSize(qreal pixelSize) const
 {
-   QFontDef request = fontDef;
+   QFontDef request = m_fontDef;
    QString actualFontName = request.family;
-   if (!uniqueFamilyName.isEmpty()) {
+
+   if (! uniqueFamilyName.isEmpty()) {
       request.family = uniqueFamilyName;
    }
+
    request.pixelSize = pixelSize;
 
-   QFontEngine *fontEngine =
-      QWindowsFontDatabase::createEngine(request,
-         QWindowsContext::instance()->defaultDPI(),
-         m_fontEngineData);
+   QFontEngine *fontEngine = QWindowsFontDatabase::createEngine(request, QWindowsContext::instance()->defaultDPI(), m_fontEngineData);
+
    if (fontEngine) {
-      fontEngine->fontDef.family = actualFontName;
-      if (!uniqueFamilyName.isEmpty()) {
+      fontEngine->m_fontDef.family = actualFontName;
+
+      if (! uniqueFamilyName.isEmpty()) {
          static_cast<QWindowsFontEngine *>(fontEngine)->setUniqueFamilyName(uniqueFamilyName);
          QPlatformFontDatabase *pfdb = QWindowsIntegration::instance()->fontDatabase();
          static_cast<QWindowsFontDatabase *>(pfdb)->refUniqueFont(uniqueFamilyName);
       }
    }
+
    return fontEngine;
 }
 
@@ -1230,22 +1234,23 @@ Qt::HANDLE QWindowsFontEngine::handle() const
    return hfont;
 }
 
-void QWindowsFontEngine::initFontInfo(const QFontDef &request,
-   int dpi)
+void QWindowsFontEngine::initFontInfo(const QFontDef &request, int dpi)
 {
-   fontDef = request; // most settings are equal
+   m_fontDef = request; // most settings are equal
    HDC dc = m_fontEngineData->hdc;
    SelectObject(dc, hfont);
    wchar_t n[64];
 
    GetTextFace(dc, 64, n);
-   fontDef.family = QString::fromStdWString(std::wstring(n));
-   fontDef.fixedPitch = !(tm.tmPitchAndFamily & TMPF_FIXED_PITCH);
+   m_fontDef.family = QString::fromStdWString(std::wstring(n));
+   m_fontDef.fixedPitch = !(tm.tmPitchAndFamily & TMPF_FIXED_PITCH);
 
-   if (fontDef.pointSize < 0) {
-      fontDef.pointSize = fontDef.pixelSize * 72. / dpi;
-   } else if (fontDef.pixelSize == -1) {
-      fontDef.pixelSize = qRound(fontDef.pointSize * dpi / 72.);
+   if (m_fontDef.pointSize < 0) {
+      m_fontDef.pointSize = m_fontDef.pixelSize * 72. / dpi;
+
+   } else if (m_fontDef.pixelSize == -1) {
+      m_fontDef.pixelSize = qRound(m_fontDef.pointSize * dpi / 72.);
+
    }
 }
 
@@ -1274,15 +1279,15 @@ QFontEngine *QWindowsMultiFontEngine::loadEngine(int at)
 
    lf.lfFaceName[faceNameLength] = 0;
 
-   QFontEngine *fe    = new QWindowsFontEngine(fam, lf, data);
-   fe->fontDef.weight = fontEngine->fontDef.weight;
+   QFontEngine *fe      = new QWindowsFontEngine(fam, lf, data);
+   fe->m_fontDef.weight = fontEngine->m_fontDef.weight;
 
-   if (fontEngine->fontDef.style > QFont::StyleNormal) {
-      fe->fontDef.style = fontEngine->fontDef.style;
+   if (fontEngine->m_fontDef.style > QFont::StyleNormal) {
+      fe->m_fontDef.style = fontEngine->m_fontDef.style;
    }
 
-   fe->fontDef.family = fam;
-   fe->fontDef.hintingPreference = fontEngine->fontDef.hintingPreference;
+   fe->m_fontDef.family = fam;
+   fe->m_fontDef.hintingPreference = fontEngine->m_fontDef.hintingPreference;
 
    return fe;
 }

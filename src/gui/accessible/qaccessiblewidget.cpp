@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,15 +27,15 @@
 
 #include <qaction.h>
 #include <qapplication.h>
+#include <qfocusframe.h>
 #include <qgroupbox.h>
 #include <qlabel.h>
+#include <qmath.h>
+#include <qmenu.h>
+#include <qrubberband.h>
 #include <qtooltip.h>
 #include <qwhatsthis.h>
 #include <qwidget.h>
-#include <qmath.h>
-#include <qrubberband.h>
-#include <qfocusframe.h>
-#include <qmenu.h>
 
 #include <qwidget_p.h>
 
@@ -49,11 +49,11 @@ static QList<QWidget *> childWidgets(const QWidget *widget)
 
       if (tmpWidget && ! tmpWidget->isWindow() && ! qobject_cast<QFocusFrame *>(tmpWidget)
 
-#if !defined(QT_NO_MENU)
-         && ! qobject_cast<QMenu *>(tmpWidget)
+#if ! defined(QT_NO_MENU)
+            && ! qobject_cast<QMenu *>(tmpWidget)
 #endif
 
-         && tmpWidget->objectName() != "qt_rubberband" && tmpWidget->objectName() != "qt_spinbox_lineedit") {
+            && tmpWidget->objectName() != "qt_rubberband" && tmpWidget->objectName() != "qt_spinbox_lineedit") {
 
          widgets.append(tmpWidget);
       }
@@ -69,7 +69,8 @@ static QString buddyString(const QWidget *widget)
    }
 
    QWidget *parent = widget->parentWidget();
-   if (!parent) {
+
+   if (! parent) {
       return QString();
    }
 
@@ -94,9 +95,8 @@ static QString buddyString(const QWidget *widget)
    return QString();
 }
 
-/* This function will return the offset of the '&' in the text that would be
-   preceding the accelerator character.
-   If this text does not have an accelerator, -1 will be returned. */
+// returns the offset of the '&' in the text that would be preceding the accelerator character
+// if the text does not have an accelerator, -1 will be returned.
 static int qt_accAmpIndex(const QString &text)
 {
 #ifndef QT_NO_SHORTCUT
@@ -129,11 +129,12 @@ QString qt_accStripAmp(const QString &text)
 {
    QString newText(text);
    int ampIndex = qt_accAmpIndex(newText);
+
    if (ampIndex != -1) {
       newText.remove(ampIndex, 1);
    }
 
-   return newText.replace(QLatin1String("&&"), QLatin1String("&"));
+   return newText.replace(QString("&&"), QString("&"));
 }
 
 QString qt_accHotKey(const QString &text)
@@ -172,7 +173,7 @@ QAccessibleWidget::QAccessibleWidget(QWidget *w, QAccessible::Role role, const Q
 
 bool QAccessibleWidget::isValid() const
 {
-   if (! object() || static_cast<QWidget *>(object())->d_func()->data.in_destructor) {
+   if (! object() || static_cast<QWidget *>(object())->d_func()->m_privateData.in_destructor) {
       return false;
    }
    return QAccessibleObject::isValid();
@@ -246,7 +247,7 @@ void QAccessibleWidget::addControllingSignal(const QString &signal)
    int index = object()->metaObject()->indexOfSignal(signalName);
 
    if (index < 0) {
-      qWarning("QAccessibleWidget::addControllingSignal(): Signal %s unknown in %s", csPrintable(signalName),
+      qWarning("QAccessibleWidget::addControllingSignal() Signal %s unknown in %s", csPrintable(signalName),
                   csPrintable(object()->metaObject()->className()));
 
    } else {
@@ -349,10 +350,10 @@ QAccessibleInterface *QAccessibleWidget::parent() const
    return QAccessible::queryAccessibleInterface(parentObject());
 }
 
-/*! \reimp */
 QAccessibleInterface *QAccessibleWidget::child(int index) const
 {
    Q_ASSERT(widget());
+
    QWidgetList childList = childWidgets(widget());
    if (index >= 0 && index < childList.size()) {
       return QAccessible::queryAccessibleInterface(childList.at(index));
@@ -360,7 +361,6 @@ QAccessibleInterface *QAccessibleWidget::child(int index) const
    return nullptr;
 }
 
-/*! \reimp */
 QAccessibleInterface *QAccessibleWidget::focusChild() const
 {
    if (widget()->hasFocus()) {
@@ -430,6 +430,7 @@ QString QAccessibleWidget::text(QAccessible::Text t) const
          }
 #endif
          break;
+
       case QAccessible::Help:
 #ifndef QT_NO_WHATSTHIS
          str = widget()->whatsThis();
@@ -446,12 +447,14 @@ QString QAccessibleWidget::text(QAccessible::Text t) const
       default:
          break;
    }
+
    return str;
 }
 
 QStringList QAccessibleWidget::actionNames() const
 {
    QStringList names;
+
    if (widget()->isEnabled()) {
       if (widget()->focusPolicy() != Qt::NoFocus) {
          names << setFocusAction();
@@ -471,10 +474,12 @@ void QAccessibleWidget::doAction(const QString &actionName)
       if (widget()->isWindow()) {
          widget()->activateWindow();
       }
+
       widget()->setFocus();
    }
 }
-QStringList QAccessibleWidget::keyBindingsForAction(const QString & /* actionName */) const
+
+QStringList QAccessibleWidget::keyBindingsForAction(const QString &) const
 {
    return QStringList();
 }
@@ -493,22 +498,28 @@ QAccessible::State QAccessibleWidget::state() const
    if (w->testAttribute(Qt::WA_WState_Visible) == false) {
       state.invisible = true;
    }
+
    if (w->focusPolicy() != Qt::NoFocus) {
       state.focusable = true;
    }
+
    if (w->hasFocus()) {
       state.focused = true;
    }
-   if (!w->isEnabled()) {
+
+   if (! w->isEnabled()) {
       state.disabled = true;
    }
+
    if (w->isWindow()) {
       if (w->windowFlags() & Qt::WindowSystemMenuHint) {
          state.movable = true;
       }
+
       if (w->minimumSize() != w->maximumSize()) {
          state.sizeable = true;
       }
+
       if (w->isActiveWindow()) {
          state.active = true;
       }
@@ -521,11 +532,13 @@ QColor QAccessibleWidget::foregroundColor() const
 {
    return widget()->palette().color(widget()->foregroundRole());
 }
+
 QColor QAccessibleWidget::backgroundColor() const
 {
 
    return widget()->palette().color(widget()->backgroundRole());
 }
+
 void *QAccessibleWidget::interface_cast(QAccessible::InterfaceType t)
 {
 

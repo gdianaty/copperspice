@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,11 +24,15 @@
 #ifndef QGSTREAMERVIDEORENDERER_H
 #define QGSTREAMERVIDEORENDERER_H
 
-#include <qvideorenderercontrol.h>
-#include <qvideosurfacegstsink_p.h>
 #include <qabstractvideosurface.h>
+#include <qvideorenderercontrol.h>
 
 #include <qgstreamervideorendererinterface_p.h>
+#include <qgstvideorenderersink_p.h>
+
+#include <gst/gst.h>
+
+using QVideoSurfaceGstSink = QGstVideoRendererSink;
 
 class QGstreamerVideoRenderer : public QVideoRendererControl, public QGstreamerVideoRendererInterface
 {
@@ -56,11 +60,11 @@ class QGstreamerVideoRenderer : public QVideoRendererControl, public QGstreamerV
    CS_SIGNAL_2(readyChanged, isReady)
 
  private:
-   CS_SLOT_1(Private, void handleFormatChange())
-   CS_SLOT_2(handleFormatChange)
-
    QVideoSurfaceGstSink *m_videoSink;
    QPointer<QAbstractVideoSurface> m_surface;
+
+   CS_SLOT_1(Private, void handleFormatChange())
+   CS_SLOT_2(handleFormatChange)
 };
 
 #endif

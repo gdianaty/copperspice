@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,22 +26,17 @@
 
 #include <qitem_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class Boolean : public AtomicValue
 {
  public:
    typedef AtomicValue::Ptr Ptr;
 
-   /**
-    * @returns the boolean value this Boolean represents
-    */
    static bool evaluateEBV(const Item::Iterator::Ptr &e,
                            const QExplicitlySharedDataPointer<DynamicContext> &);
 
-   static bool evaluateEBV(const Item &first,
-                           const Item::Iterator::Ptr &e,
+   static bool evaluateEBV(const Item &first, const Item::Iterator::Ptr &e,
                            const QExplicitlySharedDataPointer<DynamicContext> &);
 
    static bool evaluateEBV(const Item &item,
@@ -49,22 +44,9 @@ class Boolean : public AtomicValue
 
    QString stringValue() const override;
 
-   /**
-    * @returns a Boolean object instantiating @p value. Use True() or False()
-    * if you already know what value you need.
-    */
    static Boolean::Ptr fromValue(const bool value);
-
-   /**
-    * Creates a boolean value from a lexical representation. "true" and "1"
-    * becomes @c true, while "false" and "0" becomes @c false.
-    */
    static AtomicValue::Ptr fromLexical(const QString &val);
 
-   /**
-    * Get the Effective %Boolean Value of this boolean value. For <tt>xs:boolean</tt>, this
-    * is simply the value.
-    */
    bool evaluateEBV(const QExplicitlySharedDataPointer<DynamicContext> &) const override;
 
    ItemType::Ptr type() const override;
@@ -80,8 +62,7 @@ class Boolean : public AtomicValue
  private:
    const bool m_value;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

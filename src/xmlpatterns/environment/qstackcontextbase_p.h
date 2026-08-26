@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,23 +24,19 @@
 #ifndef QStackContextBase_P_H
 #define QStackContextBase_P_H
 
-#include <QVector>
+#include <qvector.h>
+
 #include <qdaytimeduration_p.h>
 #include <qdelegatingdynamiccontext_p.h>
 #include <qexpression_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 template<typename TSuperClass>
 class StackContextBase : public TSuperClass
 {
  public:
    StackContextBase();
-   /**
-    * Construct a StackContextBase and passes @p prevContext to its super class. This
-    * constructor is typically used when the super class is DelegatingDynamicContext.
-    */
    StackContextBase(const DynamicContext::Ptr &prevContext);
 
    void setRangeVariable(const VariableSlotID slotNumber, const Item &newValue) override;
@@ -57,10 +53,6 @@ class StackContextBase : public TSuperClass
    DynamicContext::TemplateParameterHash &templateParameterStore() override;
 
  protected:
-   /**
-    * This function is protected, although it only is used in this class. I don't
-    * know why it has to be, but it won't compile when private.
-    */
    template<typename VectorType, typename UnitType>
    inline void setSlotVariable(const VariableSlotID slot, const UnitType &newValue, VectorType &container) const;
 
@@ -75,14 +67,7 @@ class StackContextBase : public TSuperClass
 
 #include "qstackcontextbase.cpp"
 
-/**
- * @short A DynamicContext that creates a new scope for variables.
- *
- * This DynamicContext is used for recursive user function calls, for example.
- */
 typedef StackContextBase<DelegatingDynamicContext> StackContext;
 }
-
-QT_END_NAMESPACE
 
 #endif

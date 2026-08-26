@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,8 +26,6 @@
 
 #include <qabstractbutton_p.h>
 
-
-
 class QDialog;
 class QPushButton;
 
@@ -40,9 +38,10 @@ class QPushButtonPrivate : public QAbstractButtonPrivate
 
    QPushButtonPrivate()
       : QAbstractButtonPrivate(QSizePolicy::PushButton), autoDefault(Auto),
-        defaultButton(false), flat(false), menuOpen(false), lastAutoDefault(false) {}
+        defaultButton(false), flat(false), menuOpen(false), lastAutoDefault(false)
+   { }
 
-   inline void init() {
+   void init() {
       resetLayoutItemMargins();
    }
 

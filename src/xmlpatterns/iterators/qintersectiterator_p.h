@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,13 +26,12 @@
 
 #include <qitem_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class IntersectIterator : public Item::Iterator
 {
  public:
-   IntersectIterator(const Item::Iterator::Ptr &it1,                           const Item::Iterator::Ptr &it2);
+   IntersectIterator(const Item::Iterator::Ptr &it1, const Item::Iterator::Ptr &it2);
 
    Item next() override;
    Item current() const override;
@@ -40,7 +39,7 @@ class IntersectIterator : public Item::Iterator
    Item::Iterator::Ptr copy() const override;
 
  private:
-   inline Item closedExit() {
+   Item closedExit() {
       m_position = -1;
       m_current = Item();
       return Item();
@@ -53,9 +52,7 @@ class IntersectIterator : public Item::Iterator
    Item m_node1;
    Item m_node2;
 };
+
 }
-
-QT_END_NAMESPACE
-
 
 #endif

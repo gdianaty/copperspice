@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,15 @@
 #ifndef QTABWIDGET_H
 #define QTABWIDGET_H
 
-#include <qwidget.h>
 #include <qicon.h>
+#include <qwidget.h>
 
 #ifndef QT_NO_TABWIDGET
 
 class QTabBar;
-class QTabWidgetPrivate;
 class QStyleOptionTabWidgetFrame;
+
+class QTabWidgetPrivate;
 
 class Q_GUI_EXPORT QTabWidget : public QWidget
 {

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,15 +21,15 @@
 *
 ***********************************************************************/
 
-#include <cstdlib>
-#include <cstdio>
-
 #include <qlog.h>
 #include <qstring8.h>
 
 #if defined(Q_OS_WIN)
 #include <qt_windows.h>
 #endif
+
+#include <cstdio>
+#include <cstdlib>
 
 #if defined(Q_OS_WIN)
 extern bool usingWinMain;
@@ -39,19 +39,20 @@ extern Q_CORE_EXPORT void qWinMsgHandler(QtMsgType type, QStringView str);
 static QtMsgHandler s_handler = nullptr;          // pointer to debug handler
 
 #if ! defined(Q_OS_WIN) && defined(_POSIX_THREAD_SAFE_FUNCTIONS) && _POSIX_VERSION >= 200112L
+
 namespace {
-   static inline QString fromstrerror_helper(int, const QByteArray &buf)
-   {
-      return QString::fromUtf8(buf);
-   }
-
-   static inline QString fromstrerror_helper(const char *str, const QByteArray &)
-   {
-      return QString::fromUtf8(str);
-   }
+[[maybe_unused]] static inline QString fromstrerror_helper(int, const QByteArray &buf)
+{
+   return QString::fromUtf8(buf);
 }
-#endif
 
+[[maybe_unused]] static inline QString fromstrerror_helper(const char *str, const QByteArray &)
+{
+   return QString::fromUtf8(str);
+}
+
+}   // namespace
+#endif
 
 QString qt_error_string(int errorCode)
 {
@@ -141,7 +142,6 @@ QtMsgHandler csInstallMsgHandler(QtMsgHandler handler)
    return previous;
 }
 
-// internal
 void qt_message_output(QtMsgType msgType, QStringView msg)
 {
    if (s_handler != nullptr) {
@@ -166,7 +166,6 @@ void qt_message_output(QtMsgType msgType, QStringView msg)
 
 }
 
-// internal
 static void qEmergencyOut(QtMsgType msgType, const char *msg, va_list ap)
 {
    char emergency_buf[256] = { '\0' };
@@ -180,7 +179,6 @@ static void qEmergencyOut(QtMsgType msgType, const char *msg, va_list ap)
    qt_message_output(msgType, str);
 }
 
-// internal
 static void qt_message(QtMsgType msgType, const char *msg, va_list ap)
 {
    if (std::uncaught_exceptions() != 0) {

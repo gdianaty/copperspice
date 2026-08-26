@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,29 +22,29 @@
 ***********************************************************************/
 
 #include <qimage.h>
+#include <qimage_p.h>
 
-#include <qdatastream.h>
 #include <qbuffer.h>
+#include <qdatastream.h>
 #include <qhash.h>
-#include <qmap.h>
-#include <qmatrix.h>
-#include <qtransform.h>
 #include <qimagereader.h>
 #include <qimagewriter.h>
-#include <qstringlist.h>
-#include <qvariant.h>
+#include <qmap.h>
+#include <qmatrix.h>
 #include <qplatform_integration.h>
 #include <qplatform_pixmap.h>
+#include <qstringlist.h>
+#include <qtransform.h>
+#include <qvariant.h>
 
 #include <qimagepixmapcleanuphooks_p.h>
 #include <qapplication_p.h>
 #include <qdrawhelper_p.h>
-#include <qmemrotate_p.h>
-#include <qimagescale_p.h>
-#include <qsimd_p.h>
-#include <qpaintengine_raster_p.h>
-#include <qimage_p.h>
 #include <qfont_p.h>
+#include <qimagescale_p.h>
+#include <qmemrotate_p.h>
+#include <qpaintengine_raster_p.h>
+#include <qsimd_p.h>
 
 #include <ctype.h>
 #include <stdlib.h>
@@ -62,7 +62,7 @@ static inline bool isLocked(QImageData *data)
 
 #define QIMAGE_SANITYCHECK_MEMORY(image) \
     if ((image).isNull()) { \
-        qWarning("QImage: out of memory, returning null image"); \
+        qWarning("QImage: Out of memory, returning empty image"); \
         return QImage(); \
     }
 
@@ -389,7 +389,7 @@ QImage::QImage(const char *const xpm[])
    }
 
    if (! qt_read_xpm_image_or_array(nullptr, xpm, *this)) {
-      qWarning("QImage::QImage(), XPM is not supported");
+      qWarning("QImage::QImage() XPM format is not supported");
    }
 }
 #endif
@@ -437,7 +437,6 @@ QImage &QImage::operator=(const QImage &image)
    return *this;
 }
 
-// internal
 int QImage::devType() const
 {
    return QInternal::Image;
@@ -448,7 +447,6 @@ QImage::operator QVariant() const
    return QVariant(QVariant::Image, this);
 }
 
-// internal
 void QImage::detach()
 {
    if (d) {
@@ -715,7 +713,7 @@ void QImage::setColor(int i, QRgb c)
    }
 
    if (i < 0 || d->depth > 8 || i >= 1 << d->depth) {
-      qWarning("QImage::setColor: Index out of bound %d", i);
+      qWarning("QImage::setColor() Index out of bound %d", i);
       return;
    }
    detach();
@@ -1031,7 +1029,7 @@ void QImage::invertPixels(InvertMode mode)
 void QImage::setColorCount(int colorCount)
 {
    if (!d) {
-      qWarning("QImage::setColorCount: null image");
+      qWarning("QImage::setColorCount() Image is empty");
       return;
    }
 
@@ -1147,7 +1145,7 @@ static QImage convertWithPalette(const QImage &src, QImage::Format format,
    QStringList textKeyList = textsKeys.split('\n', QStringParser::SkipEmptyParts);
 
    for (const QString &textKey : textKeyList) {
-      QStringList textKeySplitted = textKey.split(QLatin1String(": "));
+      QStringList textKeySplitted = textKey.split(": ");
       dest.setText(textKeySplitted[0], textKeySplitted[1]);
    }
 
@@ -1229,7 +1227,7 @@ bool QImage::valid(int x, int y) const
 int QImage::pixelIndex(int x, int y) const
 {
    if (!d || x < 0 || x >= d->width || y < 0 || y >= height()) {
-      qWarning("QImage::pixelIndex: coordinate (%d,%d) out of range", x, y);
+      qWarning("QImage::pixelIndex() Coordinate (%d,%d) is out of range", x, y);
       return -12345;
    }
 
@@ -1243,7 +1241,7 @@ int QImage::pixelIndex(int x, int y) const
       case Format_Indexed8:
          return (int)s[x];
       default:
-         qWarning("QImage::pixelIndex: Not applicable for %d-bpp images (no palette)", d->depth);
+         qWarning("QImage::pixelIndex() No palette for %d bits per pixel images", d->depth);
    }
    return 0;
 }
@@ -1251,7 +1249,7 @@ int QImage::pixelIndex(int x, int y) const
 QRgb QImage::pixel(int x, int y) const
 {
    if (! d || x < 0 || x >= d->width || y < 0 || y >= d->height) {
-      qWarning("QImage::pixel: coordinate (%d,%d) out of range", x, y);
+      qWarning("QImage::pixel() Coordinate (%d,%d) is out of range", x, y);
       return 12345;
    }
 
@@ -1277,7 +1275,7 @@ QRgb QImage::pixel(int x, int y) const
 
    if (index >= 0) {    // Indexed format
       if (index >= d->colortable.size()) {
-         qWarning("QImage::pixel: color table index %d out of range.", index);
+         qWarning("QImage::pixel() Color table index %d is out of range.", index);
          return 0;
       }
       return d->colortable.at(index);
@@ -1315,9 +1313,10 @@ QRgb QImage::pixel(int x, int y) const
 void QImage::setPixel(int x, int y, uint index_or_rgb)
 {
    if (!d || x < 0 || x >= width() || y < 0 || y >= height()) {
-      qWarning("QImage::setPixel: coordinate (%d,%d) out of range", x, y);
+      qWarning("QImage::setPixel() Coordinate (%d,%d) is out of range", x, y);
       return;
    }
+
    // detach is called from within scanLine
    uchar *s = scanLine(y);
 
@@ -1325,7 +1324,8 @@ void QImage::setPixel(int x, int y, uint index_or_rgb)
       case Format_Mono:
       case Format_MonoLSB:
          if (index_or_rgb > 1) {
-            qWarning("QImage::setPixel: Index %d out of range", index_or_rgb);
+            qWarning("QImage::setPixel() Index %d is out of range", index_or_rgb);
+
          } else if (format() == Format_MonoLSB) {
             if (index_or_rgb == 0) {
                *(s + (x >> 3)) &= ~(1 << (x & 7));
@@ -1343,11 +1343,12 @@ void QImage::setPixel(int x, int y, uint index_or_rgb)
 
       case Format_Indexed8:
          if (index_or_rgb >= (uint)d->colortable.size()) {
-            qWarning("QImage::setPixel: Index %d out of range", index_or_rgb);
+            qWarning("QImage::setPixel() Index %d is out of range", index_or_rgb);
             return;
          }
          s[x] = index_or_rgb;
          return;
+
       case Format_RGB32:
          //make sure alpha is 255, we depend on it in qdrawhelper for cases
          // when image is set as a texture pattern on a qbrush
@@ -1398,7 +1399,7 @@ void QImage::setPixel(int x, int y, uint index_or_rgb)
 QColor QImage::pixelColor(int x, int y) const
 {
    if (!d || x < 0 || x >= d->width || y < 0 || y >= height()) {
-      qWarning("QImage::pixelColor: coordinate (%d,%d) out of range", x, y);
+      qWarning("QImage::pixelColor() Coordinate (%d,%d) is out of range", x, y);
       return QColor();
    }
 
@@ -1426,36 +1427,44 @@ QColor QImage::pixelColor(int x, int y) const
 void QImage::setPixelColor(int x, int y, const QColor &color)
 {
    if (!d || x < 0 || x >= width() || y < 0 || y >= height() || !color.isValid()) {
-      qWarning("QImage::setPixelColor: coordinate (%d,%d) out of range", x, y);
+      qWarning("QImage::setPixelColor() Coordinate (%d,%d) is out of range", x, y);
       return;
    }
+
    // QColor is always unpremultiplied
    QRgba64 c = color.rgba64();
-   if (!hasAlphaChannel()) {
+
+   if (! hasAlphaChannel()) {
       c.setAlpha(65535);
    } else if (qPixelLayouts[d->format].premultiplied) {
       c = c.premultiplied();
    }
+
    // detach is called from within scanLine
    uchar *s = scanLine(y);
    switch (d->format) {
       case Format_Mono:
       case Format_MonoLSB:
       case Format_Indexed8:
-         qWarning("QImage::setPixelColor: called on monochrome or indexed format");
+         qWarning("QImage::setPixelColor() Unable to set the color for a monochrome or indexed format");
          return;
+
       case Format_BGR30:
          ((uint *)s)[x] = qConvertRgb64ToRgb30<PixelOrderBGR>(c) | 0xc0000000;
          return;
+
       case Format_A2BGR30_Premultiplied:
          ((uint *)s)[x] = qConvertRgb64ToRgb30<PixelOrderBGR>(c);
          return;
+
       case Format_RGB30:
          ((uint *)s)[x] = qConvertRgb64ToRgb30<PixelOrderRGB>(c) | 0xc0000000;
          return;
+
       case Format_A2RGB30_Premultiplied:
          ((uint *)s)[x] = qConvertRgb64ToRgb30<PixelOrderRGB>(c);
          return;
+
       default:
          setPixel(x, y, c.toArgb32());
          return;
@@ -1464,7 +1473,7 @@ void QImage::setPixelColor(int x, int y, const QColor &color)
 
 bool QImage::allGray() const
 {
-   if (!d) {
+   if (! d) {
       return true;
    }
 
@@ -1551,6 +1560,7 @@ bool QImage::isGrayscale() const
    if (d->format == QImage::Format_Grayscale8) {
       return true;
    }
+
    switch (depth()) {
       case 32:
       case 24:
@@ -1573,9 +1583,10 @@ bool QImage::isGrayscale() const
 QImage QImage::scaled(const QSize &s, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode) const
 {
    if (!d) {
-      qWarning("QImage::scaled: Image is a null image");
+      qWarning("QImage::scaled() Image is empty");
       return QImage();
    }
+
    if (s.isEmpty()) {
       return QImage();
    }
@@ -1590,15 +1601,17 @@ QImage QImage::scaled(const QSize &s, Qt::AspectRatioMode aspectMode, Qt::Transf
 
    QTransform wm = QTransform::fromScale((qreal)newSize.width() / width(), (qreal)newSize.height() / height());
    QImage img = transformed(wm, mode);
+
    return img;
 }
 
 QImage QImage::scaledToWidth(int w, Qt::TransformationMode mode) const
 {
    if (!d) {
-      qWarning("QImage::scaleWidth: Image is a null image");
+      qWarning("QImage::scaleWidth() Image is empty");
       return QImage();
    }
+
    if (w <= 0) {
       return QImage();
    }
@@ -1611,9 +1624,10 @@ QImage QImage::scaledToWidth(int w, Qt::TransformationMode mode) const
 QImage QImage::scaledToHeight(int h, Qt::TransformationMode mode) const
 {
    if (!d) {
-      qWarning("QImage::scaleHeight: Image is a null image");
+      qWarning("QImage::scaleHeight() Image is empty");
       return QImage();
    }
+
    if (h <= 0) {
       return QImage();
    }
@@ -2211,11 +2225,10 @@ bool QImage::save(QIODevice *device, const QString &format, int quality) const
    return d->doImageIO(this, &writer, quality);
 }
 
-// internal
 bool QImageData::doImageIO(const QImage *image, QImageWriter *writer, int quality) const
 {
    if (quality > 100  || quality < -1) {
-      qWarning("QPixmap::save: Quality out of range [-1, 100]");
+      qWarning("QPixmap::save() Quality setting is out of range [-1, 100]");
    }
 
    if (quality >= 0) {
@@ -2230,9 +2243,10 @@ QDataStream &operator<<(QDataStream &s, const QImage &image)
    if (image.isNull()) {
       s << (qint32) 0; // null image marker
       return s;
+
    } else {
       s << (qint32) 1;
-      // continue ...
+      // continue
    }
 
    QImageWriter writer(s.device(), "png");
@@ -2379,22 +2393,25 @@ QStringList QImage::textKeys() const
 
 QString QImage::text(const QString &key) const
 {
-   if (!d) {
+   if (! d) {
       return QString();
    }
 
-   if (!key.isEmpty()) {
+   if (! key.isEmpty()) {
       return d->text.value(key);
    }
 
-   QString tmp;
-   for (const QString &key : d->text.keys()) {
-      if (! tmp.isEmpty()) {
-         tmp += QLatin1String("\n\n");
+   QString retval;
+
+   for (const QString &item : d->text.keys()) {
+      if (! retval.isEmpty()) {
+         retval += "\n\n";
       }
-      tmp += key + QLatin1String(": ") + d->text.value(key).simplified();
+
+      retval += item + ": " + d->text.value(item).simplified();
    }
-   return tmp;
+
+   return retval;
 }
 
 void QImage::setText(const QString &key, const QString &value)
@@ -2409,7 +2426,6 @@ void QImage::setText(const QString &key, const QString &value)
    }
 }
 
-// internal
 QPaintEngine *QImage::paintEngine() const
 {
    if (!d) {
@@ -2430,7 +2446,6 @@ QPaintEngine *QImage::paintEngine() const
    return d->paintEngine;
 }
 
-// internal
 int QImage::metric(PaintDeviceMetric metric) const
 {
    if (! d) {
@@ -2462,10 +2477,8 @@ int QImage::metric(PaintDeviceMetric metric) const
       case PdmDpiY:
          return qRound(d->dpmy * 0.0254);
 
-
       case PdmPhysicalDpiX:
          return qRound(d->dpmx * 0.0254);
-
 
       case PdmPhysicalDpiY:
          return qRound(d->dpmy * 0.0254);
@@ -2478,42 +2491,41 @@ int QImage::metric(PaintDeviceMetric metric) const
 
 
       default:
-         qWarning("QImage::metric(): Unhandled metric type %d", metric);
+         qWarning("QImage::metric() Unhandled metric type %d", metric);
          break;
    }
    return 0;
 }
 
 #undef IWX_MSB
-#define IWX_MSB(b)        if (trigx < maxws && trigy < maxhs) {                              \
-                            if (*(sptr+sbpl*(trigy>>12)+(trigx>>15)) &                      \
-                                 (1 << (7-((trigx>>12)&7))))                              \
-                                *dptr |= b;                                              \
+#define IWX_MSB(b)        if (trigx < maxws && trigy < maxhs) {                        \
+                            if (*(sptr+sbpl*(trigy>>12)+(trigx>>15)) &                 \
+                                 (1 << (7-((trigx>>12)&7))))                           \
+                                *dptr |= b;                                            \
                         }                                                              \
-                        trigx += m11;                                                      \
+                        trigx += m11;                                                  \
                         trigy += m12;
 // END OF MACRO
 #undef IWX_LSB
-#define IWX_LSB(b)        if (trigx < maxws && trigy < maxhs) {                              \
-                            if (*(sptr+sbpl*(trigy>>12)+(trigx>>15)) &                      \
-                                 (1 << ((trigx>>12)&7)))                              \
-                                *dptr |= b;                                              \
+#define IWX_LSB(b)        if (trigx < maxws && trigy < maxhs) {                        \
+                            if (*(sptr+sbpl*(trigy>>12)+(trigx>>15)) &                 \
+                                 (1 << ((trigx>>12)&7)))                               \
+                                *dptr |= b;                                            \
                         }                                                              \
-                        trigx += m11;                                                      \
+                        trigx += m11;                                                  \
                         trigy += m12;
 // END OF MACRO
 #undef IWX_PIX
-#define IWX_PIX(b)        if (trigx < maxws && trigy < maxhs) {                              \
-                            if ((*(sptr+sbpl*(trigy>>12)+(trigx>>15)) &              \
-                                 (1 << (7-((trigx>>12)&7)))) == 0)                      \
-                                *dptr &= ~b;                                              \
+#define IWX_PIX(b)        if (trigx < maxws && trigy < maxhs) {                        \
+                            if ((*(sptr+sbpl*(trigy>>12)+(trigx>>15)) &                \
+                                 (1 << (7-((trigx>>12)&7)))) == 0)                     \
+                                *dptr &= ~b;                                           \
                         }                                                              \
-                        trigx += m11;                                                      \
+                        trigx += m11;                                                  \
                         trigy += m12;
 // END OF MACRO
 bool qt_xForm_helper(const QTransform &trueMat, int xoffset, int type, int depth,
-   uchar *dptr, int dbpl, int p_inc, int dHeight,
-   const uchar *sptr, int sbpl, int sWidth, int sHeight)
+      uchar *dptr, int dbpl, int p_inc, int dHeight, const uchar *sptr, int sbpl, int sWidth, int sHeight)
 {
    int m11 = int(trueMat.m11() * 4096.0);
    int m12 = int(trueMat.m12() * 4096.0);
@@ -2636,7 +2648,6 @@ qint64 QImage::cacheKey() const
    }
 }
 
-// internal
 bool QImage::isDetached() const
 {
    return d && d->ref.load() == 1;
@@ -2653,14 +2664,12 @@ void QImage::setAlphaChannel(const QImage &alphaChannel)
    int h = d->height;
 
    if (w != alphaChannel.d->width || h != alphaChannel.d->height) {
-      qWarning("QImage::setAlphaChannel: "
-         "Alpha channel must have same dimensions as the target image");
+      qWarning("QImage::setAlphaChannel() Alpha channel must have the same dimensions as the target image");
       return;
    }
 
    if (d->paintEngine && d->paintEngine->isActive()) {
-      qWarning("QImage::setAlphaChannel: "
-         "Unable to set alpha channel while image is being painted on");
+      qWarning("QImage::setAlphaChannel() Unable to set alpha channel while the image is being painted");
       return;
    }
 

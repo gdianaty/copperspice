@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,15 +24,14 @@
 #ifndef QSourceLocationReflection_P_H
 #define QSourceLocationReflection_P_H
 
-QT_BEGIN_NAMESPACE
-
 #include <qstringfwd.h>
 
 namespace QPatternist {
+
 class SourceLocationReflection
 {
  public:
-   inline SourceLocationReflection() {
+   SourceLocationReflection() {
    }
 
    virtual ~SourceLocationReflection() {
@@ -40,10 +39,6 @@ class SourceLocationReflection
 
    virtual const SourceLocationReflection *actualReflection() const = 0;
 
-   /**
-    * A description of what represents the source code location, for
-    * human consumption. Must be translated, as appropriate.
-    */
    virtual QString description() const {
       return QString();
    }
@@ -58,7 +53,9 @@ class SourceLocationReflection
 class DelegatingSourceLocationReflection : public SourceLocationReflection
 {
  public:
-   inline DelegatingSourceLocationReflection(const SourceLocationReflection *const r) : m_r(r) {
+   DelegatingSourceLocationReflection(const SourceLocationReflection *const r)
+      : m_r(r)
+   {
       Q_ASSERT(r);
    }
 
@@ -70,7 +67,5 @@ class DelegatingSourceLocationReflection : public SourceLocationReflection
 };
 
 }
-
-QT_END_NAMESPACE
 
 #endif

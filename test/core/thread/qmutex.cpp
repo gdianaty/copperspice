@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -45,7 +45,7 @@ TEST_CASE("QRecursiveMutex traits", "[qrecursivemutex]")
    REQUIRE(std::has_virtual_destructor_v<QRecursiveMutex> == false);
 }
 
-TEST_CASE("QMutex basic", "[qmutex]")
+TEST_CASE("QMutex tryLock", "[qmutex]")
 {
    QMutex m;
 

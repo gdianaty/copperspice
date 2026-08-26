@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,20 +25,19 @@
 
 #ifndef QT_NO_NETWORKPROXY
 
-#include <qnetworkinterface.h>
-
 #include <qmutex.h>
-#include <qstringlist.h>
+#include <qnetworkinterface.h>
 #include <qregularexpression.h>
+#include <qstringlist.h>
+#include <qt_windows.h>
 #include <qurl.h>
 #include <qvarlengtharray.h>
 
 #include <qsystemlibrary_p.h>
 
-#include <string.h>
-#include <qt_windows.h>
-#include <wininet.h>
 #include <lmcons.h>
+#include <string.h>
+#include <wininet.h>
 
 /*
  * Information on the WinHTTP DLL:
@@ -110,8 +109,8 @@ static bool currentProcessIsService()
    typedef BOOL (WINAPI * PtrLookupAccountName)(LPCTSTR lpSystemName, LPCTSTR lpAccountName, PSID Sid,
          LPDWORD cbSid, LPTSTR ReferencedDomainName, LPDWORD cchReferencedDomainName, PSID_NAME_USE peUse);
 
-   static PtrGetUserName ptrGetUserName = (PtrGetUserName)QSystemLibrary::resolve(QLatin1String("Advapi32"), "GetUserNameW");
-   static PtrLookupAccountName ptrLookupAccountName = (PtrLookupAccountName)QSystemLibrary::resolve(QLatin1String("Advapi32"), "LookupAccountNameW");
+   static PtrGetUserName ptrGetUserName = (PtrGetUserName)QSystemLibrary::resolve("Advapi32", "GetUserNameW");
+   static PtrLookupAccountName ptrLookupAccountName = (PtrLookupAccountName)QSystemLibrary::resolve("Advapi32", "LookupAccountNameW");
 
    if (ptrGetUserName && ptrLookupAccountName) {
       wchar_t userName[UNLEN + 1] = L"";
@@ -149,8 +148,9 @@ static QStringList splitSpaceSemicolon(const QString &source)
    int end;
 
    while (true) {
-      int space = source.indexOf(QLatin1Char(' '), start);
-      int semicolon = source.indexOf(QLatin1Char(';'), start);
+      int space     = source.indexOf(QChar(' '), start);
+      int semicolon = source.indexOf(QChar(';'), start);
+
       end = space;
 
       if (semicolon != -1 && (end == -1 || semicolon < end)) {
@@ -169,6 +169,7 @@ static QStringList splitSpaceSemicolon(const QString &source)
       }
       start = end + 1;
    }
+
    return list;
 }
 
@@ -178,7 +179,7 @@ static bool isBypassed(const QString &host, const QStringList &bypassList)
       return false;
    }
 
-   bool isSimple = !host.contains(QLatin1Char('.')) && !host.contains(QLatin1Char(':'));
+   bool isSimple = ! host.contains(QChar('.')) && ! host.contains(QChar(':'));
 
    QHostAddress ipAddress;
    bool isIpAddress = ipAddress.setAddress(host);
@@ -198,7 +199,7 @@ static bool isBypassed(const QString &host, const QStringList &bypassList)
          if (isIpAddress) {
             //exclude all local subnets
             for (const QNetworkInterface &iface : QNetworkInterface::allInterfaces()) {
-               for (const QNetworkAddressEntry netaddr : iface.addressEntries()) {
+               for (const QNetworkAddressEntry &netaddr : iface.addressEntries()) {
                   if (ipAddress.isInSubnet(netaddr.ip(), netaddr.prefixLength())) {
                      return true;
                   }
@@ -301,7 +302,7 @@ static QList<QNetworkProxy> parseServerList(const QNetworkProxyQuery &query, con
       QNetworkProxy::ProxyType proxyType = QNetworkProxy::HttpProxy;
       quint16 port = 8080;
 
-      int pos = entry.indexOf(QLatin1Char('='));
+      int pos = entry.indexOf(QChar('='));
 
       QStringView scheme;
       QStringView protocolTag;
@@ -363,10 +364,11 @@ static QList<QNetworkProxy> parseServerList(const QNetworkProxyQuery &query, con
          result.prepend(taggedProxies.value(requiredTag));
       }
    }
-   if (!checkTags || requiredTag != QLatin1String("http")) {
+
+   if (! checkTags || requiredTag != "http") {
       // if there are different http proxies for http and https, prefer the https one (more likely to be capable of CONNECT)
-      QNetworkProxy httpProxy  = taggedProxies.value(QLatin1String("http"));
-      QNetworkProxy httpsProxy = taggedProxies.value(QLatin1String("http"));
+      QNetworkProxy httpProxy  = taggedProxies.value("http");
+      QNetworkProxy httpsProxy = taggedProxies.value("http");
 
       if (httpProxy != httpsProxy && httpProxy.type() == QNetworkProxy::HttpProxy &&
             httpsProxy.type() == QNetworkProxy::HttpProxy) {
@@ -634,21 +636,21 @@ QList<QNetworkProxy> QNetworkProxyFactory::systemProxyForQuery(const QNetworkPro
       // try to get the proxy config for the URL
       QUrl url = query.url();
 
-      // url could be empty, e.g. from QNetworkProxy::applicationProxy(), that's fine,
-      // we'll still ask for the proxy.
-      // But for a file url, we know we don't need one.
-      if (url.scheme() == QLatin1String("file") || url.scheme() == QLatin1String("qrc")) {
+      // url could be empty, e.g. from QNetworkProxy::applicationProxy()
+      // still ask for the proxy, for a file url, we know we do not need one
+
+      if (url.scheme() == "file" || url.scheme() == "qrc") {
          return sp->defaultResult;
       }
 
       if (query.queryType() != QNetworkProxyQuery::UrlRequest) {
          // change the scheme to https, maybe it'll work
-         url.setScheme(QLatin1String("https"));
+         url.setScheme("https");
       }
 
       QString urlQueryString = url.toString();
       if (urlQueryString.size() > 2083) {
-         qWarning("Proxy query URL too long for windows API, try with truncated URL");
+         qWarning("QNetworkProxyFactory::systemProxyForQuery() Proxy query url too long, try with truncated url");
          urlQueryString = url.toString().left(2083);
       }
 
@@ -657,8 +659,7 @@ QList<QNetworkProxy> QNetworkProxyFactory::systemProxyForQuery(const QNetworkPro
 
       DWORD getProxyError = GetLastError();
 
-      if (!getProxySucceeded
-            && (ERROR_WINHTTP_AUTODETECTION_FAILED == getProxyError)) {
+      if (! getProxySucceeded && (ERROR_WINHTTP_AUTODETECTION_FAILED == getProxyError)) {
          // WPAD failed
          if (sp->autoConfigUrl.isEmpty()) {
             //No config file could be retrieved on the network.
@@ -672,27 +673,25 @@ QList<QNetworkProxy> QNetworkProxyFactory::systemProxyForQuery(const QNetworkPro
             sp->m_proxyString = sp->autoConfigUrl.toStdWString();
             sp->m_autoProxyOptions.lpszAutoConfigUrl = sp->m_proxyString.c_str();
 
-            std::wstring tmp  = urlQueryString.toStdWString();
+            tmp = urlQueryString.toStdWString();
             getProxySucceeded = ptrWinHttpGetProxyForUrl(sp->hHttpSession, tmp.c_str(), &sp->m_autoProxyOptions, &proxyInfo);
 
             getProxyError = GetLastError();
          }
       }
 
-      if (!getProxySucceeded
-            && (ERROR_WINHTTP_LOGIN_FAILURE == getProxyError)) {
+      if (! getProxySucceeded && (ERROR_WINHTTP_LOGIN_FAILURE == getProxyError)) {
          // We first tried without AutoLogon, because this might prevent caching the result.
          // But now we've to enable it (http://msdn.microsoft.com/en-us/library/aa383153%28v=VS.85%29.aspx)
          sp->m_autoProxyOptions.fAutoLogonIfChallenged = TRUE;
 
-         std::wstring tmp  = urlQueryString.toStdWString();
+         tmp = urlQueryString.toStdWString();
          getProxySucceeded = ptrWinHttpGetProxyForUrl(sp->hHttpSession, tmp.c_str(), &sp->m_autoProxyOptions, &proxyInfo);
 
          getProxyError = GetLastError();
       }
 
-      if (!getProxySucceeded
-            && (ERROR_WINHTTP_UNABLE_TO_DOWNLOAD_SCRIPT == getProxyError)) {
+      if (! getProxySucceeded && (ERROR_WINHTTP_UNABLE_TO_DOWNLOAD_SCRIPT == getProxyError)) {
          // PAC file url is not connectable, or server returned error (e.g. http 404)
          //Don't search for it next time again.
          sp->isAutoConfig = false;

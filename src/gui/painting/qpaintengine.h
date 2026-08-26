@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,19 +25,20 @@
 #define QPAINTENGINE_H
 
 #include <qnamespace.h>
-#include <qscopedpointer.h>
 #include <qpainter.h>
+#include <qscopedpointer.h>
 
 class QFontEngine;
 class QLineF;
 class QPaintDevice;
-class QPaintEnginePrivate;
+class QPaintEngineState;
 class QPainterPath;
 class QPointF;
 class QPolygonF;
 class QRectF;
 class QTextItemInt;
-class QPaintEngineState;
+
+class QPaintEnginePrivate;
 
 struct QGlyphLayout;
 
@@ -89,12 +90,9 @@ class Q_GUI_EXPORT QPaintEngine
       ObjectBoundingModeGradients = 0x00010000, // Can do object bounding mode gradients
       RasterOpModes               = 0x00020000, // Can do logical raster operations
       PaintOutsidePaintEvent      = 0x20000000, // Engine is capable of painting outside paint events
-      /*                          0x10000000, // Used for emulating
-                                  QGradient::StretchToDevice,
-                                  defined in qpainter.cpp
 
-                                  0x40000000, // Used internally for emulating opaque backgrounds
-      */
+      //                            0x10000000,   // emulating QGradient::StretchToDevice, defined in qpainter.cpp
+      //                            0x40000000,   // emulating opaque backgrounds
 
       AllFeatures               = 0xffffffff  // For convenience
    };
@@ -159,8 +157,8 @@ class Q_GUI_EXPORT QPaintEngine
       return active;
    }
 
-   void setActive(bool state) {
-      active = state;
+   void setActive(bool newState) {
+      active =  newState;
    }
 
    virtual bool begin(QPaintDevice *pdev) = 0;
@@ -216,14 +214,14 @@ class Q_GUI_EXPORT QPaintEngine
    QPainter *painter() const;
 
    void syncState();
-   inline bool isExtended() const {
+   bool isExtended() const {
       return extended;
    }
 
  protected:
    QPaintEngine(QPaintEnginePrivate &data, PaintEngineFeatures devcaps = PaintEngineFeatures());
 
-   QPaintEngineState *state;
+   QPaintEngineState *m_engineState;
    PaintEngineFeatures gccaps;
 
    uint active : 1;
@@ -308,6 +306,7 @@ inline void QPaintEngine::fix_neg_rect(int *x, int *y, int *w, int *h)
       *w = -*w;
       *x -= *w - 1;
    }
+
    if (*h < 0) {
       *h = -*h;
       *y -= *h - 1;
@@ -316,26 +315,24 @@ inline void QPaintEngine::fix_neg_rect(int *x, int *y, int *w, int *h)
 
 inline bool QPaintEngine::testDirty(DirtyFlags df)
 {
-   Q_ASSERT(state);
-   return ((state->dirtyFlags & df) != 0);
+   Q_ASSERT(m_engineState);
+   return ((m_engineState->dirtyFlags & df) != 0);
 }
 
 inline void QPaintEngine::setDirty(DirtyFlags df)
 {
-   Q_ASSERT(state);
-   state->dirtyFlags |= df;
+   Q_ASSERT(m_engineState);
+   m_engineState->dirtyFlags |= df;
 }
 
 inline void QPaintEngine::clearDirty(DirtyFlags df)
 {
-   Q_ASSERT(state);
-   state->dirtyFlags &= ~static_cast<uint>(df);
+   Q_ASSERT(m_engineState);
+   m_engineState->dirtyFlags &= ~static_cast<uint>(df);
 }
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QTextItem::RenderFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QPaintEngine::PaintEngineFeatures)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QPaintEngine::DirtyFlags)
-
-
 
 #endif

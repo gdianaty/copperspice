@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -35,21 +35,22 @@ class Q_CORE_EXPORT QFileDevice : public QIODevice
 
  public:
    enum FileError {
-      NoError = 0,
-      ReadError = 1,
-      WriteError = 2,
-      FatalError = 3,
-      ResourceError = 4,
-      OpenError = 5,
-      AbortError = 6,
-      TimeOutError = 7,
+      NoError          = 0,
+      ReadError        = 1,
+      WriteError       = 2,
+      FatalError       = 3,
+      ResourceError    = 4,
+      OpenError        = 5,
+      AbortError       = 6,
+      TimeOutError     = 7,
       UnspecifiedError = 8,
-      RemoveError = 9,
-      RenameError = 10,
-      PositionError = 11,
-      ResizeError = 12,
+      RemoveError      = 9,
+      RenameError      = 10,
+      PositionError    = 11,
+      ResizeError      = 12,
       PermissionsError = 13,
-      CopyError = 14
+      CopyError        = 14,
+      FileTimeError    = 15
    };
 
    enum Permission {
@@ -65,6 +66,16 @@ class Q_CORE_EXPORT QFileDevice : public QIODevice
       DontCloseHandle = 0
    };
    using FileHandleFlags = QFlags<FileHandleFlag>;
+
+   enum MemoryMapFlags {
+      NoOptions = 0
+   };
+
+   enum FileTimeType {
+      CreateTime,
+      ModifiedTime,
+      AccessTime
+   };
 
    QFileDevice(const QFileDevice &) = delete;
    QFileDevice &operator=(const QFileDevice &) = delete;
@@ -88,12 +99,11 @@ class Q_CORE_EXPORT QFileDevice : public QIODevice
    qint64 size() const override;
 
    virtual bool resize(qint64 size);
-   virtual Permissions permissions() const;
-   virtual bool setPermissions(Permissions permissionSpec);
+   virtual QFileDevice::Permissions permissions() const;
+   virtual bool setPermissions(QFileDevice::Permissions permissionSpec);
 
-   enum MemoryMapFlags {
-      NoOptions = 0
-   };
+   QDateTime fileTime(QFileDevice::FileTimeType type) const;
+   bool setFileTime(const QDateTime &newTime, QFileDevice::FileTimeType type);
 
    uchar *map(qint64 offset, qint64 size, MemoryMapFlags flags = NoOptions);
    bool unmap(uchar *address);

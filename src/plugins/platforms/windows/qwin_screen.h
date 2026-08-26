@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,12 @@
 #ifndef QWINDOWSSCREEN_H
 #define QWINDOWSSCREEN_H
 
-#include <qwin_global.h>
 #include <qlist.h>
-#include <qvector.h>
 #include <qpair.h>
-#include <qscopedpointer.h>
 #include <qplatform_screen.h>
+#include <qscopedpointer.h>
+#include <qvector.h>
+#include <qwin_global.h>
 
 struct QWindowsScreenData {
    enum Flags {

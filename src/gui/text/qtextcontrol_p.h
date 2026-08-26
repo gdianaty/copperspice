@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,28 +24,29 @@
 #ifndef QTEXTCONTROL_P_H
 #define QTEXTCONTROL_P_H
 
-#include <qtextdocument.h>
-#include <qtextoption.h>
-#include <qtextcursor.h>
-#include <qtextformat.h>
-#include <qtextedit.h>
-#include <qmenu.h>
-#include <qrect.h>
 #include <qabstracttextdocumentlayout.h>
-#include <qtextdocumentfragment.h>
 #include <qclipboard.h>
+#include <qmenu.h>
 #include <qmimedata.h>
+#include <qrect.h>
+#include <qtextcursor.h>
+#include <qtextdocument.h>
+#include <qtextdocumentfragment.h>
+#include <qtextedit.h>
+#include <qtextformat.h>
+#include <qtextoption.h>
+
 #include <qinputcontrol_p.h>
 
 class QAbstractScrollArea;
+class QEvent;
 class QMenu;
+class QPagedPaintDevice;
 class QStyleSheet;
 class QTextDocument;
-class QTextControlPrivate;
-
-class QEvent;
 class QTimerEvent;
-class QPagedPaintDevice;
+
+class QTextControlPrivate;
 
 class Q_GUI_EXPORT QTextControl : public QInputControl
 {
@@ -340,12 +341,14 @@ class QUnicodeControlCharacterMenu : public QMenu
 class QTextEditMimeData : public QMimeData
 {
  public:
-   inline QTextEditMimeData(const QTextDocumentFragment &aFragment) : fragment(aFragment) {}
+   QTextEditMimeData(const QTextDocumentFragment &aFragment)
+      : fragment(aFragment)
+   { }
 
-   virtual QStringList formats() const override;
+   QStringList formats() const override;
 
  protected:
-   virtual QVariant retrieveData(const QString &mimeType, QVariant::Type type) const override;
+   QVariant retrieveData(const QString &mimeType, QVariant::Type type) const override;
 
  private:
    void setup() const;

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,11 @@
 #include <qpalette.h>
 
 #include <qapplication.h>
-#include <qguiapplication_p.h>
 #include <qdatastream.h>
-#include <qvariant.h>
 #include <qdebug.h>
+#include <qvariant.h>
+
+#include <qapplication_p.h>
 
 static int qt_palette_count = 1;
 
@@ -181,7 +182,6 @@ QPalette::~QPalette()
    }
 }
 
-// internal
 void QPalette::init()
 {
    d = new QPalettePrivate;
@@ -218,7 +218,7 @@ const QBrush &QPalette::brush(ColorGroup gr, ColorRole cr) const
          gr = (ColorGroup)current_group;
 
       } else {
-         qWarning("QPalette::brush: Unknown ColorGroup: %d", (int)gr);
+         qWarning("QPalette::brush() Unknown ColorGroup: %d", (int)gr);
          gr = Active;
       }
    }
@@ -244,7 +244,7 @@ void QPalette::setBrush(ColorGroup cg, ColorRole cr, const QBrush &b)
          cg = (ColorGroup)current_group;
 
       } else {
-         qWarning("QPalette::setBrush: Unknown ColorGroup: %d", (int)cg);
+         qWarning("QPalette::setBrush() Unknown ColorGroup: %d", (int)cg);
          cg = Active;
       }
    }
@@ -260,9 +260,6 @@ bool QPalette::isBrushSet(ColorGroup cg, ColorRole cr) const
    return (resolve_mask & (1 << cr));
 }
 
-/*!
-    \internal
-*/
 void QPalette::detach()
 {
    if (d->ref.load() != 1) {
@@ -305,7 +302,7 @@ bool QPalette::isEqual(QPalette::ColorGroup group1, QPalette::ColorGroup group2)
       if (group1 == Current) {
          group1 = (ColorGroup)current_group;
       } else {
-         qWarning("QPalette::brush: Unknown ColorGroup(1): %d", (int)group1);
+         qWarning("QPalette::isEqual() Unknown ColorGroup(1): %d", (int)group1);
          group1 = Active;
       }
    }
@@ -314,7 +311,7 @@ bool QPalette::isEqual(QPalette::ColorGroup group1, QPalette::ColorGroup group2)
       if (group2 == Current) {
          group2 = (ColorGroup)current_group;
       } else {
-         qWarning("QPalette::brush: Unknown ColorGroup(2): %d", (int)group2);
+         qWarning("QPalette::isEqual() Unknown ColorGroup(2): %d", (int)group2);
          group2 = Active;
       }
    }
@@ -412,8 +409,6 @@ void QPalette::setColorGroup(ColorGroup cg, const QBrush &windowText, const QBru
    resolve_mask &= ~(1 << Link);
 }
 
-
-/*!\internal*/
 void QPalette::setColorGroup(ColorGroup cg, const QBrush &foreground, const QBrush &button,
    const QBrush &light, const QBrush &dark, const QBrush &mid,
    const QBrush &text, const QBrush &bright_text,
@@ -429,7 +424,6 @@ void QPalette::setColorGroup(ColorGroup cg, const QBrush &foreground, const QBru
       link, link_visited, background, foreground);
 }
 
-/* internal*/
 void QPalette::setColorGroup(ColorGroup cg, const QBrush &foreground, const QBrush &button,
    const QBrush &light, const QBrush &dark, const QBrush &mid,
    const QBrush &text, const QBrush &bright_text,

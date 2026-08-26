@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,33 +26,19 @@
 
 #include <qxsdannotation_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class XsdAnnotated
 {
  public:
-   /**
-    * Adds a new @p annotation to the component.
-    */
    void addAnnotation(const XsdAnnotation::Ptr &annotation);
-
-   /**
-    * Adds a list of new @p annotations to the component.
-    */
    void addAnnotations(const XsdAnnotation::List &annotations);
-
-   /**
-    * Returns the list of all annotations of the component.
-    */
    XsdAnnotation::List annotations() const;
 
  private:
    XsdAnnotation::List m_annotations;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

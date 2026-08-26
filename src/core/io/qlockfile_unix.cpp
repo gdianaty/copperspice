@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,23 +25,22 @@
 ** Copyright (c) 2013 David Faure <faure+bluesystems@kde.org>
 *****************************************************************/
 
-#include <qlockfile_p.h>
-
 #include <qcache.h>
 #include <qcoreapplication.h>
-#include <qdebug.h>
 #include <qdatetime.h>
+#include <qdebug.h>
 #include <qfileinfo.h>
 #include <qmutex.h>
 #include <qtemporaryfile.h>
 
-#include <qcore_unix_p.h>
 #include <qabstractfileengine_p.h>
+#include <qcore_unix_p.h>
+#include <qlockfile_p.h>
 #include <qtemporaryfile_p.h>
 
+#include <signal.h>    // kill
 #include <sys/file.h>  // flock
 #include <sys/types.h> // kill
-#include <signal.h>    // kill
 #include <unistd.h>    // gethostname
 
 #if defined(Q_OS_DARWIN)
@@ -87,6 +86,7 @@ static qint64 qt_write_loop(int fd, const char *data, qint64 len)
          // for example, partition full
          return pos;
       }
+
       pos += ret;
    }
 
@@ -105,10 +105,12 @@ int QLockFilePrivate::checkFcntlWorksAfterFlock(const QString &fn)
    const int fd = file.d_func()->engine()->handle();
 
 #if defined(LOCK_EX) && defined(LOCK_NB)
+
    if (flock(fd, LOCK_EX | LOCK_NB) == -1) {
       // other threads, and other processes on a local fs
       return 0;
    }
+
 #endif
 
    struct flock flockData;
@@ -144,10 +146,6 @@ static QCache<QString, bool> *fcntlOK()
 
 static QMutex fcntlLock;
 
-/*!
-  \internal
-  Checks that the OS is not using POSIX locks to emulate flock(), this happens on macos
-*/
 static bool fcntlWorksAfterFlock(const QString &fn)
 {
    QMutexLocker lock(&fcntlLock);
@@ -168,10 +166,12 @@ static bool fcntlWorksAfterFlock(const QString &fn)
 static bool setNativeLocks(const QString &fileName, int fd)
 {
 #if defined(LOCK_EX) && defined(LOCK_NB)
+
    if (flock(fd, LOCK_EX | LOCK_NB) == -1) {
       // other threads, and other processes on a local fs
       return false;
    }
+
 #endif
 
    struct flock flockData;
@@ -182,7 +182,7 @@ static bool setNativeLocks(const QString &fileName, int fd)
    flockData.l_pid    = getpid();
 
    if (fcntlWorksAfterFlock(QDir::cleanPath(QFileInfo(fileName).absolutePath()) + '/') &&
-                  fcntl(fd, F_SETLK, &flockData) == -1) {
+         fcntl(fd, F_SETLK, &flockData) == -1) {
       // for networked filesystems
 
       return false;
@@ -198,7 +198,7 @@ QLockFile::LockError QLockFilePrivate::tryLock_sys()
    // Use operator% from the fast builder to avoid multiple memory allocations.
 
    QByteArray fileData = QByteArray::number(QCoreApplication::applicationPid()) + '\n'
-      + QCoreApplication::applicationName().toUtf8() + '\n' + localHostName() + '\n';
+         + QCoreApplication::applicationName().toUtf8() + '\n' + localHostName() + '\n';
 
    const QByteArray lockFileName = QFile::encodeName(fileName);
    const int fd = qt_safe_open(lockFileName.constData(), O_WRONLY | O_CREAT | O_EXCL, 0666);
@@ -220,14 +220,16 @@ QLockFile::LockError QLockFilePrivate::tryLock_sys()
    // Ensure nobody else can delete the file while we have it
    if (! setNativeLocks(fileName, fd)) {
       const int errnoSaved = errno;
-      qWarning() << "setNativeLocks failed:" << qt_error_string(errnoSaved);
+      qWarning() << "QLockFile::tryLock_sys() setNativeLocks failed, " << qt_error_string(errnoSaved);
    }
 
    if (qt_write_loop(fd, fileData.constData(), fileData.size()) < fileData.size()) {
       close(fd);
-      if (!QFile::remove(fileName)) {
-         qWarning("QLockFile: Could not remove our own lock file %s.", csPrintable(fileName));
+
+      if (! QFile::remove(fileName)) {
+         qWarning("QLockFile::tryLock_sys() Unable to remove lock file %s", csPrintable(fileName));
       }
+
       return QLockFile::UnknownError; // partition full
    }
 
@@ -274,6 +276,7 @@ bool QLockFilePrivate::isApparentlyStale() const
          }
 
          const QString processName = processNameByPid(pid);
+
          if (! processName.isEmpty()) {
             QFileInfo fi(appname);
 
@@ -287,6 +290,7 @@ bool QLockFilePrivate::isApparentlyStale() const
          }
       }
    }
+
    const qint64 age = QFileInfo(fileName).lastModified().msecsTo(QDateTime::currentDateTime());
    return staleLockTime > 0 && age > staleLockTime;
 }
@@ -300,6 +304,7 @@ QString QLockFilePrivate::processNameByPid(qint64 pid)
    return QFile::decodeName(name);
 
 #elif defined(Q_OS_LINUX)
+
    if (! QFile::exists("/proc/version")) {
       return QString();
    }
@@ -340,12 +345,14 @@ QString QLockFilePrivate::processNameByPid(qint64 pid)
    }
 
 # if defined(Q_OS_OPENBSD) || defined(Q_OS_NETBSD)
+
    if (kp.p_pid != pid) {
       return QString();
    }
 
    QString name = QFile::decodeName(kp.p_comm);
 # else
+
    if (kp.ki_pid != pid) {
       return QString();
    }
@@ -372,11 +379,9 @@ void QLockFile::unlock()
    d->fileHandle = -1;
 
    if (! QFile::remove(d->fileName)) {
-      qWarning() << "Could not remove our own lock file" << d->fileName << "maybe permissions changed meanwhile?";
-      // This is bad because other users of this lock file will now have to wait for the stale-lock-timeout...
+      qWarning("QLockFile::unlock() Unable to remove lock file %s", csPrintable(d->fileName));
    }
 
    d->lockError = QLockFile::NoError;
    d->isLocked  = false;
 }
-

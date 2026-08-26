@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,11 +23,12 @@
 
 #include <qstatictext.h>
 #include <qstatictext_p.h>
-#include <qtextengine_p.h>
-#include <qfontengine_p.h>
-#include <qabstracttextdocumentlayout.h>
 
+#include <qabstracttextdocumentlayout.h>
 #include <qapplication.h>
+
+#include <qfontengine_p.h>
+#include <qtextengine_p.h>
 
 QStaticText::QStaticText()
    : data(new QStaticTextPrivate)
@@ -51,9 +52,6 @@ QStaticText::~QStaticText()
    Q_ASSERT(!data || data->ref.load() >= 1);
 }
 
-/*!
-    \internal
-*/
 void QStaticText::detach()
 {
    if (data->ref.load() != 1) {
@@ -92,17 +90,6 @@ void QStaticText::setText(const QString &text)
    data->invalidate();
 }
 
-/*!
-   Sets the text format of the QStaticText to \a textFormat. If \a textFormat is set to
-   Qt::AutoText (the default), the format of the text will try to be determined using the
-   function Qt::mightBeRichText(). If the text format is Qt::PlainText, then the text will be
-   displayed as is, whereas it will be interpreted as HTML if the format is Qt::RichText. HTML tags
-   that alter the font of the text, its color, or its layout are supported by QStaticText.
-
-   \note This function will cause the layout of the text to require recalculation.
-
-   \sa textFormat(), setText(), text()
-*/
 void QStaticText::setTextFormat(Qt::TextFormat textFormat)
 {
    detach();
@@ -110,38 +97,16 @@ void QStaticText::setTextFormat(Qt::TextFormat textFormat)
    data->invalidate();
 }
 
-/*!
-  Returns the text format of the QStaticText.
-
-  \sa setTextFormat(), setText(), text()
-*/
 Qt::TextFormat QStaticText::textFormat() const
 {
    return Qt::TextFormat(data->textFormat);
 }
 
-/*!
-    Returns the text of the QStaticText.
-
-    \sa setText()
-*/
 QString QStaticText::text() const
 {
    return data->text;
 }
 
-/*!
-  Sets the performance hint of the QStaticText according to the \a
-  performanceHint provided. The \a performanceHint is used to
-  customize how much caching is done internally to improve
-  performance.
-
-  The default is QStaticText::ModerateCaching.
-
-  \note This function will cause the layout of the text to require recalculation.
-
-  \sa performanceHint()
-*/
 void QStaticText::setPerformanceHint(PerformanceHint performanceHint)
 {
    if ((performanceHint == ModerateCaching && !data->useBackendOptimizations)
@@ -153,21 +118,11 @@ void QStaticText::setPerformanceHint(PerformanceHint performanceHint)
    data->invalidate();
 }
 
-/*!
-  Returns which performance hint is set for the QStaticText.
-
-  \sa setPerformanceHint()
-*/
 QStaticText::PerformanceHint QStaticText::performanceHint() const
 {
    return data->useBackendOptimizations ? AggressiveCaching : ModerateCaching;
 }
 
-/*!
-   Sets the text option structure that controls the layout process to the given \a textOption.
-
-   \sa textOption()
-*/
 void QStaticText::setTextOption(const QTextOption &textOption)
 {
    detach();
@@ -175,27 +130,11 @@ void QStaticText::setTextOption(const QTextOption &textOption)
    data->invalidate();
 }
 
-/*!
-    Returns the current text option used to control the layout process.
-*/
 QTextOption QStaticText::textOption() const
 {
    return data->textOption;
 }
 
-/*!
-    Sets the preferred width for this QStaticText. If the text is wider than the specified width,
-    it will be broken into multiple lines and grow vertically. If the text cannot be split into
-    multiple lines, it will be larger than the specified \a textWidth.
-
-    Setting the preferred text width to a negative number will cause the text to be unbounded.
-
-    Use size() to get the actual size of the text.
-
-    \note This function will cause the layout of the text to require recalculation.
-
-    \sa textWidth(), size()
-*/
 void QStaticText::setTextWidth(qreal textWidth)
 {
    detach();
@@ -264,7 +203,7 @@ class DrawTextItemRecorder: public QPaintEngine
       const QTextItemInt &ti = static_cast<const QTextItemInt &>(textItem);
 
       QStaticTextItem currentItem;
-      currentItem.setFontEngine(ti.fontEngine);
+      currentItem.setFontEngine(ti.m_textItemFontEngine);
 
       currentItem.font           = ti.font();
       currentItem.glyphOffset    = m_glyphs.size();    // Store offset into glyph pool
@@ -276,12 +215,13 @@ class DrawTextItemRecorder: public QPaintEngine
          currentItem.color = m_currentColor;
       }
 
-      QTransform matrix = m_untransformedCoordinates ? QTransform() : state->transform();
+      QTransform matrix = m_untransformedCoordinates ? QTransform() : m_engineState->transform();
       matrix.translate(position.x(), position.y());
 
       QVarLengthArray<glyph_t> glyphs;
       QVarLengthArray<QFixedPoint> positions;
-      ti.fontEngine->getGlyphPositions(ti.glyphs, matrix, ti.flags, glyphs, positions);
+
+      ti.m_textItemFontEngine->getGlyphPositions(ti.glyphs, matrix, ti.flags, glyphs, positions);
 
       int size = glyphs.size();
       Q_ASSERT(size == positions.size());
@@ -382,7 +322,7 @@ class DrawTextItemDevice: public QPaintDevice
             break;
          default:
             val = 0;
-            qWarning("DrawTextItemDevice::metric: Invalid metric command");
+            qWarning("DrawTextItemDevice::metric() Invalid metric command");
       }
       return val;
    }
@@ -450,17 +390,20 @@ void QStaticTextPrivate::paintText(const QPointF &topLeftPosition, QPainter *p)
 #ifndef QT_NO_CSSPARSER
       QColor color = p->pen().color();
       document.setDefaultStyleSheet(QString::fromLatin1("body { color: #%1%2%3 }")
-         .formatArg(QString::number(color.red(), 16),   2, QLatin1Char('0'))
-         .formatArg(QString::number(color.green(), 16), 2, QLatin1Char('0'))
-         .formatArg(QString::number(color.blue(), 16),  2, QLatin1Char('0')));
+         .formatArg(QString::number(color.red(), 16),   2, QChar('0'))
+         .formatArg(QString::number(color.green(), 16), 2, QChar('0'))
+         .formatArg(QString::number(color.blue(), 16),  2, QChar('0')));
 #endif
+
       document.setDefaultFont(font);
       document.setDocumentMargin(0.0);
+
 #ifndef QT_NO_TEXTHTMLPARSER
       document.setHtml(text);
 #else
       document.setPlainText(text);
 #endif
+
       if (textWidth >= 0.0) {
          document.setTextWidth(textWidth);
       } else {
@@ -548,4 +491,3 @@ void QStaticTextItem::setFontEngine(QFontEngine *fe)
       m_fontEngine->m_refCount.ref();
    }
 }
-

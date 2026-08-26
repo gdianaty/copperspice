@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -31,16 +31,14 @@
 
 #ifndef QT_NO_TREEWIDGET
 
+class QTreeModel;
 class QTreeWidget;
 class QTreeWidgetItem;
-class QTreeModel;
+
 class QTreeWidgetItemIteratorPrivate;
 
 class Q_GUI_EXPORT QTreeWidgetItemIterator
 {
-
-   Q_DECLARE_PRIVATE(QTreeWidgetItemIterator)
-
  public:
    enum IteratorFlag {
       All           = 0x00000000,
@@ -87,10 +85,13 @@ class Q_GUI_EXPORT QTreeWidgetItemIterator
    inline QTreeWidgetItem *operator*() const;
 
  private:
+   Q_DECLARE_PRIVATE(QTreeWidgetItemIterator)
+
    bool matchesFlags(const QTreeWidgetItem *item) const;
+
    QScopedPointer<QTreeWidgetItemIteratorPrivate> d_ptr;
    QTreeWidgetItem *current;
-   IteratorFlags flags;
+   IteratorFlags m_treeItemFlags;
 
    friend class QTreeModel;
 };
@@ -99,6 +100,7 @@ inline const QTreeWidgetItemIterator QTreeWidgetItemIterator::operator++(int)
 {
    QTreeWidgetItemIterator it = *this;
    ++(*this);
+
    return it;
 }
 
@@ -106,6 +108,7 @@ inline const QTreeWidgetItemIterator QTreeWidgetItemIterator::operator--(int)
 {
    QTreeWidgetItemIterator it = *this;
    --(*this);
+
    return it;
 }
 
@@ -114,9 +117,11 @@ inline QTreeWidgetItemIterator &QTreeWidgetItemIterator::operator+=(size_type n)
    if (n < 0) {
       return (*this) -= (-n);
    }
+
    while (current && n--) {
       ++(*this);
    }
+
    return *this;
 }
 
@@ -125,9 +130,11 @@ inline QTreeWidgetItemIterator &QTreeWidgetItemIterator::operator-=(size_type n)
    if (n < 0) {
       return (*this) += (-n);
    }
+
    while (current && n--) {
       --(*this);
    }
+
    return *this;
 }
 

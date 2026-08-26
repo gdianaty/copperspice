@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,13 +21,13 @@
 *
 ***********************************************************************/
 
-#ifndef CPPWRITEICONINITIALIZATION_H
-#define CPPWRITEICONINITIALIZATION_H
-
-#include <treewalker.h>
+#ifndef WRITE_ICONINITIALIZATION_H
+#define WRITE_ICONINITIALIZATION_H
 
 #include <qstring.h>
 #include <qtextstream.h>
+
+#include <treewalker.h>
 
 class Driver;
 class Uic;
@@ -54,6 +54,6 @@ class WriteIconInitialization : public TreeWalker
    const Option &option;
 };
 
-} // namespace CPP
+}   // namespace
 
 #endif

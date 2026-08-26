@@ -1,7 +1,7 @@
 # ***********************************************************************
 #
-# Copyright (c) 2012-2023 Barbara Geller
-# Copyright (c) 2012-2023 Ansel Sermersheim
+# Copyright (c) 2012-2026 Barbara Geller
+# Copyright (c) 2012-2026 Ansel Sermersheim
 #
 # This file is part of CopperSpice.
 #
@@ -31,7 +31,7 @@
 #  user is responsible for setting up a config.h file which contains "#cmakedefine" for each
 #  macro which is required for your project
 
-macro(OPJ_TEST_LARGE_FILES VARIABLE)
+macro(check_large_files VARIABLE)
 
    set(TestFileOffsetBits
 

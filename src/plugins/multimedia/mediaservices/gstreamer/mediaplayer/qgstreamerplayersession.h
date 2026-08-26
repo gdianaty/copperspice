@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,13 @@
 #ifndef QGSTREAMERPLAYERSESSION_H
 #define QGSTREAMERPLAYERSESSION_H
 
-#include <qobject.h>
-#include <qmutex.h>
-#include <qnetwork_request.h>
+#include <qaudioformat.h>
 #include <qgstreamerplayercontrol.h>
-
 #include <qmediaplayer.h>
 #include <qmediastreamscontrol.h>
-#include <qaudioformat.h>
+#include <qmutex.h>
+#include <qnetwork_request.h>
+#include <qobject.h>
 
 #include <qgstreamerbushelper_p.h>
 
@@ -41,11 +40,11 @@
 
 #include <gst/gst.h>
 
+class QGstreamerAudioProbeControl;
 class QGstreamerBusHelper;
 class QGstreamerMessage;
-class QGstreamerVideoRendererInterface;
 class QGstreamerVideoProbeControl;
-class QGstreamerAudioProbeControl;
+class QGstreamerVideoRendererInterface;
 
 typedef enum {
    GST_AUTOPLUG_SELECT_TRY,
@@ -136,12 +135,16 @@ class QGstreamerPlayerSession : public QObject, public QGstreamerBusMessageFilte
 
    CS_SLOT_1(Public, void loadFromUri(const QNetworkRequest &url))
    CS_SLOT_2(loadFromUri)
+
    CS_SLOT_1(Public, void loadFromStream(const QNetworkRequest &url, QIODevice *stream))
    CS_SLOT_2(loadFromStream)
+
    CS_SLOT_1(Public, bool play())
    CS_SLOT_2(play)
+
    CS_SLOT_1(Public, bool pause())
    CS_SLOT_2(pause)
+
    CS_SLOT_1(Public, void stop())
    CS_SLOT_2(stop)
 
@@ -150,6 +153,7 @@ class QGstreamerPlayerSession : public QObject, public QGstreamerBusMessageFilte
 
    CS_SLOT_1(Public, void setVolume(int volume))
    CS_SLOT_2(setVolume)
+
    CS_SLOT_1(Public, void setMuted(bool muted))
    CS_SLOT_2(setMuted)
 
@@ -158,24 +162,34 @@ class QGstreamerPlayerSession : public QObject, public QGstreamerBusMessageFilte
 
    CS_SIGNAL_1(Public, void durationChanged(qint64 duration))
    CS_SIGNAL_2(durationChanged, duration)
+
    CS_SIGNAL_1(Public, void positionChanged(qint64 position))
    CS_SIGNAL_2(positionChanged, position)
+
    CS_SIGNAL_1(Public, void stateChanged(QMediaPlayer::State state))
    CS_SIGNAL_2(stateChanged, state)
+
    CS_SIGNAL_1(Public, void volumeChanged(int volume))
    CS_SIGNAL_2(volumeChanged, volume)
+
    CS_SIGNAL_1(Public, void mutedStateChanged(bool muted))
    CS_SIGNAL_2(mutedStateChanged, muted)
+
    CS_SIGNAL_1(Public, void audioAvailableChanged(bool audioAvailable))
    CS_SIGNAL_2(audioAvailableChanged, audioAvailable)
+
    CS_SIGNAL_1(Public, void videoAvailableChanged(bool videoAvailable))
    CS_SIGNAL_2(videoAvailableChanged, videoAvailable)
+
    CS_SIGNAL_1(Public, void bufferingProgressChanged(int percentFilled))
    CS_SIGNAL_2(bufferingProgressChanged, percentFilled)
+
    CS_SIGNAL_1(Public, void playbackFinished())
    CS_SIGNAL_2(playbackFinished)
+
    CS_SIGNAL_1(Public, void tagsChanged())
    CS_SIGNAL_2(tagsChanged)
+
    CS_SIGNAL_1(Public, void streamsChanged())
    CS_SIGNAL_2(streamsChanged)
 
@@ -195,10 +209,6 @@ class QGstreamerPlayerSession : public QObject, public QGstreamerBusMessageFilte
    static void playbinNotifySource(GObject *o, GParamSpec *p, gpointer d);
    static void handleVolumeChange(GObject *o, GParamSpec *p, gpointer d);
    static void handleMutedChange(GObject *o, GParamSpec *p, gpointer d);
-
-#if !GST_CHECK_VERSION(1,0,0)
-   static void insertColorSpaceElement(GstElement *element, gpointer data);
-#endif
 
    static void handleElementAdded(GstBin *bin, GstElement *element, QGstreamerPlayerSession *session);
    static void handleStreamsChange(GstBin *bin, gpointer user_data);
@@ -226,11 +236,6 @@ class QGstreamerPlayerSession : public QObject, public QGstreamerBusMessageFilte
 
    GstElement *m_videoOutputBin;
    GstElement *m_videoIdentity;
-
-#if ! GST_CHECK_VERSION(1,0,0)
-   GstElement *m_colorSpace;
-   bool m_usingColorspaceElement;
-#endif
 
    GstElement *m_pendingVideoSink;
    GstElement *m_nullVideoSink;
@@ -286,16 +291,22 @@ class QGstreamerPlayerSession : public QObject, public QGstreamerBusMessageFilte
 
    CS_SLOT_1(Private, void setSeekable(bool seekable))
    CS_SLOT_2(setSeekable)
+
    CS_SLOT_1(Private, void finishVideoOutputChange())
    CS_SLOT_2(finishVideoOutputChange)
+
    CS_SLOT_1(Private, void updateVideoRenderer())
    CS_SLOT_2(updateVideoRenderer)
+
    CS_SLOT_1(Private, void updateVideoResolutionTag())
    CS_SLOT_2(updateVideoResolutionTag)
+
    CS_SLOT_1(Private, void updateVolume())
    CS_SLOT_2(updateVolume)
+
    CS_SLOT_1(Private, void updateMuted())
    CS_SLOT_2(updateMuted)
+
    CS_SLOT_1(Private, void updateDuration())
    CS_SLOT_2(updateDuration)
 };

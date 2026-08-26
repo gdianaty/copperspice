@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,8 +25,8 @@
 #define QSSLCONFIGURATION_H
 
 #include <qshareddata.h>
-#include <qsslsocket.h>
 #include <qssl.h>
+#include <qsslsocket.h>
 
 #ifdef QT_SSL
 
@@ -35,8 +35,8 @@ class QList;
 
 class QSslCertificate;
 class QSslCipher;
-class QSslKey;
 class QSslEllipticCurve;
+class QSslKey;
 
 class QSslConfigurationPrivate;
 

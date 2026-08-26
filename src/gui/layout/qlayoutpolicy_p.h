@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,9 +24,9 @@
 #ifndef QLAYOUTPOLICY_H
 #define QLAYOUTPOLICY_H
 
-#include <qobject.h>
-#include <qnamespace.h>
 #include <qdatastream.h>
+#include <qnamespace.h>
+#include <qobject.h>
 
 class QVariant;
 
@@ -69,10 +69,13 @@ class Q_GUI_EXPORT QLayoutPolicy
    };
    using ControlTypes = QFlags<ControlType>;
 
-   QLayoutPolicy() : data(0) { }
+   QLayoutPolicy()
+      : data(0)
+   { }
 
    QLayoutPolicy(Policy horizontal, Policy vertical, ControlType type = DefaultType)
-      : data(0) {
+      : data(0)
+   {
       bits.horPolicy = horizontal;
       bits.verPolicy = vertical;
       setControlType(type);
@@ -81,27 +84,34 @@ class Q_GUI_EXPORT QLayoutPolicy
    Policy horizontalPolicy() const {
       return static_cast<Policy>(bits.horPolicy);
    }
+
    Policy verticalPolicy() const {
       return static_cast<Policy>(bits.verPolicy);
    }
+
    ControlType controlType() const;
 
    void setHorizontalPolicy(Policy d) {
       bits.horPolicy = d;
    }
+
    void setVerticalPolicy(Policy d) {
       bits.verPolicy = d;
    }
+
    void setControlType(ControlType type);
 
    Qt::Orientations expandingDirections() const {
       Qt::Orientations result;
-      if (verticalPolicy() & ExpandFlag) {
+
+      if (cs_enum_cast(verticalPolicy()) & cs_enum_cast(ExpandFlag)) {
          result |= Qt::Vertical;
       }
-      if (horizontalPolicy() & ExpandFlag) {
+
+      if (cs_enum_cast(horizontalPolicy()) & cs_enum_cast(ExpandFlag)) {
          result |= Qt::Horizontal;
       }
+
       return result;
    }
 

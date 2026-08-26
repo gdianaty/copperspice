@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -36,24 +36,16 @@
 #include <gst/gst.h>
 #include <gst/video/video.h>
 
-#if GST_CHECK_VERSION(1,0,0)
-# define QT_GSTREAMER_PLAYBIN_ELEMENT_NAME "playbin"
-# define QT_GSTREAMER_CAMERABIN_ELEMENT_NAME "camerabin"
-# define QT_GSTREAMER_COLORCONVERSION_ELEMENT_NAME "videoconvert"
-# define QT_GSTREAMER_RAW_AUDIO_MIME "audio/x-raw"
-# define QT_GSTREAMER_VIDEOOVERLAY_INTERFACE_NAME "GstVideoOverlay"
-#else
-# define QT_GSTREAMER_PLAYBIN_ELEMENT_NAME "playbin2"
-# define QT_GSTREAMER_CAMERABIN_ELEMENT_NAME "camerabin2"
-# define QT_GSTREAMER_COLORCONVERSION_ELEMENT_NAME "ffmpegcolorspace"
-# define QT_GSTREAMER_RAW_AUDIO_MIME "audio/x-raw-int"
-# define QT_GSTREAMER_VIDEOOVERLAY_INTERFACE_NAME "GstXOverlay"
-#endif
+#define QT_GSTREAMER_PLAYBIN_ELEMENT_NAME "playbin"
+#define QT_GSTREAMER_CAMERABIN_ELEMENT_NAME "camerabin"
+#define QT_GSTREAMER_COLORCONVERSION_ELEMENT_NAME "videoconvert"
+#define QT_GSTREAMER_RAW_AUDIO_MIME "audio/x-raw"
+#define QT_GSTREAMER_VIDEOOVERLAY_INTERFACE_NAME "GstVideoOverlay"
 
-class QSize;
-class QVariant;
 class QByteArray;
 class QImage;
+class QSize;
+class QVariant;
 class QVideoSurfaceFormat;
 
 namespace QGstUtils {
@@ -73,11 +65,7 @@ QSize capsResolution(const GstCaps *caps);
 QSize capsCorrectedResolution(const GstCaps *caps);
 QAudioFormat audioFormatForCaps(const GstCaps *caps);
 
-#if GST_CHECK_VERSION(1,0,0)
-   QAudioFormat audioFormatForSample(GstSample *sample);
-#else
-   QAudioFormat audioFormatForBuffer(GstBuffer *buffer);
-#endif
+QAudioFormat audioFormatForSample(GstSample *sample);
 
 GstCaps *capsForAudioFormat(const QAudioFormat &format);
 void initializeGst();
@@ -94,19 +82,9 @@ QByteArray cameraDriver(const QString &device, GstElementFactory *factory = null
 
 QSet<QString> supportedMimeTypes(bool (*isValidFactory)(GstElementFactory *factory));
 
-#if GST_CHECK_VERSION(1,0,0)
-
 QImage bufferToImage(GstBuffer *buffer, const GstVideoInfo &info);
 QVideoSurfaceFormat formatForCaps(GstCaps *caps, GstVideoInfo *info = nullptr,
    QAbstractVideoBuffer::HandleType handleType = QAbstractVideoBuffer::NoHandle);
-
-#else
-
-QImage bufferToImage(GstBuffer *buffer);
-QVideoSurfaceFormat formatForCaps(GstCaps *caps, int *bytesPerLine = nullptr,
-   QAbstractVideoBuffer::HandleType handleType = QAbstractVideoBuffer::NoHandle);
-
-#endif
 
 GstCaps *capsForFormats(const QList<QVideoFrame::PixelFormat> &formats);
 void setFrameTimeStamps(QVideoFrame *frame, GstBuffer *buffer);

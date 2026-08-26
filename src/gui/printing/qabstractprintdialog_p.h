@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -33,6 +33,7 @@
 #ifndef QT_NO_PRINTER
 
 class QPrinter;
+
 class QPrinterPrivate;
 
 class QAbstractPrintDialogPrivate : public QDialogPrivate
@@ -41,25 +42,28 @@ class QAbstractPrintDialogPrivate : public QDialogPrivate
 
  public:
    QAbstractPrintDialogPrivate()
-      : printer(nullptr), pd(nullptr), ownsPrinter(false)
-      , options(QAbstractPrintDialog::PrintToFile | QAbstractPrintDialog::PrintPageRange |
-                QAbstractPrintDialog::PrintCollateCopies | QAbstractPrintDialog::PrintShowPageSize),
-        minPage(0), maxPage(INT_MAX)
-   {  }
+      : printer(nullptr), m_printDialog(nullptr), ownsPrinter(false),
+        options(QAbstractPrintDialog::PrintToFile | QAbstractPrintDialog::PrintPageRange |
+              QAbstractPrintDialog::PrintCollateCopies | QAbstractPrintDialog::PrintShowPageSize),
+        m_minPage(0), m_maxPage(INT_MAX)
+   { }
 
+   virtual void setTabs(const QList<QWidget *> &) {
+   }
 
    QPrinter *printer;
-   QPrinterPrivate *pd;
+   QPrinterPrivate *m_printDialog;
+
    bool ownsPrinter;
    QPointer<QObject> receiverToDisconnectOnClose;
    QString memberToDisconnectOnClose;
 
    QAbstractPrintDialog::PrintDialogOptions options;
 
-   virtual void setTabs(const QList<QWidget *> &) {}
    void setPrinter(QPrinter *newPrinter);
-   int minPage;
-   int maxPage;
+
+   int m_minPage;
+   int m_maxPage;
 };
 
 #endif //QT_NO_PRINTER

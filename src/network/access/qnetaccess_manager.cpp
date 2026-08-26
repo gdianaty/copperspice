@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,31 +24,31 @@
 #include <qnetaccess_manager.h>
 #include <qnetaccess_manager_p.h>
 
-#include <qalgorithms.h>
 #include <qabstract_networkcache.h>
+#include <qalgorithms.h>
 #include <qbuffer.h>
 #include <qhttp_multipart.h>
-#include <qnetwork_request.h>
-#include <qnetwork_reply.h>
 #include <qnetwork_cookie.h>
 #include <qnetwork_cookiejar.h>
-#include <qnetworksession.h>
+#include <qnetwork_reply.h>
+#include <qnetwork_request.h>
 #include <qnetworkconfigmanager.h>
+#include <qnetworksession.h>
 #include <qsslconfiguration.h>
 #include <qthread.h>
 #include <qurl.h>
 #include <qvector.h>
 
 #include <qauthenticator_p.h>
-#include <qsharednetworksession_p.h>
-#include <qnetaccess_ftpbackend_p.h>
-#include <qnetaccess_filebackend_p.h>
+#include <qhttp_multipart_p.h>
 #include <qnetaccess_cachebackend_p.h>
+#include <qnetaccess_filebackend_p.h>
+#include <qnetaccess_ftpbackend_p.h>
+#include <qnetwork_reply_p.h>
 #include <qnetwork_replydata_p.h>
 #include <qnetwork_replyfile_p.h>
 #include <qnetwork_replyhttp_p.h>
-#include <qnetwork_reply_p.h>
-#include <qhttp_multipart_p.h>
+#include <qsharednetworksession_p.h>
 
 QNetworkAccessFileBackendFactory *cs_FileBackend()
 {
@@ -154,13 +154,6 @@ QNetworkAccessManager::QNetworkAccessManager(QObject *parent)
 #endif
 }
 
-/*!
-    Destroys the QNetworkAccessManager object and frees up any
-    resources. Note that QNetworkReply objects that are returned from
-    this class have this object set as their parents, which means that
-    they will be deleted along with it if you don't call
-    QObject::setParent() on them.
-*/
 QNetworkAccessManager::~QNetworkAccessManager()
 {
 
@@ -405,7 +398,6 @@ QNetworkAccessManager::NetworkAccessibility QNetworkAccessManager::networkAccess
    }
 }
 
-// internal
 const QWeakPointer<const QNetworkSession> QNetworkAccessManagerPrivate::getNetworkSession(const QNetworkAccessManager *q)
 {
    return q->d_func()->networkSessionWeakRef;
@@ -790,14 +782,14 @@ void QNetworkAccessManagerPrivate::authenticationRequired(QAuthenticator *authen
 }
 
 #ifndef QT_NO_NETWORKPROXY
-void QNetworkAccessManagerPrivate::proxyAuthenticationRequired(const QUrl &url, const QNetworkProxy &proxy,
+void QNetworkAccessManagerPrivate::proxyAuthenticationRequired(const QUrl &url, const QNetworkProxy &newProxy,
       bool synchronous, QAuthenticator *authenticator, QNetworkProxy *lastProxyAuthentication)
 {
    Q_Q(QNetworkAccessManager);
    QAuthenticatorPrivate *priv = QAuthenticatorPrivate::getPrivate(*authenticator);
 
-   if (proxy != *lastProxyAuthentication && (!priv || !priv->hasFailed)) {
-      QNetworkAuthenticationCredential cred = authenticationManager->fetchCachedProxyCredentials(proxy);
+   if (newProxy != *lastProxyAuthentication && (!priv || !priv->hasFailed)) {
+      QNetworkAuthenticationCredential cred = authenticationManager->fetchCachedProxyCredentials(newProxy);
 
       if (!cred.isNull()) {
          authenticator->setUser(cred.user);
@@ -811,10 +803,10 @@ void QNetworkAccessManagerPrivate::proxyAuthenticationRequired(const QUrl &url, 
    QString username;
    QString password;
 
-   if (getProxyAuth(proxy.hostName(), url.scheme(), username, password)) {
+   if (getProxyAuth(newProxy.hostName(), url.scheme(), username, password)) {
       // only cache the system credentials if they are correct (or if they have changed)
       // to not run into an endless loop in case they are wrong
-      QNetworkAuthenticationCredential cred = authenticationManager->fetchCachedProxyCredentials(proxy);
+      QNetworkAuthenticationCredential cred = authenticationManager->fetchCachedProxyCredentials(newProxy);
 
       if (!priv->hasFailed || cred.user != username || cred.password != password) {
          authenticator->setUser(username);
@@ -834,9 +826,9 @@ void QNetworkAccessManagerPrivate::proxyAuthenticationRequired(const QUrl &url, 
       return;
    }
 
-   *lastProxyAuthentication = proxy;
-   emit q->proxyAuthenticationRequired(proxy, authenticator);
-   authenticationManager->cacheProxyCredentials(proxy, authenticator);
+   *lastProxyAuthentication = newProxy;
+   emit q->proxyAuthenticationRequired(newProxy, authenticator);
+   authenticationManager->cacheProxyCredentials(newProxy, authenticator);
 }
 
 QList<QNetworkProxy> QNetworkAccessManagerPrivate::queryProxy(const QNetworkProxyQuery &query)
@@ -846,7 +838,7 @@ QList<QNetworkProxy> QNetworkAccessManagerPrivate::queryProxy(const QNetworkProx
       proxies = proxyFactory->queryProxy(query);
 
       if (proxies.isEmpty()) {
-         qWarning("QNetworkAccessManager: factory %p has returned an empty result set", proxyFactory);
+         qWarning("QNetworkAccessManager::queryProxy() Factory returned an empty result set");
          proxies << QNetworkProxy::NoProxy;
       }
 
@@ -1162,11 +1154,11 @@ QNetworkRequest QNetworkAccessManagerPrivate::prepareMultipart(const QNetworkReq
    if (! device->isReadable()) {
       if (! device->isOpen()) {
          if (! device->open(QIODevice::ReadOnly)) {
-            qWarning("Unable to open device for reading");
+            qWarning("QNetworkAccessManager::prepareMultipart() Unable to open device for reading");
          }
 
       } else {
-         qWarning("Device is not readable");
+         qWarning("QNetworkAccessManager::prepareMultipart() Device is not readable");
       }
    }
 

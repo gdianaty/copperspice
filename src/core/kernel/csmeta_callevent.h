@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,6 +24,8 @@
 #ifndef CSMETA_CALLEVENT_H
 #define CSMETA_CALLEVENT_H
 
+#include <functional>
+
 class QObject;
 class QSemaphore;
 
@@ -31,11 +33,13 @@ class Q_CORE_EXPORT CSMetaCallEvent : public QEvent
 {
  public:
    CSMetaCallEvent(const CsSignal::Internal::BentoAbstract *bento, const CsSignal::Internal::TeaCupAbstract *dataPack,
-                   const QObject *sender, int signal_index, QSemaphore *semaphore = nullptr);
+      const QObject *sender, int signal_index, QSemaphore *semaphore = nullptr,
+      std::function<void()> scrubFunction = std::function<void()>());
 
    ~CSMetaCallEvent();
 
    void placeMetaCall(QObject *object);
+
    const QObject *sender() const;
    int signal_index() const;
 
@@ -45,7 +49,10 @@ class Q_CORE_EXPORT CSMetaCallEvent : public QEvent
 
    const QObject *m_sender;
    QSemaphore *m_semaphore;
+
    int m_signal_index;
+
+   std::function<void()> m_scrubFunction;
 };
 
 #endif

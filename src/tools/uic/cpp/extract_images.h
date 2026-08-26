@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,14 +21,15 @@
 *
 ***********************************************************************/
 
-#ifndef CPPEXTRACTIMAGES_H
-#define CPPEXTRACTIMAGES_H
-
-#include <treewalker.h>
+#ifndef EXTRACT_IMAGES_H
+#define EXTRACT_IMAGES_H
 
 #include <qdir.h>
 
+#include <treewalker.h>
+
 class QTextStream;
+
 class Driver;
 class Uic;
 
@@ -51,6 +52,6 @@ class ExtractImages : public TreeWalker
    QDir m_imagesDir;
 };
 
-} // namespace CPP
+}   // namespace
 
 #endif

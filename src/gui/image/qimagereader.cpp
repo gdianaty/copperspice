@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,28 +23,21 @@
 
 #include <qimagereader.h>
 
-#ifdef QIMAGEREADER_DEBUG
+#include <qcolor.h>
+#include <qcoreapplication.h>
 #include <qdebug.h>
-#endif
-
 #include <qfile.h>
 #include <qfileinfo.h>
 #include <qimage.h>
 #include <qimageiohandler.h>
 #include <qlist.h>
+#include <qmutexlocker.h>
 #include <qrect.h>
-
 #include <qsize.h>
-#include <qcolor.h>
 #include <qvariant.h>
 
-// factory loader
-#include <qcoreapplication.h>
-#include <qfactoryloader_p.h>
-#include <qmutexlocker.h>
-
-// image handlers
 #include <qbmphandler_p.h>
+#include <qfactoryloader_p.h>
 #include <qppmhandler_p.h>
 #include <qxbmhandler_p.h>
 #include <qxpmhandler_p.h>
@@ -92,8 +85,7 @@ static const cs_BuiltInFormatStruct cs_BuiltInFormats[] = {
       "png", "image/png",
       [](QIODevice * device) -> QImageIOHandler *
       {
-         if (QPngHandler::canRead(device))
-         {
+         if (QPngHandler::canRead(device)) {
             return new QPngHandler;
          }
 
@@ -107,8 +99,7 @@ static const cs_BuiltInFormatStruct cs_BuiltInFormats[] = {
       "jpg",  "image/jpeg",
       [](QIODevice * device) -> QImageIOHandler *
       {
-         if (QJpegHandler::canRead(device))
-         {
+         if (QJpegHandler::canRead(device)) {
             return new QJpegHandler;
          }
 
@@ -120,8 +111,7 @@ static const cs_BuiltInFormatStruct cs_BuiltInFormats[] = {
       "jpeg", "image/jpeg",
       [](QIODevice * device) -> QImageIOHandler *
       {
-         if (QJpegHandler::canRead(device))
-         {
+         if (QJpegHandler::canRead(device)) {
             return new QJpegHandler;
          }
 
@@ -135,8 +125,7 @@ static const cs_BuiltInFormatStruct cs_BuiltInFormats[] = {
       "gif", "image/gif",
       [](QIODevice * device) -> QImageIOHandler *
       {
-         if (QGifHandler::canRead(device))
-         {
+         if (QGifHandler::canRead(device)) {
             return new QGifHandler;
          }
 
@@ -149,8 +138,7 @@ static const cs_BuiltInFormatStruct cs_BuiltInFormats[] = {
       "bmp", "image/bmp",
       [](QIODevice * device) -> QImageIOHandler *
       {
-         if (QBmpHandler::canRead(device))
-         {
+         if (QBmpHandler::canRead(device)) {
             return new QBmpHandler;
          }
 
@@ -175,8 +163,7 @@ static const cs_BuiltInFormatStruct cs_BuiltInFormats[] = {
       "ppm", "image/x-portable-pixmap",
       [](QIODevice * device) -> QImageIOHandler *
       {
-         if (QPpmHandler::canRead(device))
-         {
+         if (QPpmHandler::canRead(device)) {
             auto handler = new QPpmHandler;
             handler->setOption(QImageIOHandler::SubType, QString("ppm"));
 
@@ -191,8 +178,7 @@ static const cs_BuiltInFormatStruct cs_BuiltInFormats[] = {
       "pgm", "image/x-portable-graymap",
       [](QIODevice * device) -> QImageIOHandler *
       {
-         if (QPpmHandler::canRead(device))
-         {
+         if (QPpmHandler::canRead(device)) {
             auto handler = new QPpmHandler;
             handler->setOption(QImageIOHandler::SubType, QString("pgm"));
 
@@ -207,8 +193,7 @@ static const cs_BuiltInFormatStruct cs_BuiltInFormats[] = {
       "pbm", "image/x-portable-bitmap",
       [](QIODevice * device) -> QImageIOHandler *
       {
-         if (QPpmHandler::canRead(device))
-         {
+         if (QPpmHandler::canRead(device)) {
             auto handler = new QPpmHandler;
             handler->setOption(QImageIOHandler::SubType, QString("pbm"));
 
@@ -225,8 +210,7 @@ static const cs_BuiltInFormatStruct cs_BuiltInFormats[] = {
       "xbm", "image/x-xbitmap",
       [](QIODevice * device) -> QImageIOHandler *
       {
-         if (QXbmHandler::canRead(device))
-         {
+         if (QXbmHandler::canRead(device)) {
             auto handler = new QXbmHandler;
             handler->setOption(QImageIOHandler::SubType, QString("xbm"));
 
@@ -243,8 +227,7 @@ static const cs_BuiltInFormatStruct cs_BuiltInFormats[] = {
       "xpm", "image/x-xpixmap",
       [](QIODevice * device) -> QImageIOHandler *
       {
-         if (QXpmHandler::canRead(device))
-         {
+         if (QXpmHandler::canRead(device)) {
             return new QXpmHandler;
          }
 
@@ -258,8 +241,7 @@ static const cs_BuiltInFormatStruct cs_BuiltInFormats[] = {
       "ico", "image/x-icon",
       [](QIODevice * device) -> QImageIOHandler *
       {
-         if (QIcoHandler::canRead(device))
-         {
+         if (QIcoHandler::canRead(device)) {
             return new QIcoHandler;
          }
 
@@ -273,8 +255,7 @@ static const cs_BuiltInFormatStruct cs_BuiltInFormats[] = {
       "tif", "image/tiff",
       [](QIODevice * device) -> QImageIOHandler *
       {
-         if (QTiffHandler::canRead(device))
-         {
+         if (QTiffHandler::canRead(device)) {
             return new QTiffHandler;
          }
 
@@ -454,6 +435,12 @@ static QImageIOHandler *createReadHandlerHelper(QIODevice *device,
 class QImageReaderPrivate
 {
  public:
+   enum ImageReadFlags {
+      UsePluginDefault,
+      ApplyTransform,
+      DoNotApplyTransform
+   };
+
    QImageReaderPrivate(QImageReader *qq);
    ~QImageReaderPrivate();
 
@@ -474,11 +461,7 @@ class QImageReaderPrivate
    QMap<QString, QString> text;
    void getText();
 
-   enum {
-      UsePluginDefault,
-      ApplyTransform,
-      DoNotApplyTransform
-   } autoTransform;
+   ImageReadFlags autoTransform;
 
    // error
    QImageReader::ImageReaderError imageReaderError;
@@ -487,9 +470,6 @@ class QImageReaderPrivate
    QImageReader *q;
 };
 
-/*!
-    \internal
-*/
 QImageReaderPrivate::QImageReaderPrivate(QImageReader *qq)
    : autoDetectImageFormat(true), ignoresFormatAndExtension(false)
 {
@@ -503,9 +483,6 @@ QImageReaderPrivate::QImageReaderPrivate(QImageReader *qq)
    q = qq;
 }
 
-/*!
-    \internal
-*/
 QImageReaderPrivate::~QImageReaderPrivate()
 {
    if (deleteDevice) {
@@ -514,9 +491,6 @@ QImageReaderPrivate::~QImageReaderPrivate()
    delete handler;
 }
 
-/*!
-    \internal
-*/
 bool QImageReaderPrivate::initHandler()
 {
    // check some preconditions
@@ -570,9 +544,6 @@ bool QImageReaderPrivate::initHandler()
    return true;
 }
 
-/*!
-    \internal
-*/
 void QImageReaderPrivate::getText()
 {
    if (!text.isEmpty() || (!handler && !initHandler()) || !handler->supportsOption(QImageIOHandler::Description)) {
@@ -901,7 +872,7 @@ extern void qt_imageTransform(QImage &src, QImageIOHandler::Transformations orie
 bool QImageReader::read(QImage *image)
 {
    if (! image) {
-      qWarning("QImageReader::read: cannot read into null pointer");
+      qWarning("QImageReader::read() Unable to read image (nullptr)");
       return false;
    }
 
@@ -1005,7 +976,7 @@ bool QImageReader::read(QImage *image)
    }
    static bool disable2xImageLoading = ! qgetenv("QT_HIGHDPI_DISABLE_2X_IMAGE_LOADING").isEmpty();
 
-   if (!disable2xImageLoading && QFileInfo(fileName()).baseName().endsWith("@2x")) {
+   if (! disable2xImageLoading && QFileInfo(fileName()).baseName().endsWith("@2x")) {
       image->setDevicePixelRatio(2.0);
    }
 
@@ -1019,57 +990,61 @@ bool QImageReader::read(QImage *image)
 
 bool QImageReader::jumpToNextImage()
 {
-   if (!d->initHandler()) {
+   if (! d->initHandler()) {
       return false;
    }
+
    return d->handler->jumpToNextImage();
 }
 
-
 bool QImageReader::jumpToImage(int imageNumber)
 {
-   if (!d->initHandler()) {
+   if (! d->initHandler()) {
       return false;
    }
+
    return d->handler->jumpToImage(imageNumber);
 }
 
 int QImageReader::loopCount() const
 {
-   if (!d->initHandler()) {
+   if (! d->initHandler()) {
       return -1;
    }
+
    return d->handler->loopCount();
 }
 
-
 int QImageReader::imageCount() const
 {
-   if (!d->initHandler()) {
+   if (! d->initHandler()) {
       return -1;
    }
+
    return d->handler->imageCount();
 }
 
 int QImageReader::nextImageDelay() const
 {
-   if (!d->initHandler()) {
+   if (! d->initHandler()) {
       return -1;
    }
+
    return d->handler->nextImageDelay();
 }
 
 int QImageReader::currentImageNumber() const
 {
-   if (!d->initHandler()) {
+   if (! d->initHandler()) {
       return -1;
    }
+
    return d->handler->currentImageNumber();
 }
 
 QRect QImageReader::currentImageRect() const
 {
-   if (!d->initHandler()) {
+   if (! d->initHandler()) {
       return QRect();
    }
    return d->handler->currentImageRect();
@@ -1085,20 +1060,23 @@ QString QImageReader::errorString() const
    if (d->errorString.isEmpty()) {
       return QImageReader::tr("Unknown error");
    }
+
    return d->errorString;
 }
 
 bool QImageReader::supportsOption(QImageIOHandler::ImageOption option) const
 {
-   if (!d->initHandler()) {
+   if (! d->initHandler()) {
       return false;
    }
+
    return d->handler->supportsOption(option);
 }
 
 QString QImageReader::imageFormat(const QString &fileName)
 {
    QFile file(fileName);
+
    if (!file.open(QFile::ReadOnly)) {
       return QString();
    }
@@ -1117,6 +1095,7 @@ QString QImageReader::imageFormat(QIODevice *device)
       }
       delete handler;
    }
+
    return format;
 }
 

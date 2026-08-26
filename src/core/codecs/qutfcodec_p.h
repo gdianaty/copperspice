@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -150,7 +150,6 @@ class QUtf32LECodec : public QUtf32Codec
    QStringList aliases() const override;
    int mibEnum() const override;
 };
-
 
 #endif // QT_NO_TEXTCODEC
 

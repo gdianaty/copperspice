@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,24 +22,15 @@
 ***********************************************************************/
 
 #include <qxcb_image.h>
+
 #include <qcolor.h>
 
-#include <qimage_p.h>
 #include <qdrawhelper_p.h>
+#include <qimage_p.h>
 
 #ifdef XCB_USE_RENDER
-
 #include <xcb/render.h>
-
-// 'template' is used as a function argument name in xcb_renderutil.h
-#define template template_param
-
-// extern "C" is missing too
-extern "C" {
 #include <xcb/xcb_renderutil.h>
-}
-
-#undef template
 #endif
 
 QImage::Format qt_xcb_imageFormatForVisual(QXcbConnection *connection, uint8_t depth,

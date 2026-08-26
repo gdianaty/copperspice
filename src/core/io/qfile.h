@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,6 +26,7 @@
 
 #include <qfiledevice.h>
 #include <qstring.h>
+
 #include <stdio.h>
 
 #ifdef open
@@ -33,6 +34,7 @@
 #endif
 
 class QTemporaryFile;
+
 class QFilePrivate;
 
 class Q_CORE_EXPORT QFile : public QFileDevice
@@ -55,12 +57,13 @@ class Q_CORE_EXPORT QFile : public QFileDevice
    QString fileName() const override;
    void setFileName(const QString &name);
 
-   typedef QByteArray (*EncoderFn)(const QString &fileName);
-   typedef QString (*DecoderFn)(const QByteArray &localfileName);
+   using EncoderFn = QByteArray (*)(const QString &fileName);
+   using DecoderFn = QString (*)(const QByteArray &localfileName);
+
    static QByteArray encodeName(const QString &fileName);
    static QString decodeName(const QByteArray &localFileName);
 
-   static inline QString decodeName(const char *localFileName) {
+   static QString decodeName(const char *localFileName) {
       return decodeName(QByteArray(localFileName));
    }
 
@@ -72,11 +75,12 @@ class Q_CORE_EXPORT QFile : public QFileDevice
 
    QString readLink() const;
    static QString readLink(const QString &fileName);
-   inline QString symLinkTarget() const {
+
+   QString symLinkTarget() const {
       return readLink();
    }
 
-   static inline QString symLinkTarget(const QString &fileName) {
+   static QString symLinkTarget(const QString &fileName) {
       return readLink(fileName);
    }
 
@@ -101,10 +105,11 @@ class Q_CORE_EXPORT QFile : public QFileDevice
    bool resize(qint64 sz) override;
    static bool resize(const QString &filename, qint64 sz);
 
-   Permissions permissions() const override;
-   static Permissions permissions(const QString &fileName);
-   bool setPermissions(Permissions permissions) override;
-   static bool setPermissions(const QString &fileName, Permissions permissions);
+   QFileDevice::Permissions permissions() const override;
+   static QFileDevice::Permissions permissions(const QString &fileName);
+
+   bool setPermissions(QFileDevice::Permissions permissions) override;
+   static bool setPermissions(const QString &fileName, QFileDevice::Permissions permissions);
 
  protected:
    QFile(QFilePrivate &dd, QObject *parent = nullptr);

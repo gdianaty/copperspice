@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,13 +22,12 @@
 ***********************************************************************/
 
 #include <qabstract_networkcache.h>
+#include <qabstract_networkcache_p.h>
 
 #include <qdatetime.h>
-#include <qurl.h>
 #include <qdebug.h>
 #include <qscopedpointer.h>
-
-#include <qabstract_networkcache_p.h>
+#include <qurl.h>
 
 class QNetworkCacheMetaDataPrivate : public QSharedData
 {
@@ -202,7 +201,7 @@ static inline QDataStream &operator>>(QDataStream &in, QNetworkCacheMetaData::At
 {
    hash.clear();
 
-   QDataStream::Status oldStatus = in.status();
+   QDataStream::DataStreamStatus oldStatus = in.status();
    in.resetStatus();
 
    quint32 n;

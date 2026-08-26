@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -82,7 +82,7 @@ class Q_GUI_EXPORT QInputMethod : public QObject
    QLocale locale() const;
    Qt::LayoutDirection inputDirection() const;
 
-   static QVariant queryFocusObject(Qt::InputMethodQuery query, QVariant argument); // ### Qt 6: QVariant by const-ref
+   static QVariant queryFocusObject(Qt::InputMethodQuery query, QVariant argument); // TODO: QVariant by const-ref
 
    GUI_CS_SLOT_1(Public, void show())
    GUI_CS_SLOT_2(show)

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,8 +26,6 @@
 
 #include <qvariablereference_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class RangeVariableReference : public VariableReference
@@ -47,8 +45,7 @@ class RangeVariableReference : public VariableReference
  private:
    const Expression::Ptr m_sourceExpression;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

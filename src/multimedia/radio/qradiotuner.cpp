@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,10 +23,10 @@
 
 #include <qradiotuner.h>
 
-#include <qpair.h>
 #include <qmediaservice.h>
-#include <qradiotunercontrol.h>
+#include <qpair.h>
 #include <qradiodata.h>
+#include <qradiotunercontrol.h>
 
 #include <qmediaobject_p.h>
 #include <qmediaserviceprovider_p.h>

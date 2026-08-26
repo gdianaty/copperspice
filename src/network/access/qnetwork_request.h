@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,8 +29,8 @@
 #include <qurl.h>
 #include <qvariant.h>
 
-class QSslConfiguration;
 class QNetworkRequestPrivate;
+class QSslConfiguration;
 
 class Q_NETWORK_EXPORT QNetworkRequest
 {
@@ -62,9 +62,9 @@ class Q_NETWORK_EXPORT QNetworkRequest
       CookieLoadControlAttribute,
       AuthenticationReuseAttribute,
       CookieSaveControlAttribute,
-      MaximumDownloadBufferSizeAttribute, // internal
-      DownloadBufferAttribute, // internal
-      SynchronousRequestAttribute, // internal
+      MaximumDownloadBufferSizeAttribute,
+      DownloadBufferAttribute,
+      SynchronousRequestAttribute,
       BackgroundRequestAttribute,
       SpdyAllowedAttribute,
       SpdyWasUsedAttribute,
@@ -109,7 +109,7 @@ class Q_NETWORK_EXPORT QNetworkRequest
    }
 
    bool operator==(const QNetworkRequest &other) const;
-   inline bool operator!=(const QNetworkRequest &other) const {
+   bool operator!=(const QNetworkRequest &other) const {
       return !operator==(other);
    }
 

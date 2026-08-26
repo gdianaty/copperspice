@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,18 +24,18 @@
 #ifndef QXCB_WINDOW_H
 #define QXCB_WINDOW_H
 
+#include <qimage.h>
 #include <qplatform_window.h>
 #include <qsurfaceformat.h>
-#include <qimage.h>
 #include <qxcb_object.h>
 #include <qxcbwindowfunctions.h>
 
 #include <xcb/xcb.h>
 #include <xcb/sync.h>
 
+class QIcon;
 class QXcbScreen;
 class QXcbSyncWindowRequest;
-class QIcon;
 
 class Q_XCB_EXPORT QXcbWindow : public QObject, public QXcbObject, public QXcbWindowEventListener, public QPlatformWindow
 {
@@ -138,10 +138,8 @@ class Q_XCB_EXPORT QXcbWindow : public QObject, public QXcbObject, public QXcbWi
    void handleFocusOutEvent(const xcb_focus_out_event_t *event) override;
    void handlePropertyNotifyEvent(const xcb_property_notify_event_t *event) override;
 
-#ifdef XCB_USE_XINPUT22
    void handleXIMouseEvent(xcb_ge_event_t *, Qt::MouseEventSource source = Qt::MouseEventNotSynthesized) override;
    void handleXIEnterLeave(xcb_ge_event_t *) override;
-#endif
 
    QXcbWindow *toWindow() override;
 

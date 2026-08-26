@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,15 +26,11 @@
 
 #include <qpaircontainer_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class ForClause : public PairContainer
 {
  public:
-   /**
-    * If @p positionSlot is -1, no positional variable will be used.
-    */
    ForClause(const VariableSlotID varSlot,
              const Expression::Ptr &bindingSequence,
              const Expression::Ptr &returnExpression,
@@ -46,7 +42,7 @@ class ForClause : public PairContainer
 
    SequenceType::Ptr staticType() const override;
    SequenceType::List expectedOperandTypes() const override;
-   Expression::Ptr typeCheck(const StaticContext::Ptr &context, const SequenceType::Ptr &reqType) override; 
+   Expression::Ptr typeCheck(const StaticContext::Ptr &context, const SequenceType::Ptr &reqType) override;
    ExpressionVisitorResult::Ptr accept(const ExpressionVisitor::Ptr &visitor) const override;
    QList<QExplicitlySharedDataPointer<OptimizationPass> > optimizationPasses() const override;
 
@@ -55,25 +51,18 @@ class ForClause : public PairContainer
 
    inline Item::Iterator::Ptr mapToSequence(const Item &item, const DynamicContext::Ptr &context) const;
 
-   /**
-    * Sets m_allowsMany properly.
-    */
    Expression::Ptr compress(const StaticContext::Ptr &context) override;
 
  private:
-   inline void riggPositionalVariable(const DynamicContext::Ptr &context,
-                                      const Item::Iterator::Ptr &source) const;
+   inline void riggPositionalVariable(const DynamicContext::Ptr &context, const Item::Iterator::Ptr &source) const;
 
    typedef QExplicitlySharedDataPointer<const ForClause> ConstPtr;
    const VariableSlotID m_varSlot;
    const VariableSlotID m_positionSlot;
-   /**
-    * Initialized to @c false. This default is always safe.
-    */
+
    bool m_allowsMany;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

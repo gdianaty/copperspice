@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,16 +24,15 @@
 #ifndef QCSSPARSER_P_H
 #define QCSSPARSER_P_H
 
-#include <qstringlist.h>
-#include <qvector.h>
-#include <qvariant.h>
-#include <qpair.h>
-#include <qsize.h>
-#include <qmultihash.h>
 #include <qfont.h>
+#include <qmultihash.h>
+#include <qpair.h>
 #include <qpalette.h>
-
 #include <qshareddata.h>
+#include <qsize.h>
+#include <qstringlist.h>
+#include <qvariant.h>
+#include <qvector.h>
 
 #ifndef QT_NO_CSSPARSER
 
@@ -336,21 +335,45 @@ struct Value {
 };
 
 struct ColorData {
+   enum ColorType {
+      Invalid,
+      Color,
+      Role
+   };
+
    ColorData() : role(QPalette::NoRole), type(Invalid) {}
    ColorData(const QColor &col) : color(col), role(QPalette::NoRole), type(Color) {}
    ColorData(QPalette::ColorRole r) : role(r), type(Role) {}
    QColor color;
    QPalette::ColorRole role;
-   enum { Invalid, Color, Role} type;
+
+   ColorType type;
 };
 
 struct BrushData {
-   BrushData() : role(QPalette::NoRole), type(Invalid) {}
-   BrushData(const QBrush &br) : brush(br), role(QPalette::NoRole), type(Brush) {}
-   BrushData(QPalette::ColorRole r) : role(r), type(Role) {}
+   enum BrushType {
+      Invalid,
+      Brush,
+      Role,
+      DependsOnThePalette
+   };
+
+   BrushData()
+      : role(QPalette::NoRole), type(Invalid)
+   { }
+
+   BrushData(const QBrush &br)
+      : brush(br), role(QPalette::NoRole), type(Brush)
+   { }
+
+   BrushData(QPalette::ColorRole r)
+      : role(r), type(Role)
+   { }
+
    QBrush brush;
    QPalette::ColorRole role;
-   enum { Invalid, Brush, Role, DependsOnThePalette } type;
+
+   BrushType type;
 };
 
 struct BackgroundData {
@@ -361,8 +384,16 @@ struct BackgroundData {
 };
 
 struct LengthData {
+   enum UnitType {
+      None,
+      Px,
+      Ex,
+      Em
+   };
+
    qreal number;
-   enum { None, Px, Ex, Em } unit;
+
+   UnitType unit;
 };
 
 struct BorderData {
@@ -571,13 +602,13 @@ struct StyleSheet {
       : origin(StyleSheetOrigin_Unspecified), depth(0)
    { }
 
-   QVector<StyleRule> styleRules;  // only contains rules that are not indexed
+   QVector<StyleRule> styleRules;              // only contains rules that are not indexed
    QVector<MediaRule> mediaRules;
    QVector<PageRule> pageRules;
    QVector<ImportRule> importRules;
    StyleSheetOrigin origin;
 
-   int depth;                      // applicable only for inline style sheets
+   int depth;                                  // applicable only for inline style sheets
    QMultiHash<QString, StyleRule> nameIndex;
    QMultiHash<QString, StyleRule> idIndex;
 
@@ -916,9 +947,10 @@ struct Q_GUI_EXPORT ValueExtractor {
    QFont f;
    int adjustment;
    int fontExtracted;
-   QPalette pal;
+   QPalette m_palette;
 };
-} // namespace QCss
+
+}   // namespace
 
 CS_DECLARE_METATYPE(QCss::BackgroundData)
 CS_DECLARE_METATYPE(QCss::LengthData)

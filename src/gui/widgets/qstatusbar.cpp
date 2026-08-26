@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,24 +25,23 @@
 
 #ifndef QT_NO_STATUSBAR
 
-#include <qlist.h>
 #include <qdebug.h>
 #include <qevent.h>
 #include <qlayout.h>
+#include <qlist.h>
+#include <qmainwindow.h>
 #include <qpainter.h>
-#include <qtimer.h>
+#include <qsizegrip.h>
 #include <qstyle.h>
 #include <qstyleoption.h>
-#include <qsizegrip.h>
-#include <qmainwindow.h>
-
-#ifndef QT_NO_ACCESSIBILITY
-#include <qaccessible.h>
-#endif
+#include <qtimer.h>
 
 #include <qlayoutengine_p.h>
 #include <qwidget_p.h>
 
+#ifndef QT_NO_ACCESSIBILITY
+#include <qaccessible.h>
+#endif
 
 class QStatusBarPrivate : public QWidgetPrivate
 {
@@ -175,7 +174,6 @@ void QStatusBar::addWidget(QWidget *widget, int stretch)
    insertWidget(d_func()->indexToLastNonPermanentWidget() + 1, widget, stretch);
 }
 
-
 int QStatusBar::insertWidget(int index, QWidget *widget, int stretch)
 {
    if (!widget) {
@@ -186,6 +184,7 @@ int QStatusBar::insertWidget(int index, QWidget *widget, int stretch)
    QStatusBarPrivate::SBItem *item = new QStatusBarPrivate::SBItem(widget, stretch, false);
 
    int idx = d->indexToLastNonPermanentWidget();
+
    if (index < 0 || index > d->items.size() || (idx >= 0 && index > idx + 1)) {
       qWarning("QStatusBar::insertWidget() Index (%d) is out of range, appending widget instead", index);
       index = idx + 1;
@@ -197,26 +196,12 @@ int QStatusBar::insertWidget(int index, QWidget *widget, int stretch)
    }
 
    reformat();
-   if (!widget->isHidden() || !widget->testAttribute(Qt::WA_WState_ExplicitShowHide)) {
+   if (! widget->isHidden() || !widget->testAttribute(Qt::WA_WState_ExplicitShowHide)) {
       widget->show();
    }
 
    return index;
 }
-
-/*!
-    Adds the given \a widget permanently to this status bar,
-    reparenting the widget if it isn't already a child of this
-    QStatusBar object. The \a stretch parameter is used to compute a
-    suitable size for the given \a widget as the status bar grows and
-    shrinks. The default stretch factor is 0, i.e giving the widget a
-    minimum of space.
-
-    Permanently means that the widget may not be obscured by temporary
-    messages. It is is located at the far right of the status bar.
-
-    \sa insertPermanentWidget(), removeWidget(), addWidget()
-*/
 
 void QStatusBar::addPermanentWidget(QWidget *widget, int stretch)
 {
@@ -225,7 +210,6 @@ void QStatusBar::addPermanentWidget(QWidget *widget, int stretch)
    }
    insertPermanentWidget(d_func()->items.size(), widget, stretch);
 }
-
 
 int QStatusBar::insertPermanentWidget(int index, QWidget *widget, int stretch)
 {
@@ -250,16 +234,6 @@ int QStatusBar::insertPermanentWidget(int index, QWidget *widget, int stretch)
 
    return index;
 }
-
-/*!
-    Removes the specified \a widget from the status bar.
-
-    \note This function does not delete the widget but \e hides it.
-    To add the widget again, you must call both the addWidget() and
-    show() functions.
-
-    \sa addWidget(), addPermanentWidget(), clearMessage()
-*/
 
 void QStatusBar::removeWidget(QWidget *widget)
 {
@@ -288,7 +262,8 @@ void QStatusBar::removeWidget(QWidget *widget)
    if (found) {
       reformat();
    }
-#if defined(QT_DEBUG)
+
+#if defined(CS_SHOW_DEBUG_GUI_WIDGETS)
    else {
       qDebug("QStatusBar::removeWidget(): Widget not found.");
    }
@@ -483,9 +458,6 @@ void QStatusBar::hideOrShow()
    repaint(d->messageRect());
 }
 
-/*!
-  \reimp
- */
 void QStatusBar::showEvent(QShowEvent *)
 {
 #ifndef QT_NO_SIZEGRIP
@@ -496,54 +468,50 @@ void QStatusBar::showEvent(QShowEvent *)
 #endif
 }
 
-
 void QStatusBar::paintEvent(QPaintEvent *event)
 {
    Q_D(QStatusBar);
    bool haveMessage = !d->tempItem.isEmpty();
 
    QPainter p(this);
-   QStyleOption opt;
-   opt.initFrom(this);
-   style()->drawPrimitive(QStyle::PE_PanelStatusBar, &opt, &p, this);
+
+   QStyleOption option;
+   option.initFrom(this);
+   style()->drawPrimitive(QStyle::PE_PanelStatusBar, &option, &p, this);
 
    for (int i = 0; i < d->items.size(); ++i) {
       QStatusBarPrivate::SBItem *item = d->items.at(i);
-      if (item && item->w->isVisible() && (!haveMessage || item->p)) {
+
+      if (item && item->w->isVisible() && (! haveMessage || item->p)) {
          QRect ir = item->w->geometry().adjusted(-2, -1, 2, 1);
+
          if (event->rect().intersects(ir)) {
-            QStyleOption opt(0);
-            opt.rect = ir;
-            opt.palette = palette();
-            opt.state = QStyle::State_None;
-            style()->drawPrimitive(QStyle::PE_FrameStatusBarItem, &opt, &p, item->w);
+            QStyleOption newOption(0);
+            newOption.rect = ir;
+            newOption.palette = palette();
+            newOption.state = QStyle::State_None;
+
+            style()->drawPrimitive(QStyle::PE_FrameStatusBarItem, &newOption, &p, item->w);
          }
       }
    }
+
    if (haveMessage) {
       p.setPen(palette().foreground().color());
       p.drawText(d->messageRect(), Qt::AlignLeading | Qt::AlignVCenter | Qt::TextSingleLine, d->tempItem);
    }
 }
 
-/*!
-    \reimp
-*/
 void QStatusBar::resizeEvent(QResizeEvent *e)
 {
    QWidget::resizeEvent(e);
 }
 
-/*!
-    \reimp
-*/
-
 bool QStatusBar::event(QEvent *e)
 {
    Q_D(QStatusBar);
 
-   if (e->type() == QEvent::LayoutRequest
-   ) {
+   if (e->type() == QEvent::LayoutRequest) {
       // Calculate new strut height and call reformat() if it has changed
       int maxH = fontMetrics().height();
 
@@ -569,6 +537,7 @@ bool QStatusBar::event(QEvent *e)
          update();
       }
    }
+
    if (e->type() == QEvent::ChildRemoved) {
       QStatusBarPrivate::SBItem *item = nullptr;
 

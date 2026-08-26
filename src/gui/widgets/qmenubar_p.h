@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,13 +24,15 @@
 #ifndef QMENUBAR_P_H
 #define QMENUBAR_P_H
 
-#include <qstyleoption.h>
-#include <qmenu_p.h>          // Mac needs what in this file
 #include <qplatform_menu.h>
+#include <qstyleoption.h>
+
+#include <qmenu_p.h>          // Mac needs what in this file
 
 #ifndef QT_NO_MENUBAR
-class QToolBar;
+
 class QMenuBarExtension;
+class QToolBar;
 
 class QMenuBarPrivate : public QWidgetPrivate
 {
@@ -108,7 +110,7 @@ class QMenuBarPrivate : public QWidgetPrivate
    QBasicTimer autoReleaseTimer;
 
    QPlatformMenuBar *platformMenuBar;
-   inline int indexOf(QAction *act) const {
+   int indexOf(QAction *act) const {
       return q_func()->actions().indexOf(act);
    }
 };

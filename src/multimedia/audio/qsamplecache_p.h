@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,13 +24,13 @@
 #ifndef QSAMPLECACHE_P_H
 #define QSAMPLECACHE_P_H
 
+#include <qaudioformat.h>
+#include <qmap.h>
+#include <qmutex.h>
 #include <qobject.h>
+#include <qset.h>
 #include <qthread.h>
 #include <qurl.h>
-#include <qmutex.h>
-#include <qmap.h>
-#include <qset.h>
-#include <qaudioformat.h>
 
 class QIODevice;
 class QNetworkAccessManager;

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,11 +24,10 @@
 #ifndef QUnlimitedContainer_P_H
 #define QUnlimitedContainer_P_H
 
-#include <QList>
+#include <qlist.h>
+
 #include <qexpression_p.h>
 #include <qgenericsequencetype_p.h>
-
-QT_BEGIN_NAMESPACE
 
 namespace QPatternist {
 
@@ -66,7 +65,7 @@ class UnlimitedContainer : public Expression
 
          /* Since this function is a template function, it doesn't
           * hurt performance that this test is inside the loop. */
-         if (suppliedCard == ProductOfCardinality) {
+         if constexpr (suppliedCard == ProductOfCardinality) {
             card += t->cardinality();
          } else {
             card |= t->cardinality();
@@ -81,7 +80,5 @@ class UnlimitedContainer : public Expression
 
 
 }
-
-QT_END_NAMESPACE
 
 #endif

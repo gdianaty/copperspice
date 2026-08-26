@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -62,23 +62,23 @@ union EnumUnion {
 class TokenSource : public QSharedData
 {
  public:
-   /**
-    * typedef for the enum Bison generates that contains the token symbols.
-    */
    typedef yytokentype TokenType;
+   typedef QExplicitlySharedDataPointer<TokenSource> Ptr;
+   typedef QQueue<Ptr> Queue;
 
-   /**
-    * Represents a token by carrying its name and value.
-    */
    class Token
    {
     public:
-      /**
-       * Constructs an invalid Token. This default constructor is need in the container classes.
-       */
-      inline Token() {}
-      inline Token(const TokenType t) : type(t) {}
-      inline Token(const TokenType t, const QString &val) : type(t), value(val) {}
+      Token()
+      { }
+
+      Token(const TokenType t)
+         : type(t)
+      { }
+
+      Token(const TokenType t, const QString &val)
+         : type(t), value(val)
+      { }
 
       bool hasError() const {
          return type == ERROR;
@@ -87,9 +87,6 @@ class TokenSource : public QSharedData
       TokenType type;
       QString value;
    };
-
-   typedef QExplicitlySharedDataPointer<TokenSource> Ptr;
-   typedef QQueue<Ptr> Queue;
 
    TokenSource() = default;
 
@@ -101,6 +98,7 @@ class TokenSource : public QSharedData
    TokenSource(const TokenSource &) = delete;
    TokenSource &operator=(const TokenSource &) = delete;
 };
+
 }
 
 #endif

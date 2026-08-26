@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,13 +24,13 @@
 #ifndef QXCB_SYSTEMTRAYTRACKER_H
 #define QXCB_SYSTEMTRAYTRACKER_H
 
-#include <qxcb_connection.h>
 #include <qobject.h>
+#include <qxcb_connection.h>
 
 #include <xcb/xcb.h>
 
-class QXcbConnection;
 class QScreen;
+class QXcbConnection;
 
 class QXcbSystemTrayTracker : public QObject, public QXcbWindowEventListener
 {

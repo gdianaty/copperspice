@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2013 Klarälvdalens Datakonsult AB, a KDAB Group company
 * Copyright (c) 2015 The Qt Company Ltd.
@@ -196,9 +196,11 @@ GLuint QOpenGLTextureCache::bindTexture(QOpenGLContext *context, qint64 key, con
    funcs->glBindTexture(GL_TEXTURE_2D, id);
 
    QImage tx;
-   GLenum externalFormat;
-   GLenum internalFormat;
-   GLuint pixelType;
+
+   GLenum externalFormat = GL_RGBA;
+   GLenum internalFormat = GL_RGBA;
+   GLuint pixelType      = GL_UNSIGNED_BYTE;
+
    QImage::Format targetFormat = QImage::Format_Invalid;
 
    const bool isOpenGL12orBetter = !context->isOpenGLES() &&
@@ -222,10 +224,10 @@ GLuint QOpenGLTextureCache::bindTexture(QOpenGLContext *context, qint64 key, con
             if (static_cast<QOpenGLExtensions*>(context->functions())->hasOpenGLExtension(QOpenGLExtensions::BGRATextureFormat)) {
                 // GL_EXT_bgra or GL_EXT_texture_format_BGRA8888 extensions.
                 if (context->isOpenGLES()) {
-                    // The GL_EXT_texture_format_BGRA8888 extension requires the internal format to match the external.
+                    // The GL_EXT_texture_format_BGRA8888 extension requires the formats to match
                     externalFormat = internalFormat = GL_BGRA;
                 } else {
-                    // OpenGL BGRA/BGR format is not allowed as an internal format
+                    // OpenGL BGRA/BGR format is not allowed as a format
                     externalFormat = GL_BGRA;
                     internalFormat = GL_RGBA;
                 }

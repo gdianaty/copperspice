@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,14 @@
 #ifndef QFunctionArgument_P_H
 #define QFunctionArgument_P_H
 
-#include <QList>
-#include <QSharedData>
+#include <qlist.h>
+#include <qshareddata.h>
 #include <qxmlname.h>
+
 #include <qsequencetype_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class FunctionArgument : public QSharedData
 {
  public:
@@ -50,8 +50,7 @@ class FunctionArgument : public QSharedData
    const QXmlName m_name;
    const SequenceType::Ptr m_type;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

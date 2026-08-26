@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,18 +28,19 @@
 
 #ifndef QT_NO_MAINWINDOW
 
+#include <qbasictimer.h>
 #include <qlayout.h>
+#include <qset.h>
 #include <qtabbar.h>
 #include <qvector.h>
-#include <qset.h>
-#include <qbasictimer.h>
-#include <qlayoutengine_p.h>
-#include <qwidgetanimator_p.h>
-#include <qdockarealayout_p.h>
-#include <qtoolbararealayout_p.h>
 
-class QToolBar;
+#include <qdockarealayout_p.h>
+#include <qlayoutengine_p.h>
+#include <qtoolbararealayout_p.h>
+#include <qwidgetanimator_p.h>
+
 class QRubberBand;
+class QToolBar;
 
 #ifndef QT_NO_DOCKWIDGET
 class QDockWidgetGroupWindow : public QWidget

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,13 +23,13 @@
 
 #include <qaudiodecoder.h>
 
-#include <qcoreevent.h>
-#include <qmetaobject.h>
-#include <qtimer.h>
-#include <qdebug.h>
-#include <qpointer.h>
-#include <qmediaservice.h>
 #include <qaudiodecodercontrol.h>
+#include <qcoreevent.h>
+#include <qdebug.h>
+#include <qmediaservice.h>
+#include <qmetaobject.h>
+#include <qpointer.h>
+#include <qtimer.h>
 
 #include <qmediaobject_p.h>
 #include <qmediaserviceprovider_p.h>
@@ -40,13 +40,13 @@ class QAudioDecoderPrivate : public QMediaObjectPrivate
 
  public:
    QAudioDecoderPrivate()
-      : provider(nullptr), control(nullptr), state(QAudioDecoder::StoppedState), error(QAudioDecoder::NoError)
+      : provider(nullptr), control(nullptr), m_state(QAudioDecoder::StoppedState), error(QAudioDecoder::NoError)
    {
    }
 
    QMediaServiceProvider *provider;
    QAudioDecoderControl *control;
-   QAudioDecoder::State state;
+   QAudioDecoder::State m_state;
    QAudioDecoder::Error error;
    QString errorString;
 
@@ -54,23 +54,23 @@ class QAudioDecoderPrivate : public QMediaObjectPrivate
    void _q_error(int error, const QString &errorString);
 };
 
-void QAudioDecoderPrivate::_q_stateChanged(QAudioDecoder::State ps)
+void QAudioDecoderPrivate::_q_stateChanged(QAudioDecoder::State newState)
 {
    Q_Q(QAudioDecoder);
 
-   if (ps != state) {
-      state = ps;
+   if (m_state != newState) {
+      m_state = newState;
 
-      emit q->stateChanged(ps);
+      emit q->stateChanged(newState);
    }
 }
 
-void QAudioDecoderPrivate::_q_error(int error, const QString &errorString)
+void QAudioDecoderPrivate::_q_error(int newError, const QString &errorMsg)
 {
    Q_Q(QAudioDecoder);
 
-   this->error = QAudioDecoder::Error(error);
-   this->errorString = errorString;
+   this->error = QAudioDecoder::Error(newError);
+   this->errorString = errorMsg;
 
    emit q->error(this->error);
 }
@@ -121,7 +121,7 @@ QAudioDecoder::~QAudioDecoder()
 
 QAudioDecoder::State QAudioDecoder::state() const
 {
-   return d_func()->state;
+   return d_func()->m_state;
 }
 
 QAudioDecoder::Error QAudioDecoder::error() const
@@ -167,6 +167,7 @@ QString QAudioDecoder::sourceFilename() const
    if (d->control) {
       return d->control->sourceFilename();
    }
+
    return QString();
 }
 
@@ -182,6 +183,7 @@ void QAudioDecoder::setSourceFilename(const QString &fileName)
 QIODevice *QAudioDecoder::sourceDevice() const
 {
    Q_D(const QAudioDecoder);
+
    if (d->control) {
       return d->control->sourceDevice();
    }
@@ -201,6 +203,7 @@ void QAudioDecoder::setSourceDevice(QIODevice *device)
 QAudioFormat QAudioDecoder::audioFormat() const
 {
    Q_D(const QAudioDecoder);
+
    if (d->control) {
       return d->control->audioFormat();
    }

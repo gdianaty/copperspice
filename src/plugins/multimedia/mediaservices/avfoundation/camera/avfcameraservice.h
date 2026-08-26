@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,34 +24,34 @@
 #ifndef AVFCAMERASERVICE_H
 #define AVFCAMERASERVICE_H
 
+#include <qmediaservice.h>
 #include <qobject.h>
 #include <qset.h>
-#include <qmediaservice.h>
 
-class QCameraControl;
-class QMediaRecorderControl;
+class AVFAudioEncoderSettingsControl;
+class AVFAudioInputSelectorControl;
 class AVFCameraControl;
+class AVFCameraDeviceControl;
+class AVFCameraExposureControl;
+class AVFCameraFlashControl;
+class AVFCameraFocusControl;
 class AVFCameraInfoControl;
 class AVFCameraMetaDataControl;
-class AVFVideoWindowControl;
-class AVFVideoWidgetControl;
 class AVFCameraRendererControl;
-class AVFImageCaptureControl;
 class AVFCameraSession;
-class AVFCameraDeviceControl;
-class AVFAudioInputSelectorControl;
-class AVFCameraFocusControl;
-class AVFCameraExposureControl;
-class AVFCameraZoomControl;
 class AVFCameraViewfinderSettingsControl2;
 class AVFCameraViewfinderSettingsControl;
+class AVFCameraZoomControl;
+class AVFImageCaptureControl;
 class AVFImageEncoderControl;
-class AVFCameraFlashControl;
+class AVFMediaContainerControl;
 class AVFMediaRecorderControl;
 class AVFMediaRecorderControlIOS;
-class AVFAudioEncoderSettingsControl;
 class AVFVideoEncoderSettingsControl;
-class AVFMediaContainerControl;
+class AVFVideoWidgetControl;
+class AVFVideoWindowControl;
+class QCameraControl;
+class QMediaRecorderControl;
 
 class AVFCameraService : public QMediaService
 {

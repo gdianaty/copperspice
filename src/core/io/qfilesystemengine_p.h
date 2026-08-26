@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -33,14 +33,13 @@
 class QFileSystemEngine
 {
  public:
-   static bool isCaseSensitive()
-    {
+   static bool isCaseSensitive() {
 #ifndef Q_OS_WIN
-        return true;
+      return true;
 #else
-        return false;
+      return false;
 #endif
-    }
+   }
 
    static QFileSystemEntry getLinkTarget(const QFileSystemEntry &link, QFileSystemMetaData &data);
    static QFileSystemEntry canonicalName(const QFileSystemEntry &entry, QFileSystemMetaData &data);
@@ -67,18 +66,21 @@ class QFileSystemEngine
 
 #if defined(Q_OS_UNIX)
    static bool fillMetaData(int fd, QFileSystemMetaData &data); // what = PosixStatFlags
+
+   static bool setFileTime(int fd, const QDateTime &newTime, QFileDevice::FileTimeType type, QSystemError &error);
 #endif
 
 #if defined(Q_OS_WIN)
-   static bool uncListSharesOnServer(const QString &server,QStringList *list);
-   static bool fillMetaData(int fd, QFileSystemMetaData &data,QFileSystemMetaData::MetaDataFlags what);
+   static bool uncListSharesOnServer(const QString &server, QStringList *list);
+   static bool fillMetaData(int fd, QFileSystemMetaData &data, QFileSystemMetaData::MetaDataFlags what);
    static bool fillMetaData(HANDLE fHandle, QFileSystemMetaData &data, QFileSystemMetaData::MetaDataFlags what);
    static bool fillPermissions(const QFileSystemEntry &entry, QFileSystemMetaData &data, QFileSystemMetaData::MetaDataFlags what);
    static QString owner(const QFileSystemEntry &entry, QAbstractFileEngine::FileOwner own);
    static QString nativeAbsoluteFilePath(const QString &path);
+
+   static bool setFileTime(HANDLE fHandle, const QDateTime &newTime, QFileDevice::FileTimeType type, QSystemError &error);
 #endif
 
-   //homePath, rootPath and tempPath shall return clean paths
    static QString homePath();
    static QString rootPath();
    static QString tempPath();
@@ -92,13 +94,13 @@ class QFileSystemEngine
    static bool renameFile(const QFileSystemEntry &source, const QFileSystemEntry &target, QSystemError &error);
    static bool removeFile(const QFileSystemEntry &entry, QSystemError &error);
 
-   static bool setPermissions(const QFileSystemEntry &entry, QFile::Permissions permissions,
+   static bool setPermissions(const QFileSystemEntry &entry, QFileDevice::Permissions permissions,
          QSystemError &error, QFileSystemMetaData *data = nullptr);
 
    static bool setCurrentPath(const QFileSystemEntry &entry);
    static QFileSystemEntry currentPath();
 
-   static QAbstractFileEngine *resolveEntryAndCreateLegacyEngine(QFileSystemEntry &entry,QFileSystemMetaData &data);
+   static QAbstractFileEngine *resolveEntryAndCreateLegacyEngine(QFileSystemEntry &entry, QFileSystemMetaData &data);
 
  private:
    static QString slowCanonicalized(const QString &path);

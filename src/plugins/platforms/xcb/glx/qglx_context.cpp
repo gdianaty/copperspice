@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,12 @@
 #include <qglx_context.h>
 
 #include <qdebug.h>
-#include <qlibrary.h>
-#include <qxcb_window.h>
-#include <qxcb_screen.h>
-#include <qopenglcontext.h>
-#include <qoffscreensurface.h>
 #include <qglxnativecontext.h>
+#include <qlibrary.h>
+#include <qoffscreensurface.h>
+#include <qopenglcontext.h>
+#include <qxcb_screen.h>
+#include <qxcb_window.h>
 
 #include <qglx_convenience_p.h>
 
@@ -76,9 +76,11 @@ static Window createDummyWindow(Display *dpy, XVisualInfo *visualInfo, int scree
          0, 0, 100, 100,
          0, visualInfo->depth, InputOutput, visualInfo->visual,
          CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect, &a);
-#ifndef QT_NO_DEBUG
+
+#if defined(CS_SHOW_DEBUG_PLATFORM)
    XStoreName(dpy, window, "Qt GLX dummy window");
 #endif
+
    XFreeColormap(dpy, cmap);
    return window;
 }

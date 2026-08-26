@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,8 +24,9 @@
 #ifndef QDocumentProjector_P_H
 #define QDocumentProjector_P_H
 
-#include <qprojectedexpression_p.h>
 #include <qabstractxmlreceiver.h>
+
+#include <qprojectedexpression_p.h>
 
 namespace QPatternist {
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -113,15 +113,15 @@ class Q_GUI_EXPORT QStrokerOps
       qfixed x;
       qfixed y;
 
-      inline bool isMoveTo() const {
+      bool isMoveTo() const {
          return type == QPainterPath::MoveToElement;
       }
 
-      inline bool isLineTo() const {
+      bool isLineTo() const {
          return type == QPainterPath::LineToElement;
       }
 
-      inline bool isCurveTo() const {
+      bool isCurveTo() const {
          return type == QPainterPath::CurveToElement;
       }
 
@@ -316,11 +316,11 @@ class Q_GUI_EXPORT QDashStroker : public QStrokerOps
    void begin(void *data) override;
    void end() override;
 
-   inline void setStrokeWidth(qreal width) {
+   void setStrokeWidth(qreal width) {
       m_stroke_width = width;
    }
 
-   inline void setMiterLimit(qreal limit) {
+   void setMiterLimit(qreal limit) {
       m_miter_limit = limit;
    }
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,19 +28,20 @@
 
 #ifndef QT_NO_STYLE_STYLESHEET
 
-#include <qstyleoption.h>
+#include <qapplication.h>
 #include <qbrush.h>
 #include <qevent.h>
 #include <qhash.h>
+#include <qstyleoption.h>
 #include <qvector.h>
-#include <qapplication.h>
 
 #include <qcssparser_p.h>
 #include <qrenderrule_p.h>
 
 class QAbstractScrollArea;
-class QStyleSheetStylePrivate;
 class QStyleOptionTitleBar;
+
+class QStyleSheetStylePrivate;
 
 class QStyleSheetStyle : public QWindowsStyle
 {
@@ -65,42 +66,41 @@ class QStyleSheetStyle : public QWindowsStyle
    void drawItemPixmap(QPainter *painter, const QRect &rect, int alignment, const QPixmap &pixmap) const override;
 
    void drawItemText(QPainter *painter, const QRect &rect, int alignment, const QPalette &palette,
-      bool enabled, const QString &text, QPalette::ColorRole textRole  = QPalette::NoRole) const override;
+         bool enabled, const QString &text, QPalette::ColorRole textRole = QPalette::NoRole) const override;
 
    void drawPrimitive(PrimitiveElement pe, const QStyleOption *opiont, QPainter *painter,
-      const QWidget *widget = nullptr) const override;
+         const QWidget *widget = nullptr) const override;
 
    QPixmap generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &pixmap, const QStyleOption *option) const override;
    SubControl hitTestComplexControl(ComplexControl control, const QStyleOptionComplex *option, const QPoint &point,
-      const QWidget *widget = nullptr) const override;
+         const QWidget *widget = nullptr) const override;
 
    QRect itemPixmapRect(const QRect &rect, int alignment, const QPixmap &pixmap) const override;
    QRect itemTextRect(const QFontMetrics &metrics, const QRect &rect, int alignment, bool enabled,
-      const QString &text) const override;
+         const QString &text) const override;
 
    int pixelMetric(PixelMetric metric, const QStyleOption *option = nullptr, const QWidget *widget = nullptr) const override;
 
    QSize sizeFromContents(ContentsType ct, const QStyleOption *option, const QSize &contentsSize,
-      const QWidget *widget = nullptr) const override;
+         const QWidget *widget = nullptr) const override;
 
    QPalette standardPalette() const override;
 
    QIcon standardIcon(StandardPixmap standardIcon, const QStyleOption *opt = nullptr,
-      const QWidget *widget = nullptr) const override;
+         const QWidget *widget = nullptr) const override;
 
    QPixmap standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option = nullptr,
-      const QWidget *widget = nullptr ) const override;
+         const QWidget *widget = nullptr ) const override;
 
    int layoutSpacing(QSizePolicy::ControlType control1, QSizePolicy::ControlType control2,
-      Qt::Orientation orientation, const QStyleOption *option = nullptr, const QWidget *widget = nullptr) const override;
+         Qt::Orientation orientation, const QStyleOption *option = nullptr, const QWidget *widget = nullptr) const override;
 
    int styleHint(StyleHint styleHint, const QStyleOption *option = nullptr, const QWidget *widget = nullptr,
-            QStyleHintReturn *styleHintReturn = nullptr) const
+         QStyleHintReturn *styleHintReturn = nullptr) const override;
 
- override;
    QRect subElementRect(SubElement rect, const QStyleOption *option, const QWidget *widget = nullptr) const override;
    QRect subControlRect(ComplexControl cc, const QStyleOptionComplex *option, SubControl subControl,
-      const QWidget *widget = nullptr) const override;
+         const QWidget *widget = nullptr) const override;
 
    void polish(QWidget *widget) override;
    void polish(QApplication *app) override;
@@ -114,7 +114,6 @@ class QStyleSheetStyle : public QWindowsStyle
    void repolish(QWidget *widget);
    void repolish(QApplication *app);
 
-   QStyle *base;
    void ref() {
       ++refcount;
    }
@@ -131,6 +130,8 @@ class QStyleSheetStyle : public QWindowsStyle
    void clearWidgetFont(QWidget *widget) const;
 
    bool styleSheetPalette(const QWidget *widget, const QStyleOption *option, QPalette *palette);
+
+   QStyle *m_styleSheetBase;
 
    static int numinstances;
 

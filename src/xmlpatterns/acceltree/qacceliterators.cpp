@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,11 +21,9 @@
 *
 ***********************************************************************/
 
-#include <QDebug>
+#include <qacceliterators_p.h>
 
-#include "qacceliterators_p.h"
-
-QT_BEGIN_NAMESPACE
+#include <qdebug.h>
 
 using namespace QPatternist;
 
@@ -160,6 +158,3 @@ QXmlNodeModelIndex::Iterator::Ptr AttributeIterator::copy() const
 {
    return QXmlNodeModelIndex::Iterator::Ptr(new AttributeIterator(m_document, m_preNumber));
 }
-
-QT_END_NAMESPACE
-

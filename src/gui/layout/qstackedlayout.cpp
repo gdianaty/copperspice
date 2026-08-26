@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,12 @@
 #include <qstackedlayout.h>
 
 #include <qalgorithms.h>
-#include <qlayout_p.h>
 #include <qlist.h>
 #include <qwidget.h>
 
-#include <qwidget_p.h>
+#include <qlayout_p.h>
 #include <qlayoutengine_p.h>
+#include <qwidget_p.h>
 
 class QStackedLayoutPrivate : public QLayoutPrivate
 {
@@ -47,13 +47,14 @@ class QStackedLayoutPrivate : public QLayoutPrivate
 QLayoutItem *QStackedLayoutPrivate::replaceAt(int idx, QLayoutItem *newitem)
 {
    Q_Q(QStackedLayout);
+
    if (idx < 0 || idx >= list.size() || !newitem) {
       return nullptr;
    }
 
    QWidget *wdg = newitem->widget();
-   if (!wdg) {
-      qWarning("QStackedLayout::replaceAt: Only widgets can be added");
+   if (! wdg) {
+      qWarning("QStackedLayout::replaceAt() Only widgets can be added to a stacked layout");
       return nullptr;
    }
 
@@ -110,6 +111,7 @@ int QStackedLayout::insertWidget(int index, QWidget *widget)
 
    if (d->index < 0) {
       setCurrentIndex(index);
+
    } else {
       if (index <= d->index) {
          ++d->index;
@@ -123,9 +125,6 @@ int QStackedLayout::insertWidget(int index, QWidget *widget)
    return index;
 }
 
-/*!
-    \reimp
-*/
 QLayoutItem *QStackedLayout::itemAt(int index) const
 {
    Q_D(const QStackedLayout);
@@ -162,7 +161,6 @@ QLayoutItem *QStackedLayout::takeAt(int index)
    return item;
 }
 
-
 void QStackedLayout::setCurrentIndex(int index)
 {
    Q_D(QStackedLayout);
@@ -182,7 +180,12 @@ void QStackedLayout::setCurrentIndex(int index)
       parent->setUpdatesEnabled(false);
    }
 
-   QPointer<QWidget> fw = parent ? parent->window()->focusWidget() : nullptr;
+   QPointer<QWidget> fw = QPointer<QWidget>(nullptr);
+
+   if (parent != nullptr) {
+      fw = parent->window()->focusWidget();
+   }
+
    const bool focusWasOnOldPage = fw && (prev && prev->isAncestorOf(fw));
 
    if (prev) {
@@ -243,10 +246,13 @@ int QStackedLayout::currentIndex() const
 void QStackedLayout::setCurrentWidget(QWidget *widget)
 {
    int index = indexOf(widget);
+
    if (index == -1) {
-      qWarning("QStackedLayout::setCurrentWidget: Widget %p not contained in stack", widget);
+      qWarning("QStackedLayout::setCurrentWidget() Widget %p is not part of this stacked layout",
+            static_cast<void *>(widget));
       return;
    }
+
    setCurrentIndex(index);
 }
 
@@ -272,23 +278,18 @@ int QStackedLayout::count() const
    return d->list.size();
 }
 
-/*!
-    \reimp
-*/
 void QStackedLayout::addItem(QLayoutItem *item)
 {
    QWidget *widget = item->widget();
+
    if (widget) {
       addWidget(widget);
       delete item;
    } else {
-      qWarning("QStackedLayout::addItem: Only widgets can be added");
+      qWarning("QStackedLayout::addItem() Only widgets can be added to a stacked layout");
    }
 }
 
-/*!
-    \reimp
-*/
 QSize QStackedLayout::sizeHint() const
 {
    Q_D(const QStackedLayout);
@@ -309,9 +310,6 @@ QSize QStackedLayout::sizeHint() const
    return s;
 }
 
-/*!
-    \reimp
-*/
 QSize QStackedLayout::minimumSize() const
 {
    Q_D(const QStackedLayout);
@@ -325,9 +323,6 @@ QSize QStackedLayout::minimumSize() const
    return s;
 }
 
-/*!
-    \reimp
-*/
 void QStackedLayout::setGeometry(const QRect &rect)
 {
    Q_D(QStackedLayout);
@@ -365,6 +360,7 @@ bool QStackedLayout::hasHeightForWidth() const
 
    return false;
 }
+
 int QStackedLayout::heightForWidth(int width) const
 {
    const int n = count();
@@ -384,10 +380,10 @@ int QStackedLayout::heightForWidth(int width) const
          }
       }
    }
+
    hfw = qMax(hfw, minimumSize().height());
    return hfw;
 }
-
 
 QStackedLayout::StackingMode QStackedLayout::stackingMode() const
 {

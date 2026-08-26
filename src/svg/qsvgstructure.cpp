@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,9 +24,9 @@
 #include <qsvgstructure_p.h>
 
 #include <qalgorithms.h>
-#include <qpainter.h>
-#include <qlocale.h>
 #include <qdebug.h>
+#include <qlocale.h>
+#include <qpainter.h>
 
 #include <qsvgnode_p.h>
 #include <qsvgstyle_p.h>

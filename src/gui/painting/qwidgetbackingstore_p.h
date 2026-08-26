@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,16 +26,19 @@
 
 #include <qdebug.h>
 #include <qwidget.h>
+#include <qbackingstore.h>
 
 #include <qwidget_p.h>
-#include <qbackingstore.h>
 
 class QPlatformTextureList;
 class QPlatformTextureListWatcher;
 class QWidgetBackingStore;
 
 struct BeginPaintInfo {
-   inline BeginPaintInfo() : wasFlushed(0), nothingToPaint(0), backingStoreRecreated(0) {}
+   BeginPaintInfo()
+      : wasFlushed(0), nothingToPaint(0), backingStoreRecreated(0)
+   { }
+
    uint wasFlushed : 1;
    uint nothingToPaint : 1;
    uint backingStoreRecreated : 1;
@@ -80,7 +83,6 @@ class QWidgetBackingStore
 
    ~QWidgetBackingStore();
 
-   static void showYellowThing(QWidget *widget, const QRegion &rgn, int msec, bool);
    void sync(QWidget *exposedWidget, const QRegion &exposedRegion);
    void sync();
    void flush(QWidget *widget = nullptr);
@@ -94,10 +96,10 @@ class QWidgetBackingStore
    }
 
    bool isDirty() const {
-      return !(dirtyWidgets.isEmpty() && dirty.isEmpty() && !fullUpdatePending && dirtyRenderToTextureWidgets.isEmpty());
+      return ! (dirtyWidgets.isEmpty() && dirty.isEmpty() && !fullUpdatePending && dirtyRenderToTextureWidgets.isEmpty());
    }
 
-   // ### merge into a template function (after MSVC isn't supported anymore).
+   // ### merge into a template function
    void markDirty(const QRegion &rgn, QWidget *widget, UpdateTime updateTime = UpdateLater,
       BufferState bufferState = BufferValid);
 
@@ -106,9 +108,10 @@ class QWidgetBackingStore
 
  private:
    QWidget *tlw;
-   QRegion dirtyOnScreen; // needsFlush
-   QRegion dirty; // needsRepaint
+   QRegion dirtyOnScreen;       // needsFlush
+   QRegion dirty;               // needsRepaint
    QRegion dirtyFromPreviousSync;
+
    QVector<QWidget *> dirtyWidgets;
    QVector<QWidget *> dirtyRenderToTextureWidgets;
    QVector<QWidget *> *dirtyOnScreenWidgets;
@@ -127,11 +130,8 @@ class QWidgetBackingStore
 
    void sendUpdateRequest(QWidget *widget, UpdateTime updateTime);
 
-   static bool flushPaint(QWidget *widget, const QRegion &rgn);
-   static void unflushPaint(QWidget *widget, const QRegion &rgn);
    static void qt_flush(QWidget *widget, const QRegion &region, QBackingStore *backingStore,
-      QWidget *tlw, const QPoint &tlwOffset,
-      QPlatformTextureList *widgetTextures,
+      QWidget *tlw, const QPoint &tlwOffset, QPlatformTextureList *widgetTextures,
       QWidgetBackingStore *widgetBackingStore);
 
    void doSync();
@@ -155,17 +155,17 @@ class QWidgetBackingStore
    bool syncAllowed();
 
    void addDirtyWidget(QWidget *widget, const QRegion &rgn) {
-      if (widget && !widget->d_func()->inDirtyList && !widget->data->in_destructor) {
+      if (widget && ! widget->d_func()->inDirtyList && ! widget->m_widgetData->in_destructor) {
          QWidgetPrivate *widgetPrivate = widget->d_func();
 
 #ifndef QT_NO_GRAPHICSEFFECT
          if (widgetPrivate->graphicsEffect) {
-            widgetPrivate->dirty = widgetPrivate->effectiveRectFor(rgn.boundingRect());
+            widgetPrivate->m_dirty = widgetPrivate->effectiveRectFor(rgn.boundingRect());
 
          } else
 #endif
          {
-            widgetPrivate->dirty = rgn;
+            widgetPrivate->m_dirty = rgn;
             dirtyWidgets.append(widget);
             widgetPrivate->inDirtyList = true;
          }
@@ -173,7 +173,7 @@ class QWidgetBackingStore
    }
 
    void addDirtyRenderToTextureWidget(QWidget *widget) {
-      if (widget && !widget->d_func()->inDirtyList && !widget->data->in_destructor) {
+      if (widget && ! widget->d_func()->inDirtyList && ! widget->m_widgetData->in_destructor) {
          QWidgetPrivate *widgetPrivate = widget->d_func();
          Q_ASSERT(widgetPrivate->renderToTexture);
          dirtyRenderToTextureWidgets.append(widget);
@@ -204,13 +204,13 @@ class QWidgetBackingStore
       }
    }
 
-   inline void removeStaticWidget(QWidget *widget) {
+   void removeStaticWidget(QWidget *widget) {
       staticWidgets.removeAll(widget);
    }
 
    // Move the reparented widget and all its static children from this backing store
    // to the new backing store if reparented into another top-level / backing store.
-   inline void moveStaticWidgets(QWidget *reparented) {
+   void moveStaticWidgets(QWidget *reparented) {
       Q_ASSERT(reparented);
       QWidgetBackingStore *newBs = reparented->d_func()->maybeBackingStore();
       if (newBs == this) {
@@ -232,7 +232,7 @@ class QWidgetBackingStore
    }
 
    QRect topLevelRect() const {
-      return tlw->data->crect;
+      return tlw->m_widgetData->crect;
    }
 
    void appendDirtyOnScreenWidget(QWidget *widget) {
@@ -266,9 +266,9 @@ class QWidgetBackingStore
    void resetWidget(QWidget *widget) {
       if (widget) {
          widget->d_func()->inDirtyList = false;
-         widget->d_func()->isScrolled = false;
-         widget->d_func()->isMoved = false;
-         widget->d_func()->dirty = QRegion();
+         widget->d_func()->isScrolled  = false;
+         widget->d_func()->isMoved     = false;
+         widget->d_func()->m_dirty     = QRegion();
       }
    }
 
@@ -278,7 +278,7 @@ class QWidgetBackingStore
          if (!wd->extra) {
             wd->createExtra();
          }
-         wd->extra->staticContentsSize = wd->data.crect.size();
+         wd->extra->staticContentsSize = wd->m_privateData.crect.size();
       }
    }
 

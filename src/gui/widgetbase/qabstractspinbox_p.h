@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,14 +28,16 @@
 
 #ifndef QT_NO_SPINBOX
 
+#include <qdatetime.h>
 #include <qlineedit.h>
 #include <qstyleoption.h>
 #include <qvalidator.h>
-#include <qdatetime.h>
 #include <qvariant.h>
 
-#include <qwidget_p.h>
 #include <qdatetime_p.h>
+#include <qwidget_p.h>
+
+class QSpinBoxValidator;
 
 QVariant operator+(const QVariant &arg1, const QVariant &arg2);
 QVariant operator-(const QVariant &arg1, const QVariant &arg2);
@@ -59,7 +61,7 @@ enum Button {
    Down = 0x020,
    DirectionMask = 0x040
 };
-class QSpinBoxValidator;
+
 class QAbstractSpinBoxPrivate : public QWidgetPrivate
 {
    Q_DECLARE_PUBLIC(QAbstractSpinBox)
@@ -75,7 +77,7 @@ class QAbstractSpinBoxPrivate : public QWidgetPrivate
    bool specialValue() const;
    virtual QVariant getZeroVariant() const;
    virtual void setRange(const QVariant &min, const QVariant &max);
-   void setValue(const QVariant &val, EmitPolicy ep, bool updateEdit = true);
+   void setValue(const QVariant &newValue, EmitPolicy ep, bool updateEdit = true);
    virtual QVariant bound(const QVariant &val, const QVariant &old = QVariant(), int steps = 0) const;
    virtual void updateEdit();
 
@@ -97,9 +99,18 @@ class QAbstractSpinBoxPrivate : public QWidgetPrivate
    static QVariant variantBound(const QVariant &min, const QVariant &value, const QVariant &max);
 
    QLineEdit *edit;
-   QString prefix, suffix, specialValueText;
-   QVariant value, minimum, maximum, singleStep;
+
+   QString prefix;
+   QString suffix;
+   QString specialValueText;
+
+   QVariant m_spinBoxValue;
+   QVariant minimum;
+   QVariant maximum;
+   QVariant singleStep;
+
    QVariant::Type type;
+
    int spinClickTimerId, spinClickTimerInterval, spinClickThresholdTimerId, spinClickThresholdTimerInterval;
    int effectiveSpinRepeatRate;
    uint buttonState;

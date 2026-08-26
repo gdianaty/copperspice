@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -37,17 +37,13 @@ template<bool IsForGlobal>
 class EvaluationCache : public SingleContainer
 {
  public:
-   EvaluationCache(const Expression::Ptr &operand, const VariableDeclaration *varDecl, const VariableSlotID slot);
+   EvaluationCache(const Expression::Ptr &operand, const VariableDeclaration::Ptr &varDecl, const VariableSlotID slot);
 
    Item evaluateSingleton(const DynamicContext::Ptr &context) const override;
    Item::Iterator::Ptr evaluateSequence(const DynamicContext::Ptr &context) const override;
    Expression::Ptr compress(const StaticContext::Ptr &context) override;
 
    SequenceType::Ptr staticType() const override;
-
-   /**
-    * The first operand must be exactly one @c xs:string.
-    */
    SequenceType::List expectedOperandTypes() const override;
 
    ExpressionVisitorResult::Ptr accept(const ExpressionVisitor::Ptr &visitor) const override;
@@ -62,16 +58,9 @@ class EvaluationCache : public SingleContainer
 
  private:
    static DynamicContext::Ptr topFocusContext(const DynamicContext::Ptr &context);
-   const VariableDeclaration *m_declaration;
-   bool m_declarationUsedByMany;
-   /**
-    * This variable must not be called m_slot. If it so, a compiler bug on
-    * HP-UX-aCC-64 is triggered in the constructor initializor. See the
-    * preprocessor output.
-    *
-    * Note that this is the cache slot, and is disjoint to any variable's
-    * regular slot.
-    */
+
+   const VariableDeclaration::Ptr m_declaration;
+
    const VariableSlotID m_varSlot;
 };
 

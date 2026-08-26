@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,21 +23,21 @@
 
 #include <write_iconinitialization.h>
 
+#include <qstring.h>
+#include <qtextstream.h>
+
 #include <driver.h>
 #include <ui4.h>
-#include <utils.h>
 #include <uic.h>
+#include <utils.h>
 #include <write_icondata.h>
-
-#include <qtextstream.h>
-#include <qstring.h>
 
 namespace CPP {
 
-WriteIconInitialization::WriteIconInitialization(Uic *uic)
-   : driver(uic->driver()), output(uic->output()), option(uic->option())
+WriteIconInitialization::WriteIconInitialization(Uic *newUic)
+   : driver(newUic->driver()), output(newUic->output()), option(newUic->option())
 {
-   this->uic = uic;
+   this->uic = newUic;
 }
 
 void WriteIconInitialization::acceptUI(DomUI *node)
@@ -94,5 +94,4 @@ void WriteIconInitialization::acceptImage(DomImage *image)
    }
 }
 
-} // namespace
-
+}   // namespace

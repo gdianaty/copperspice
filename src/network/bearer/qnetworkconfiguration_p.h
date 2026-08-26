@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,9 +25,10 @@
 #define QNETWORKCONFIGURATION_P_H
 
 #include <qnetworkconfiguration.h>
-#include <qshareddata.h>
-#include <qmutex.h>
+
 #include <qmap.h>
+#include <qmutex.h>
+#include <qshareddata.h>
 
 using QNetworkConfigurationPrivatePointer = QExplicitlySharedDataPointer<QNetworkConfigurationPrivate>;
 

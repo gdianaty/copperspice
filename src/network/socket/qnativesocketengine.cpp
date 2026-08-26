@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,15 +26,14 @@
 #include <qabstracteventdispatcher.h>
 #include <qsocketnotifier.h>
 #include <qnetworkinterface.h>
+
 #include <qthread_p.h>
 
 #if ! defined(QT_NO_NETWORKPROXY)
-# include <qnetworkproxy.h>
 # include <qabstractsocket.h>
+# include <qnetworkproxy.h>
 # include <qtcpserver.h>
 #endif
-
-//#define QNATIVESOCKETENGINE_DEBUG
 
 // Common constructs
 #define Q_CHECK_STATE(function, checkState, returnValue) do { \
@@ -86,15 +85,16 @@ QNativeSocketEnginePrivate::~QNativeSocketEnginePrivate()
 void QNativeSocketEnginePrivate::setError(QAbstractSocket::SocketError error, ErrorString errorString) const
 {
    if (hasSetSocketError) {
-      // Only set socket errors once for one engine; expect the
-      // socket to recreate its engine after an error. Note: There's
-      // one exception: SocketError(11) bypasses this as it's purely
-      // a temporary internal error condition.
-      // Another exception is the way the waitFor*() functions set
-      // an error when a timeout occurs. After the call to setError()
-      // they reset the hasSetSocketError to false
+      // Only set socket errors once for one engine, the socket will recreate its engine after an error.
+
+      // There is one exception. SocketError(11) bypasses this becasue it is a temporary error condition.
+
+      // Another exception is the way the waitFor*() methods will set an error when a timeout occurs. After
+      // the call to setError() these methods reset hasSetSocketError to false
+
       return;
    }
+
    if (error != QAbstractSocket::SocketError(11)) {
       hasSetSocketError = true;
    }
@@ -291,7 +291,7 @@ bool QNativeSocketEngine::initialize(QAbstractSocket::SocketType socketType, QAb
    // Create the socket
    if (!d->createNewSocket(socketType, protocol)) {
 
-#if defined (QNATIVESOCKETENGINE_DEBUG)
+#if defined(CS_SHOW_DEBUG_NETWORK)
       QString typeStr = "UnknownSocketType";
 
       if (socketType == QAbstractSocket::TcpSocket) {
@@ -333,7 +333,7 @@ bool QNativeSocketEngine::initialize(QAbstractSocket::SocketType socketType, QAb
 
    // Make sure we receive out-of-band data
    if (socketType == QAbstractSocket::TcpSocket && !setOption(ReceiveOutOfBandData, 1)) {
-      qWarning("QNativeSocketEngine::initialize unable to inline out-of-band data");
+      qWarning("QNativeSocketEngine::initialize() Unable to inline out-of-band data");
    }
 
    return true;
@@ -352,7 +352,7 @@ bool QNativeSocketEngine::initialize(qintptr socketDescriptor, QAbstractSocket::
    // determine socket type and protocol
    if (! d->fetchConnectionParameters()) {
 
-#if defined (QNATIVESOCKETENGINE_DEBUG)
+#if defined(CS_SHOW_DEBUG_NETWORK)
       qDebug() << "QNativeSocketEngine::initialize(socketDescriptor) failed:"
                << socketDescriptor << d->socketErrorString;
 #endif
@@ -535,8 +535,8 @@ bool QNativeSocketEngine::joinMulticastGroup(const QHostAddress &groupAddress,
    if (groupAddress.protocol() == QAbstractSocket::IPv4Protocol &&
          (d->socketProtocol == QAbstractSocket::IPv6Protocol ||
           d->socketProtocol == QAbstractSocket::AnyIPProtocol)) {
-      qWarning("QAbstractSocket: cannot bind to QHostAddress::Any (or an IPv6 address) and join an IPv4 multicast group;"
-               " bind to QHostAddress::AnyIPv4 instead if you want to do this");
+      qWarning("QNativeSocketEngine::joinMulticastGroup() Unable to bind to QHostAddress::Any (or IPv6 address) "
+            "and join an IPv4 multicast group, bind to QHostAddress::AnyIPv4 instead");
       return false;
    }
 
@@ -958,7 +958,6 @@ bool QNativeSocketEngine::isReadNotificationEnabled() const
    return d->readNotifier && d->readNotifier->isEnabled();
 }
 
-// internal
 class QReadNotifier : public QSocketNotifier
 {
  public:
@@ -986,14 +985,6 @@ bool QReadNotifier::event(QEvent *e)
    return QSocketNotifier::event(e);
 }
 
-/*
-  \internal
-  \class QWriteNotifier
-  \brief The QWriteNotifer class is used to improve performance.
-
-  QWriteNotifier is a private class used for performance reasons vs
-  connecting to the QSocketNotifier activated() signal.
- */
 class QWriteNotifier : public QSocketNotifier
 {
  public:

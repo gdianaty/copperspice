@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,28 +21,20 @@
 *
 ***********************************************************************/
 
-#include <driver.h>
 #include <uic.h>
-#include <ui4.h>
-#include <option.h>
-#include <treewalker.h>
-#include <validator.h>
 
-#ifdef QT_UIC_CPP_GENERATOR
-#include <write_includes.h>
-#include <write_declaration.h>
-#endif
-
-#ifdef QT_UIC_JAVA_GENERATOR
-#include <javawriteincludes.h>
-#include <javawritedeclaration.h>
-#endif
-
-#include <qxmlstreamreader.h>
 #include <qfileinfo.h>
 #include <qregularexpression.h>
 #include <qtextstream.h>
-#include <qdatetime.h>
+#include <qxmlstreamreader.h>
+
+#include <driver.h>
+#include <option.h>
+#include <treewalker.h>
+#include <ui4.h>
+#include <validator.h>
+#include <write_declaration.h>
+#include <write_includes.h>
 
 Uic::Uic(Driver *d)
    : drv(d), out(d->output()), opt(d->option()), externalPix(true)
@@ -64,6 +56,7 @@ bool Uic::printDependencies()
 
    } else {
       f.setFileName(fileName);
+
       if (! f.open(QIODevice::ReadOnly)) {
          return false;
       }
@@ -80,9 +73,9 @@ bool Uic::printDependencies()
       }
    }
 
-   if (DomIncludes *includes = ui->elementIncludes()) {
-      for (DomInclude *incl : includes->elementInclude()) {
-         QString file = incl->text();
+   if (DomIncludes *item = ui->elementIncludes()) {
+      for (DomInclude *domInc : item->elementInclude()) {
+         QString file = domInc->text();
 
          if (file.isEmpty()) {
             continue;
@@ -92,10 +85,10 @@ bool Uic::printDependencies()
       }
    }
 
-   if (DomCustomWidgets *customWidgets = ui->elementCustomWidgets()) {
-      for (DomCustomWidget *customWidget : customWidgets->elementCustomWidget()) {
+   if (DomCustomWidgets *item = ui->elementCustomWidgets()) {
+      for (DomCustomWidget *widgetItem : item->elementCustomWidget()) {
 
-         if (DomHeader *header = customWidget->elementHeader()) {
+         if (DomHeader *header = widgetItem->elementHeader()) {
             QString file = header->text();
 
             if (file.isEmpty()) {
@@ -116,7 +109,7 @@ void Uic::writeCopyrightHeader(DomUI *ui)
 {
    QString comment = ui->elementComment();
 
-   if (comment.size()) {
+   if (! comment.isEmpty()) {
       out << "/*\n" << comment << "\n*/\n\n";
    }
 
@@ -162,11 +155,6 @@ DomUI *Uic::parseUiFile(QXmlStreamReader &reader)
 
 bool Uic::write(QIODevice *in)
 {
-   if (option().generator == Option::JavaGenerator) {
-      // the Java generator ignores header protection
-      opt.headerProtection = false;
-   }
-
    DomUI *ui = nullptr;
 
    {
@@ -189,43 +177,20 @@ bool Uic::write(QIODevice *in)
    }
 
    QString language = ui->attributeLanguage();
-
-
    bool rtn = false;
 
-   if (option().generator == Option::JavaGenerator) {
-
-#ifdef QT_UIC_JAVA_GENERATOR
-      if (language.toLower() != "jambi") {
-         fprintf(stderr, "Uic: File is not a 'jambi' form\n");
-         return false;
-      }
-
-      rtn = jwrite (ui);
-#else
-      fprintf(stderr, "Uic: option to generate java code not compiled in\n");
-#endif
-
-   } else {
-
-#ifdef QT_UIC_CPP_GENERATOR
-      if (! language.isEmpty() && language.toLower() != "c++") {
-         fprintf(stderr, "Uic: File is not a C++ ui file, language = %s\n", csPrintable(language));
-         return false;
-      }
-
-      rtn = write (ui);
-#else
-      fprintf(stderr, "Uic: option to generate cpp code not compiled in\n");
-#endif
+   if (! language.isEmpty() && language.toLower() != "c++") {
+      fprintf(stderr, "Uic: File is not a C++ ui file, language = %s\n", csPrintable(language));
+      return false;
    }
+
+   rtn = write(ui);
 
    delete ui;
 
    return rtn;
 }
 
-#ifdef QT_UIC_CPP_GENERATOR
 bool Uic::write(DomUI *ui)
 {
    using namespace CPP;
@@ -256,7 +221,7 @@ bool Uic::write(DomUI *ui)
    writeIncludes.acceptUI(ui);
 
    Validator(this).acceptUI(ui);
-   WriteDeclaration(this, writeIncludes.scriptsActivated()).acceptUI(ui);
+   WriteDeclaration(this).acceptUI(ui);
 
    if (opt.headerProtection) {
       writeHeaderProtectionEnd();
@@ -264,40 +229,6 @@ bool Uic::write(DomUI *ui)
 
    return true;
 }
-#endif
-
-#ifdef QT_UIC_JAVA_GENERATOR
-bool Uic::jwrite(DomUI *ui)
-{
-   using namespace Java;
-
-   if (! ui || ! ui->elementWidget()) {
-      return false;
-   }
-
-   if (opt.copyrightHeader) {
-      writeCopyrightHeader(ui);
-   }
-
-   pixFunction = ui->elementPixmapFunction();
-   if (pixFunction == "QPixmap::fromMimeSource") {
-      pixFunction = "qPixmapFromMimeSource";
-   }
-
-   externalPix = ui->elementImages() == 0;
-
-   info.acceptUI(ui);
-   cWidgetsInfo.acceptUI(ui);
-   WriteIncludes(this).acceptUI(ui);
-
-   Validator(this).acceptUI(ui);
-   WriteDeclaration(this).acceptUI(ui);
-
-   return true;
-}
-#endif
-
-#ifdef QT_UIC_CPP_GENERATOR
 
 void Uic::writeHeaderProtectionStart()
 {
@@ -312,8 +243,6 @@ void Uic::writeHeaderProtectionEnd()
    out << "#endif // " << h << "\n";
 }
 
-#endif
-
 bool Uic::isMainWindow(const QString &className) const
 {
    return customWidgetsInfo()->extends(className, "QMainWindow");
@@ -326,22 +255,22 @@ bool Uic::isToolBar(const QString &className) const
 
 bool Uic::isButton(const QString &className) const
 {
-   return customWidgetsInfo()->extends(className, "QRadioButton")
-        || customWidgetsInfo()->extends(className, "QToolButton")
-        || customWidgetsInfo()->extends(className, "QCheckBox")
-        || customWidgetsInfo()->extends(className, "QPushButton")
-        || customWidgetsInfo()->extends(className, "QCommandLinkButton");
+   return customWidgetsInfo()->extends(className, "QRadioButton") ||
+          customWidgetsInfo()->extends(className, "QToolButton")  ||
+          customWidgetsInfo()->extends(className, "QCheckBox")    ||
+          customWidgetsInfo()->extends(className, "QPushButton")  ||
+          customWidgetsInfo()->extends(className, "QCommandLinkButton");
 }
 
 bool Uic::isContainer(const QString &className) const
 {
-   return customWidgetsInfo()->extends(className, "QStackedWidget")
-        || customWidgetsInfo()->extends(className, "QToolBox")
-        || customWidgetsInfo()->extends(className, "QTabWidget")
-        || customWidgetsInfo()->extends(className, "QScrollArea")
-        || customWidgetsInfo()->extends(className, "QMdiArea")
-        || customWidgetsInfo()->extends(className, "QWizard")
-        || customWidgetsInfo()->extends(className, "QDockWidget");
+   return customWidgetsInfo()->extends(className, "QStackedWidget") ||
+          customWidgetsInfo()->extends(className, "QToolBox")       ||
+          customWidgetsInfo()->extends(className, "QTabWidget")     ||
+          customWidgetsInfo()->extends(className, "QScrollArea")    ||
+          customWidgetsInfo()->extends(className, "QMdiArea")       ||
+          customWidgetsInfo()->extends(className, "QWizard")        ||
+          customWidgetsInfo()->extends(className, "QDockWidget");
 }
 
 bool Uic::isCustomWidgetContainer(const QString &className) const

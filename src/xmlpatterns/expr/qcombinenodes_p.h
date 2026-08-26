@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,9 +26,8 @@
 
 #include <qpaircontainer_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class CombineNodes : public PairContainer
 {
  public:
@@ -50,12 +49,6 @@ class CombineNodes : public PairContainer
    Operator operatorID() const;
    ID id() const override;
 
-   /**
-    * Determines the string representation for operator @p op.
-    *
-    * @return "union" if @p op is Union, "intersect" if @p op
-    * is Intersect and "except" if @p op is Except.
-    */
    static QString displayName(const Operator op);
 
    ExpressionVisitorResult::Ptr accept(const ExpressionVisitor::Ptr &visitor) const override;
@@ -63,8 +56,7 @@ class CombineNodes : public PairContainer
  private:
    const Operator m_operator;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

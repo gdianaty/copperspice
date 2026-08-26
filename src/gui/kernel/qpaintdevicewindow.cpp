@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,7 +23,7 @@
 
 #include <qpaintdevicewindow_p.h>
 
-#include <qguiapplication.h>
+#include <qapplication.h>
 #include <qscreen.h>
 
 void QPaintDeviceWindow::update()
@@ -56,9 +56,6 @@ void QPaintDeviceWindow::paintEvent(QPaintEvent *event)
    (void) event;
 }
 
-/*!
-  \internal
- */
 int QPaintDeviceWindow::metric(PaintDeviceMetric metric) const
 {
    QScreen *screen = this->screen();
@@ -124,7 +121,6 @@ int QPaintDeviceWindow::metric(PaintDeviceMetric metric) const
    return QPaintDevice::metric(metric);
 }
 
-// internal
 void QPaintDeviceWindow::exposeEvent(QExposeEvent *exposeEvent)
 {
    (void) exposeEvent;
@@ -145,7 +141,6 @@ void QPaintDeviceWindow::exposeEvent(QExposeEvent *exposeEvent)
    }
 }
 
-// internal
 bool QPaintDeviceWindow::event(QEvent *event)
 {
    Q_D(QPaintDeviceWindow);
@@ -162,15 +157,12 @@ bool QPaintDeviceWindow::event(QEvent *event)
    return QWindow::event(event);
 }
 
-// internal
 QPaintDeviceWindow::QPaintDeviceWindow(QPaintDeviceWindowPrivate &dd, QWindow *parent)
    : QWindow(dd, parent)
 {
 }
 
-// internal
 QPaintEngine *QPaintDeviceWindow::paintEngine() const
 {
    return nullptr;
 }
-

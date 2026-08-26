@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,9 +24,9 @@
 #ifndef QFONTDIALOG_P_H
 #define QFONTDIALOG_P_H
 
+#include <qfontdialog.h>
 
 #include <qfontdatabase.h>
-#include <qfontdialog.h>
 #include <qplatform_dialoghelper.h>
 #include <qsharedpointer.h>
 
@@ -102,15 +102,15 @@ class QFontDialogPrivate : public QDialogPrivate
 
    QDialogButtonBox *buttonBox;
 
-   QFontDatabase fdb;
-   QString family;
+   QFontDatabase m_fdb;
+   QString m_family;
    QFontDatabase::WritingSystem writingSystem;
    QString style;
-   int size;
+   int m_size;
    bool smoothScalable;
 
    QFont selectedFont;
-   QSharedPointer<QFontDialogOptions> options;
+   QSharedPointer<QFontDialogOptions> m_options;
    QPointer<QObject> receiverToDisconnectOnClose;
    QString memberToDisconnectOnClose;
 
@@ -118,8 +118,8 @@ class QFontDialogPrivate : public QDialogPrivate
    void _q_runNativeAppModalPanel();
 
  private:
-   virtual void initHelper(QPlatformDialogHelper *) override;
-   virtual void helperPrepareShow(QPlatformDialogHelper *) override;
+   void initHelper(QPlatformDialogHelper *) override;
+   void helperPrepareShow(QPlatformDialogHelper *) override;
 };
 
 #endif // QT_NO_FONTDIALOG

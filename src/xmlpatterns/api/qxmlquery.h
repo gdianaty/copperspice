@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,10 @@
 #ifndef QXMLQUERY_H
 #define QXMLQUERY_H
 
-#include <QUrl>
-#include <QAbstractXmlNodeModel>
-#include <QAbstractXmlReceiver>
-#include <QXmlNamePool>
+#include <qurl.h>
+#include <qabstractxmlnodemodel.h>
+#include <qabstractxmlreceiver.h>
+#include <qxmlnamepool.h>
 
 class QAbstractMessageHandler;
 class QAbstractUriResolver;
@@ -39,8 +39,6 @@ class QXmlQueryPrivate;
 class QXmlResultItems;
 class QXmlSerializer;
 
-/* The members in the namespace QPatternistSDK are internal, not part of the public API, and
- * unsupported. Using them leads to undefined behavior. */
 namespace QPatternistSDK {
 class TestCase;
 }

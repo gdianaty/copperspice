@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,8 +26,6 @@
 
 #include "qandexpression_p.h"
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class OrExpression : public AndExpression
@@ -39,8 +37,7 @@ class OrExpression : public AndExpression
    Expression::Ptr compress(const StaticContext::Ptr &context) override;
    ExpressionVisitorResult::Ptr accept(const ExpressionVisitor::Ptr &visitor) const override;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,17 +28,17 @@
 
 #ifndef QT_NO_MDIAREA
 
+#include <qdebug.h>
+#include <qmenubar.h>
+#include <qpointer.h>
+#include <qsizegrip.h>
 #include <qstyle.h>
 #include <qstyleoptiontitlebar.h>
-#include <qmenubar.h>
-#include <qsizegrip.h>
-#include <qpointer.h>
-#include <qdebug.h>
 
 #include <qwidget_p.h>
 
-class QVBoxLayout;
 class QMouseEvent;
+class QVBoxLayout;
 
 namespace QMdi {
 
@@ -98,7 +98,7 @@ class ControlContainer : public QObject
 
    QPointer<QWidget> m_controllerWidget;
    QPointer<QWidget> m_menuLabel;
-   QPointer<QMdiSubWindow> mdiChild;
+   QPointer<QMdiSubWindow> m_mdiChild;
 };
 
 } // namespace QMdi
@@ -146,8 +146,8 @@ class QMdiSubWindowPrivate : public QWidgetPrivate
       QRegion region;
       bool hover;
 
-      OperationInfo(uint changeFlags, Qt::CursorShape cursorShape, bool hover = true)
-         : changeFlags(changeFlags), cursorShape(cursorShape), hover(hover)
+      OperationInfo(uint newChangeFlags, Qt::CursorShape newCursorShape, bool newHover = true)
+         : changeFlags(newChangeFlags), cursorShape(newCursorShape), hover(newHover)
       {
       }
    };
@@ -294,12 +294,13 @@ class QMdiSubWindowPrivate : public QWidgetPrivate
          return 0;
       }
 
-      QStyleOptionTitleBar options = titleBarOptions();
-      int height = options.rect.height();
+      QStyleOptionTitleBar newOptions = titleBarOptions();
+      int height = newOptions.rect.height();
 
-      if (hasBorder(options)) {
+      if (hasBorder(newOptions)) {
          height += q->isMinimized() ? 8 : 4;
       }
+
       return height;
    }
 
@@ -323,9 +324,9 @@ class QMdiSubWindowPrivate : public QWidgetPrivate
          q->setGeometry(*geometry);
    }
 
-   bool hasBorder(const QStyleOptionTitleBar &options) const {
+   bool hasBorder(const QStyleOptionTitleBar &newOptions) const {
       Q_Q(const QMdiSubWindow);
-      return !q->style()->styleHint(QStyle::SH_TitleBar_NoBorder, &options, q);
+      return ! q->style()->styleHint(QStyle::SH_TitleBar_NoBorder, &newOptions, q);
    }
 
    bool autoRaise() const {

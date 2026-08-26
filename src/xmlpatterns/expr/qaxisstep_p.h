@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,9 +27,8 @@
 #include <qemptycontainer_p.h>
 #include <qitem_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class AxisStep : public EmptyContainer
 {
  public:
@@ -38,35 +37,22 @@ class AxisStep : public EmptyContainer
    Item::Iterator::Ptr evaluateSequence(const DynamicContext::Ptr &) const override;
    Item evaluateSingleton(const DynamicContext::Ptr &) const override;
 
-   /**
-    * Returns @p node if it matches the node test this step is using, otherwise @c null.
-    */
-   inline Item mapToItem(const QXmlNodeModelIndex &node,
-                         const DynamicContext::Ptr &context) const;
+   inline Item mapToItem(const QXmlNodeModelIndex &node, const DynamicContext::Ptr &context) const;
 
    SequenceType::List expectedOperandTypes() const override;
    SequenceType::Ptr staticType() const override;
 
-   /**
-    * Rewrites to ParentNodeAxis, if possible.
-    */
    Expression::Ptr typeCheck(const StaticContext::Ptr &context, const SequenceType::Ptr &reqType) override;
 
-   /**
-    * @returns always BuiltinTypes::node;
-    */
    ItemType::Ptr expectedContextItemType() const override;
 
    ExpressionVisitorResult::Ptr accept(const ExpressionVisitor::Ptr &visitor) const override;
 
    Properties properties() const override;
 
-   /**
-    * @returns the axis this step is using.
-    */
    QXmlNodeModelIndex::Axis axis() const;
 
-   inline ItemType::Ptr nodeTest() const {
+   ItemType::Ptr nodeTest() const {
       return m_nodeTest;
    }
 
@@ -88,7 +74,6 @@ class AxisStep : public EmptyContainer
 
    static bool isAlwaysEmpty(const QXmlNodeModelIndex::Axis axis, const QXmlNodeModelIndex::NodeKind nodeKind);
 
-
    QXmlNodeModelIndex::Axis m_axis;
    ItemType::Ptr m_nodeTest;
 };
@@ -99,7 +84,5 @@ void AxisStep::setAxis(const QXmlNodeModelIndex::Axis newAxis)
 }
 
 }
-
-QT_END_NAMESPACE
 
 #endif

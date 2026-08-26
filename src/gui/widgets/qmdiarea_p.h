@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,13 +29,14 @@
 
 #ifndef QT_NO_MDIAREA
 
-#include <QList>
-#include <QVector>
-#include <QRect>
-#include <QPoint>
 #include <qapplication.h>
-#include <qmdisubwindow_p.h>
+#include <qlist.h>
+#include <qpoint.h>
+#include <qrect.h>
+#include <qvector.h>
+
 #include <qabstractscrollarea_p.h>
+#include <qmdisubwindow_p.h>
 
 class QMdiAreaTabBar;
 
@@ -213,7 +214,7 @@ class QMdiAreaPrivate : public QAbstractScrollAreaPrivate
    void refreshTabBar();
 #endif
 
-   inline void startResizeTimer() {
+   void startResizeTimer() {
       Q_Q(QMdiArea);
       if (resizeTimerId > 0) {
          q->killTimer(resizeTimerId);
@@ -221,7 +222,7 @@ class QMdiAreaPrivate : public QAbstractScrollAreaPrivate
       resizeTimerId = q->startTimer(200);
    }
 
-   inline void startTabToPreviousTimer() {
+   void startTabToPreviousTimer() {
       Q_Q(QMdiArea);
       if (tabToPreviousTimerId > 0) {
          q->killTimer(tabToPreviousTimerId);
@@ -229,30 +230,30 @@ class QMdiAreaPrivate : public QAbstractScrollAreaPrivate
       tabToPreviousTimerId = q->startTimer(QApplication::keyboardInputInterval());
    }
 
-   inline bool windowStaysOnTop(QMdiSubWindow *subWindow) const {
+   bool windowStaysOnTop(QMdiSubWindow *subWindow) const {
       if (!subWindow) {
          return false;
       }
       return subWindow->windowFlags() & Qt::WindowStaysOnTopHint;
    }
 
-   inline bool isExplicitlyDeactivated(QMdiSubWindow *subWindow) const {
+   bool isExplicitlyDeactivated(QMdiSubWindow *subWindow) const {
       if (!subWindow) {
          return true;
       }
       return subWindow->d_func()->isExplicitlyDeactivated;
    }
 
-   inline void setActive(QMdiSubWindow *subWindow, bool active = true, bool changeFocus = true) const {
+   void setActive(QMdiSubWindow *subWindow, bool isActive = true, bool changeFocus = true) const {
       if (subWindow) {
-         subWindow->d_func()->setActive(active, changeFocus);
+         subWindow->d_func()->setActive(isActive, changeFocus);
       }
    }
 
 #ifndef QT_NO_RUBBERBAND
    void showRubberBandFor(QMdiSubWindow *subWindow);
 
-   inline void hideRubberBand() {
+   void hideRubberBand() {
       if (rubberBand && rubberBand->isVisible()) {
          rubberBand->hide();
       }

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,9 +26,8 @@
 
 #include <qsinglecontainer_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class InstanceOf : public SingleContainer
 {
  public:
@@ -41,17 +40,12 @@ class InstanceOf : public SingleContainer
    Expression::Ptr compress(const StaticContext::Ptr &context) override;
    ExpressionVisitorResult::Ptr accept(const ExpressionVisitor::Ptr &visitor) const override;
 
-   /**
-    * @returns the SequenceType that this <tt>instance of</tt> Expression
-    * is testing its operand against.
-    */
    SequenceType::Ptr targetType() const;
 
  private:
    const SequenceType::Ptr m_targetType;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

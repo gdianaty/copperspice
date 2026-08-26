@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,14 +25,14 @@
 
 #ifndef QT_NO_FONTDIALOG
 
-#include <qtimer.h>
-#include <qfontdatabase.h>
 #include <qcocoaeventdispatcher.h>
+#include <qcocoahelpers.h>
+#include <qfontdatabase.h>
+#include <qtimer.h>
 
 #include <qfont_p.h>
-#include <qfontengine_p.h>
 #include <qfontengine_coretext_p.h>
-#include <qcocoahelpers.h>
+#include <qfontengine_p.h>
 
 #import <AppKit/AppKit.h>
 

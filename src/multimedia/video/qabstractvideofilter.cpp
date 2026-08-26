@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,33 +25,23 @@
 
 class QAbstractVideoFilterPrivate
 {
-public:
-    QAbstractVideoFilterPrivate() :
-        active(true)
+ public:
+    QAbstractVideoFilterPrivate()
+      : active(true)
     { }
 
     bool active;
 };
 
-/*!
-  \internal
- */
 QVideoFilterRunnable::~QVideoFilterRunnable()
 {
 }
 
-/*!
-  Constructs a new QAbstractVideoFilter instance with parent object \a parent.
- */
-QAbstractVideoFilter::QAbstractVideoFilter(QObject *parent) :
-    QObject(parent),
-    d_ptr(new QAbstractVideoFilterPrivate)
+QAbstractVideoFilter::QAbstractVideoFilter(QObject *parent)
+   : QObject(parent), d_ptr(new QAbstractVideoFilterPrivate)
 {
 }
 
-/*!
-  \internal
- */
 QAbstractVideoFilter::~QAbstractVideoFilter()
 {
     delete d_ptr;
@@ -71,4 +61,3 @@ void QAbstractVideoFilter::setActive(bool v)
         emit activeChanged();
     }
 }
-

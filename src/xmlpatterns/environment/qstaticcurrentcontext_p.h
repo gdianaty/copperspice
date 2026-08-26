@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,25 +26,19 @@
 
 #include <qdelegatingstaticcontext_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class StaticCurrentContext : public DelegatingStaticContext
 {
  public:
-   StaticCurrentContext(const ItemType::Ptr &currentItemType,
-                        const StaticContext::Ptr &context);
-   /**
-    * @returns the type passed in the constructor.
-    */
+   StaticCurrentContext(const ItemType::Ptr &currentItemType, const StaticContext::Ptr &context);
+
    ItemType::Ptr currentItemType() const override;
 
  private:
-   const ItemType::Ptr         m_currentItemType;
+   const ItemType::Ptr m_currentItemType;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

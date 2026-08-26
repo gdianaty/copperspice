@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -46,7 +46,7 @@ class QSmSocketReceiver : public QObject
  public:
    QSmSocketReceiver(int socket) {
       QSocketNotifier *sn = new QSocketNotifier(socket, QSocketNotifier::Read, this);
-      connect(sn, SIGNAL(activated(int)), this, SLOT(socketActivated(int)));
+      connect(sn, &QSocketNotifier::activated, this, &QSmSocketReceiver::socketActivated);
    }
 
    CS_SLOT_1(Public, void socketActivated(int))

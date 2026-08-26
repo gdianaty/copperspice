@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,6 +29,8 @@
 #include <qglobal.h>
 #include <cs_char.h>
 #include <cs_string.h>
+
+#include <compare>
 
 class QChar32;
 class QString8;
@@ -67,6 +69,7 @@ class Q_CORE_EXPORT QChar32 : public CsString::CsChar
       Null                           = 0x0000,
       Tabulation                     = 0x0009,
       LineFeed                       = 0x000a,
+      FormFeed                       = 0x000c,
       CarriageReturn                 = 0x000d,
       Space                          = 0x0020,
       Nbsp                           = 0x00a0,
@@ -77,6 +80,7 @@ class Q_CORE_EXPORT QChar32 : public CsString::CsChar
       ByteOrderSwapped               = 0xfffe,
       ParagraphSeparator             = 0x2029,
       LineSeparator                  = 0x2028,
+      VisualTabCharacter             = 0x2192,
       LastValidCodePoint             = 0x10ffff
    };
 
@@ -310,11 +314,18 @@ class Q_CORE_EXPORT QChar32 : public CsString::CsChar
       Script_Yezidi,
 
       // Unicode 14.0
-      //   Script_Cypro_Minoan,
-      //   Script_Old_Uyghur,
-      //   Script_Tangsa,
-      //   Script_Toto,
-      //   Script_Vithkuqi,
+      Script_Cypro_Minoan,
+      Script_Old_Uyghur,
+      Script_Tangsa,
+      Script_Toto,
+      Script_Vithkuqi,
+
+      // Unicode 15.0
+      Script_Kawi,
+      Script_Nag_Mundari,
+
+      // Unicode 15.1
+      // nothing was added
 
       ScriptCount
    };
@@ -376,7 +387,13 @@ class Q_CORE_EXPORT QChar32 : public CsString::CsChar
       Unicode_8_0,
       Unicode_9_0,
       Unicode_10_0,
-      Unicode_11_0
+      Unicode_11_0,
+      Unicode_12_0,
+      Unicode_12_1,
+      Unicode_13_0,
+      Unicode_14_0,
+      Unicode_15_0,
+      Unicode_15_1,
    };
 
    QChar32() = default;
@@ -430,6 +447,11 @@ class Q_CORE_EXPORT QChar32 : public CsString::CsChar
 
    bool isDigit() const {
       return category() == Number_DecimalDigit;
+   }
+
+   bool isHex() const {
+      char32_t c = this->unicode();
+      return (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') || (c >= '0' && c <= '9');
    }
 
    bool isLetter() const;
@@ -496,6 +518,8 @@ class Q_CORE_EXPORT QChar32 : public CsString::CsChar
       CsString::CsChar::operator=(c);
       return *this;
    }
+
+   auto operator<=>(const QChar32 &other) const = default;
 };
 
 class Q_CORE_EXPORT QChar32Arrow : public CsString::CsCharArrow
@@ -513,36 +537,6 @@ class Q_CORE_EXPORT QChar32Arrow : public CsString::CsCharArrow
       return reinterpret_cast<const QChar32 *>(CsString::CsCharArrow::operator->());
    }
 };
-
-inline bool operator==(QChar32 c1, QChar32 c2)
-{
-   return c1.unicode() == c2.unicode();
-}
-
-inline bool operator!=(QChar32 c1, QChar32 c2)
-{
-   return c1.unicode() != c2.unicode();
-}
-
-inline bool operator<=(QChar32 c1, QChar32 c2)
-{
-   return c1.unicode() <= c2.unicode();
-}
-
-inline bool operator>=(QChar32 c1, QChar32 c2)
-{
-   return c1.unicode() >= c2.unicode();
-}
-
-inline bool operator<(QChar32 c1, QChar32 c2)
-{
-   return c1.unicode() < c2.unicode();
-}
-
-inline bool operator>(QChar32 c1, QChar32 c2)
-{
-   return c1.unicode() > c2.unicode();
-}
 
 inline uint qHash(const QChar32 &key, uint seed)
 {

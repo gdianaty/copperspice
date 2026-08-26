@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,14 +22,13 @@
 ***********************************************************************/
 
 #include <qabstractproxymodel.h>
+#include <qabstractproxymodel_p.h>
 
 #ifndef QT_NO_PROXYMODEL
 
 #include <qitemselectionmodel.h>
 #include <qsize.h>
 #include <qstringlist.h>
-
-#include <qabstractproxymodel_p.h>
 
 // detects the deletion of the source model
 void QAbstractProxyModelPrivate::_q_sourceModelDestroyed()
@@ -44,7 +43,6 @@ QAbstractProxyModel::QAbstractProxyModel(QObject *parent)
    setSourceModel(QAbstractItemModelPrivate::staticEmptyModel());
 }
 
-// internal (cs)
 QAbstractProxyModel::QAbstractProxyModel(QAbstractProxyModelPrivate &dd, QObject *parent)
    : QAbstractItemModel(dd, parent)
 {

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,11 @@
 #ifndef QGL_PIXELBUFFER_P_H
 #define QGL_PIXELBUFFER_P_H
 
+#include <qglobal.h>
 #include <qglpixelbuffer.h>
+
 #include <qgl_p.h>
 #include <qglpaintdevice_p.h>
-#include <qglobal.h>
 
 class QEglContext;
 class QOpenGLFramebufferObject;

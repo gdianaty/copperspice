@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,14 +21,14 @@
 *
 ***********************************************************************/
 
-#include <qplatform_graphicsbuffer.h>
-
 #include <qplatform_graphicsbufferhelper.h>
+
 #include <qdebug.h>
+#include <qimage.h>
 #include <qopengl.h>
-#include <QImage>
-#include <QOpenGLContext>
-#include <QOpenGLFunctions>
+#include <qopenglcontext.h>
+#include <qopenglfunctions.h>
+#include <qplatform_graphicsbuffer.h>
 
 #ifndef GL_RGB10_A2
 #define GL_RGB10_A2                       0x8059
@@ -43,7 +43,7 @@ bool QPlatformGraphicsBufferHelper::lockAndBindToTexture(QPlatformGraphicsBuffer
 {
    if (graphicsBuffer->lock(QPlatformGraphicsBuffer::TextureAccess)) {
       if (! graphicsBuffer->bindToTexture(rect)) {
-         qWarning("Failed to bind %sgraphicsbuffer to texture", "");
+         qWarning("QPlatformGraphicsBufferHelper::lockAndBindToTexture() Failed to bind graphicsbuffer to texture");
          return false;
       }
 
@@ -57,12 +57,12 @@ bool QPlatformGraphicsBufferHelper::lockAndBindToTexture(QPlatformGraphicsBuffer
 
    } else if (graphicsBuffer->lock(QPlatformGraphicsBuffer::SWReadAccess)) {
       if (! bindSWToTexture(graphicsBuffer, swizzle, premultiplied, rect)) {
-         qWarning("Failed to bind %sgraphicsbuffer to texture", "SW ");
+         qWarning("QPlatformGraphicsBufferHelper::lockAndBindToTexture() Failed to bind SW graphicsbuffer to texture");
          return false;
       }
 
    } else {
-      qWarning("Failed to lock");
+      qWarning("QPlatformGraphicsBufferHelper::lockAndBindToTexture() Failed to lock");
       return false;
    }
 

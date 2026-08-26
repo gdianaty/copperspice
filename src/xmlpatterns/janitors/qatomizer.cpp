@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,15 +21,13 @@
 *
 ***********************************************************************/
 
-#include "qatomictype_p.h"
-#include "qbuiltintypes_p.h"
-#include "qcommonsequencetypes_p.h"
-#include "qgenericsequencetype_p.h"
-#include "qsequencemappingiterator_p.h"
+#include <qatomizer_p.h>
 
-#include "qatomizer_p.h"
-
-QT_BEGIN_NAMESPACE
+#include <qatomictype_p.h>
+#include <qbuiltintypes_p.h>
+#include <qcommonsequencetypes_p.h>
+#include <qgenericsequencetype_p.h>
+#include <qsequencemappingiterator_p.h>
 
 using namespace QPatternist;
 
@@ -105,5 +103,3 @@ const SourceLocationReflection *Atomizer::actualReflection() const
 {
    return m_operand->actualReflection();
 }
-
-QT_END_NAMESPACE

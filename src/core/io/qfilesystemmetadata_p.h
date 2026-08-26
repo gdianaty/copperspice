@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,10 @@
 #ifndef QFILESYSTEMMETADATA_P_H
 #define QFILESYSTEMMETADATA_P_H
 
-#include <qplatformdefs.h>
-#include <qglobal.h>
-#include <qdatetime.h>
 #include <qabstractfileengine.h>
+#include <qdatetime.h>
+#include <qglobal.h>
+#include <qplatformdefs.h>
 
 #if defined(Q_OS_WIN)
 #ifndef IO_REPARSE_TAG_SYMLINK
@@ -45,11 +45,12 @@ class QFileSystemMetaData
    }
 
    enum MetaDataFlag {
-      // Permissions, overlaps with QFile::Permissions
-      OtherReadPermission = 0x00000004,   OtherWritePermission = 0x00000002,  OtherExecutePermission = 0x00000001,
-      GroupReadPermission = 0x00000040,   GroupWritePermission = 0x00000020,  GroupExecutePermission = 0x00000010,
-      UserReadPermission  = 0x00000400,   UserWritePermission  = 0x00000200,  UserExecutePermission  = 0x00000100,
-      OwnerReadPermission = 0x00004000,   OwnerWritePermission = 0x00002000,  OwnerExecutePermission = 0x00001000,
+      // following permissions here overlap with QFileDevice::Permissions
+
+      OtherReadPermission = 0x00000004,  OtherWritePermission = 0x00000002,  OtherExecutePermission = 0x00000001,
+      GroupReadPermission = 0x00000040,  GroupWritePermission = 0x00000020,  GroupExecutePermission = 0x00000010,
+      UserReadPermission  = 0x00000400,  UserWritePermission  = 0x00000200,  UserExecutePermission  = 0x00000100,
+      OwnerReadPermission = 0x00004000,  OwnerWritePermission = 0x00002000,  OwnerExecutePermission = 0x00001000,
 
       OtherPermissions    = OtherReadPermission | OtherWritePermission | OtherExecutePermission,
       GroupPermissions    = GroupReadPermission | GroupWritePermission | GroupExecutePermission,
@@ -60,7 +61,7 @@ class QFileSystemMetaData
       WritePermissions    = OtherWritePermission | GroupWritePermission | UserWritePermission | OwnerWritePermission,
       ExecutePermissions  = OtherExecutePermission | GroupExecutePermission | UserExecutePermission | OwnerExecutePermission,
 
-      Permissions         = OtherPermissions | GroupPermissions | UserPermissions | OwnerPermissions,
+      AllPermissions      = OtherPermissions | GroupPermissions | UserPermissions | OwnerPermissions,
 
       // Type
       LinkType            = 0x00010000,
@@ -89,13 +90,13 @@ class QFileSystemMetaData
 
       // Attributes
       HiddenAttribute     = 0x00100000,
-      SizeAttribute       = 0x00200000,   // Note: overlaps with QAbstractFileEngine::LocalDiskFlag
+      SizeAttribute       = 0x00200000,   // overlaps with QAbstractFileEngine::LocalDiskFlag
       ExistsAttribute     = 0x00400000,
 
       Attributes          = HiddenAttribute | SizeAttribute | ExistsAttribute,
 
       // Times
-      CreationTime        = 0x01000000,   // Note: overlaps with QAbstractFileEngine::Refresh
+      CreationTime        = 0x01000000,   // overlaps with QAbstractFileEngine::Refresh
       ModificationTime    = 0x02000000,
       AccessTime          = 0x04000000,
 
@@ -107,23 +108,25 @@ class QFileSystemMetaData
 
       OwnerIds            = UserId | GroupId,
 
-      PosixStatFlags      = QFileSystemMetaData::OtherPermissions
-                            | QFileSystemMetaData::GroupPermissions
-                            | QFileSystemMetaData::OwnerPermissions
-                            | QFileSystemMetaData::FileType
-                            | QFileSystemMetaData::DirectoryType
-                            | QFileSystemMetaData::SequentialType
-                            | QFileSystemMetaData::SizeAttribute
-                            | QFileSystemMetaData::Times
-                            | QFileSystemMetaData::OwnerIds,
+      PosixStatFlags      =
+              QFileSystemMetaData::OtherPermissions
+            | QFileSystemMetaData::GroupPermissions
+            | QFileSystemMetaData::OwnerPermissions
+            | QFileSystemMetaData::FileType
+            | QFileSystemMetaData::DirectoryType
+            | QFileSystemMetaData::SequentialType
+            | QFileSystemMetaData::SizeAttribute
+            | QFileSystemMetaData::Times
+            | QFileSystemMetaData::OwnerIds,
 
 #if defined(Q_OS_WIN)
-      WinStatFlags        = QFileSystemMetaData::FileType
-                            | QFileSystemMetaData::DirectoryType
-                            | QFileSystemMetaData::HiddenAttribute
-                            | QFileSystemMetaData::ExistsAttribute
-                            | QFileSystemMetaData::SizeAttribute
-                            | QFileSystemMetaData::Times,
+      WinStatFlags        =
+              QFileSystemMetaData::FileType
+            | QFileSystemMetaData::DirectoryType
+            | QFileSystemMetaData::HiddenAttribute
+            | QFileSystemMetaData::ExistsAttribute
+            | QFileSystemMetaData::SizeAttribute
+            | QFileSystemMetaData::Times,
 #endif
 
       AllMetaDataFlags    = 0xFFFFFFFF
@@ -193,15 +196,16 @@ class QFileSystemMetaData
       return size_;
    }
 
-   QFile::Permissions permissions() const  {
-      return QFile::Permissions(Permissions & entryFlags);
+   QFileDevice::Permissions permissions() const  {
+      return QFileDevice::Permissions(MetaDataFlag::AllPermissions & entryFlags);
    }
 
    QDateTime creationTime() const;
    QDateTime modificationTime() const;
    QDateTime accessTime() const;
 
-   QDateTime fileTime(QAbstractFileEngine::FileTime time) const;
+   QDateTime fileTime(QFileDevice::FileTimeType type) const;
+
    uint userId() const;
    uint groupId() const;
    uint ownerId(QAbstractFileEngine::FileOwner owner) const;
@@ -267,17 +271,17 @@ inline bool QFileSystemMetaData::isAlias() const
 #endif
 
 #if (defined(Q_OS_UNIX)) || defined (Q_OS_WIN)
-inline QDateTime QFileSystemMetaData::fileTime(QAbstractFileEngine::FileTime time) const
+inline QDateTime QFileSystemMetaData::fileTime(QFileDevice::FileTimeType type) const
 {
-   switch (time) {
-      case QAbstractFileEngine::ModificationTime:
+   switch (type) {
+      case QFileDevice::CreateTime:
+         return creationTime();
+
+      case QFileDevice::ModifiedTime:
          return modificationTime();
 
-      case QAbstractFileEngine::AccessTime:
+      case QFileDevice::AccessTime:
          return accessTime();
-
-      case QAbstractFileEngine::CreationTime:
-         return creationTime();
    }
 
    return QDateTime();
@@ -289,10 +293,12 @@ inline QDateTime QFileSystemMetaData::creationTime() const
 {
    return QDateTime::fromTime_t(creationTime_);
 }
+
 inline QDateTime QFileSystemMetaData::modificationTime() const
 {
    return QDateTime::fromTime_t(modificationTime_);
 }
+
 inline QDateTime QFileSystemMetaData::accessTime() const
 {
    return QDateTime::fromTime_t(accessTime_);
@@ -302,6 +308,7 @@ inline uint QFileSystemMetaData::userId() const
 {
    return userId_;
 }
+
 inline uint QFileSystemMetaData::groupId() const
 {
    return groupId_;
@@ -384,9 +391,9 @@ inline void QFileSystemMetaData::fillFromFindData(WIN32_FIND_DATA &findData, boo
 inline void QFileSystemMetaData::fillFromFindInfo(BY_HANDLE_FILE_INFORMATION &fileInfo)
 {
    fillFromFileAttribute(fileInfo.dwFileAttributes);
-   creationTime_ = fileInfo.ftCreationTime;
+   creationTime_   = fileInfo.ftCreationTime;
    lastAccessTime_ = fileInfo.ftLastAccessTime;
-   lastWriteTime_ = fileInfo.ftLastWriteTime;
+   lastWriteTime_  = fileInfo.ftLastWriteTime;
 
    if (fileAttribute_ & FILE_ATTRIBUTE_DIRECTORY) {
       size_ = 0;
@@ -395,8 +402,9 @@ inline void QFileSystemMetaData::fillFromFindInfo(BY_HANDLE_FILE_INFORMATION &fi
       size_ <<= 32;
       size_ += fileInfo.nFileSizeLow;
    }
+
    knownFlagsMask |=  Times | SizeAttribute;
 }
 #endif
 
-#endif // include guard
+#endif //

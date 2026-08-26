@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,16 +28,14 @@
 
 class QItemSelectionModelPrivate
 {
-   Q_DECLARE_PUBLIC(QItemSelectionModel)
-
  public:
    QItemSelectionModelPrivate()
-      : model(nullptr), currentCommand(QItemSelectionModel::NoUpdate),
+      : m_model(nullptr), currentCommand(QItemSelectionModel::NoUpdate),
         tableSelected(false), tableColCount(0), tableRowCount(0)
-   {
-   }
+   { }
 
-   virtual ~QItemSelectionModelPrivate() {}
+   virtual ~QItemSelectionModelPrivate()
+   { }
 
    QItemSelection expandSelection(const QItemSelection &selection, QItemSelectionModel::SelectionFlags command) const;
 
@@ -47,26 +45,31 @@ class QItemSelectionModelPrivate
    void _q_columnsAboutToBeRemoved(const QModelIndex &parent, int start, int end);
    void _q_rowsAboutToBeInserted(const QModelIndex &parent, int start, int end);
    void _q_columnsAboutToBeInserted(const QModelIndex &parent, int start, int end);
+
    void _q_layoutAboutToBeChanged(const QList<QPersistentModelIndex> &parents = QList<QPersistentModelIndex>(),
       QAbstractItemModel::LayoutChangeHint hint = QAbstractItemModel::NoLayoutChangeHint);
+
    void _q_layoutChanged(const QList<QPersistentModelIndex> &parents = QList<QPersistentModelIndex>(),
       QAbstractItemModel::LayoutChangeHint hint = QAbstractItemModel::NoLayoutChangeHint);
 
-   inline void remove(QList<QItemSelectionRange> &r) {
+   void remove(QList<QItemSelectionRange> &r) {
       QList<QItemSelectionRange>::const_iterator it = r.constBegin();
+
       for (; it != r.constEnd(); ++it) {
          ranges.removeAll(*it);
       }
    }
 
-   inline void finalize() {
+   void finalize() {
       ranges.merge(currentSelection, currentCommand);
-      if (!currentSelection.isEmpty()) { // ### perhaps this should be in QList
+
+      if (! currentSelection.isEmpty()) {
+         // ### perhaps this should be in QList
          currentSelection.clear();
       }
    }
 
-   QPointer<QAbstractItemModel> model;
+   QPointer<QAbstractItemModel> m_model;
    QItemSelection ranges;
    QItemSelection currentSelection;
    QPersistentModelIndex currentIndex;
@@ -84,9 +87,10 @@ class QItemSelectionModelPrivate
  protected:
    QItemSelectionModel *q_ptr;
 
+ private:
+   Q_DECLARE_PUBLIC(QItemSelectionModel)
 };
 
 #endif // QT_NO_ITEMVIEWS
-
 
 #endif // QITEMSELECTIONMODEL_P_H

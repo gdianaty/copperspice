@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,20 +24,15 @@
 #ifndef QABSTRACTSOCKET_H
 #define QABSTRACTSOCKET_H
 
+#include <qdebug.h>
 #include <qiodevice.h>
 #include <qobject.h>
-#include <qdebug.h>
 
+class QAbstractSocketPrivate;
 class QAuthenticator;
 class QHostAddress;
 class QHostInfo;
-
-#ifndef QT_NO_NETWORKPROXY
-   class QNetworkProxy;
-#endif
-
-class QAbstractSocketPrivate;
-class QAbstractSocketPrivate;
+class QNetworkProxy;
 
 class Q_NETWORK_EXPORT QAbstractSocket : public QIODevice
 {

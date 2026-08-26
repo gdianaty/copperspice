@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,16 +29,17 @@
 #ifndef QT_NO_PRINTER
 
 #include <qprinter.h>
-#include <qprinterinfo.h>
-#include <qprintengine.h>
+
 #include <qpointer.h>
+#include <qprintengine.h>
+#include <qprinterinfo.h>
 #include <qset.h>
 
 #include <limits.h>
 
-class QPrintEngine;
-class QPreviewPaintEngine;
 class QPicture;
+class QPreviewPaintEngine;
+class QPrintEngine;
 
 class QPrinterPrivate
 {

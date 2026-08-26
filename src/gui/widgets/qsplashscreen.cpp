@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,16 +26,17 @@
 #ifndef QT_NO_SPLASHSCREEN
 
 #include <qapplication.h>
+#include <qdebug.h>
 #include <qdesktopwidget.h>
+#include <qelapsedtimer.h>
 #include <qpainter.h>
 #include <qpixmap.h>
-#include <qtextdocument.h>
 #include <qtextcursor.h>
+#include <qtextdocument.h>
 #include <qwindow.h>
-#include <qdebug.h>
-#include <qelapsedtimer.h>
 
 #include <qwidget_p.h>
+
 #ifdef Q_OS_WIN
 #  include <qt_windows.h>
 #else
@@ -45,6 +46,7 @@
 class QSplashScreenPrivate : public QWidgetPrivate
 {
    Q_DECLARE_PUBLIC(QSplashScreen)
+
  public:
    QPixmap pixmap;
    QString currStatus;
@@ -76,12 +78,6 @@ void QSplashScreen::mousePressEvent(QMouseEvent *)
    hide();
 }
 
-/*!
-    This overrides QWidget::repaint(). It differs from the standard
-    repaint function in that it also calls QApplication::flush() to
-    ensure the updates are displayed, even when there is no event loop
-    present.
-*/
 void QSplashScreen::repaint()
 {
    QWidget::repaint();
@@ -114,7 +110,8 @@ void QSplashScreen::clearMessage()
 
 static inline bool waitForWindowExposed(QWindow *window, int timeout = 1000)
 {
-   enum { TimeOutMs = 10 };
+   static constexpr const int TimeOutMs = 10;
+
    QElapsedTimer timer;
    timer.start();
 
@@ -123,6 +120,7 @@ static inline bool waitForWindowExposed(QWindow *window, int timeout = 1000)
       if (remaining <= 0) {
          break;
       }
+
       QCoreApplication::processEvents(QEventLoop::AllEvents, remaining);
       QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
 

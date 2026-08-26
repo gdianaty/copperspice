@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -52,7 +52,7 @@ class QGestureManager : public QObject
    bool filterEvent(QGraphicsObject *receiver, QEvent *event);
 #endif
 
-   static QGestureManager *instance(); // declared in qapplication.cpp
+   static QGestureManager *instance();          // declared in qapplication.cpp
    static bool gesturePending(QObject *o);
 
    void cleanupCachedGestures(QObject *target, Qt::GestureType type);
@@ -70,23 +70,28 @@ class QGestureManager : public QObject
    enum State {
       Gesture,
       NotGesture,
-      MaybeGesture // this means timers are up and waiting for some
-      // more events, and input events are handled by
-      // gesture recognizer explicitly
-   } state;
+      MaybeGesture
+   };
+
+   State m_gestureState;
 
    struct ObjectGesture {
       QObject *object;
       Qt::GestureType gesture;
 
-      ObjectGesture(QObject *o, const Qt::GestureType &g) : object(o), gesture(g) { }
-      inline bool operator<(const ObjectGesture &rhs) const {
+      ObjectGesture(QObject *o, const Qt::GestureType &g)
+         : object(o), gesture(g)
+      { }
+
+      bool operator<(const ObjectGesture &rhs) const {
          if (object < rhs.object) {
             return true;
          }
+
          if (object == rhs.object) {
             return gesture < rhs.gesture;
          }
+
          return false;
       }
    };

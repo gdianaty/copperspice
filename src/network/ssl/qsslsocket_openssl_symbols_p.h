@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,8 +24,9 @@
 #ifndef QSSLSOCKET_OPENSSL_SYMBOLS_P_H
 #define QSSLSOCKET_OPENSSL_SYMBOLS_P_H
 
-#include <qsslsocket_openssl_p.h>
 #include <qglobal.h>
+
+#include <qsslsocket_openssl_p.h>
 
 #define DUMMYARG
 
@@ -38,7 +39,7 @@
    static _q_PTR_ ## func _q_ ## func = nullptr;         \
    ret q_ ## func(arg) {                                 \
       if (!_q_ ## func) {                                \
-         qWarning("QSslSocket: can not call unresolved function "#func);  \
+         qWarning("QSslSocket() Unable to call unresolved function "#func);  \
          err;                                            \
       }                                                  \
       funcret _q_ ## func(a);                            \
@@ -50,7 +51,7 @@
    static _q_PTR_ ## func _q_ ## func = nullptr;         \
    ret q_ ## func(arg1, arg2) {                          \
       if (!_q_ ## func) {                                \
-         qWarning("QSslSocket: can not call unresolved function "#func);  \
+         qWarning("QSslSocket() Unable to call unresolved function "#func);  \
          err;                                            \
       }                                                  \
       funcret _q_ ## func(a, b);                         \
@@ -62,7 +63,7 @@
    static _q_PTR_ ## func _q_ ## func = nullptr;         \
    ret q_ ## func(arg1, arg2, arg3) {                    \
       if (!_q_ ## func) {                                \
-         qWarning("QSslSocket: can not call unresolved function "#func); \
+         qWarning("QSslSocket() Unable to call unresolved function "#func); \
          err;                                            \
       }                                                  \
       funcret _q_ ## func(a, b, c);                      \
@@ -74,7 +75,7 @@
    static _q_PTR_ ## func _q_ ## func = nullptr;            \
    ret q_ ## func(arg1, arg2, arg3, arg4) {                 \
       if (!_q_ ## func) {                                   \
-         qWarning("QSslSocket: can not call unresolved function "#func); \
+         qWarning("QSslSocket() Unable to call unresolved function "#func); \
          err;                                               \
       }                                                     \
       funcret _q_ ## func(a, b, c, d);                      \
@@ -86,7 +87,7 @@
    static _q_PTR_ ## func _q_ ## func = nullptr;                                 \
    ret q_ ## func(arg1, arg2, arg3, arg4, arg5) { \
       if (!_q_ ## func) { \
-         qWarning("QSslSocket: can not call unresolved function "#func); \
+         qWarning("QSslSocket() Unable to call unresolved function "#func); \
          err; \
       } \
       funcret _q_ ## func(a, b, c, d, e); \
@@ -98,7 +99,7 @@
    static _q_PTR_ ## func _q_ ## func = nullptr;                                 \
    ret q_ ## func(arg1, arg2, arg3, arg4, arg5, arg6) { \
       if (!_q_ ## func) { \
-         qWarning("QSslSocket: can not call unresolved function "#func); \
+         qWarning("QSslSocket() Unable to call unresolved function "#func); \
          err; \
       } \
       funcret _q_ ## func(a, b, c, d, e, f); \
@@ -110,7 +111,7 @@
    static _q_PTR_ ## func _q_ ## func = nullptr;                                       \
    ret q_ ## func(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { \
       if (!_q_ ## func) { \
-         qWarning("QSslSocket: can not call unresolved function "#func); \
+         qWarning("QSslSocket() Unable to call unresolved function "#func); \
          err; \
       } \
       funcret _q_ ## func(a, b, c, d, e, f, g); \
@@ -122,7 +123,7 @@
    static _q_PTR_ ## func _q_ ## func = nullptr;                                                   \
    ret q_ ## func(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { \
       if (_q_ ## func) { \
-         qWarning("QSslSocket: cann ot call unresolved function "#func); \
+         qWarning("QSslSocket() Unable to call unresolved function "#func); \
          err; \
       }   \
       funcret _q_ ## func(a, b, c, d, e, f, g, h, i); \

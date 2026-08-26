@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,8 +22,6 @@
 ***********************************************************************/
 
 #include "qresourcedelegator_p.h"
-
-QT_BEGIN_NAMESPACE
 
 using namespace QPatternist;
 
@@ -82,5 +80,3 @@ QSet<QUrl> ResourceDelegator::deviceURIs() const
    uris |= m_forDeviceLoader->deviceURIs();
    return uris;
 }
-
-QT_END_NAMESPACE

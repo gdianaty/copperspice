@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,10 +25,11 @@
 #define QTCPSERVER_P_H
 
 #include <qtcpserver.h>
+
 #include <qabstractsocket.h>
-#include <qnetworkproxy.h>
-#include <qlist.h>
 #include <qhostaddress.h>
+#include <qlist.h>
+#include <qnetworkproxy.h>
 
 #include <qabstractsocketengine_p.h>
 
@@ -71,15 +72,12 @@ class QTcpServerPrivate : public QAbstractSocketEngineReceiver
    void connectionNotification() override {}
 
 #ifndef QT_NO_NETWORKPROXY
-   void proxyAuthenticationRequired(const QNetworkProxy &proxy, QAuthenticator *) override
-   {
-      (void) proxy;
-   }
+   void proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *) override
+   { }
 #endif
 
  protected:
    QTcpServer *q_ptr;
-
 };
 
 #endif

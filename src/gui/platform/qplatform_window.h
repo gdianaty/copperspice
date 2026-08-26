@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,20 +24,21 @@
 #ifndef QPLATFORM_WINDOW_H
 #define QPLATFORM_WINDOW_H
 
-#include <qscopedpointer.h>
-#include <qrect.h>
 #include <qmargins.h>
-#include <qstring.h>
-#include <qwindowdefs.h>
-#include <qwindow.h>
 #include <qplatform_openglcontext.h>
 #include <qplatform_surface.h>
+#include <qrect.h>
+#include <qscopedpointer.h>
+#include <qstring.h>
+#include <qwindow.h>
+#include <qwindowdefs.h>
 
-class QPlatformScreen;
-class QPlatformWindowPrivate;
-class QWindow;
 class QIcon;
+class QPlatformScreen;
 class QRegion;
+class QWindow;
+
+class QPlatformWindowPrivate;
 
 class Q_GUI_EXPORT QPlatformWindow : public QPlatformSurface
 {
@@ -54,7 +55,7 @@ class Q_GUI_EXPORT QPlatformWindow : public QPlatformSurface
    QWindow *window() const;
    QPlatformWindow *parent() const;
    QPlatformScreen *screen() const;
-   virtual QSurfaceFormat format() const override;
+   QSurfaceFormat format() const override;
    virtual void setGeometry(const QRect &rect);
    virtual QRect geometry() const;
    virtual QRect normalGeometry() const;

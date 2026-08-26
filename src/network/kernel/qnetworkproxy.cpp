@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -31,17 +31,17 @@
 #include <qstringlist.h>
 #include <qurl.h>
 
-#include <qnetworkproxy_p.h>
-#include <qnetwork_request_p.h>
-#include <qsocks5socketengine_p.h>
-#include <qhttpsocketengine_p.h>
-
 #ifndef QT_NO_BEARERMANAGEMENT
 #include <qnetworkconfiguration.h>
 #endif
 
-class QSocks5SocketEngineHandler;
+#include <qhttpsocketengine_p.h>
+#include <qnetwork_request_p.h>
+#include <qnetworkproxy_p.h>
+#include <qsocks5socketengine_p.h>
+
 class QHttpSocketEngineHandler;
+class QSocks5SocketEngineHandler;
 
 class QGlobalNetworkProxy
 {
@@ -140,32 +140,17 @@ QList<QNetworkProxy> QGlobalNetworkProxy::proxyForQuery(const QNetworkProxyQuery
    result = applicationLevelProxyFactory->queryProxy(query);
 
    if (result.isEmpty()) {
-      qWarning("QNetworkProxyFactory: factory %p has returned an empty result set", applicationLevelProxyFactory);
+      qWarning("QGlobalNetworkProxy::proxyForQuery() Factory returned an empty result set");
       result << QNetworkProxy(QNetworkProxy::NoProxy);
    }
 
    return result;
 }
 
-namespace {
-
-template <bool>
-struct StaticAssertTest;
-
-template <>
-struct StaticAssertTest<true> {
-   enum { Value = 1 };
-};
-
-}
-
-static inline void qt_noop_with_arg(int) {}
-#define q_static_assert(expr)   qt_noop_with_arg(sizeof(StaticAssertTest< expr >::Value))
-
 static QNetworkProxy::Capabilities defaultCapabilitiesForType(QNetworkProxy::ProxyType type)
 {
-   q_static_assert(int(QNetworkProxy::DefaultProxy) == 0);
-   q_static_assert(int(QNetworkProxy::FtpCachingProxy) == 5);
+   static_assert(int(QNetworkProxy::DefaultProxy) == 0);
+   static_assert(int(QNetworkProxy::FtpCachingProxy) == 5);
 
    static const int defaults[] = {
       /* [QNetworkProxy::DefaultProxy] = */
@@ -197,6 +182,7 @@ static QNetworkProxy::Capabilities defaultCapabilitiesForType(QNetworkProxy::Pro
    if (int(type) < 0 || int(type) > int(QNetworkProxy::FtpCachingProxy)) {
       type = QNetworkProxy::DefaultProxy;
    }
+
    return QNetworkProxy::Capabilities(defaults[int(type)]);
 }
 
@@ -432,14 +418,12 @@ void QNetworkProxy::setRawHeader(const QByteArray &headerName, const QByteArray 
 class QNetworkProxyQueryPrivate: public QSharedData
 {
  public:
-   inline QNetworkProxyQueryPrivate()
+   QNetworkProxyQueryPrivate()
       : localPort(-1), type(QNetworkProxyQuery::TcpSocket) {
    }
 
    bool operator==(const QNetworkProxyQueryPrivate &other) const {
-      return type == other.type &&
-             localPort == other.localPort &&
-             remote == other.remote;
+      return type == other.type && localPort == other.localPort && remote == other.remote;
    }
 
    QUrl remote;

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -31,9 +31,10 @@
 
 #include <limits.h>
 
-class QThreadData;
-class QThreadPrivate;
 class QAbstractEventDispatcher;
+class QThreadData;
+
+class QThreadPrivate;
 
 class Q_CORE_EXPORT QThread : public QObject
 {
@@ -85,8 +86,8 @@ class Q_CORE_EXPORT QThread : public QObject
    QAbstractEventDispatcher *eventDispatcher() const;
    void setEventDispatcher(QAbstractEventDispatcher *eventDispatcher);
 
-    bool event(QEvent *event) override;
-    int loopLevel() const;
+   bool event(QEvent *event) override;
+   int loopLevel() const;
 
    CORE_CS_SIGNAL_1(Public, void started())
    CORE_CS_SIGNAL_2(started)
@@ -114,7 +115,6 @@ class Q_CORE_EXPORT QThread : public QObject
 
  private:
    Q_DECLARE_PRIVATE(QThread)
-
 
    friend class QCoreApplication;
    friend class QThreadData;

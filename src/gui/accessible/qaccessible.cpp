@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,20 +22,20 @@
 ***********************************************************************/
 
 #include <qaccessible.h>
-#include <qaccessiblecache_p.h>
 
-#include <qapplication.h>
-#include <qaccessibleplugin.h>
-#include <qaccessibleobject.h>
 #include <qaccessiblebridge.h>
+#include <qaccessibleobject.h>
+#include <qaccessibleplugin.h>
+#include <qapplication.h>
 #include <qclipboard.h>
 #include <qhash.h>
 #include <qmetaobject.h>
-#include <qtextcursor.h>
-#include <qtextboundaryfinder.h>
 #include <qplatform_accessibility.h>
 #include <qplatform_integration.h>
+#include <qtextboundaryfinder.h>
+#include <qtextcursor.h>
 
+#include <qaccessiblecache_p.h>
 #include <qapplication_p.h>
 #include <qfactoryloader_p.h>
 
@@ -117,13 +117,6 @@ void QAccessible::removeFactory(InterfaceFactory factory)
    qAccessibleFactories()->removeAll(factory);
 }
 
-/*!
-    \internal
-
-    Installs the given \a handler as the function to be used by
-    updateAccessibility(), and returns the previously installed
-    handler.
-*/
 QAccessible::UpdateHandler QAccessible::installUpdateHandler(UpdateHandler handler)
 {
    UpdateHandler old = updateHandler;
@@ -311,13 +304,7 @@ void QAccessible::updateAccessibility(QAccessibleEvent *event)
       pfAccessibility->notifyAccessibilityUpdate(event);
    }
 }
-/*!
-    \internal
-    \brief getBoundaries is a helper function to find the accessible text boundaries for QTextCursor based documents.
-    \param documentCursor a valid cursor bound to the document (not null). It needs to ba at the position to look for the boundary
-    \param boundaryType the type of boundary to find
-    \return the boundaries as pair
-*/
+
 QPair< int, int > QAccessible::qAccessibleTextBoundaryHelper(const QTextCursor &offsetCursor, TextBoundaryType boundaryType)
 {
    Q_ASSERT(!offsetCursor.isNull());
@@ -488,7 +475,8 @@ QAccessibleInterface *QAccessibleEvent::accessibleInterface() const
       if (child) {
          iface = child;
       } else {
-         qWarning() << "Unable to create accessible child interface for object: " << m_object << " index: " << m_child;
+         qWarning() << "QAccessibleEvent::accessibleInterface() Unable to create accessible interface for child: "
+                    << m_object << " index: " << m_child;
       }
    }
    return iface;
@@ -499,7 +487,7 @@ QWindow *QAccessibleInterface::window() const
    return nullptr;
 }
 
-void QAccessibleInterface::virtual_hook(int /*id*/, void * /*data*/)
+void QAccessibleInterface::virtual_hook(int, void *)
 {
 }
 
@@ -525,199 +513,205 @@ bool operator==(const QAccessible::State &first, const QAccessible::State &secon
    return memcmp(&first, &second, sizeof(QAccessible::State)) == 0;
 }
 
-Q_GUI_EXPORT QDebug operator<<(QDebug d, const QAccessibleInterface *iface)
+Q_GUI_EXPORT QDebug operator<<(QDebug debug, const QAccessibleInterface *iface)
 {
-   QDebugStateSaver saver(d);
-
    if (! iface) {
-      d << "QAccessibleInterface(null)";
-      return d;
+      debug << "QAccessibleInterface(null)";
+      return debug;
    }
 
-   d.nospace();
-   d << "QAccessibleInterface(" << hex << (const void *) iface << dec;
+   QDebugStateSaver saver(debug);
+   debug.nospace();
+
+   debug << "QAccessibleInterface(" << hex << (const void *) iface << dec;
 
    if (iface->isValid()) {
-      d << " name=" << iface->text(QAccessible::Name) << ' ';
-      d << "role="  << qAccessibleRoleString(iface->role()) << ' ';
+      debug << " name=" << iface->text(QAccessible::Name) << ' ';
+      debug << "role="  << qAccessibleRoleString(iface->role()) << ' ';
 
       if (iface->childCount()) {
-         d << "childc=" << iface->childCount() << ' ';
+         debug << "childc=" << iface->childCount() << ' ';
       }
 
       if (iface->object()) {
-         d << "obj=" << iface->object();
+         debug << "obj=" << iface->object();
       }
 
       QStringList stateStrings;
       QAccessible::State st = iface->state();
 
       if (st.focusable) {
-         stateStrings << QLatin1String("focusable");
+         stateStrings << QString("focusable");
       }
 
       if (st.focused) {
-         stateStrings << QLatin1String("focused");
+         stateStrings << QString("focused");
       }
 
       if (st.selected) {
-         stateStrings << QLatin1String("selected");
+         stateStrings << QString("selected");
       }
       if (st.invisible) {
-         stateStrings << QLatin1String("invisible");
+         stateStrings << QString("invisible");
       }
 
       if (!stateStrings.isEmpty()) {
-         d << stateStrings.join(QLatin1Char('|'));
+         debug << stateStrings.join(QChar('|'));
       }
 
       if (! st.invisible) {
-         d << "rect=" << iface->rect();
+         debug << "rect=" << iface->rect();
       }
 
    } else {
-      d << " invalid";
+      debug << " invalid";
    }
 
-   d << ')';
+   debug << ')';
 
-   return d;
+   return debug;
 }
 
-QDebug operator<<(QDebug d, const QAccessibleEvent &ev)
+QDebug operator<<(QDebug debug, const QAccessibleEvent &ev)
 {
-   QDebugStateSaver saver(d);
+   QDebugStateSaver saver(debug);
+   debug.nospace();
 
-   d.nospace() << "QAccessibleEvent(";
+   debug << "QAccessibleEvent(";
 
    if (ev.object()) {
-      d.nospace() << "object=" << hex << ev.object() << dec;
-      d.nospace() << "child=" << ev.child();
+      debug << "object=" << hex << ev.object() << dec;
+      debug << "child=" << ev.child();
    } else {
-      d.nospace() << "no object, uniqueId=" << ev.uniqueId();
+      debug << "no object, uniqueId=" << ev.uniqueId();
    }
 
-   d << " event=" << qAccessibleEventString(ev.type());
+   debug << " event=" << qAccessibleEventString(ev.type());
 
    if (ev.type() == QAccessible::StateChanged) {
       QAccessible::State changed = static_cast<const QAccessibleStateChangeEvent *>(&ev)->changedStates();
-      d << "State changed:";
+      debug << "State changed:";
+
       if (changed.disabled) {
-         d << "disabled";
+         debug << "disabled";
       }
+
       if (changed.selected) {
-         d << "selected";
+         debug << "selected";
       }
+
       if (changed.focusable) {
-         d << "focusable";
+         debug << "focusable";
       }
+
       if (changed.focused) {
-         d << "focused";
+         debug << "focused";
       }
       if (changed.pressed) {
-         d << "pressed";
+         debug << "pressed";
       }
       if (changed.checkable) {
-         d << "checkable";
+         debug << "checkable";
       }
       if (changed.checked) {
-         d << "checked";
+         debug << "checked";
       }
       if (changed.checkStateMixed) {
-         d << "checkStateMixed";
+         debug << "checkStateMixed";
       }
       if (changed.readOnly) {
-         d << "readOnly";
+         debug << "readOnly";
       }
       if (changed.hotTracked) {
-         d << "hotTracked";
+         debug << "hotTracked";
       }
       if (changed.defaultButton) {
-         d << "defaultButton";
+         debug << "defaultButton";
       }
       if (changed.expanded) {
-         d << "expanded";
+         debug << "expanded";
       }
       if (changed.collapsed) {
-         d << "collapsed";
+         debug << "collapsed";
       }
       if (changed.busy) {
-         d << "busy";
+         debug << "busy";
       }
       if (changed.expandable) {
-         d << "expandable";
+         debug << "expandable";
       }
       if (changed.marqueed) {
-         d << "marqueed";
+         debug << "marqueed";
       }
       if (changed.animated) {
-         d << "animated";
+         debug << "animated";
       }
       if (changed.invisible) {
-         d << "invisible";
+         debug << "invisible";
       }
       if (changed.offscreen) {
-         d << "offscreen";
+         debug << "offscreen";
       }
       if (changed.sizeable) {
-         d << "sizeable";
+         debug << "sizeable";
       }
       if (changed.movable) {
-         d << "movable";
+         debug << "movable";
       }
       if (changed.selfVoicing) {
-         d << "selfVoicing";
+         debug << "selfVoicing";
       }
       if (changed.selectable) {
-         d << "selectable";
+         debug << "selectable";
       }
       if (changed.linked) {
-         d << "linked";
+         debug << "linked";
       }
       if (changed.traversed) {
-         d << "traversed";
+         debug << "traversed";
       }
       if (changed.multiSelectable) {
-         d << "multiSelectable";
+         debug << "multiSelectable";
       }
       if (changed.extSelectable) {
-         d << "extSelectable";
+         debug << "extSelectable";
       }
       if (changed.passwordEdit) {
-         d << "passwordEdit";   // used to be Protected
+         debug << "passwordEdit";   // used to be Protected
       }
       if (changed.hasPopup) {
-         d << "hasPopup";
+         debug << "hasPopup";
       }
       if (changed.modal) {
-         d << "modal";
+         debug << "modal";
       }
 
       // IA2 - we chose to not add some IA2 states for now
       // Below the ones that seem helpful
       if (changed.active) {
-         d << "active";
+         debug << "active";
       }
       if (changed.invalid) {
-         d << "invalid";   // = defuncts
+         debug << "invalid";   // = defuncts
       }
       if (changed.editable) {
-         d << "editable";
+         debug << "editable";
       }
       if (changed.multiLine) {
-         d << "multiLine";
+         debug << "multiLine";
       }
       if (changed.selectableText) {
-         d << "selectableText";
+         debug << "selectableText";
       }
       if (changed.supportsAutoCompletion) {
-         d << "supportsAutoCompletion";
+         debug << "supportsAutoCompletion";
       }
 
    }
 
-   d << ')';
-   return d;
+   debug << ')';
+
+   return debug;
 }
 
 QAccessibleTextInterface::~QAccessibleTextInterface()

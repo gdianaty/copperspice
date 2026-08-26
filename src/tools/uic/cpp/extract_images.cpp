@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,18 +23,18 @@
 
 #include <extract_images.h>
 
+#include <qdatastream.h>
+#include <qdir.h>
+#include <qfile.h>
+#include <qfileinfo.h>
+#include <qtextcodec.h>
+#include <qtextstream.h>
+
 #include <driver.h>
 #include <ui4.h>
 #include <uic.h>
 #include <utils.h>
 #include <write_icondata.h>
-
-#include <qdatastream.h>
-#include <qtextstream.h>
-#include <qtextcodec.h>
-#include <qdir.h>
-#include <qfile.h>
-#include <qfileinfo.h>
 
 namespace CPP {
 
@@ -135,4 +135,4 @@ void ExtractImages::acceptImage(DomImage *image)
    f.close();
 }
 
-} // namespace CPP
+}   // namespace

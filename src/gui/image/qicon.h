@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,18 +26,28 @@
 
 #include <qglobal.h>
 #include <qlist.h>
-#include <qsize.h>
 #include <qpixmap.h>
+#include <qsize.h>
 #include <qvariant.h>
 
-class QIconPrivate;
 class QIconEngine;
+
+class QIconPrivate;
 
 class Q_GUI_EXPORT QIcon
 {
  public:
-   enum Mode { Normal, Disabled, Active, Selected };
-   enum State { On, Off };
+   enum Mode {
+      Normal,
+      Disabled,
+      Active,
+      Selected
+   };
+
+   enum State {
+      On,
+      Off
+   };
 
    QIcon();
    QIcon(const QPixmap &pixmap);
@@ -84,7 +94,7 @@ class Q_GUI_EXPORT QIcon
    void paint(QPainter *painter, const QRect &rect, Qt::Alignment alignment = Qt::AlignCenter, Mode mode = Normal,
       State state = Off) const;
 
-   inline void paint(QPainter *painter, int x, int y, int w, int h,
+   void paint(QPainter *painter, int x, int y, int w, int h,
       Qt::Alignment alignment = Qt::AlignCenter, Mode mode = Normal, State state = Off) const {
       paint(painter, QRect(x, y, w, h), alignment, mode, state);
    }

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,51 +24,33 @@
 #ifndef QXsdNotation_P_H
 #define QXsdNotation_P_H
 
+#include <qlist.h>
+
 #include <qanyuri_p.h>
 #include <qderivedstring_p.h>
 #include <qnamedschemacomponent_p.h>
 #include <qxsdannotated_p.h>
-#include <QList>
-
-QT_BEGIN_NAMESPACE
 
 namespace QPatternist {
+
 class XsdNotation : public NamedSchemaComponent, public XsdAnnotated
 {
  public:
    typedef QExplicitlySharedDataPointer<XsdNotation> Ptr;
    typedef QList<XsdNotation::Ptr> List;
 
-   /**
-    * Sets the public @p identifier of the notation.
-    *
-    * @see <a href="http://www.w3.org/TR/xmlschema11-1/#nd-public_identifier">Public Identifier Definition</a>
-    */
    void setPublicId(const DerivedString<TypeToken>::Ptr &identifier);
 
-   /**
-    * Returns the public identifier of the notation.
-    */
    DerivedString<TypeToken>::Ptr publicId() const;
 
-   /**
-    * Sets the system @p identifier of the notation.
-    *
-    * @see <a href="http://www.w3.org/TR/xmlschema11-1/#nd-system_identifier">System Identifier Definition</a>
-    */
    void setSystemId(const AnyURI::Ptr &identifier);
-
-   /**
-    * Returns the system identifier of the notation.
-    */
    AnyURI::Ptr systemId() const;
 
  private:
    DerivedString<TypeToken>::Ptr m_publicId;
    AnyURI::Ptr m_systemId;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

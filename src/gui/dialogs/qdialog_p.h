@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,13 @@
 #ifndef QDIALOG_P_H
 #define QDIALOG_P_H
 
-#include <qwidget_p.h>
-#include <qeventloop.h>
-#include <qpointer.h>
 #include <qdialog.h>
-#include <qpushbutton.h>
+#include <qeventloop.h>
 #include <qplatform_dialoghelper.h>
+#include <qpointer.h>
+#include <qpushbutton.h>
+
+#include <qwidget_p.h>
 
 class QSizeGrip;
 
@@ -61,7 +62,10 @@ class QDialogPrivate : public QWidgetPrivate
    Qt::Orientation orientation;
    QWidget *extension;
    bool doShowExtension;
-   QSize size, min, max;
+
+   QSize size;
+   QSize min;
+   QSize max;
 
 #ifndef QT_NO_SIZEGRIP
    QSizeGrip *resizer;

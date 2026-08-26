@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,26 +28,27 @@
 
 #ifndef QT_NO_ACCESSIBILITY
 
-#include <qpointer.h>
 #include <qpair.h>
+#include <qpointer.h>
 
-class QTextEdit;
-class QStackedWidget;
-class QToolBox;
-class QMdiArea;
-class QMdiSubWindow;
-class QRubberBand;
-class QTextBrowser;
-class QCalendarWidget;
 class QAbstractItemView;
+class QCalendarWidget;
 class QDockWidget;
 class QDockWidgetLayout;
 class QMainWindow;
+class QMdiArea;
+class QMdiSubWindow;
 class QPlainTextEdit;
+class QRubberBand;
+class QStackedWidget;
+class QTextBrowser;
 class QTextCursor;
 class QTextDocument;
+class QTextEdit;
+class QToolBox;
 
 #ifndef QT_NO_CURSOR
+
 class QAccessibleTextWidget : public QAccessibleWidget,
    public QAccessibleTextInterface,
    public QAccessibleEditableTextInterface

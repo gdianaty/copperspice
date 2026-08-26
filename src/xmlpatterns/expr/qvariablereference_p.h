@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,11 +26,10 @@
 
 #include <qemptycontainer_p.h>
 
-QT_BEGIN_NAMESPACE
-
 template<typename T> class QList;
 
 namespace QPatternist {
+
 class VariableReference : public EmptyContainer
 {
  public:
@@ -53,7 +52,5 @@ inline VariableSlotID VariableReference::slot() const
 }
 
 }
-
-QT_END_NAMESPACE
 
 #endif

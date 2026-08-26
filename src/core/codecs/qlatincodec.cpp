@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,6 +22,7 @@
 ***********************************************************************/
 
 #include <qlatincodec_p.h>
+
 #include <qlist.h>
 
 #ifndef QT_NO_TEXTCODEC
@@ -104,68 +105,60 @@ QString QLatin15Codec::convertToUnicode(const char *chars, int len, ConverterSta
 
       switch (static_cast<uchar>(*c)) {
 
-         case 0xa4:
-            {
-               char32_t tmp = U'\u20ac';
-               retval.append(tmp);
-            }
-            break;
+         case 0xa4: {
+            char32_t tmp = U'\u20ac';
+            retval.append(tmp);
+         }
+         break;
 
-         case 0xa6:
-            {
-               char32_t tmp = U'\u0160';
-               retval.append(tmp);
-            }
-            break;
+         case 0xa6: {
+            char32_t tmp = U'\u0160';
+            retval.append(tmp);
+         }
+         break;
 
-         case 0xa8:
-            {
-               char32_t tmp = U'\u0161';
-               retval.append(tmp);
-            }
-            break;
+         case 0xa8: {
+            char32_t tmp = U'\u0161';
+            retval.append(tmp);
+         }
+         break;
 
-         case 0xb4:
-            {
-               char32_t tmp = U'\u017d';
-               retval.append(tmp);
-            }
-            break;
+         case 0xb4: {
+            char32_t tmp = U'\u017d';
+            retval.append(tmp);
+         }
+         break;
 
-         case 0xb8:
-            {
-               char32_t tmp = U'\u017e';
-               retval.append(tmp);
-            }
-            break;
+         case 0xb8: {
+            char32_t tmp = U'\u017e';
+            retval.append(tmp);
+         }
+         break;
 
-         case 0xbc:
-            {
-               char32_t tmp = U'\u0152';
-               retval.append(tmp);
-            }
-            break;
+         case 0xbc: {
+            char32_t tmp = U'\u0152';
+            retval.append(tmp);
+         }
+         break;
 
-         case 0xbd:
-            {
-               char32_t tmp = U'\u0153';
-               retval.append(tmp);
-            }
-            break;
+         case 0xbd: {
+            char32_t tmp = U'\u0153';
+            retval.append(tmp);
+         }
+         break;
 
-         case 0xbe:
-            {
-               char32_t tmp = U'\u0178';
-               retval.append(tmp);
-            }
-            break;
+         case 0xbe: {
+            char32_t tmp = U'\u0178';
+            retval.append(tmp);
+         }
+         break;
 
          default:
             retval.append(c);
             break;
       }
 
-      c++;
+      ++c;
    }
 
    return retval;
@@ -213,24 +206,31 @@ QByteArray QLatin15Codec::convertFromUnicode(QStringView str, ConverterState *st
                case 0x0160:
                   tmp = 0xa6;
                   break;
+
                case 0x0161:
                   tmp = 0xa8;
                   break;
+
                case 0x017d:
                   tmp = 0xb4;
                   break;
+
                case 0x017e:
                   tmp = 0xb8;
                   break;
+
                case 0x0152:
                   tmp = 0xbc;
                   break;
+
                case 0x0153:
                   tmp = 0xbd;
                   break;
+
                case 0x0178:
                   tmp = 0xbe;
                   break;
+
                default:
                   tmp = replacement;
                   ++invalid;

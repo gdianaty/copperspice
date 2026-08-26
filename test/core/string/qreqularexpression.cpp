@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -37,11 +37,11 @@ TEST_CASE("QRegularExpression empty", "[qregularexpression]")
    QRegularExpression regExp;
 
    REQUIRE(regExp.captureCount() == -1);
-   REQUIRE(regExp.namedCaptureGroups().isEmpty());
+   REQUIRE(regExp.namedCaptureGroups().isEmpty() == true);
    REQUIRE(regExp.pattern() == "");
 // REQUIRE(regExp.patternErrorOffset() == 0);    // emerald, add soon to CS
 
-   REQUIRE(! regExp.isValid());
+   REQUIRE(regExp.isValid() == false);
 }
 
 TEST_CASE("QRegularExpression match_a", "[qregularexpression]")
@@ -51,9 +51,9 @@ TEST_CASE("QRegularExpression match_a", "[qregularexpression]")
 
    QRegularExpressionMatch match = regExp.match(str);
 
-   REQUIRE(regExp.isValid());
-   REQUIRE(match.hasMatch());
-   REQUIRE(! match.hasPartialMatch());
+   REQUIRE(regExp.isValid() == true);
+   REQUIRE(match.hasMatch() == true);
+   REQUIRE(match.hasPartialMatch() == false);
 
    REQUIRE(regExp.captureCount() == 1);
    REQUIRE(match.captured(0)  == "halfway");
@@ -77,8 +77,8 @@ TEST_CASE("QRegularExpression look_ahead", "[qregularexpression]")
 
    QRegularExpressionMatch match = regExp.match(str);
 
-   REQUIRE(match.hasMatch());
-   REQUIRE(! match.hasPartialMatch());
+   REQUIRE(match.hasMatch() == true);
+   REQUIRE(match.hasPartialMatch() == false);
 
    REQUIRE(match.captured(0) == "fox");
    REQUIRE(match.captured(1) == "o");
@@ -146,6 +146,49 @@ TEST_CASE("QRegularExpression global_match", "[qregularexpression]")
    REQUIRE(result[2].captured(0) == "Tuesday");
 }
 
+TEST_CASE("QRegularExpression replace", "[qregularexpression]")
+{
+   QString8 str = "@3::A   A::@2::B   @A";
 
+   QRegularExpression regExp = QRegularExpression("(::)?@[0-9]+");
+   str.replace(regExp, "");
 
+   REQUIRE(str == "::A   A::B   @A");
+}
 
+//
+TEST_CASE("QRegularExpression digit_a", "[qregularexpression]")
+{
+   QRegularExpression regExp = QRegularExpression("\\d");
+   QRegularExpressionMatch match = regExp.match("12");
+
+   REQUIRE(regExp.isValid() == true);
+   REQUIRE(match.hasMatch() == true);
+}
+
+TEST_CASE("QRegularExpression digit_b", "[qregularexpression]")
+{
+   QRegularExpression regExp = QRegularExpression("[[:digit:]]");
+   QRegularExpressionMatch match = regExp.match("5");
+
+   REQUIRE(regExp.isValid() == true);
+   REQUIRE(match.hasMatch() == true);
+}
+
+TEST_CASE("QRegularExpression word", "[qregularexpression]")
+{
+   QRegularExpression regExp = QRegularExpression("[[:word:]]");
+   QRegularExpressionMatch match = regExp.match("b");
+
+   REQUIRE(regExp.isValid() == true);
+   REQUIRE(match.hasMatch() == true);
+}
+
+TEST_CASE("QRegularExpression xdigit", "[qregularexpression]")
+{
+   QRegularExpression regExp = QRegularExpression("[[:xdigit:]]");
+   QRegularExpressionMatch match = regExp.match("a0");
+
+   REQUIRE(regExp.isValid() == true);
+   REQUIRE(match.hasMatch() == true);
+}

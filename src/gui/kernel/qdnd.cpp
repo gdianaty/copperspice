@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,27 +21,28 @@
 *
 ***********************************************************************/
 
-#include <qplatformdefs.h>
+#include <qdnd_p.h>
+
+#include <qapplication.h>
 #include <qbitmap.h>
+#include <qbuffer.h>
+#include <qdir.h>
 #include <qdrag.h>
-#include <qpixmap.h>
 #include <qevent.h>
 #include <qfile.h>
-#include <qtextcodec.h>
-#include <qapplication.h>
-#include <qpoint.h>
-
-#include <qbuffer.h>
 #include <qimage.h>
-#include <qpainter.h>
-#include <qregularexpression.h>
-#include <qdir.h>
-#include <qdnd_p.h>
 #include <qimagereader.h>
 #include <qimagewriter.h>
-#include <qplatform_integration.h>
+#include <qpainter.h>
+#include <qpixmap.h>
 #include <qplatform_drag.h>
-#include <qguiapplication_p.h>
+#include <qplatform_integration.h>
+#include <qplatformdefs.h>
+#include <qpoint.h>
+#include <qregularexpression.h>
+#include <qtextcodec.h>
+
+#include <qapplication_p.h>
 
 #include <ctype.h>
 
@@ -112,7 +113,7 @@ Qt::DropAction QDragManager::drag(QDrag *objDrag)
    }
 
    if (m_object) {
-      qWarning("QDragManager::drag in possibly invalid state");
+      qWarning("QDragManager::drag() State may be invalid");
       return Qt::IgnoreAction;
    }
 
@@ -187,29 +188,35 @@ QInternalMimeData::~QInternalMimeData()
 bool QInternalMimeData::hasFormat(const QString &mimeType) const
 {
    bool foundFormat = hasFormat_sys(mimeType);
-   if (!foundFormat && mimeType == QLatin1String("application/x-qt-image")) {
+
+   if (! foundFormat && mimeType == "application/x-qt-image") {
       QStringList imageFormats = imageReadMimeFormats();
+
       for (int i = 0; i < imageFormats.size(); ++i) {
          if ((foundFormat = hasFormat_sys(imageFormats.at(i)))) {
             break;
          }
       }
    }
+
    return foundFormat;
 }
 
 QStringList QInternalMimeData::formats() const
 {
    QStringList realFormats = formats_sys();
-   if (!realFormats.contains(QLatin1String("application/x-qt-image"))) {
+
+   if (! realFormats.contains("application/x-qt-image")) {
       QStringList imageFormats = imageReadMimeFormats();
+
       for (int i = 0; i < imageFormats.size(); ++i) {
          if (realFormats.contains(imageFormats.at(i))) {
-            realFormats += QLatin1String("application/x-qt-image");
+            realFormats += "application/x-qt-image";
             break;
          }
       }
    }
+
    return realFormats;
 }
 
@@ -217,7 +224,7 @@ QVariant QInternalMimeData::retrieveData(const QString &mimeType, QVariant::Type
 {
    QVariant data = retrieveData_sys(mimeType, type);
 
-   if (mimeType == QLatin1String("application/x-qt-image")) {
+   if (mimeType == "application/x-qt-image") {
       if (! data.isValid() || (data.type() == QVariant::ByteArray && data.toByteArray().isEmpty())) {
          // try to find an image
          QStringList imageFormats = imageReadMimeFormats();
@@ -238,26 +245,33 @@ QVariant QInternalMimeData::retrieveData(const QString &mimeType, QVariant::Type
          data = QImage::fromData(data.toByteArray());
       }
 
-   } else if (mimeType == QLatin1String("application/x-color") && data.type() == QVariant::ByteArray) {
+   } else if (mimeType == "application/x-color" && data.type() == QVariant::ByteArray) {
       QColor c;
       QByteArray ba = data.toByteArray();
+
       if (ba.size() == 8) {
          ushort *colBuf = (ushort *)ba.data();
+
          c.setRgbF(qreal(colBuf[0]) / qreal(0xFFFF),
             qreal(colBuf[1]) / qreal(0xFFFF),
             qreal(colBuf[2]) / qreal(0xFFFF),
             qreal(colBuf[3]) / qreal(0xFFFF));
+
          data = c;
+
       } else {
-         qWarning("Qt: Invalid color format");
+         qWarning("QMimeData::retrieveData() Invalid color format");
       }
+
    } else if (data.type() != type && data.type() == QVariant::ByteArray) {
-      // try to use mime data's internal conversion stuf.
+      // try to use the mime data conversion
       QInternalMimeData *that = const_cast<QInternalMimeData *>(this);
+
       that->setData(mimeType, data.toByteArray());
       data = QMimeData::retrieveData(mimeType, type);
       that->clear();
    }
+
    return data;
 }
 
@@ -266,7 +280,7 @@ bool QInternalMimeData::canReadData(const QString &mimeType)
    return imageReadMimeFormats().contains(mimeType);
 }
 
-// helper functions for rendering mimedata to the system, this is needed because QMimeData is in core.
+// for rendering mimedata to the system, this is needed because QMimeData is in core
 QStringList QInternalMimeData::formatsHelper(const QMimeData *data)
 {
    QStringList realFormats = data->formats();
@@ -298,9 +312,9 @@ bool QInternalMimeData::hasFormatHelper(const QString &mimeType, const QMimeData
             if ((foundFormat = data->hasFormat(imageFormats.at(i)))) {
                break;
             }
-
          }
-      } else if (mimeType.startsWith(QLatin1String("image/"))) {
+
+      } else if (mimeType.startsWith("image/")) {
          return data->hasImage() && imageWriteMimeFormats().contains(mimeType);
       }
    }

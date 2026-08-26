@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,25 +26,22 @@
 
 #include <qfunctionargument_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class WithParam : public FunctionArgument
 {
  public:
    typedef QExplicitlySharedDataPointer<WithParam> Ptr;
    typedef QHash<QXmlName, Ptr> Hash;
 
-   inline WithParam(const QXmlName name,
-                    const SequenceType::Ptr &type,
-                    const Expression::Ptr &sourceExpression);
+   inline WithParam(const QXmlName name, const SequenceType::Ptr &type, const Expression::Ptr &sourceExpression);
 
-   inline void setSourceExpression(const Expression::Ptr &expr) {
+   void setSourceExpression(const Expression::Ptr &expr) {
       Q_ASSERT(expr);
       m_sourceExpression = expr;
    }
 
-   inline Expression::Ptr sourceExpression() const {
+   Expression::Ptr sourceExpression() const {
       return m_sourceExpression;
    }
 
@@ -52,16 +49,12 @@ class WithParam : public FunctionArgument
    Expression::Ptr m_sourceExpression;
 };
 
-WithParam::WithParam(const QXmlName name,
-                     const SequenceType::Ptr &type,
-                     const Expression::Ptr &sourceExpression) : FunctionArgument(name, type)
-   , m_sourceExpression(sourceExpression)
+WithParam::WithParam(const QXmlName name, const SequenceType::Ptr &type, const Expression::Ptr &sourceExpression)
+   : FunctionArgument(name, type), m_sourceExpression(sourceExpression)
 {
    Q_ASSERT(m_sourceExpression);
 }
 
 }
-
-QT_END_NAMESPACE
 
 #endif

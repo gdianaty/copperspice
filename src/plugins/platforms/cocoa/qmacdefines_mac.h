@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -37,17 +37,9 @@ typedef signed long OSStatus;
 #endif
 
 #ifdef __OBJC__
-#    ifdef slots
-#      define old_slots slots
-#      undef slots
-#    endif
 #include <Cocoa/Cocoa.h>
-#    ifdef old_slots
-#      undef slots
-#      define slots
-#      undef old_slots
-#    endif
 #endif
+
 typedef struct OpaqueEventHandlerCallRef *EventHandlerCallRef;
 typedef struct OpaqueEventRef *EventRef;
 typedef struct OpaqueMenuRef *MenuRef;

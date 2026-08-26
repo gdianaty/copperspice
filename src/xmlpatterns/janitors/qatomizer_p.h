@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,11 @@
 #ifndef QAtomizer_P_H
 #define QAtomizer_P_H
 
-#include "qitem_p.h"
-#include "qsinglecontainer_p.h"
-
-QT_BEGIN_NAMESPACE
+#include <qitem_p.h>
+#include <qsinglecontainer_p.h>
 
 namespace QPatternist {
+
 class Atomizer : public SingleContainer
 {
  public:
@@ -43,11 +42,6 @@ class Atomizer : public SingleContainer
    SequenceType::List expectedOperandTypes() const override;
    const SourceLocationReflection *actualReflection() const override;
 
-   /**
-    * Makes an early compression, by returning the result of
-    * the type checked operand, if the operand has the static type
-    * xs:anyAtomicType(no atomization needed).
-    */
    Expression::Ptr typeCheck(const StaticContext::Ptr &context, const SequenceType::Ptr &reqType) override;
 
    inline Item::Iterator::Ptr mapToSequence(const Item &item, const DynamicContext::Ptr &context) const;
@@ -56,8 +50,7 @@ class Atomizer : public SingleContainer
  private:
    typedef QExplicitlySharedDataPointer<const Atomizer> ConstPtr;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

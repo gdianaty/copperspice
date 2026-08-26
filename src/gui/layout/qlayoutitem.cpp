@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,13 +21,12 @@
 *
 ***********************************************************************/
 
-#include <qlayout.h>
-
 #include <qapplication.h>
-#include <qmenubar.h>
-#include <qtoolbar.h>
 #include <qevent.h>
+#include <qlayout.h>
+#include <qmenubar.h>
 #include <qstyle.h>
+#include <qtoolbar.h>
 #include <qvariant.h>
 
 #include <qlayoutengine_p.h>
@@ -64,8 +63,7 @@ QSpacerItem::~QSpacerItem()
 {
 }
 
-void QSpacerItem::changeSize(int w, int h, QSizePolicy::Policy hPolicy,
-   QSizePolicy::Policy vPolicy)
+void QSpacerItem::changeSize(int w, int h, QSizePolicy::Policy hPolicy, QSizePolicy::Policy vPolicy)
 {
    width = w;
    height = h;
@@ -124,7 +122,7 @@ int QLayoutItem::minimumHeightForWidth(int w) const
    return heightForWidth(w);
 }
 
-int QLayoutItem::heightForWidth(int /* w */) const
+int QLayoutItem::heightForWidth(int) const
 {
    return -1;
 }
@@ -263,17 +261,11 @@ int QWidgetItem::heightForWidth(int w) const
    return hfw;
 }
 
-/*!
-    \reimp
-*/
 Qt::Orientations QSpacerItem::expandingDirections() const
 {
    return sizeP.expandingDirections();
 }
 
-/*!
-    \reimp
-*/
 Qt::Orientations QWidgetItem::expandingDirections() const
 {
    if (isEmpty()) {
@@ -286,13 +278,11 @@ Qt::Orientations QWidgetItem::expandingDirections() const
    //  its own size policy isn't expanding. This behavior should be reconsidered.
 
    if (wid->layout()) {
-      if (wid->sizePolicy().horizontalPolicy() & QSizePolicy::GrowFlag
-         && (wid->layout()->expandingDirections() & Qt::Horizontal)) {
+      if (cs_enum_cast(wid->sizePolicy().horizontalPolicy()) & cs_enum_cast(QSizePolicy::GrowFlag) && (wid->layout()->expandingDirections() & Qt::Horizontal)) {
          e |= Qt::Horizontal;
       }
 
-      if (wid->sizePolicy().verticalPolicy() & QSizePolicy::GrowFlag
-         && (wid->layout()->expandingDirections() & Qt::Vertical)) {
+      if (cs_enum_cast(wid->sizePolicy().verticalPolicy()) & cs_enum_cast(QSizePolicy::GrowFlag) && (wid->layout()->expandingDirections() & Qt::Vertical)) {
          e |= Qt::Vertical;
       }
    }
@@ -308,18 +298,12 @@ Qt::Orientations QWidgetItem::expandingDirections() const
    return e;
 }
 
-/*!
-    \reimp
-*/
 QSize QSpacerItem::minimumSize() const
 {
-   return QSize(sizeP.horizontalPolicy() & QSizePolicy::ShrinkFlag ? 0 : width,
-         sizeP.verticalPolicy() & QSizePolicy::ShrinkFlag ? 0 : height);
+   return QSize(cs_enum_cast(sizeP.horizontalPolicy()) & cs_enum_cast(QSizePolicy::ShrinkFlag) ? 0 : width,
+         cs_enum_cast(sizeP.verticalPolicy()) & cs_enum_cast(QSizePolicy::ShrinkFlag) ? 0 : height);
 }
 
-/*!
-    \reimp
-*/
 QSize QWidgetItem::minimumSize() const
 {
    if (isEmpty()) {
@@ -327,37 +311,26 @@ QSize QWidgetItem::minimumSize() const
    }
 
    return ! wid->testAttribute(Qt::WA_LayoutUsesWidgetRect)
-      ? toLayoutItemSize(wid->d_func(), qSmartMinSize(this))
-      : qSmartMinSize(this);
+         ? toLayoutItemSize(wid->d_func(), qSmartMinSize(this)) : qSmartMinSize(this);
 }
 
-/*!
-    \reimp
-*/
 QSize QSpacerItem::maximumSize() const
 {
-   return QSize(sizeP.horizontalPolicy() & QSizePolicy::GrowFlag ? QLAYOUTSIZE_MAX : width,
-         sizeP.verticalPolicy() & QSizePolicy::GrowFlag ? QLAYOUTSIZE_MAX : height);
+   return QSize(cs_enum_cast(sizeP.horizontalPolicy()) & cs_enum_cast(QSizePolicy::GrowFlag) ? QLAYOUTSIZE_MAX : width,
+         cs_enum_cast(sizeP.verticalPolicy()) & cs_enum_cast(QSizePolicy::GrowFlag) ? QLAYOUTSIZE_MAX : height);
 }
 
-/*!
-    \reimp
-*/
 QSize QWidgetItem::maximumSize() const
 {
    if (isEmpty()) {
       return QSize(0, 0);
 
    } else {
-      return !wid->testAttribute(Qt::WA_LayoutUsesWidgetRect)
-         ? toLayoutItemSize(wid->d_func(), qSmartMaxSize(this, align))
-         : qSmartMaxSize(this, align);
+      return ! wid->testAttribute(Qt::WA_LayoutUsesWidgetRect)
+            ? toLayoutItemSize(wid->d_func(), qSmartMaxSize(this, align)) : qSmartMaxSize(this, align);
    }
 }
 
-/*!
-    \reimp
-*/
 QSize QSpacerItem::sizeHint() const
 {
    return QSize(width, height);
@@ -402,13 +375,13 @@ QSizePolicy::ControlTypes QWidgetItem::controlTypes() const
 }
 
 QWidgetItemV2::QWidgetItemV2(QWidget *widget)
-   : QWidgetItem(widget), q_cachedMinimumSize(Dirty, Dirty), q_cachedSizeHint(Dirty, Dirty),
-     q_cachedMaximumSize(Dirty, Dirty), q_firstCachedHfw(0), q_hfwCacheSize(0), d(nullptr)
+   : QWidgetItem(widget), q_cachedMinimumSize(ItemDirty, ItemDirty), q_cachedSizeHint(ItemDirty, ItemDirty),
+     q_cachedMaximumSize(ItemDirty, ItemDirty), q_firstCachedHfw(0), q_hfwCacheSize(0), d(nullptr)
 {
    QWidgetPrivate *wd = wid->d_func();
 
-   if (! wd->widgetItem) {
-      wd->widgetItem = this;
+   if (! wd->m_widgetItem2) {
+      wd->m_widgetItem2 = this;
    }
 }
 
@@ -416,20 +389,20 @@ QWidgetItemV2::~QWidgetItemV2()
 {
    if (wid) {
       QWidgetPrivate *wd = wid->d_func();
-      if (wd->widgetItem == this) {
-         wd->widgetItem = nullptr;
+      if (wd->m_widgetItem2 == this) {
+         wd->m_widgetItem2 = nullptr;
       }
    }
 }
 
 inline bool QWidgetItemV2::useSizeCache() const
 {
-   return wid->d_func()->widgetItem == this;
+   return wid->d_func()->m_widgetItem2 == this;
 }
 
 void QWidgetItemV2::updateCacheIfNecessary() const
 {
-   if (q_cachedMinimumSize.width() != Dirty) {
+   if (q_cachedMinimumSize.width() != ItemDirty) {
       return;
    }
 
@@ -517,21 +490,6 @@ QSize QWidgetItemV2::maximumSize() const
    }
 }
 
-/*
-    The height-for-width cache is organized as a circular buffer. The entries
-
-        q_hfwCachedHfws[q_firstCachedHfw],
-        ...,
-        q_hfwCachedHfws[(q_firstCachedHfw + q_hfwCacheSize - 1) % HfwCacheMaxSize]
-
-    contain the last cached values. When the cache is full, the first entry to
-    be erased is the entry before q_hfwCachedHfws[q_firstCachedHfw]. When
-    values are looked up, we try to move q_firstCachedHfw to point to that new
-    entry (unless the cache is not full, in which case it would leave the cache
-    in a broken state), so that the most recently used entry is also the last
-    to be erased.
-*/
-
 int QWidgetItemV2::heightForWidth(int width) const
 {
    if (isEmpty()) {
@@ -540,10 +498,10 @@ int QWidgetItemV2::heightForWidth(int width) const
 
    for (int i = 0; i < q_hfwCacheSize; ++i) {
       int offset = q_firstCachedHfw + i;
-      const QSize &size = q_cachedHfws[offset % HfwCacheMaxSize];
+      const QSize &size = q_cachedHfws[offset % SizeCacheMax];
 
       if (size.width() == width) {
-         if (q_hfwCacheSize == HfwCacheMaxSize) {
+         if (q_hfwCacheSize == SizeCacheMax) {
             q_firstCachedHfw = offset;
          }
 
@@ -551,14 +509,13 @@ int QWidgetItemV2::heightForWidth(int width) const
       }
    }
 
-   if (q_hfwCacheSize < HfwCacheMaxSize) {
+   if (q_hfwCacheSize < SizeCacheMax) {
       ++q_hfwCacheSize;
    }
 
-   q_firstCachedHfw = (q_firstCachedHfw + HfwCacheMaxSize - 1) % HfwCacheMaxSize;
+   q_firstCachedHfw = (q_firstCachedHfw + SizeCacheMax - 1) % SizeCacheMax;
 
    int height = QWidgetItem::heightForWidth(width);
    q_cachedHfws[q_firstCachedHfw] = QSize(width, height);
    return height;
 }
-

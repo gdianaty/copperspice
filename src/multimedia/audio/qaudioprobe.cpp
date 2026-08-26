@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,11 +22,12 @@
 ***********************************************************************/
 
 #include <qaudioprobe.h>
+
 #include <qmediaaudioprobecontrol.h>
-#include <qmediaservice.h>
 #include <qmediarecorder.h>
-#include <qsharedpointer.h>
+#include <qmediaservice.h>
 #include <qpointer.h>
+#include <qsharedpointer.h>
 
 class QAudioProbePrivate {
  public:
@@ -42,34 +43,34 @@ QAudioProbe::QAudioProbe(QObject *parent)
 QAudioProbe::~QAudioProbe()
 {
     if (d->source) {
-        // Disconnect
         if (d->probee) {
-            disconnect(d->probee.data(), SIGNAL(audioBufferProbed(QAudioBuffer)), this, SLOT(audioBufferProbed(QAudioBuffer)));
-            disconnect(d->probee.data(), SIGNAL(flush()), this, SLOT(flush()));
+            disconnect(d->probee.data(), &QMediaAudioProbeControl::audioBufferProbed, this, &QAudioProbe::audioBufferProbed);
+            disconnect(d->probee.data(), &QMediaAudioProbeControl::flush,             this, &QAudioProbe::flush);
         }
+
         d->source.data()->service()->releaseControl(d->probee.data());
     }
 }
 
 bool QAudioProbe::setSource(QMediaObject *source)
 {
-    // Need to:
     // 1) disconnect from current source if necessary
     // 2) see if new one has the probe control
     // 3) connect if so
 
     // in case source was destroyed but probe control is still valid
-    if (!d->source && d->probee) {
-        disconnect(d->probee.data(), SIGNAL(audioBufferProbed(QAudioBuffer)), this, SLOT(audioBufferProbed(QAudioBuffer)));
-        disconnect(d->probee.data(), SIGNAL(flush()), this, SLOT(flush()));
+    if (! d->source && d->probee) {
+        disconnect(d->probee.data(), &QMediaAudioProbeControl::flush, this, &QAudioProbe::flush);
         d->probee.clear();
     }
 
     if (source != d->source.data()) {
         if (d->source) {
             Q_ASSERT(d->probee);
-            disconnect(d->probee.data(), SIGNAL(audioBufferProbed(QAudioBuffer)), this, SLOT(audioBufferProbed(QAudioBuffer)));
-            disconnect(d->probee.data(), SIGNAL(flush()), this, SLOT(flush()));
+
+            disconnect(d->probee.data(), &QMediaAudioProbeControl::audioBufferProbed, this, &QAudioProbe::audioBufferProbed);
+            disconnect(d->probee.data(), &QMediaAudioProbeControl::flush,             this, &QAudioProbe::flush);
+
             d->source.data()->service()->releaseControl(d->probee.data());
             d->source.clear();
             d->probee.clear();
@@ -82,8 +83,8 @@ bool QAudioProbe::setSource(QMediaObject *source)
             }
 
             if (d->probee) {
-                connect(d->probee.data(), SIGNAL(audioBufferProbed(QAudioBuffer)), this, SLOT(audioBufferProbed(QAudioBuffer)));
-                connect(d->probee.data(), SIGNAL(flush()), this, SLOT(flush()));
+                connect(d->probee.data(), &QMediaAudioProbeControl::audioBufferProbed, this, &QAudioProbe::audioBufferProbed);
+                connect(d->probee.data(), &QMediaAudioProbeControl::flush,             this, &QAudioProbe::flush);
                 d->source = source;
             }
         }

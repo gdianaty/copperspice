@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,12 +25,13 @@
 #define QCUPSJOBWIDGET_P_H
 
 #include <ui_qcupsjobwidget.h>
+
 #include <qcups_p.h>
 
 #if ! defined(QT_NO_PRINTER) && ! defined(QT_NO_CUPS)
 
-class QTime;
 class QPrinter;
+class QTime;
 
 class QCupsJobWidget : public QWidget
 {

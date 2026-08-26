@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,12 +21,10 @@
 *
 ***********************************************************************/
 
-#include "qxsdidcache_p.h"
+#include <qxsdidcache_p.h>
 
-#include <QReadLocker>
-#include <QWriteLocker>
-
-QT_BEGIN_NAMESPACE
+#include <qreadlocker.h>
+#include <qwritelocker.h>
 
 using namespace QPatternist;
 
@@ -44,5 +42,3 @@ bool XsdIdCache::hasId(const QString &id) const
 
    return m_ids.contains(id);
 }
-
-QT_END_NAMESPACE

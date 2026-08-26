@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,12 +21,11 @@
 *
 ***********************************************************************/
 
-#include <camera_locks.h>
-#include <camera_session.h>
 #include <camera_focus.h>
 #include <camera_imageprocessing.h>
+#include <camera_locks.h>
+#include <camera_session.h>
 #include <qcoreevent.h>
-#include <qdebug.h>
 
 #include <gst/interfaces/photography.h>
 
@@ -69,18 +68,23 @@ QCamera::LockStatus CameraBinLocks::lockStatus(QCamera::LockType lock) const
    switch (lock) {
       case QCamera::LockFocus:
          return m_focus->focusStatus();
+
 #if GST_CHECK_VERSION(1, 2, 0)
       case QCamera::LockExposure:
          if (m_pendingLocks & QCamera::LockExposure) {
             return QCamera::Searching;
          }
+
          return isExposureLocked() ? QCamera::Locked : QCamera::Unlocked;
+
       case QCamera::LockWhiteBalance:
          if (m_pendingLocks & QCamera::LockWhiteBalance) {
             return QCamera::Searching;
          }
+
          return isWhiteBalanceLocked() ? QCamera::Locked : QCamera::Unlocked;
 #endif
+
       default:
          return QCamera::Unlocked;
    }
@@ -96,6 +100,7 @@ void CameraBinLocks::searchAndLock(QCamera::LockTypes locks)
       m_pendingLocks |= QCamera::LockFocus;
       m_focus->_q_startFocusing();
    }
+
 #if GST_CHECK_VERSION(1, 2, 0)
    if (!m_pendingLocks) {
       m_lockTimer.stop();

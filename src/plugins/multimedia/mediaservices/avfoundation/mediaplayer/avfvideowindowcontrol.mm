@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,6 +24,10 @@
 #include "avfvideowindowcontrol.h"
 
 #include <AVFoundation/AVFoundation.h>
+
+#if defined(Q_OS_DARWIN)
+#import <AppKit/AppKit.h>
+#endif
 
 AVFVideoWindowControl::AVFVideoWindowControl(QObject *parent)
    : QVideoWindowControl(parent)
@@ -168,7 +172,10 @@ void AVFVideoWindowControl::setLayer(void *playerLayer)
    }
 
    if (!m_winId) {
-      qDebug("AVFVideoWindowControl: No video window");
+#if defined(CS_SHOW_DEBUG_PLUGINS_AVF)
+      qDebug("AVFVideoWindowControl::setLayer() No video window");
+#endif
+
       return;
    }
 

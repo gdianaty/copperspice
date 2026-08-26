@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -44,9 +44,14 @@ bool QSslCertificate::operator==(const QSslCertificate &other) const
    return d->derData == other.d->derData;
 }
 
-uint qHash(const QSslCertificate &key, uint seed) {
+uint QSslCertificate::hash(const QSslCertificate &key, uint seed) {
    // DER is the native encoding here, so toDer() is just "return d->derData":
    return qHash(key.toDer(), seed);
+}
+
+uint qHash(const QSslCertificate &key, uint seed)
+{
+   return QSslCertificate::hash(key, seed);
 }
 
 bool QSslCertificate::isNull() const
@@ -59,9 +64,6 @@ bool QSslCertificate::isSelfSigned() const
    if (d->null) {
       return false;
    }
-
-   qWarning("QSslCertificate::isSelfSigned: This function does not check, whether the certificate "
-            "is actually signed. It just checks whether issuer and subject are identical");
 
    return d->subjectMatchesIssuer;
 }
@@ -401,7 +403,7 @@ bool QSslCertificatePrivate::parse(const QByteArray &data)
                }
                extensions << extension;
 
-               if (extension.oid() == QLatin1String("2.5.29.17")) {
+               if (extension.oid() == "2.5.29.17") {
                   // subjectAltName
                   QAsn1Element sanElem;
 

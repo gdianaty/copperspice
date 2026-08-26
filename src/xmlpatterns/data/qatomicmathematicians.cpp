@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -34,8 +34,6 @@
 #include "qpatternistlocale_p.h"
 
 #include "qatomicmathematicians_p.h"
-
-QT_BEGIN_NAMESPACE
 
 using namespace QPatternist;
 
@@ -297,4 +295,3 @@ Item AbstractDateTimeMathematician::calculate(const Item &o1,
    return toItem(DayTimeDuration::fromSeconds(diff));
 }
 
-QT_END_NAMESPACE

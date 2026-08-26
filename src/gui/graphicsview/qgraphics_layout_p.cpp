@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,9 +27,9 @@
 
 #include <qgraphics_layout_p.h>
 
+#include <qapplication.h>
 #include <qgraphicslayout.h>
 #include <qgraphicswidget.h>
-#include <qapplication.h>
 
 void QGraphicsLayoutPrivate::reparentChildItems(QGraphicsItem *newParent)
 {
@@ -53,15 +53,16 @@ void QGraphicsLayoutPrivate::reparentChildItems(QGraphicsItem *newParent)
       } else if (QGraphicsItem *itemChild = layoutChild->graphicsItem()) {
          QGraphicsItem *childParent = itemChild->parentItem();
 
-#ifdef QT_DEBUG
-         if (childParent && childParent != newParent && itemChild->isWidget() && qt_graphicsLayoutDebug()) {
+#if defined(CS_SHOW_DEBUG_GUI_GRAPHICSVIEW)
+         if (childParent && childParent != newParent && itemChild->isWidget()) {
 
             QGraphicsWidget *w = static_cast<QGraphicsWidget *>(layoutChild);
 
-            qWarning("QGraphicsLayout::addChildLayout: widget %s \"%s\" in wrong parent; moved to correct parent",
+            qWarning("QGraphicsLayout::reparentChildItems() Widget %s \"%s\" had the wrong parent, moved to correct",
                csPrintable(w->metaObject()->className()), csPrintable(w->objectName()));
          }
 #endif
+
          if (childParent != newParent) {
             itemChild->setParentItem(newParent);
          }
@@ -150,10 +151,10 @@ void QGraphicsLayoutPrivate::addChildLayoutItem(QGraphicsLayoutItem *layoutItem)
             return;
          }
 
-#ifdef QT_DEBUG
+#if defined(CS_SHOW_DEBUG_GUI_GRAPHICSVIEW)
          if (oldParent && item->isWidget()) {
             QGraphicsWidget *w = static_cast<QGraphicsWidget *>(item);
-            qWarning("QGraphicsLayout::addChildLayoutItem: %s \"%s\" in wrong parent; moved to correct parent",
+            qWarning("QGraphicsLayout::addChildLayoutItem() Widget %s \"%s\" had the wrong parent, moved to correct",
                csPrintable(w->metaObject()->className()), csPrintable(w->objectName()));
          }
 #endif

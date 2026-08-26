@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,28 +23,28 @@
 
 #include <qsvghandler_p.h>
 
-#include <qplatformdefs.h>
-#include <qpen.h>
-#include <qpainterpath.h>
 #include <qbrush.h>
 #include <qcolor.h>
-#include <qtextformat.h>
-#include <qvector.h>
-#include <qfileinfo.h>
-#include <qfile.h>
 #include <qdebug.h>
+#include <qfile.h>
+#include <qfileinfo.h>
 #include <qmath.h>
 #include <qnumeric.h>
+#include <qpainterpath.h>
+#include <qpen.h>
+#include <qplatformdefs.h>
+#include <qtextformat.h>
 #include <qvarlengtharray.h>
+#include <qvector.h>
 
 #include <qmath_p.h>
-#include <qsvgtinydocument_p.h>
-#include <qsvgstructure_p.h>
+#include <qsvgfont_p.h>
 #include <qsvggraphics_p.h>
 #include <qsvgnode_p.h>
-#include <qsvgfont_p.h>
+#include <qsvgstructure_p.h>
+#include <qsvgtinydocument_p.h>
 
-#include "float.h"
+#include <float.h>
 
 Q_CORE_EXPORT double qstrtod(const char *s00, char const **se, bool *ok);
 
@@ -484,15 +484,15 @@ class QSvgStyleSelector : public QCss::StyleSelector
    {
    }
 
-   inline QString nodeToName(QSvgNode *node) const {
+   QString nodeToName(QSvgNode *node) const {
       return QString::fromLatin1(QSvgStyleSelector_nodeString[node->type()]);
    }
 
-   inline QSvgNode *svgNode(NodePtr node) const {
+   QSvgNode *svgNode(NodePtr node) const {
       return (QSvgNode *)node.ptr;
    }
 
-   inline QSvgStructureNode *nodeToStructure(QSvgNode *n) const {
+   QSvgStructureNode *nodeToStructure(QSvgNode *n) const {
       if (n &&
             (n->type() == QSvgNode::DOC ||
              n->type() == QSvgNode::G ||
@@ -504,7 +504,7 @@ class QSvgStyleSelector : public QCss::StyleSelector
       return nullptr;
    }
 
-   inline QSvgStructureNode *svgStructure(NodePtr node) const {
+   QSvgStructureNode *svgStructure(NodePtr node) const {
       QSvgNode *n = svgNode(node);
       QSvgStructureNode *st = nodeToStructure(n);
       return st;
@@ -868,10 +868,6 @@ static QString idFromUrl(const QString &url)
    return id;
 }
 
-/**
- * returns true when successfuly set the color. false signifies
- * that the color should be inherited
- */
 static bool resolveColor(QStringView colorStr, QColor &color, QSvgHandler *handler)
 {
    QStringView colorStrTr = colorStr.trimmed();
@@ -883,7 +879,7 @@ static bool resolveColor(QStringView colorStr, QColor &color, QSvgHandler *handl
    switch (colorStrTr.at(0).unicode()) {
 
       case '#': {
-         // #rrggbb is very common, so let's tackle it here  rather than falling back to QColor
+         // #rrggbb is very common so handle it here rather than falling back to QColor
 
          QRgb rgb;
          bool ok = qsvg_get_hex_rgb(colorStrTr, &rgb);
@@ -1467,7 +1463,15 @@ static void parseFont(QSvgNode *node, const QSvgAttributes &attributes, QSvgHand
       static const qreal sizeTable[] = { qreal(6.9), qreal(8.3), qreal(10.0),
                   qreal(12.0), qreal(14.4), qreal(17.3), qreal(20.7) };
 
-      enum AbsFontSize { XXSmall, XSmall, Small, Medium, Large, XLarge, XXLarge };
+      enum AbsFontSize {
+         XXSmall,
+         XSmall,
+         Small,
+         Medium,
+         Large,
+         XLarge,
+         XXLarge
+      };
 
       switch (attributes.fontSize.at(0).unicode()) {
          case 'x':
@@ -2102,6 +2106,7 @@ static void parseCSStoXMLAttrs(const QVector<QCss::Declaration> &declarations, Q
 {
    for (int i = 0; i < declarations.count(); ++i) {
       const QCss::Declaration &decl = declarations.at(i);
+
       if (decl.d->property.isEmpty()) {
          continue;
       }
@@ -2110,8 +2115,8 @@ static void parseCSStoXMLAttrs(const QVector<QCss::Declaration> &declarations, Q
       QString valueStr;
 
       if (decl.d->values.count() != 1) {
-         for (int i = 0; i < decl.d->values.count(); ++i) {
-            const QString &value = decl.d->values[i].toString();
+         for (int j = 0; j < decl.d->values.count(); ++j) {
+            const QString &value = decl.d->values[j].toString();
 
             if (value.isEmpty()) {
                valueStr += ',';
@@ -2125,18 +2130,18 @@ static void parseCSStoXMLAttrs(const QVector<QCss::Declaration> &declarations, Q
       }
 
       if (val.type == QCss::Value::Uri) {
-         valueStr.prepend( "url(" );
-         valueStr.append( ')' );
+         valueStr.prepend("url(");
+         valueStr.append(')');
 
       } else if (val.type == QCss::Value::Function) {
          QStringList lst = val.variant.toStringList();
          valueStr.append(lst.at(0));
          valueStr.append( '(' );
 
-         for (int i = 1; i < lst.count(); ++i) {
-            valueStr.append(lst.at(i));
+         for (int k = 1; k < lst.count(); ++k) {
+            valueStr.append(lst.at(k));
 
-            if ((i + 1) < lst.count()) {
+            if ((k + 1) < lst.count()) {
                valueStr.append(',');
             }
          }
@@ -2191,7 +2196,7 @@ void QSvgHandler::parseCSStoXMLAttrs(QString css, QVector<QSvgCssAttribute> *att
       }
 
       m_cssParser.skipSpace();
-      if ( !m_cssParser.hasNext()) {
+      if (! m_cssParser.hasNext()) {
          break;
       }
 
@@ -2199,11 +2204,9 @@ void QSvgHandler::parseCSStoXMLAttrs(QString css, QVector<QSvgCssAttribute> *att
       attribute.name = name;
 
       const int firstSymbol = m_cssParser.index;
-      int symbolCount = 0;
 
       do {
          m_cssParser.next();
-         ++symbolCount;
       } while (m_cssParser.hasNext() && !m_cssParser.test(QCss::SEMICOLON));
 
       for (int i = firstSymbol; i < m_cssParser.index - 1; ++i) {
@@ -2546,25 +2549,26 @@ static bool parseAnimateColorNode(QSvgNode *parent, const QXmlStreamAttributes &
 
    } else {
       QStringList str = valuesStr.split(';');
-      QStringList::const_iterator itr;
 
-      for (itr = str.constBegin(); itr != str.constEnd(); ++itr) {
+      for (auto iter = str.constBegin(); iter != str.constEnd(); ++iter) {
          QColor color;
-         QString str = *itr;
+         QString tmpStr = *iter;
 
-         resolveColor(QStringView(str), color, handler);
+         resolveColor(QStringView(tmpStr), color, handler);
          colors.append(color);
       }
    }
 
    int ms = 1000;
    beginStr = beginStr.trimmed();
+
    if (beginStr.endsWith(QString("ms"))) {
       beginStr.chop(2);
       ms = 1;
    } else if (beginStr.endsWith(QString("s"))) {
       beginStr.chop(1);
    }
+
    durStr = durStr.trimmed();
    if (durStr.endsWith(QString("ms"))) {
       durStr.chop(2);
@@ -2972,25 +2976,32 @@ static QSvgNode *createImageNode(QSvgNode *parent, const QXmlStreamAttributes &a
 
    filename = filename.trimmed();
    if (filename.isEmpty()) {
-      qWarning() << "QSvgHandler: Image filename is empty";
+      qWarning() << "QSvgHandler::createImageNode() Image filename is empty";
       return nullptr;
    }
 
    if (nwidth <= 0 || nheight <= 0) {
-        qWarning() << "QSvgHandler: Width or height for" << filename << "image was not greater than 0";
-        return nullptr;
+      qWarning() << "QSvgHandler::createImageNode() Both the Width and height in " << filename
+            << " image must be greater than zero";
+
+      return nullptr;
    }
    QImage image;
 
    if (filename.startsWith(QString("data"))) {
       int idx = filename.lastIndexOf(QString("base64,"));
+
       if (idx != -1) {
          idx += 7;
          QString dataStr = filename.mid(idx);
          QByteArray data = QByteArray::fromBase64(dataStr.toLatin1());
          image = QImage::fromData(data);
+
       } else {
-         qDebug() << "QSvgHandler::createImageNode: Unrecognized inline image format!";
+
+#if defined(CS_SHOW_DEBUG_SVG)
+         qDebug() << "QSvgHandler::createImageNode() Unrecognized inline image format!";
+#endif
       }
 
    } else {
@@ -2998,7 +3009,10 @@ static QSvgNode *createImageNode(QSvgNode *parent, const QXmlStreamAttributes &a
    }
 
    if (image.isNull()) {
+#if defined(CS_SHOW_DEBUG_SVG)
       qDebug() << "Unable to create image from " << filename;
+#endif
+
       return nullptr;
    }
 
@@ -3051,8 +3065,6 @@ static void parseBaseGradient(QSvgNode *node, const QXmlStreamAttributes &attrib
 
    if (!link.isEmpty()) {
       QSvgStyleProperty *prop = node->styleProperty(link);
-
-      //qDebug()<<"inherited "<<prop<<" ("<<link<<")";
 
       if (prop && prop->type() == QSvgStyleProperty::GRADIENT) {
          QSvgGradientStyle *inherited =  static_cast<QSvgGradientStyle *>(prop);
@@ -3478,7 +3490,7 @@ static QSvgNode *createSvgNode(QSvgNode *parent, const QXmlStreamAttributes &att
    QSvgHandler::LengthType type = QSvgHandler::LT_PX; // FIXME: is the default correct?
    qreal width = 0;
 
-   if (!widthStr.isEmpty()) {
+   if (! widthStr.isEmpty()) {
       width = parseLength(widthStr, type, handler);
 
       if (type != QSvgHandler::LT_PT) {
@@ -3488,8 +3500,10 @@ static QSvgNode *createSvgNode(QSvgNode *parent, const QXmlStreamAttributes &att
    }
 
    qreal height = 0;
+
    if (!heightStr.isEmpty()) {
       height = parseLength(heightStr, type, handler);
+
       if (type != QSvgHandler::LT_PT) {
          height = convertToPixels(height, false, type);
       }
@@ -3497,18 +3511,21 @@ static QSvgNode *createSvgNode(QSvgNode *parent, const QXmlStreamAttributes &att
    }
 
    QStringList viewBoxValues;
-   if (!viewBoxStr.isEmpty()) {
+
+   if (! viewBoxStr.isEmpty()) {
       viewBoxStr    = viewBoxStr.replace(QChar(' '),  QChar(','));
       viewBoxStr    = viewBoxStr.replace(QChar('\r'), QChar(','));
       viewBoxStr    = viewBoxStr.replace(QChar('\n'), QChar(','));
       viewBoxStr    = viewBoxStr.replace(QChar('\t'), QChar(','));
       viewBoxValues = viewBoxStr.split(QChar(','), QStringParser::SkipEmptyParts);
    }
+
    if (viewBoxValues.count() == 4) {
-      QString xStr      = viewBoxValues.at(0).trimmed();
-      QString yStr      = viewBoxValues.at(1).trimmed();
-      QString widthStr  = viewBoxValues.at(2).trimmed();
-      QString heightStr = viewBoxValues.at(3).trimmed();
+      QString xStr = viewBoxValues.at(0).trimmed();
+      QString yStr = viewBoxValues.at(1).trimmed();
+
+      widthStr  = viewBoxValues.at(2).trimmed();
+      heightStr = viewBoxValues.at(3).trimmed();
 
       QSvgHandler::LengthType lt;
       qreal x = parseLength(xStr, lt, handler);
@@ -3520,11 +3537,13 @@ static QSvgNode *createSvgNode(QSvgNode *parent, const QXmlStreamAttributes &att
 
    } else if (width && height) {
       if (type == QSvgHandler::LT_PT) {
-         width = convertToPixels(width, false, type);
+         width  = convertToPixels(width, false, type);
          height = convertToPixels(height, false, type);
       }
+
       node->setViewBox(QRectF(0, 0, width, height));
    }
+
    handler->setDefaultCoordinateSystem(QSvgHandler::LT_PX);
 
    return node;
@@ -3622,7 +3641,7 @@ static QSvgNode *createUseNode(QSvgNode *parent, const QXmlStreamAttributes &att
 
       if (link) {
          if (parent->isDescendantOf(link))
-            qWarning("link #%s is recursive!", csPrintable(linkId));
+            qWarning("QSvgNode createUseNode() Link #%s is recursive", csPrintable(linkId));
 
          QPointF pt;
 
@@ -3644,7 +3663,7 @@ static QSvgNode *createUseNode(QSvgNode *parent, const QXmlStreamAttributes &att
       }
    }
 
-   qWarning("Link %s has not been detected", csPrintable(linkId));
+   qWarning("QSvgNode::createUseNode() Link %s has not been detected", csPrintable(linkId));
    return nullptr;
 }
 
@@ -4089,8 +4108,8 @@ bool QSvgHandler::startElement(const QString &localName, const QXmlStreamAttribu
       m_whitespaceMode.push(QSvgText::Default);
 
    } else {
-      qWarning() << QString::fromLatin1("\"%1\" is an invalid value for attribute xml:space. "
-                  "Valid values are \"preserve\" and \"default\".").formatArg(xmlSpace.toString());
+      qWarning() << "QSvgHandler::startElement() " << QString::fromLatin1("\"%1\" is an invalid value for attribute xml:space. "
+            "Valid values are \"preserve\" and \"default\".").formatArg(xmlSpace.toString());
 
       m_whitespaceMode.push(QSvgText::Default);
    }
@@ -4099,9 +4118,9 @@ bool QSvgHandler::startElement(const QString &localName, const QXmlStreamAttribu
       return false;
    }
 
-   if (FactoryMethod method = findGroupFactory(localName)) {
+   if (FactoryMethod method_A = findGroupFactory(localName)) {
       //group
-      node = method(m_doc ? m_nodes.top() : nullptr, attributes, this);
+      node = method_A(m_doc ? m_nodes.top() : nullptr, attributes, this);
       Q_ASSERT(node);
 
       if (! m_doc) {
@@ -4132,10 +4151,11 @@ bool QSvgHandler::startElement(const QString &localName, const QXmlStreamAttribu
 
       parseStyle(node, attributes, this);
 
-   } else if (FactoryMethod method = findGraphicsFactory(localName)) {
+   } else if (FactoryMethod method_B = findGraphicsFactory(localName)) {
       //rendering element
       Q_ASSERT(!m_nodes.isEmpty());
-      node = method(m_nodes.top(), attributes, this);
+
+      node = method_B(m_nodes.top(), attributes, this);
 
       if (node) {
          switch (m_nodes.top()->type()) {
@@ -4153,14 +4173,14 @@ bool QSvgHandler::startElement(const QString &localName, const QXmlStreamAttribu
                if (node->type() == QSvgNode::TSPAN) {
                   static_cast<QSvgText *>(m_nodes.top())->addTspan(static_cast<QSvgTspan *>(node));
                } else {
-                  qWarning("\'text\' or \'textArea\' element contains invalid element type.");
+                  qWarning("QSvgHandler::startElement() \'text\' or \'textArea\' element contains invalid element type");
                   delete node;
                   node = nullptr;
                }
                break;
 
             default:
-               qWarning("Could not add child element to parent element because the types are incorrect.");
+               qWarning("QSvgHandler::startElement() Unable to add child element to parent element, type mismatch");
                delete node;
                node = nullptr;
                break;
@@ -4181,32 +4201,32 @@ bool QSvgHandler::startElement(const QString &localName, const QXmlStreamAttribu
          }
       }
 
-   } else if (ParseMethod method = findUtilFactory(localName)) {
+   } else if (ParseMethod method_C = findUtilFactory(localName)) {
       Q_ASSERT(!m_nodes.isEmpty());
-      if (!method(m_nodes.top(), attributes, this)) {
-         qWarning("Problem parsing %s", csPrintable(localName));
+
+      if (! method_C(m_nodes.top(), attributes, this)) {
+         qWarning("QSvgHandler::startElement() Unable to parse %s", csPrintable(localName));
       }
 
-   } else if (StyleFactoryMethod method = findStyleFactoryMethod(localName)) {
-      QSvgStyleProperty *prop = method(m_nodes.top(), attributes, this);
+   } else if (StyleFactoryMethod method_D = findStyleFactoryMethod(localName)) {
+      QSvgStyleProperty *prop = method_D(m_nodes.top(), attributes, this);
 
       if (prop) {
          m_style = prop;
          m_nodes.top()->appendStyleProperty(prop, someId(attributes));
 
       } else {
-         qWarning("Could not parse node: %s", csPrintable(localName));
+         qWarning("QSvgHandler::startElement() Unable to parse node: %s", csPrintable(localName));
       }
 
-   } else if (StyleParseMethod method = findStyleUtilFactoryMethod(localName)) {
+   } else if (StyleParseMethod method_E = findStyleUtilFactoryMethod(localName)) {
       if (m_style) {
-         if (!method(m_style, attributes, this)) {
-            qWarning("Problem parsing %s", csPrintable(localName));
+         if (! method_E(m_style, attributes, this)) {
+            qWarning("QSvgHandler::startElement() Unable to parse %s", csPrintable(localName));
          }
       }
 
    } else {
-      //qWarning()<<"Skipping unknown element!"<<namespaceURI<<"::"<<localName;
       m_skipNodes.push(Unknown);
       return true;
    }
@@ -4215,7 +4235,6 @@ bool QSvgHandler::startElement(const QString &localName, const QXmlStreamAttribu
       m_nodes.push(node);
       m_skipNodes.push(Graphics);
    } else {
-      //qDebug()<<"Skipping "<<localName;
       m_skipNodes.push(Style);
    }
 
@@ -4271,7 +4290,7 @@ void QSvgHandler::resolveGradients(QSvgNode *node)
          if (style) {
             fill->setFillStyle(style);
          } else {
-            qWarning("Could not resolve property : %s", csPrintable(id));
+            qWarning("QSvgHandler::resolveGradients() Unable to resolve property, %s", csPrintable(id));
             fill->setBrush(Qt::NoBrush);
          }
       }
@@ -4284,7 +4303,7 @@ void QSvgHandler::resolveGradients(QSvgNode *node)
          if (style) {
             stroke->setStyle(style);
          } else {
-            qWarning("Could not resolve property : %s", csPrintable(id));
+            qWarning("QSvgHandler::resolveGradients() Unable to resolve property, %s", csPrintable(id));
             stroke->setStroke(Qt::NoBrush);
          }
       }
@@ -4371,7 +4390,6 @@ QColor QSvgHandler::currentColor() const
 }
 
 #ifndef QT_NO_CSSPARSER
-
 void QSvgHandler::setInStyle(bool b)
 {
    m_inStyle = b;
@@ -4386,33 +4404,33 @@ QSvgStyleSelector *QSvgHandler::selector() const
 {
    return m_selector;
 }
+#endif
 
-#endif // QT_NO_CSSPARSER
 bool QSvgHandler::processingInstruction(const QString &target, const QString &data)
 {
 #ifndef QT_NO_CSSPARSER
    if (target == "xml-stylesheet") {
 
-      static QRegularExpression rx("type=\\\"(.+?)\\\"");
-      QRegularExpressionMatch match = rx.match(data);
+      static QRegularExpression regExpA("type=\\\"(.+?)\\\"");
+      QRegularExpressionMatch matchA = regExpA.match(data);
 
       bool isCss = false;
 
-      while (match.hasMatch()) {
-         QStringView type = match.capturedView(1);
+      while (matchA.hasMatch()) {
+         QStringView type = matchA.capturedView(1);
 
          if (type.toLower() == "text/css") {
             isCss = true;
          }
 
-         match = rx.match(data, match.capturedEnd(0));
+         matchA = regExpA.match(data, matchA.capturedEnd(0));
       }
 
       if (isCss) {
-         static QRegularExpression rx("href=\\\"(.+?)\\\"");
-         QRegularExpressionMatch match = rx.match(data);
+         static QRegularExpression regExpB("href=\\\"(.+?)\\\"");
+         QRegularExpressionMatch matchB = regExpB.match(data);
 
-         QString addr = match.captured(1);
+         QString addr = matchB.captured(1);
          QFileInfo fi(addr);
 
          if (fi.exists()) {

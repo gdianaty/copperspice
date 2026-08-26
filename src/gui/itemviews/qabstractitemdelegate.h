@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,11 +29,12 @@
 
 #ifndef QT_NO_ITEMVIEWS
 
-class QPainter;
-class QModelIndex;
 class QAbstractItemModel;
 class QAbstractItemView;
 class QHelpEvent;
+class QModelIndex;
+class QPainter;
+
 class QAbstractItemDelegatePrivate;
 
 class Q_GUI_EXPORT QAbstractItemDelegate : public QObject

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,12 +22,12 @@
 ***********************************************************************/
 
 #include <qvulkan_instance.h>
-#include <qvulkan_functions.h>
-#include <qvulkan_device_functions.h>
-#include <qvulkan_window.h>
 
 #include <qapplication.h>
 #include <qplatform_window.h>
+#include <qvulkan_device_functions.h>
+#include <qvulkan_functions.h>
+#include <qvulkan_window.h>
 
 QVulkanInstance::QVulkanInstance()
    : m_errorCode(VK_SUCCESS)
@@ -145,6 +145,16 @@ static QString debugFlagsToString(VkDebugReportFlagsEXT flags)
    return retval;
 }
 
+#if (VK_VERSION_1_3 && VK_HEADER_VERSION >= 303) || (VK_VERSION_1_4)
+   VkBool32 QVulkanInstance::debugCallback(vk::DebugReportFlagsEXT flags, vk::DebugReportObjectTypeEXT objectType,
+      uint64_t object, size_t location, int32_t messageCode, const char *pLayerPrefix, const char *pMessage, void *pUserData)
+   {
+      return debugCallback(VkDebugReportFlagsEXT(flags), VkDebugReportObjectTypeEXT(objectType), object, location,
+          messageCode, pLayerPrefix, pMessage, pUserData);
+   }
+#endif
+
+
 VkBool32 QVulkanInstance::debugCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType, uint64_t object,
    size_t location, int32_t messageCode, const char *pLayerPrefix, const char *pMessage, void *pUserData)
 {
@@ -174,7 +184,7 @@ VkBool32 QVulkanInstance::debugCallback(VkDebugReportFlagsEXT flags, VkDebugRepo
          .formatArg(QString::fromUtf8(pLayerPrefix)).formatArg(QString::fromUtf8(pMessage));
    }
 
-   qDebug("%s", errorMessage.constData());
+   qWarning("%s", errorMessage.constData());
 
    return VK_FALSE;
 }

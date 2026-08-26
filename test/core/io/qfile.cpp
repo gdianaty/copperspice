@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -18,8 +18,10 @@
 ***********************************************************************/
 
 #include <qbytearray.h>
+#include <qdatetime.h>
 #include <qdir.h>
 #include <qfile.h>
+#include <qfileinfo.h>
 #include <qtemporaryfile.h>
 
 #include <cs_catch2.h>
@@ -47,7 +49,7 @@ TEST_CASE("QFile exists", "[qfile]")
    REQUIRE(file.resize(10) == false);
 }
 
-TEST_CASE("QFile file_name", "[qfile]")
+TEST_CASE("QFile fileName", "[qfile]")
 {
    QFile file("c:/machine/path1/dir1/file1");
 
@@ -56,6 +58,53 @@ TEST_CASE("QFile file_name", "[qfile]")
    REQUIRE(file.pos() == 0);
    REQUIRE(file.size() == 0);
    REQUIRE(file.resize(10) == false);
+}
+
+TEST_CASE("QFile setFileTime", "[qfile]")
+{
+    QTemporaryFile tmpFile;
+
+    REQUIRE(tmpFile.open() == true);
+
+    SECTION("Set create time")
+    {
+        QDateTime newTime = QDateTime::currentDateTimeUtc().addDays(-5);
+        bool ok = tmpFile.setFileTime(newTime, QFileDevice::FileTimeType::CreateTime);
+
+        if (ok) {
+            QFileInfo info(tmpFile);
+            QDateTime result = info.created();
+
+            REQUIRE(std::abs(newTime.secsTo(result)) <= 1);
+
+        } else {
+            SUCCEED("File system does not support setting the file create time");
+        }
+    }
+
+    SECTION("Set modification time")
+    {
+        QDateTime newTime = QDateTime::currentDateTimeUtc().addDays(-2);
+
+        REQUIRE(tmpFile.setFileTime(newTime, QFileDevice::FileTimeType::ModifiedTime) == true);
+
+        QFileInfo info(tmpFile);
+        QDateTime result = info.lastModified();
+
+        REQUIRE(std::abs(newTime.secsTo(result)) <= 1);
+    }
+
+    SECTION("Set access time")
+    {
+        QDateTime newTime = QDateTime::currentDateTimeUtc().addDays(-3);
+
+        REQUIRE(tmpFile.setFileTime(newTime, QFileDevice::FileTimeType::AccessTime) == true);
+
+        QFileInfo info(tmpFile);
+        QDateTime result = info.lastRead();
+
+        REQUIRE(std::abs(newTime.secsTo(result)) <= 1);
+    }
 }
 
 TEST_CASE("QFile size", "[qfile]")

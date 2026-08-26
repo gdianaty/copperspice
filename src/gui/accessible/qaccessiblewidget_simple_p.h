@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,16 +24,16 @@
 #ifndef SIMPLEWIDGETS_H
 #define SIMPLEWIDGETS_H
 
-#include <qcoreapplication.h>
 #include <qaccessiblewidget.h>
+#include <qcoreapplication.h>
 
 #ifndef QT_NO_ACCESSIBILITY
 
 class QAbstractButton;
-class QLineEdit;
-class QToolButton;
 class QGroupBox;
+class QLineEdit;
 class QProgressBar;
+class QToolButton;
 
 class QAccessibleButton : public QAccessibleWidget
 {

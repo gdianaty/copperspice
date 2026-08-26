@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,31 +28,32 @@
 
 #ifndef QT_NO_TEXTEDIT
 
-#include <qfont.h>
-#include <qpainter.h>
-#include <qevent.h>
+#include <qapplication.h>
+#include <qclipboard.h>
+#include <qdatetime.h>
 #include <qdebug.h>
 #include <qdrag.h>
-#include <qclipboard.h>
+#include <qevent.h>
+#include <qfont.h>
 #include <qmenu.h>
+#include <qpainter.h>
 #include <qstyle.h>
-#include <qtimer.h>
+#include <qtextdocument.h>
 #include <qtextformat.h>
-#include <qdatetime.h>
-#include <qapplication.h>
-#include <limits.h>
+#include <qtextlist.h>
 #include <qtexttable.h>
+#include <qtimer.h>
 #include <qvariant.h>
+
+#include <qtextcontrol_p.h>
+#include <qtextdocument_p.h>
+#include <qtextdocumentlayout_p.h>
+
+#include <limits.h>
 
 #ifndef QT_NO_ACCESSIBILITY
 #include <qaccessible.h>
 #endif
-
-#include <qtextdocumentlayout_p.h>
-#include <qtextdocument.h>
-#include <qtextdocument_p.h>
-#include <qtextlist.h>
-#include <qtextcontrol_p.h>
 
 #endif
 
@@ -65,7 +66,9 @@ static inline bool shouldEnableInputMethod(QTextEdit *textedit)
 class QTextEditControl : public QTextControl
 {
  public:
-   inline QTextEditControl(QObject *parent) : QTextControl(parent) {}
+   QTextEditControl(QObject *parent)
+      : QTextControl(parent)
+   { }
 
    QMimeData *createMimeDataFromSelection() const override {
       QTextEdit *ed = qobject_cast<QTextEdit *>(parent());
@@ -315,10 +318,12 @@ void QTextEditPrivate::_q_adjustScrollbars()
 void QTextEditPrivate::_q_ensureVisible(const QRectF &_rect)
 {
    const QRect rect = _rect.toRect();
+
    if ((vbar->isVisible() && vbar->maximum() < rect.bottom())
       || (hbar->isVisible() && hbar->maximum() < rect.right())) {
       _q_adjustScrollbars();
    }
+
    const int visibleWidth = viewport->width();
    const int visibleHeight = viewport->height();
    const bool rtl = q_func()->isRightToLeft();
@@ -329,6 +334,7 @@ void QTextEditPrivate::_q_ensureVisible(const QRectF &_rect)
       } else {
          hbar->setValue(rect.x());
       }
+
    } else if (rect.x() + rect.width() > horizontalOffset() + visibleWidth) {
       if (rtl) {
          hbar->setValue(hbar->maximum() - (rect.x() + rect.width() - visibleWidth));
@@ -344,14 +350,12 @@ void QTextEditPrivate::_q_ensureVisible(const QRectF &_rect)
    }
 }
 
-
 QTextEdit::QTextEdit(QWidget *parent)
    : QAbstractScrollArea(*new QTextEditPrivate, parent)
 {
    Q_D(QTextEdit);
    d->init();
 }
-
 
 QTextEdit::QTextEdit(QTextEditPrivate &dd, QWidget *parent)
    : QAbstractScrollArea(dd, parent)
@@ -407,7 +411,6 @@ qreal QTextEdit::fontPointSize() const
    return d->control->textCursor().charFormat().fontPointSize();
 }
 
-
 QString QTextEdit::fontFamily() const
 {
    Q_D(const QTextEdit);
@@ -420,13 +423,11 @@ int QTextEdit::fontWeight() const
    return d->control->textCursor().charFormat().fontWeight();
 }
 
-
 bool QTextEdit::fontUnderline() const
 {
    Q_D(const QTextEdit);
    return d->control->textCursor().charFormat().fontUnderline();
 }
-
 
 bool QTextEdit::fontItalic() const
 {
@@ -434,13 +435,11 @@ bool QTextEdit::fontItalic() const
    return d->control->textCursor().charFormat().fontItalic();
 }
 
-
 QColor QTextEdit::textColor() const
 {
    Q_D(const QTextEdit);
    return d->control->textCursor().charFormat().foreground().color();
 }
-
 
 QColor QTextEdit::textBackgroundColor() const
 {
@@ -448,13 +447,11 @@ QColor QTextEdit::textBackgroundColor() const
    return d->control->textCursor().charFormat().background().color();
 }
 
-
 QFont QTextEdit::currentFont() const
 {
    Q_D(const QTextEdit);
    return d->control->textCursor().charFormat().font();
 }
-
 
 void QTextEdit::setAlignment(Qt::Alignment a)
 {
@@ -486,15 +483,16 @@ QTextDocument *QTextEdit::document() const
    return d->control->document();
 }
 
-
 QString QTextEdit::placeholderText() const
 {
    Q_D(const QTextEdit);
    return d->placeholderText;
 }
+
 void QTextEdit::setPlaceholderText(const QString &placeholderText)
 {
    Q_D(QTextEdit);
+
    if (d->placeholderText != placeholderText) {
       d->placeholderText = placeholderText;
       if (d->control->document()->isEmpty()) {
@@ -513,13 +511,11 @@ void QTextEdit::doSetTextCursor(const QTextCursor &cursor)
    d->control->setTextCursor(cursor);
 }
 
-
 QTextCursor QTextEdit::textCursor() const
 {
    Q_D(const QTextEdit);
    return d->control->textCursor();
 }
-
 
 void QTextEdit::setFontFamily(const QString &fontFamily)
 {
@@ -527,7 +523,6 @@ void QTextEdit::setFontFamily(const QString &fontFamily)
    fmt.setFontFamily(fontFamily);
    mergeCurrentCharFormat(fmt);
 }
-
 
 void QTextEdit::setFontPointSize(qreal s)
 {
@@ -543,7 +538,6 @@ void QTextEdit::setFontWeight(int w)
    mergeCurrentCharFormat(fmt);
 }
 
-
 void QTextEdit::setFontUnderline(bool underline)
 {
    QTextCharFormat fmt;
@@ -551,12 +545,6 @@ void QTextEdit::setFontUnderline(bool underline)
    mergeCurrentCharFormat(fmt);
 }
 
-/*!
-    If \a italic is true, sets the current format to italic;
-    otherwise sets the current format to non-italic.
-
-    \sa fontItalic()
-*/
 void QTextEdit::setFontItalic(bool italic)
 {
    QTextCharFormat fmt;
@@ -564,18 +552,12 @@ void QTextEdit::setFontItalic(bool italic)
    mergeCurrentCharFormat(fmt);
 }
 
-/*!
-    Sets the text color of the current format to \a c.
-
-    \sa textColor()
-*/
 void QTextEdit::setTextColor(const QColor &c)
 {
    QTextCharFormat fmt;
    fmt.setForeground(QBrush(c));
    mergeCurrentCharFormat(fmt);
 }
-
 
 void QTextEdit::setTextBackgroundColor(const QColor &c)
 {
@@ -592,7 +574,6 @@ void QTextEdit::setCurrentFont(const QFont &f)
    mergeCurrentCharFormat(fmt);
 }
 
-
 void QTextEdit::undo()
 {
    Q_D(QTextEdit);
@@ -605,43 +586,18 @@ void QTextEdit::redo()
    d->control->redo();
 }
 
-
 #ifndef QT_NO_CLIPBOARD
-/*!
-    Copies the selected text to the clipboard and deletes it from
-    the text edit.
-
-    If there is no selected text nothing happens.
-
-    \sa copy() paste()
-*/
-
 void QTextEdit::cut()
 {
    Q_D(QTextEdit);
    d->control->cut();
 }
 
-
 void QTextEdit::copy()
 {
    Q_D(QTextEdit);
    d->control->copy();
 }
-
-/*!
-    Pastes the text from the clipboard into the text edit at the
-    current cursor position.
-
-    If there is no text in the clipboard nothing happens.
-
-    To change the behavior of this function, i.e. to modify what
-    QTextEdit can paste and how it is being pasted, reimplement the
-    virtual canInsertFromMimeData() and insertFromMimeData()
-    functions.
-
-    \sa cut() copy()
-*/
 
 void QTextEdit::paste()
 {
@@ -650,53 +606,42 @@ void QTextEdit::paste()
 }
 #endif
 
-/*!
-    Deletes all the text in the text edit.
-
-    Note that the undo/redo history is cleared by this function.
-
-    \sa cut() setPlainText() setHtml()
-*/
 void QTextEdit::clear()
 {
    Q_D(QTextEdit);
+
    // clears and sets empty content
    d->control->clear();
 }
 
-
-/*!
-    Selects all text.
-
-    \sa copy() cut() textCursor()
- */
 void QTextEdit::selectAll()
 {
    Q_D(QTextEdit);
    d->control->selectAll();
 }
 
-/*! \internal
-*/
 bool QTextEdit::event(QEvent *e)
 {
    Q_D(QTextEdit);
+
 #ifndef QT_NO_CONTEXTMENU
-   if (e->type() == QEvent::ContextMenu
-      && static_cast<QContextMenuEvent *>(e)->reason() == QContextMenuEvent::Keyboard) {
-      Q_D(QTextEdit);
+   if (e->type() == QEvent::ContextMenu && static_cast<QContextMenuEvent *>(e)->reason() == QContextMenuEvent::Keyboard) {
       ensureCursorVisible();
+
       const QPoint cursorPos = cursorRect().center();
       QContextMenuEvent ce(QContextMenuEvent::Keyboard, cursorPos, d->viewport->mapToGlobal(cursorPos));
       ce.setAccepted(e->isAccepted());
+
       const bool result = QAbstractScrollArea::event(&ce);
       e->setAccepted(ce.isAccepted());
+
       return result;
-   } else if (e->type() == QEvent::ShortcutOverride
-      || e->type() == QEvent::ToolTip) {
+
+   } else if (e->type() == QEvent::ShortcutOverride || e->type() == QEvent::ToolTip) {
       d->sendControlEvent(e);
    }
-#endif // QT_NO_CONTEXTMENU
+#endif
+
 #ifdef QT_KEYPAD_NAVIGATION
    if (e->type() == QEvent::EnterEditFocus || e->type() == QEvent::LeaveEditFocus) {
       if (QApplication::keypadNavigationEnabled()) {
@@ -704,18 +649,18 @@ bool QTextEdit::event(QEvent *e)
       }
    }
 #endif
+
    return QAbstractScrollArea::event(e);
 }
-
-/*! \internal
-*/
 
 void QTextEdit::timerEvent(QTimerEvent *e)
 {
    Q_D(QTextEdit);
+
    if (e->timerId() == d->autoScrollTimer.timerId()) {
       QRect visible = d->viewport->rect();
       QPoint pos;
+
       if (d->inDrag) {
          pos = d->autoScrollDragPos;
          visible.adjust(qMin(visible.width() / 3, 20), qMin(visible.height() / 3, 20),
@@ -723,12 +668,17 @@ void QTextEdit::timerEvent(QTimerEvent *e)
       } else {
          const QPoint globalPos = QCursor::pos();
          pos = d->viewport->mapFromGlobal(globalPos);
-         QMouseEvent ev(QEvent::MouseMove, pos, mapTo(topLevelWidget(), pos), globalPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+
+         QMouseEvent ev(QEvent::MouseMove, pos, mapTo(topLevelWidget(), pos), globalPos,
+               Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+
          mouseMoveEvent(&ev);
       }
+
       int deltaY = qMax(pos.y() - visible.top(), visible.bottom() - pos.y()) - visible.height();
       int deltaX = qMax(pos.x() - visible.left(), visible.right() - pos.x()) - visible.width();
       int delta = qMax(deltaX, deltaY);
+
       if (delta >= 0) {
          if (delta < 7) {
             delta = 7;
@@ -746,6 +696,7 @@ void QTextEdit::timerEvent(QTimerEvent *e)
                : QAbstractSlider::SliderSingleStepAdd);
       }
    }
+
 #ifdef QT_KEYPAD_NAVIGATION
    else if (e->timerId() == d->deleteAllTimer.timerId()) {
       d->deleteAllTimer.stop();
@@ -753,8 +704,6 @@ void QTextEdit::timerEvent(QTimerEvent *e)
    }
 #endif
 }
-
-
 
 void QTextEdit::setPlainText(const QString &text)
 {
@@ -769,7 +718,6 @@ QString QTextEdit::toPlainText() const
    return d->control->toPlainText();
 }
 
-
 #ifndef QT_NO_TEXTHTMLPARSER
 void QTextEdit::setHtml(const QString &text)
 {
@@ -777,6 +725,7 @@ void QTextEdit::setHtml(const QString &text)
    d->control->setHtml(text);
    d->preferRichText = true;
 }
+
 QString QTextEdit::toHtml() const
 {
    Q_D(const QTextEdit);
@@ -784,8 +733,6 @@ QString QTextEdit::toHtml() const
 }
 #endif
 
-/*! \reimp
-*/
 void QTextEdit::keyPressEvent(QKeyEvent *e)
 {
    Q_D(QTextEdit);
@@ -812,6 +759,7 @@ void QTextEdit::keyPressEvent(QKeyEvent *e)
             }
          }
          break;
+
       case Qt::Key_Back:
       case Qt::Key_No:
          if (!QApplication::keypadNavigationEnabled()
@@ -820,6 +768,7 @@ void QTextEdit::keyPressEvent(QKeyEvent *e)
             return;
          }
          break;
+
       default:
          if (QApplication::keypadNavigationEnabled()) {
             if (!hasEditFocus() && !(e->modifiers() & Qt::ControlModifier)) {
@@ -834,6 +783,7 @@ void QTextEdit::keyPressEvent(QKeyEvent *e)
          break;
    }
 #endif
+
 #ifndef QT_NO_SHORTCUT
 
    Qt::TextInteractionFlags tif = d->control->textInteractionFlags();
@@ -849,6 +799,7 @@ void QTextEdit::keyPressEvent(QKeyEvent *e)
          return;
       }
    }
+
    if (tif & (Qt::TextSelectableByKeyboard | Qt::TextEditable)) {
       if (e == QKeySequence::MoveToPreviousPage) {
          e->accept();
@@ -889,7 +840,7 @@ void QTextEdit::keyPressEvent(QKeyEvent *e)
       }
       return;
    }
-#endif // QT_NO_SHORTCUT
+#endif
 
    {
       QTextCursor cursor = d->control->textCursor();
@@ -909,7 +860,7 @@ void QTextEdit::keyPressEvent(QKeyEvent *e)
    d->sendControlEvent(e);
 
 #ifdef QT_KEYPAD_NAVIGATION
-   if (!e->isAccepted()) {
+   if (! e->isAccepted()) {
       switch (e->key()) {
          case Qt::Key_Up:
          case Qt::Key_Down:
@@ -943,20 +894,19 @@ void QTextEdit::keyPressEvent(QKeyEvent *e)
 #endif
 }
 
-/*! \reimp
-*/
 void QTextEdit::keyReleaseEvent(QKeyEvent *e)
 {
 #ifdef QT_KEYPAD_NAVIGATION
    Q_D(QTextEdit);
+
    if (QApplication::keypadNavigationEnabled()) {
-      if (!e->isAutoRepeat() && e->key() == Qt::Key_Back
-         && d->deleteAllTimer.isActive()) {
+      if (!e->isAutoRepeat() && e->key() == Qt::Key_Back && d->deleteAllTimer.isActive()) {
          d->deleteAllTimer.stop();
          QTextCursor cursor = d->control->textCursor();
          QTextBlockFormat blockFmt = cursor.blockFormat();
 
          QTextList *list = cursor.currentList();
+
          if (list && cursor.atBlockStart()) {
             list->remove(cursor.block());
          } else if (cursor.atBlockStart() && blockFmt.indent() > 0) {
@@ -965,12 +915,14 @@ void QTextEdit::keyReleaseEvent(QKeyEvent *e)
          } else {
             cursor.deletePreviousChar();
          }
+
          setTextCursor(cursor);
          e->accept();
          return;
       }
    }
 #endif
+
    e->ignore();
 }
 
@@ -1071,15 +1023,10 @@ void QTextEditPrivate::relayoutDocument()
    // (narrower because the vertical scroll bar takes up horizontal space)) to disappear
    // again then we have an endless loop, as _q_adjustScrollBars sets new ranges on the
    // scroll bars, the QAbstractScrollArea will find out about it and try to show/hide
-   // the scroll bars again. That's why we try to detect this case here and break out.
-   //
-   // (if you change this please also check the layoutingLoop() testcase in
-   // QTextEdit's autotests)
-   if (lastUsedSize.isValid()
-      && !vbar->isHidden()
-      && viewport->width() < lastUsedSize.width()
-      && usedSize.height() < lastUsedSize.height()
-      && usedSize.height() <= viewport->height()) {
+   // the scroll bars again. That is why we try to detect this case here and break out.
+
+   if (lastUsedSize.isValid() && !vbar->isHidden() && viewport->width() < lastUsedSize.width()
+         && usedSize.height() < lastUsedSize.height() && usedSize.height() <= viewport->height()) {
       return;
    }
 
@@ -1151,11 +1098,10 @@ void QTextEditPrivate::updateDefaultTextOption()
    }
 }
 
-/*! \reimp
-*/
 void QTextEdit::mousePressEvent(QMouseEvent *e)
 {
    Q_D(QTextEdit);
+
 #ifdef QT_KEYPAD_NAVIGATION
    if (QApplication::keypadNavigationEnabled() && !hasEditFocus()) {
       setEditFocus(true);
@@ -1164,8 +1110,6 @@ void QTextEdit::mousePressEvent(QMouseEvent *e)
    d->sendControlEvent(e);
 }
 
-/*! \reimp
-*/
 void QTextEdit::mouseMoveEvent(QMouseEvent *e)
 {
    Q_D(QTextEdit);
@@ -1174,7 +1118,7 @@ void QTextEdit::mouseMoveEvent(QMouseEvent *e)
    const QPoint pos = e->pos();
    d->sendControlEvent(e);
 
-   if (!(e->buttons() & Qt::LeftButton)) {
+   if (! (e->buttons() & Qt::LeftButton)) {
       return;
    }
 
@@ -1189,8 +1133,6 @@ void QTextEdit::mouseMoveEvent(QMouseEvent *e)
    }
 }
 
-/*! \reimp
-*/
 void QTextEdit::mouseReleaseEvent(QMouseEvent *e)
 {
    Q_D(QTextEdit);
@@ -1207,16 +1149,12 @@ void QTextEdit::mouseReleaseEvent(QMouseEvent *e)
    d->clickCausedFocus = 0;
 }
 
-/*! \reimp
-*/
 void QTextEdit::mouseDoubleClickEvent(QMouseEvent *e)
 {
    Q_D(QTextEdit);
    d->sendControlEvent(e);
 }
 
-/*! \reimp
-*/
 bool QTextEdit::focusNextPrevChild(bool next)
 {
    Q_D(const QTextEdit);
@@ -1233,11 +1171,10 @@ void QTextEdit::contextMenuEvent(QContextMenuEvent *e)
    Q_D(QTextEdit);
    d->sendControlEvent(e);
 }
-#endif // QT_NO_CONTEXTMENU
+#endif
 
 #ifndef QT_NO_DRAGANDDROP
-/*! \reimp
-*/
+
 void QTextEdit::dragEnterEvent(QDragEnterEvent *e)
 {
    Q_D(QTextEdit);
@@ -1245,8 +1182,6 @@ void QTextEdit::dragEnterEvent(QDragEnterEvent *e)
    d->sendControlEvent(e);
 }
 
-/*! \reimp
-*/
 void QTextEdit::dragLeaveEvent(QDragLeaveEvent *e)
 {
    Q_D(QTextEdit);
@@ -1255,8 +1190,6 @@ void QTextEdit::dragLeaveEvent(QDragLeaveEvent *e)
    d->sendControlEvent(e);
 }
 
-/*! \reimp
-*/
 void QTextEdit::dragMoveEvent(QDragMoveEvent *e)
 {
    Q_D(QTextEdit);
@@ -1267,8 +1200,6 @@ void QTextEdit::dragMoveEvent(QDragMoveEvent *e)
    d->sendControlEvent(e);
 }
 
-/*! \reimp
-*/
 void QTextEdit::dropEvent(QDropEvent *e)
 {
    Q_D(QTextEdit);
@@ -1277,13 +1208,12 @@ void QTextEdit::dropEvent(QDropEvent *e)
    d->sendControlEvent(e);
 }
 
-#endif // QT_NO_DRAGANDDROP
+#endif
 
-/*! \reimp
- */
 void QTextEdit::inputMethodEvent(QInputMethodEvent *e)
 {
    Q_D(QTextEdit);
+
 #ifdef QT_KEYPAD_NAVIGATION
    if (d->control->textInteractionFlags() & Qt::TextEditable
       && QApplication::keypadNavigationEnabled()
@@ -1291,27 +1221,27 @@ void QTextEdit::inputMethodEvent(QInputMethodEvent *e)
       setEditFocus(true);
    }
 #endif
+
    d->sendControlEvent(e);
    ensureCursorVisible();
 }
 
-/*!\reimp
-*/
 void QTextEdit::scrollContentsBy(int dx, int dy)
 {
    Q_D(QTextEdit);
+
    if (isRightToLeft()) {
       dx = -dx;
    }
+
    d->viewport->scroll(dx, dy);
 }
 
-/*!\reimp
-*/
 QVariant QTextEdit::inputMethodQuery(Qt::InputMethodQuery property) const
 {
    return inputMethodQuery(property, QVariant());
 }
+
 QVariant QTextEdit::inputMethodQuery(Qt::InputMethodQuery query, QVariant argument) const
 {
    Q_D(const QTextEdit);
@@ -1326,20 +1256,22 @@ QVariant QTextEdit::inputMethodQuery(Qt::InputMethodQuery query, QVariant argume
    switch (v.type()) {
       case QVariant::RectF:
          return v.toRectF().translated(offset);
+
       case QVariant::PointF:
          return v.toPointF() + offset;
       case QVariant::Rect:
          return v.toRect().translated(offset.toPoint());
+
       case QVariant::Point:
          return v.toPoint() + offset.toPoint();
+
       default:
          break;
    }
+
    return v;
 }
 
-/*! \reimp
-*/
 void QTextEdit::focusInEvent(QFocusEvent *e)
 {
    Q_D(QTextEdit);
@@ -1350,8 +1282,6 @@ void QTextEdit::focusInEvent(QFocusEvent *e)
    d->sendControlEvent(e);
 }
 
-/*! \reimp
-*/
 void QTextEdit::focusOutEvent(QFocusEvent *e)
 {
    Q_D(QTextEdit);
@@ -1359,8 +1289,6 @@ void QTextEdit::focusOutEvent(QFocusEvent *e)
    d->sendControlEvent(e);
 }
 
-/*! \reimp
-*/
 void QTextEdit::showEvent(QShowEvent *)
 {
    Q_D(QTextEdit);
@@ -1374,32 +1302,32 @@ void QTextEdit::showEvent(QShowEvent *)
    }
 }
 
-/*! \reimp
-*/
 void QTextEdit::changeEvent(QEvent *e)
 {
    Q_D(QTextEdit);
    QAbstractScrollArea::changeEvent(e);
-   if (e->type() == QEvent::ApplicationFontChange
-      || e->type() == QEvent::FontChange) {
+
+   if (e->type() == QEvent::ApplicationFontChange || e->type() == QEvent::FontChange) {
       d->control->document()->setDefaultFont(font());
-   }  else if (e->type() == QEvent::ActivationChange) {
+
+   } else if (e->type() == QEvent::ActivationChange) {
       if (!isActiveWindow()) {
          d->autoScrollTimer.stop();
       }
+
    } else if (e->type() == QEvent::EnabledChange) {
       e->setAccepted(isEnabled());
       d->control->setPalette(palette());
       d->sendControlEvent(e);
+
    } else if (e->type() == QEvent::PaletteChange) {
       d->control->setPalette(palette());
+
    } else if (e->type() == QEvent::LayoutDirectionChange) {
       d->sendControlEvent(e);
    }
 }
 
-/*! \reimp
-*/
 #ifndef QT_NO_WHEELEVENT
 void QTextEdit::wheelEvent(QWheelEvent *e)
 {
@@ -1417,51 +1345,25 @@ void QTextEdit::wheelEvent(QWheelEvent *e)
 #endif
 
 #ifndef QT_NO_CONTEXTMENU
-/*!  This function creates the standard context menu which is shown
-  when the user clicks on the text edit with the right mouse
-  button. It is called from the default contextMenuEvent() handler.
-  The popup menu's ownership is transferred to the caller.
-
-  We recommend that you use the createStandardContextMenu(QPoint) version instead
-  which will enable the actions that are sensitive to where the user clicked.
-*/
-
 QMenu *QTextEdit::createStandardContextMenu()
 {
    Q_D(QTextEdit);
    return d->control->createStandardContextMenu(QPointF(), this);
 }
 
-/*!
-  \since 4.4
-  This function creates the standard context menu which is shown
-  when the user clicks on the text edit with the right mouse
-  button. It is called from the default contextMenuEvent() handler
-  and it takes the \a position of where the mouse click was.
-  This can enable actions that are sensitive to the position where the user clicked.
-  The popup menu's ownership is transferred to the caller.
-*/
-
 QMenu *QTextEdit::createStandardContextMenu(const QPoint &position)
 {
    Q_D(QTextEdit);
    return d->control->createStandardContextMenu(position, this);
 }
-#endif // QT_NO_CONTEXTMENU
+#endif
 
-/*!
-  returns a QTextCursor at position \a pos (in viewport coordinates).
-*/
 QTextCursor QTextEdit::cursorForPosition(const QPoint &pos) const
 {
    Q_D(const QTextEdit);
    return d->control->cursorForPosition(d->mapToContents(pos));
 }
 
-/*!
-  returns a rectangle (in viewport coordinates) that includes the
-  \a cursor.
- */
 QRect QTextEdit::cursorRect(const QTextCursor &cursor) const
 {
    Q_D(const QTextEdit);
@@ -1474,10 +1376,6 @@ QRect QTextEdit::cursorRect(const QTextCursor &cursor) const
    return r;
 }
 
-/*!
-  returns a rectangle (in viewport coordinates) that includes the
-  cursor of the text edit.
- */
 QRect QTextEdit::cursorRect() const
 {
    Q_D(const QTextEdit);
@@ -1486,31 +1384,11 @@ QRect QTextEdit::cursorRect() const
    return r;
 }
 
-
-/*!
-    Returns the reference of the anchor at position \a pos, or an
-    empty string if no anchor exists at that point.
-*/
 QString QTextEdit::anchorAt(const QPoint &pos) const
 {
    Q_D(const QTextEdit);
    return d->control->anchorAt(d->mapToContents(pos));
 }
-
-/*!
-   \property QTextEdit::overwriteMode
-   \since 4.1
-   \brief whether text entered by the user will overwrite existing text
-
-   As with many text editors, the text editor widget can be configured
-   to insert or overwrite existing text with new text entered by the user.
-
-   If this property is true, existing text is overwritten, character-for-character
-   by new text; otherwise, text is inserted at the cursor position, displacing
-   existing text.
-
-   By default, this property is false (new text does not overwrite existing text).
-*/
 
 bool QTextEdit::overwriteMode() const
 {
@@ -1523,14 +1401,6 @@ void QTextEdit::setOverwriteMode(bool overwrite)
    Q_D(QTextEdit);
    d->control->setOverwriteMode(overwrite);
 }
-
-/*!
-    \property QTextEdit::tabStopWidth
-    \brief the tab stop width in pixels
-    \since 4.1
-
-    By default, this property contains a value of 80 pixels.
-*/
 
 int QTextEdit::tabStopWidth() const
 {
@@ -1549,12 +1419,6 @@ void QTextEdit::setTabStopWidth(int width)
    d->control->document()->setDefaultTextOption(opt);
 }
 
-/*!
-    \since 4.2
-    \property QTextEdit::cursorWidth
-
-    This property specifies the width of the cursor in pixels. The default value is 1.
-*/
 int QTextEdit::cursorWidth() const
 {
    Q_D(const QTextEdit);
@@ -1566,17 +1430,6 @@ void QTextEdit::setCursorWidth(int width)
    Q_D(QTextEdit);
    d->control->setCursorWidth(width);
 }
-
-/*!
-    \property QTextEdit::acceptRichText
-    \brief whether the text edit accepts rich text insertions by the user
-    \since 4.1
-
-    When this propery is set to false text edit will accept only
-    plain text input from the user. For example through clipboard or drag and drop.
-
-    This property's default is true.
-*/
 
 bool QTextEdit::acceptRichText() const
 {
@@ -1596,7 +1449,6 @@ void QTextEdit::setExtraSelections(const QList<ExtraSelection> &selections)
    d->control->setExtraSelections(selections);
 }
 
-
 QList<QTextEdit::ExtraSelection> QTextEdit::extraSelections() const
 {
    Q_D(const QTextEdit);
@@ -1609,45 +1461,17 @@ QMimeData *QTextEdit::createMimeDataFromSelection() const
    return d->control->QTextControl::createMimeDataFromSelection();
 }
 
-/*!
-    This function returns true if the contents of the MIME data object, specified
-    by \a source, can be decoded and inserted into the document. It is called
-    for example when during a drag operation the mouse enters this widget and it
-    is necessary to determine whether it is possible to accept the drag and drop
-    operation.
-
-    Reimplement this function to enable drag and drop support for additional MIME types.
- */
 bool QTextEdit::canInsertFromMimeData(const QMimeData *source) const
 {
    Q_D(const QTextEdit);
    return d->control->QTextControl::canInsertFromMimeData(source);
 }
 
-/*!
-    This function inserts the contents of the MIME data object, specified
-    by \a source, into the text edit at the current cursor position. It is
-    called whenever text is inserted as the result of a clipboard paste
-    operation, or when the text edit accepts data from a drag and drop
-    operation.
-
-    Reimplement this function to enable drag and drop support for additional MIME types.
- */
 void QTextEdit::insertFromMimeData(const QMimeData *source)
 {
    Q_D(QTextEdit);
    d->control->QTextControl::insertFromMimeData(source);
 }
-
-/*!
-    \property QTextEdit::readOnly
-    \brief whether the text edit is read-only
-
-    In a read-only text edit the user can only navigate through the
-    text and select text; modifying the text is not possible.
-
-    This property's default is false.
-*/
 
 bool QTextEdit::isReadOnly() const
 {
@@ -1675,8 +1499,6 @@ void QTextEdit::setReadOnly(bool ro)
    QApplication::sendEvent(this, &event);
 }
 
-
-
 void QTextEdit::setTextInteractionFlags(Qt::TextInteractionFlags flags)
 {
    Q_D(QTextEdit);
@@ -1689,52 +1511,23 @@ Qt::TextInteractionFlags QTextEdit::textInteractionFlags() const
    return d->control->textInteractionFlags();
 }
 
-/*!
-    Merges the properties specified in \a modifier into the current character
-    format by calling QTextCursor::mergeCharFormat on the editor's cursor.
-    If the editor has a selection then the properties of \a modifier are
-    directly applied to the selection.
-
-    \sa QTextCursor::mergeCharFormat()
- */
 void QTextEdit::mergeCurrentCharFormat(const QTextCharFormat &modifier)
 {
    Q_D(QTextEdit);
    d->control->mergeCurrentCharFormat(modifier);
 }
 
-/*!
-    Sets the char format that is be used when inserting new text to \a
-    format by calling QTextCursor::setCharFormat() on the editor's
-    cursor.  If the editor has a selection then the char format is
-    directly applied to the selection.
- */
 void QTextEdit::setCurrentCharFormat(const QTextCharFormat &format)
 {
    Q_D(QTextEdit);
    d->control->setCurrentCharFormat(format);
 }
 
-/*!
-    Returns the char format that is used when inserting new text.
- */
 QTextCharFormat QTextEdit::currentCharFormat() const
 {
    Q_D(const QTextEdit);
    return d->control->currentCharFormat();
 }
-
-/*!
-    \property QTextEdit::autoFormatting
-    \brief the enabled set of auto formatting features
-
-    The value can be any combination of the values in the
-    AutoFormattingFlag enum.  The default is AutoNone. Choose
-    AutoAll to enable all automatic formatting.
-
-    Currently, the only automatic formatting feature provided is
-    AutoBulletList; future versions of Qt may offer more.
-*/
 
 QTextEdit::AutoFormatting QTextEdit::autoFormatting() const
 {
@@ -1748,7 +1541,6 @@ void QTextEdit::setAutoFormatting(AutoFormatting features)
    d->autoFormatting = features;
 }
 
-
 void QTextEdit::insertPlainText(const QString &text)
 {
    Q_D(QTextEdit);
@@ -1761,7 +1553,7 @@ void QTextEdit::insertHtml(const QString &text)
    Q_D(QTextEdit);
    d->control->insertHtml(text);
 }
-#endif // QT_NO_TEXTHTMLPARSER
+#endif
 
 void QTextEdit::scrollToAnchor(const QString &name)
 {
@@ -1780,6 +1572,7 @@ void QTextEdit::scrollToAnchor(const QString &name)
    if ( d->vbar->maximum() < newPosition ) {
       d->_q_adjustScrollbars();
    }
+
    d->vbar->setValue(newPosition);
 }
 
@@ -1787,10 +1580,12 @@ void QTextEdit::zoomIn(int range)
 {
    zoomInF(range);
 }
+
 void QTextEdit::zoomOut(int range)
 {
    zoomInF(-range);
 }
+
 void QTextEdit::zoomInF(float range)
 {
    if (range == 0.f) {
@@ -1807,8 +1602,6 @@ void QTextEdit::zoomInF(float range)
    f.setPointSizeF(newSize);
    setFont(f);
 }
-
-
 
 void QTextEdit::moveCursor(QTextCursor::MoveOperation operation, QTextCursor::MoveMode mode)
 {
@@ -1829,7 +1622,7 @@ void QTextEdit::print(QPagedPaintDevice *printer) const
    Q_D(const QTextEdit);
    d->control->print(printer);
 }
-#endif // QT _NO_PRINTER
+#endif
 
 bool QTextEdit::tabChangesFocus() const
 {
@@ -1900,6 +1693,7 @@ bool QTextEdit::find(const QRegularExpression &exp, QTextDocument::FindFlags opt
    Q_D(QTextEdit);
    return d->control->find(exp, options);
 }
+
 void QTextEdit::setText(const QString &text)
 {
    Q_D(QTextEdit);
@@ -1937,6 +1731,3 @@ void QTextEdit::ensureCursorVisible()
 }
 
 #endif
-
-
-

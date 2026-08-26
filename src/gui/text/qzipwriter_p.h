@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,15 +26,15 @@
 
 #ifndef QT_NO_TEXTODFWRITER
 
-#include <qstring.h>
 #include <qfile.h>
+#include <qstring.h>
 
 class QZipWriterPrivate;
 
 class Q_GUI_EXPORT QZipWriter
 {
  public:
-   enum Status {
+   enum WriterStatus {
       NoError,
       FileWriteError,
       FileOpenError,
@@ -61,13 +61,13 @@ class Q_GUI_EXPORT QZipWriter
    bool isWritable() const;
    bool exists() const;
 
-   Status status() const;
+   WriterStatus status() const;
 
    void setCompressionPolicy(CompressionPolicy policy);
    CompressionPolicy compressionPolicy() const;
 
-   void setCreationPermissions(QFile::Permissions permissions);
-   QFile::Permissions creationPermissions() const;
+   void setCreationPermissions(QFileDevice::Permissions permissions);
+   QFileDevice::Permissions creationPermissions() const;
 
    void addFile(const QString &fileName, const QByteArray &data);
    void addFile(const QString &fileName, QIODevice *device);

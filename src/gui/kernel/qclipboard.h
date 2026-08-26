@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,8 +29,8 @@
 
 #ifndef QT_NO_CLIPBOARD
 
-class QMimeData;
 class QImage;
+class QMimeData;
 class QPixmap;
 
 class Q_GUI_EXPORT QClipboard : public QObject
@@ -38,10 +38,15 @@ class Q_GUI_EXPORT QClipboard : public QObject
    GUI_CS_OBJECT(QClipboard)
 
  public:
+   enum Mode {
+      Clipboard,
+      Selection,
+      FindBuffer,
+      LastMode = FindBuffer
+   };
+
    QClipboard(const QClipboard &) = delete;
    QClipboard &operator=(const QClipboard &) = delete;
-
-   enum Mode { Clipboard, Selection, FindBuffer, LastMode = FindBuffer };
 
    void clear(Mode mode = Clipboard);
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -66,7 +66,7 @@ class Q_CORE_EXPORT QCryptographicHash
    QByteArray result() const;
 
    static QByteArray hash(const QByteArray &data, Algorithm method);
-
+   static int hashLength(Algorithm method);
  private:
    QCryptographicHashPrivate *d;
 };

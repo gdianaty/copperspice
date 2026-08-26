@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,8 +28,8 @@
 
 #if !defined(QT_NO_GRAPHICSVIEW)
 
-#include <qevent.h>
 #include <qcoreapplication.h>
+#include <qevent.h>
 #include <qgraphicssceneevent.h>
 #include <qstyleoption.h>
 
@@ -146,41 +146,41 @@ class Q_GUI_EXPORT QGraphicsViewPrivate : public QAbstractScrollAreaPrivate
    QRegion dirtyRegion;
    QRect dirtyBoundingRect;
    void processPendingUpdates();
-   inline void updateAll() {
+
+   void updateAll() {
       viewport->update();
       fullUpdatePending = true;
       dirtyBoundingRect = QRect();
       dirtyRegion = QRegion();
    }
 
-   inline void dispatchPendingUpdateRequests() {
-
-
-      {
-         if (qt_widget_private(viewport)->paintOnScreen()) {
-            QCoreApplication::sendPostedEvents(viewport, QEvent::UpdateRequest);
-         } else {
-            QCoreApplication::sendPostedEvents(viewport->window(), QEvent::UpdateRequest);
-         }
+   void dispatchPendingUpdateRequests() {
+      if (qt_widget_private(viewport)->paintOnScreen()) {
+         QCoreApplication::sendPostedEvents(viewport, QEvent::UpdateRequest);
+      } else {
+         QCoreApplication::sendPostedEvents(viewport->window(), QEvent::UpdateRequest);
       }
    }
 
    void setUpdateClip(QGraphicsItem *);
 
-   inline bool updateRectF(const QRectF &rect) {
+   bool updateRectF(const QRectF &rect) {
       if (rect.isEmpty()) {
          return false;
       }
+
       if (optimizationFlags & QGraphicsView::DontAdjustForAntialiasing) {
          return updateRect(rect.toAlignedRect().adjusted(-1, -1, 1, 1));
       }
+
       return updateRect(rect.toAlignedRect().adjusted(-2, -2, 2, 2));
    }
 
    bool updateRect(const QRect &rect);
    bool updateRegion(const QRectF &rect, const QTransform &xform);
    bool updateSceneSlotReimplementedChecked;
-   QRegion exposedRegion;
+
+   QRegion m_exposedRegion;
 
    QList<QGraphicsItem *> findItems(const QRegion &exposedRegion, bool *allItems,
       const QTransform &viewTransform) const;

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,10 @@
 #ifndef QSVGFONT_P_H
 #define QSVGFONT_P_H
 
-#include <qpainterpath.h>
-
 #include <qhash.h>
+#include <qpainterpath.h>
 #include <qstring.h>
+
 #include <qsvgstyle_p.h>
 
 class QSvgGlyph

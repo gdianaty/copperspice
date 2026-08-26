@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,8 +27,6 @@
 #include <qabstractnodetest_p.h>
 #include <qcontainerfwd.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class NamespaceNameTest : public AbstractNodeTest
@@ -38,9 +36,6 @@ class NamespaceNameTest : public AbstractNodeTest
 
    static ItemType::Ptr create(const ItemType::Ptr &primaryType, const QXmlName::NamespaceCode namespaceURI);
 
-   /**
-    * @note This function assumes that @p item is a QXmlNodeModelIndex.
-    */
    bool itemMatches(const Item &item) const override;
 
    QString displayName(const NamePool::Ptr &np) const override;
@@ -55,8 +50,7 @@ class NamespaceNameTest : public AbstractNodeTest
    NamespaceNameTest(const ItemType::Ptr &primaryType, const QXmlName::NamespaceCode namespaceURI);
    const QXmlName::NamespaceCode m_namespaceURI;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

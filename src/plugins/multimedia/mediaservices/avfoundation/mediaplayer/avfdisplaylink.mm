@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,7 @@
 #include <avfdisplaylink.h>
 
 #include <qcoreapplication.h>
-
-#ifdef QT_DEBUG_AVF
 #include <qdebug.h>
-#endif
 
 #if defined(Q_OS_IOS)
 #import <QuartzCore/CADisplayLink.h>
@@ -127,10 +124,6 @@ AVFDisplayLink::AVFDisplayLink(QObject *parent)
 
 AVFDisplayLink::~AVFDisplayLink()
 {
-#ifdef QT_DEBUG_AVF
-   qDebug() << Q_FUNC_INFO;
-#endif
-
    if (m_displayLink) {
       stop();
 #if defined(Q_OS_IOS)

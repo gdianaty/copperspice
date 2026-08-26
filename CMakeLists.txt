@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.16.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.18.0 FATAL_ERROR)
 
-cmake_policy(VERSION 3.16..3.23)
+cmake_policy(VERSION 3.18.0..3.31.10)
 
 if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.19.0")
    # allows spaces in ctest names
@@ -12,13 +12,18 @@ if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.20.0")
    cmake_policy(SET CMP0117 OLD)
 endif()
 
+if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.31.0")
+   # normalized path
+   cmake_policy(SET CMP0177 NEW)
+endif()
+
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 
 project(copperspice)
 
-set(BUILD_MAJOR "1")
-set(BUILD_MINOR "8")
-set(BUILD_MICRO "2")
+set(BUILD_MAJOR "2")
+set(BUILD_MINOR "1")
+set(BUILD_MICRO "0")
 
 set(BUILD_ABI ${BUILD_MAJOR}.${BUILD_MINOR})
 
@@ -35,6 +40,7 @@ include(CheckAtomics)
 include(CheckLibraryExists)
 
 include(ResourceMacros)
+include(Test64BitFiles)
 include(TestLargeFiles)
 
 # location for install or package
@@ -54,7 +60,7 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "(Linux|OpenBSD|FreeBSD|NetBSD|DragonFly)")
    file(RELATIVE_PATH CS_BIN_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}"
                                    "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 
-   set(CMAKE_INSTALL_RPATH "$ORIGIN/${CS_BIN_RPATH}:$ORIGIN/..")
+   set(CMAKE_INSTALL_RPATH "$ORIGIN/${CS_BIN_RPATH}:$ORIGIN/..:$ORIGIN")
 
 elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
    set(CMAKE_INSTALL_BINDIR bin)
@@ -66,8 +72,7 @@ endif()
 # required libraries
 set(BUILD_COMPONENTS "Core Xml")
 
-# unused at this time: DBus, Declarative, and ScriptTools
-set(CS_OPTIONAL_COMPONENTS Gui Multimedia Network OpenGL Script Sql Svg Vulkan WebKit XmlPatterns)
+set(CS_OPTIONAL_COMPONENTS Gui Multimedia Network OpenGL Sql Svg Vulkan WebKit XmlPatterns)
 
 set(PACKAGE           "copperspice")
 set(PACKAGE_NAME      "CopperSpice")
@@ -133,7 +138,7 @@ include(CPack)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_INCLUDE_DIRECTORIES_BEFORE ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
    set(CMAKE_EXE_LINKER_FLAGS    "${CMAKE_EXE_LINKER_FLAGS}    -Wl,-undefined,error")
@@ -149,7 +154,7 @@ elseif (MSVC)
    string (REGEX REPLACE "/W3" "" CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}"  )
    string (REGEX REPLACE "/W3" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
-   add_compile_options("/utf-8")
+   add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:/utf-8>")
 
 else()
    # Linux, Windows (MinGW)
@@ -204,7 +209,8 @@ check_include_file(sys/param.h   HAVE_SYS_PARAM_H)
 
 check_include_files("dlfcn.h;stdint.h;stddef.h;inttypes.h;stdlib.h;strings.h;string.h;float.h" STDC_HEADERS)
 check_type_size(size_t SIZEOF_SIZE_T)
-opj_test_large_files(HAVE_LARGEFILESUPPORT)
+check_64_bit_io_functions(HAVE_64BIT_IO)
+check_large_files(HAVE_LARGEFILESUPPORT)
 
 # Raspberry Pi does not have built in atomic support
 check_working_cxx_atomics(HAVE_CXX_ATOMICS_WITHOUT_LIB)
@@ -363,15 +369,34 @@ if (PostgreSQL_FOUND AND CMAKE_SYSTEM_NAME MATCHES "Windows" AND NOT MSVC)
       if (EXISTS "${fname}/pthread.h")
          # Postgres bug
 
-         message(WARNING "")
-         message(WARNING "------------------------------------------------------------")
-         message(WARNING "WARNING WARNING")
-         message(WARNING "The '${fname}' directory contains a file called pthread.h")
-         message(WARNING "")
-         message(WARNING "A conflict exists between pthread.h and the standard library ")
-         message(WARNING "Rename or remove pthread.h in order to build the CsSqlPsql plugin")
-         message(WARNING "------------------------------------------------------------")
-         message(WARNING "")
+         message(WARNING
+         " \n \n"
+         " -----------------------------------------------------------------\n"
+         " * WARNING *\n \n"
+         " The directory '${fname}' contains the file pthread.h\n \n"
+         " A conflict exists between pthread.h and the standard library.\n"
+         " Rename or remove pthread.h in order to build the CsSqlPsql plugin\n"
+         " -----------------------------------------------------------------\n")
+
+         # force to not found
+         set(PostgreSQL_FOUND false)
+
+         message(STATUS "PostgreSQL client library was found, CopperSpice plugin will not be built")
+         message(STATUS "")
+      endif()
+
+      if (EXISTS "${fname}/semaphore.h" AND PostgreSQL_FOUND)
+         # Postgres bug
+
+
+        message(WARNING
+         " \n \n"
+         " -----------------------------------------------------------------\n"
+         " * WARNING *\n \n"
+         " The directory '${fname}' contains the file semaphore.h\n \n"
+         " A conflict exists between semaphore.h and the standard library.\n"
+         " Rename or remove semaphore.h in order to build the CsSqlPsql plugin\n"
+         " -----------------------------------------------------------------\n")
 
          # force to not found
          set(PostgreSQL_FOUND false)
@@ -429,7 +454,7 @@ set_package_properties(SQLite3 PROPERTIES
 )
 
 if (WITH_VULKAN)
-   find_package(Vulkan 1.1)
+   find_package(Vulkan 1.2.170)
    set_package_properties(Vulkan PROPERTIES
       PURPOSE "Required for Vulkan support"
       DESCRIPTION "The Vulkan SDK"
@@ -507,9 +532,17 @@ if (CMAKE_SYSTEM_NAME MATCHES "(Linux|OpenBSD|FreeBSD|NetBSD|DragonFly)")
    )
 
    if (WITH_GUI)
+      find_package(Fontconfig)
+      set_package_properties(Fontconfig PROPERTIES
+         PURPOSE "Required for fonts configuration support"
+         DESCRIPTION "Library for configuring and customizing font access"
+         URL "http://www.freedesktop.org/wiki/Software/fontconfig/"
+         TYPE REQUIRED
+      )
+
       find_package(X11 COMPONENTS ICE SM Xcursor Xext Xfixes Xi Xinerama Xrandr Xrender)
       set_package_properties(X11 PROPERTIES
-         PURPOSE "Required for X11/X.Org integration support"
+         PURPOSE "Required for the X11 display plugin"
          DESCRIPTION "Open source implementation of the X Window System"
          URL "https://www.x.org"
          TYPE REQUIRED
@@ -518,9 +551,17 @@ if (CMAKE_SYSTEM_NAME MATCHES "(Linux|OpenBSD|FreeBSD|NetBSD|DragonFly)")
       find_package(XCB COMPONENTS xcb xcb-image xcb-icccm xcb-sync xcb-xfixes xcb-shm xcb-randr
                    xcb-shape xcb-keysyms xcb-xinerama xcb-xkb xcb-render xcb-render-util xcb-glx)
       set_package_properties(XCB PROPERTIES
-         PURPOSE "Required for XCB/X.Org integration support"
+         PURPOSE "Required for XCB integration support"
          DESCRIPTION "Open source implementation of the XCB Interface for the X11 Window System"
          URL "https://xcb.freedesktop.org"
+         TYPE REQUIRED
+      )
+
+      find_package(XKBCommon_X11)
+      set_package_properties(XKBCommon_X11 PROPERTIES
+         PURPOSE "Required for XKB X11 integration support"
+         DESCRIPTION "Keyboard library"
+         URL "https://xkbcommon.org"
          TYPE REQUIRED
       )
 
@@ -534,27 +575,21 @@ if (CMAKE_SYSTEM_NAME MATCHES "(Linux|OpenBSD|FreeBSD|NetBSD|DragonFly)")
 
       find_package(XKBCommon)
       set_package_properties(XKBCommon PROPERTIES
-         PURPOSE "Required for XKB integration support"
+         PURPOSE "Required for XKB integration support for X11 and Wayland"
          DESCRIPTION "Keyboard library"
          URL "https://xkbcommon.org"
          TYPE REQUIRED
       )
 
-      find_package(XKBCommon_X11)
-      set_package_properties(XKBCommon_X11 PROPERTIES
-         PURPOSE "Required for XKB X11 integration support"
-         DESCRIPTION "Keyboard library"
-         URL "https://xkbcommon.org"
-         TYPE REQUIRED
+      find_package(Wayland 1.18)
+      set_package_properties(Wayland PROPERTIES
+         PURPOSE "Required for the Wayland display plugin"
+         DESCRIPTION "Libraries for the Wayland display protocol"
+         URL "https://gitlab.freedesktop.org/wayland/wayland"
+         TYPE RECOMMENDED
       )
 
-      find_package(Fontconfig)
-      set_package_properties(Fontconfig PROPERTIES
-         PURPOSE "Required for fonts configuration support"
-         DESCRIPTION "Library for configuring and customizing font access"
-         URL "http://www.freedesktop.org/wiki/Software/fontconfig/"
-         TYPE REQUIRED
-      )
+      find_package(OpenGL COMPONENTS EGL)
    endif()
 
    if (WITH_MULTIMEDIA)
@@ -567,11 +602,11 @@ if (CMAKE_SYSTEM_NAME MATCHES "(Linux|OpenBSD|FreeBSD|NetBSD|DragonFly)")
       )
    endif()
 
-   if (WITH_OPENGL)
+   if (WITH_GUI)
       find_package(OpenGL)
       set_package_properties(OpenGL PROPERTIES
          PURPOSE "Required for OpenGL support"
-         DESCRIPTION "The Mesa 3D Graphics Library"
+         DESCRIPTION "Mesa 3D Graphics Library"
          URL "http://www.mesa3d.org/"
          TYPE REQUIRED
       )
@@ -649,8 +684,8 @@ elseif (WITH_SVG AND NOT WITH_GUI)
 elseif (WITH_XMLPATTERNS AND NOT WITH_NETWORK)
    message(SEND_ERROR "CsXmlPatterns component requires CsNetwork component")
 
-elseif (WITH_WEBKIT AND NOT (WITH_GUI AND WITH_NETWORK AND WITH_SCRIPT))
-   message(SEND_ERROR "CsWebKit component requires CsGui, CsNetwork, and CsScript components")
+elseif (WITH_WEBKIT AND NOT (WITH_GUI AND WITH_NETWORK))
+   message(SEND_ERROR "CsWebKit component requires CsGui  and CsNetwork components")
 
 endif()
 
@@ -690,7 +725,25 @@ if (WITH_GUI)
    endif()
 
    if (CMAKE_SYSTEM_NAME MATCHES "(Linux|OpenBSD|FreeBSD|NetBSD|DragonFly)")
-      set(BUILD_PLATFORMS_XCB_PLUGIN TRUE)
+
+      if (XCB_FOUND)
+         set(BUILD_PLATFORMS_XCB_PLUGIN TRUE)
+      endif()
+
+      if (Wayland_FOUND AND TARGET OpenGL::EGL)
+         set(BUILD_PLATFORMS_WAYLAND_PLUGIN TRUE)
+      endif()
+
+      if (NOT XCB_FOUND AND NOT WAYLAND_FOUND)
+         message("")
+         message("----------------------------------------------------------------------")
+         message("Both XCB and Wayland plugins can not be turned off when building CsGui")
+         message("----------------------------------------------------------------------")
+         message("")
+
+         message(FATAL_ERROR "Abort Configuration")
+      endif()
+
    endif()
 
    add_subdirectory(src/plugins/imageformats)

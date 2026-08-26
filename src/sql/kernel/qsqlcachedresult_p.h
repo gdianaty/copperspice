@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -34,9 +34,9 @@ class QSqlCachedResultPrivate;
 class Q_SQL_EXPORT QSqlCachedResult: public QSqlResult
 {
  public:
-   virtual ~QSqlCachedResult();
+   using ValueCache = QVector<QVariant>;
 
-   typedef QVector<QVariant> ValueCache;
+   virtual ~QSqlCachedResult();
 
  protected:
    QSqlCachedResult(const QSqlDriver *db);

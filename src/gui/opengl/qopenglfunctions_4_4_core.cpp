@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2013 Klarälvdalens Datakonsult AB, a KDAB Group company
 * Copyright (c) 2015 The Qt Company Ltd.
@@ -22,22 +22,9 @@
 *
 ***********************************************************************/
 
-#include "qopenglfunctions_4_4_core.h"
-#include "qopenglcontext.h"
+#include <qopenglfunctions_4_4_core.h>
 
-/*!
-    \class QOpenGLFunctions_4_4_Core
-    \inmodule QtGui
-    \since 5.5
-    \wrapper
-    \brief The QOpenGLFunctions_4_4_Core class provides all functions for OpenGL 4.4 core profile.
-
-    This class is a wrapper for functions from OpenGL 4.4 core profile.
-    See reference pages on \l {http://www.opengl.org/sdk/docs/}{opengl.org}
-    for function documentation.
-
-    \sa QAbstractOpenGLFunctions
-*/
+#include <qopenglcontext.h>
 
 QOpenGLFunctions_4_4_Core::QOpenGLFunctions_4_4_Core()
  : QAbstractOpenGLFunctions()
@@ -64,71 +51,71 @@ QOpenGLFunctions_4_4_Core::QOpenGLFunctions_4_4_Core()
 QOpenGLFunctions_4_4_Core::~QOpenGLFunctions_4_4_Core()
 {
     if (d_1_0_Core && !d_1_0_Core->refs.deref()) {
-        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_1_0_Core->context, QOpenGLFunctions_1_0_CoreBackend::versionStatus());
+        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_1_0_Core->m_context, QOpenGLFunctions_1_0_CoreBackend::versionStatus());
         delete d_1_0_Core;
     }
     if (d_1_1_Core && !d_1_1_Core->refs.deref()) {
-        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_1_1_Core->context, QOpenGLFunctions_1_1_CoreBackend::versionStatus());
+        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_1_1_Core->m_context, QOpenGLFunctions_1_1_CoreBackend::versionStatus());
         delete d_1_1_Core;
     }
     if (d_1_2_Core && !d_1_2_Core->refs.deref()) {
-        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_1_2_Core->context, QOpenGLFunctions_1_2_CoreBackend::versionStatus());
+        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_1_2_Core->m_context, QOpenGLFunctions_1_2_CoreBackend::versionStatus());
         delete d_1_2_Core;
     }
     if (d_1_3_Core && !d_1_3_Core->refs.deref()) {
-        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_1_3_Core->context, QOpenGLFunctions_1_3_CoreBackend::versionStatus());
+        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_1_3_Core->m_context, QOpenGLFunctions_1_3_CoreBackend::versionStatus());
         delete d_1_3_Core;
     }
     if (d_1_4_Core && !d_1_4_Core->refs.deref()) {
-        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_1_4_Core->context, QOpenGLFunctions_1_4_CoreBackend::versionStatus());
+        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_1_4_Core->m_context, QOpenGLFunctions_1_4_CoreBackend::versionStatus());
         delete d_1_4_Core;
     }
     if (d_1_5_Core && !d_1_5_Core->refs.deref()) {
-        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_1_5_Core->context, QOpenGLFunctions_1_5_CoreBackend::versionStatus());
+        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_1_5_Core->m_context, QOpenGLFunctions_1_5_CoreBackend::versionStatus());
         delete d_1_5_Core;
     }
     if (d_2_0_Core && !d_2_0_Core->refs.deref()) {
-        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_2_0_Core->context, QOpenGLFunctions_2_0_CoreBackend::versionStatus());
+        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_2_0_Core->m_context, QOpenGLFunctions_2_0_CoreBackend::versionStatus());
         delete d_2_0_Core;
     }
     if (d_2_1_Core && !d_2_1_Core->refs.deref()) {
-        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_2_1_Core->context, QOpenGLFunctions_2_1_CoreBackend::versionStatus());
+        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_2_1_Core->m_context, QOpenGLFunctions_2_1_CoreBackend::versionStatus());
         delete d_2_1_Core;
     }
     if (d_3_0_Core && !d_3_0_Core->refs.deref()) {
-        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_3_0_Core->context, QOpenGLFunctions_3_0_CoreBackend::versionStatus());
+        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_3_0_Core->m_context, QOpenGLFunctions_3_0_CoreBackend::versionStatus());
         delete d_3_0_Core;
     }
     if (d_3_1_Core && !d_3_1_Core->refs.deref()) {
-        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_3_1_Core->context, QOpenGLFunctions_3_1_CoreBackend::versionStatus());
+        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_3_1_Core->m_context, QOpenGLFunctions_3_1_CoreBackend::versionStatus());
         delete d_3_1_Core;
     }
     if (d_3_2_Core && !d_3_2_Core->refs.deref()) {
-        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_3_2_Core->context, QOpenGLFunctions_3_2_CoreBackend::versionStatus());
+        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_3_2_Core->m_context, QOpenGLFunctions_3_2_CoreBackend::versionStatus());
         delete d_3_2_Core;
     }
     if (d_3_3_Core && !d_3_3_Core->refs.deref()) {
-        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_3_3_Core->context, QOpenGLFunctions_3_3_CoreBackend::versionStatus());
+        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_3_3_Core->m_context, QOpenGLFunctions_3_3_CoreBackend::versionStatus());
         delete d_3_3_Core;
     }
     if (d_4_0_Core && !d_4_0_Core->refs.deref()) {
-        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_4_0_Core->context, QOpenGLFunctions_4_0_CoreBackend::versionStatus());
+        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_4_0_Core->m_context, QOpenGLFunctions_4_0_CoreBackend::versionStatus());
         delete d_4_0_Core;
     }
     if (d_4_1_Core && !d_4_1_Core->refs.deref()) {
-        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_4_1_Core->context, QOpenGLFunctions_4_1_CoreBackend::versionStatus());
+        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_4_1_Core->m_context, QOpenGLFunctions_4_1_CoreBackend::versionStatus());
         delete d_4_1_Core;
     }
     if (d_4_2_Core && !d_4_2_Core->refs.deref()) {
-        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_4_2_Core->context, QOpenGLFunctions_4_2_CoreBackend::versionStatus());
+        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_4_2_Core->m_context, QOpenGLFunctions_4_2_CoreBackend::versionStatus());
         delete d_4_2_Core;
     }
     if (d_4_3_Core && !d_4_3_Core->refs.deref()) {
-        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_4_3_Core->context, QOpenGLFunctions_4_3_CoreBackend::versionStatus());
+        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_4_3_Core->m_context, QOpenGLFunctions_4_3_CoreBackend::versionStatus());
         delete d_4_3_Core;
     }
     if (d_4_4_Core && !d_4_4_Core->refs.deref()) {
-        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_4_4_Core->context, QOpenGLFunctions_4_4_CoreBackend::versionStatus());
+        QAbstractOpenGLFunctionsPrivate::removeFunctionsBackend(d_4_4_Core->m_context, QOpenGLFunctions_4_4_CoreBackend::versionStatus());
         delete d_4_4_Core;
     }
 }
@@ -307,4 +294,3 @@ QOpenGLVersionProfile QOpenGLFunctions_4_4_Core::versionProfile()
     v.setProfile(QSurfaceFormat::CoreProfile);
     return v;
 }
-

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -34,8 +34,7 @@
 #include <gst/gst.h>
 #include <gst/video/video.h>
 
-class QGstreamerVideoProbeControl
-   : public QMediaVideoProbeControl, public QGstreamerBufferProbe, public QSharedData
+class QGstreamerVideoProbeControl : public QMediaVideoProbeControl, public QGstreamerBufferProbe, public QSharedData
 {
    CS_OBJECT(QGstreamerVideoProbeControl)
 
@@ -57,11 +56,7 @@ class QGstreamerVideoProbeControl
    QVideoFrame m_pendingFrame;
    QMutex m_frameMutex;
 
-#if GST_CHECK_VERSION(1,0,0)
    GstVideoInfo m_videoInfo;
-#else
-   int m_bytesPerLine;
-#endif
 
    bool m_flushing;
    bool m_frameProbed; // true if at least one frame was probed

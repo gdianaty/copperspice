@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,19 +26,19 @@
 
 #include <qbrush.h>
 #include <qfont.h>
-#include <qpen.h>
-#include <qregion.h>
 #include <qmatrix.h>
+#include <qpaintengine.h>
 #include <qpainter.h>
 #include <qpainterpath.h>
-#include <qpaintengine.h>
+#include <qpen.h>
+#include <qregion.h>
 
 #include <qpen_p.h>
 
-class QRawFont;
-class QPaintEngine;
 class QEmulationPaintEngine;
+class QPaintEngine;
 class QPaintEngineEx;
+class QRawFont;
 
 struct QFixedPoint;
 struct QTLWExtra;

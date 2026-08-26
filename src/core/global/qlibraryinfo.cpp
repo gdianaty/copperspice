@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,14 +21,15 @@
 *
 ***********************************************************************/
 
+#include <qlibraryinfo.h>
+
 #include <qcoreapplication.h>
 #include <qdir.h>
 #include <qfile.h>
-#include <qlibraryinfo.h>
 #include <qregularexpression.h>
-#include <qstringlist.h>
-#include <qsettings.h>
 #include <qscopedpointer.h>
+#include <qsettings.h>
+#include <qstringlist.h>
 
 #include <cs_build_info.h>
 

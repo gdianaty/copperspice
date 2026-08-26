@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -33,9 +33,6 @@ QLocalSocket::QLocalSocket(QObject *parent)
    d->init();
 }
 
-/*!
-    Destroys the socket, closing the connection if necessary.
- */
 QLocalSocket::~QLocalSocket()
 {
    close();
@@ -61,7 +58,7 @@ void QLocalSocket::setServerName(const QString &name)
 {
    Q_D(QLocalSocket);
    if (d->state != UnconnectedState) {
-      qWarning("QLocalSocket::setServerName() called while not in unconnected state");
+      qWarning("QLocalSocket::setServerName() Must be called while in unconnected state");
       return;
    }
    d->serverName = name;
@@ -73,13 +70,6 @@ QString QLocalSocket::serverName() const
    return d->serverName;
 }
 
-/*!
-    Returns the server path that the socket is connected to.
-
-    \note The return value of this function is platform specific.
-
-    \sa connectToServer(), serverName()
- */
 QString QLocalSocket::fullServerName() const
 {
    Q_D(const QLocalSocket);
@@ -106,33 +96,43 @@ QDebug operator<<(QDebug debug, QLocalSocket::LocalSocketError error)
       case QLocalSocket::ConnectionRefusedError:
          debug << "QLocalSocket::ConnectionRefusedError";
          break;
+
       case QLocalSocket::PeerClosedError:
          debug << "QLocalSocket::PeerClosedError";
          break;
+
       case QLocalSocket::ServerNotFoundError:
          debug << "QLocalSocket::ServerNotFoundError";
          break;
+
       case QLocalSocket::SocketAccessError:
          debug << "QLocalSocket::SocketAccessError";
          break;
+
       case QLocalSocket::SocketResourceError:
          debug << "QLocalSocket::SocketResourceError";
          break;
+
       case QLocalSocket::SocketTimeoutError:
          debug << "QLocalSocket::SocketTimeoutError";
          break;
+
       case QLocalSocket::DatagramTooLargeError:
          debug << "QLocalSocket::DatagramTooLargeError";
          break;
+
       case QLocalSocket::ConnectionError:
          debug << "QLocalSocket::ConnectionError";
          break;
+
       case QLocalSocket::UnsupportedSocketOperationError:
          debug << "QLocalSocket::UnsupportedSocketOperationError";
          break;
+
       case QLocalSocket::UnknownSocketError:
          debug << "QLocalSocket::UnknownSocketError";
          break;
+
       default:
          debug << "QLocalSocket::SocketError(" << int(error) << ')';
          break;

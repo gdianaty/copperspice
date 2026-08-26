@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,18 +24,19 @@
 #ifndef QGRAPHICSTRANSFORM_H
 #define QGRAPHICSTRANSFORM_H
 
-#include <qobject.h>
-#include <qvector3d.h>
-#include <qtransform.h>
 #include <qmatrix4x4.h>
+#include <qobject.h>
 #include <qscopedpointer.h>
+#include <qtransform.h>
+#include <qvector3d.h>
 
 #ifndef QT_NO_GRAPHICSVIEW
 
 class QGraphicsItem;
-class QGraphicsTransformPrivate;
-class QGraphicsScalePrivate;
+
 class QGraphicsRotationPrivate;
+class QGraphicsScalePrivate;
+class QGraphicsTransformPrivate;
 
 class Q_GUI_EXPORT QGraphicsTransform : public QObject
 {

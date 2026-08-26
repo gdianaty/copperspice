@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,12 +22,13 @@
 ***********************************************************************/
 
 #include <qhttp_networkreply_p.h>
+
 #include <qhttp_networkconnection_p.h>
 
 #ifdef QT_SSL
-#  include <qsslkey.h>
 #  include <qsslcipher.h>
 #  include <qsslconfiguration.h>
+#  include <qsslkey.h>
 #endif
 
 #ifndef QT_NO_COMPRESS
@@ -487,16 +488,14 @@ bool QHttpNetworkReplyPrivate::parseStatus(const QByteArray &status)
    // that makes: 'HTTP/n.n xxx Message'
    // byte count:  0123456789012
 
-   static const int minLength = 11;
-   static const int dotPos = 6;
-   static const int spacePos = 8;
-   static const char httpMagic[] = "HTTP/";
+   static constexpr const int minLength = 11;
+   static constexpr const int dotPos = 6;
+   static constexpr const int spacePos = 8;
+   static constexpr const char httpMagic[] = "HTTP/";
 
-   if (status.length() < minLength
-         || !status.startsWith(httpMagic)
-         || status.at(dotPos) != '.'
-         || status.at(spacePos) != ' ') {
-      // I don't know how to parse this status line
+   if (status.length() < minLength || ! status.startsWith(httpMagic) || status.at(dotPos) != '.' || status.at(spacePos) != ' ') {
+      // unable to parse this status line
+
       return false;
    }
 
@@ -787,9 +786,10 @@ qint64 QHttpNetworkReplyPrivate::uncompressBodyData(QByteDataBuffer *in, QByteDa
          bOut.reserve(inflateStrm->avail_in * 3 + 512);
          inflateStrm->avail_out = bOut.capacity();
          inflateStrm->next_out = reinterpret_cast<Bytef *>(bOut.data());
-         int ret = inflate(inflateStrm, Z_NO_FLUSH);
 
-         if (ret == Z_DATA_ERROR && !triedRawDeflate) {
+         int result1 = inflate(inflateStrm, Z_NO_FLUSH);
+
+         if (result1 == Z_DATA_ERROR && !triedRawDeflate) {
             inflateEnd(inflateStrm);
             triedRawDeflate       = true;
             inflateStrm->zalloc   = nullptr;
@@ -797,9 +797,10 @@ qint64 QHttpNetworkReplyPrivate::uncompressBodyData(QByteDataBuffer *in, QByteDa
             inflateStrm->opaque   = nullptr;
             inflateStrm->avail_in = 0;
             inflateStrm->next_in  = nullptr;
-            int ret = inflateInit2(inflateStrm, -MAX_WBITS);
 
-            if (ret != Z_OK) {
+            int result2 = inflateInit2(inflateStrm, -MAX_WBITS);
+
+            if (result2 != Z_OK) {
                return -1;
 
             } else {
@@ -808,14 +809,14 @@ qint64 QHttpNetworkReplyPrivate::uncompressBodyData(QByteDataBuffer *in, QByteDa
                continue;
             }
 
-         } else if (ret < 0 || ret == Z_NEED_DICT) {
+         } else if (result1 < 0 || result1 == Z_NEED_DICT) {
             return -1;
          }
 
          bOut.resize(bOut.capacity() - inflateStrm->avail_out);
          out->append(bOut);
 
-         if (ret == Z_STREAM_END) {
+         if (result1 == Z_STREAM_END) {
             return out->byteAmount();
          }
 

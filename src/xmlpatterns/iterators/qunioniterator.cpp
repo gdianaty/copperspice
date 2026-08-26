@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,8 +24,6 @@
 #include "qitem_p.h"
 
 #include "qunioniterator_p.h"
-
-QT_BEGIN_NAMESPACE
 
 using namespace QPatternist;
 
@@ -101,5 +99,3 @@ Item::Iterator::Ptr UnionIterator::copy() const
 {
    return Item::Iterator::Ptr(new UnionIterator(m_it1->copy(), m_it2->copy()));
 }
-
-QT_END_NAMESPACE

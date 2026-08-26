@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,8 +21,8 @@
 *
 ***********************************************************************/
 
-#include <qglobal.h>
 #include <qendian.h>
+#include <qglobal.h>
 #include <qsettings.h>
 
 #include <qcoretextfontdatabase_p.h>
@@ -191,7 +191,7 @@ void QCoreTextFontDatabase::populateFontDatabase()
       CFStringRef familyNameRef = (CFStringRef) CFArrayGetValueAtIndex(familyNames, i);
       QString familyName = QCFString::toQString(familyNameRef);
 
-      // do not populate internal fonts
+      // do not populate system fonts
       if (familyName.startsWith('.') || familyName == "LastResort") {
          continue;
       }
@@ -437,7 +437,7 @@ QFontEngine *QCoreTextFontDatabase::fontEngine(const QFontDef &f, void *usrPtr)
 
    if (font) {
       QFontEngine *engine = new QCoreTextFontEngine(font, f);
-      engine->fontDef = f;
+      engine->m_fontDef = f;
       CFRelease(font);
       return engine;
    }

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,29 +22,22 @@
 ***********************************************************************/
 
 #include <qsqlfield.h>
+
 #include <qatomic.h>
 #include <qdebug.h>
 
 class QSqlFieldPrivate
 {
  public:
-   QSqlFieldPrivate(const QString &name, QVariant::Type type)
-      : ref(1), nm(name), ro(false), type(type), req(QSqlField::Unknown),
+   QSqlFieldPrivate(const QString &name, QVariant::Type newType)
+      : ref(1), nm(name), ro(false), type(newType), req(QSqlField::Unknown),
         len(-1), prec(-1), tp(-1), gen(true), autoval(false) {
    }
 
    QSqlFieldPrivate(const QSqlFieldPrivate &other)
-      : ref(1),
-        nm(other.nm),
-        ro(other.ro),
-        type(other.type),
-        req(other.req),
-        len(other.len),
-        prec(other.prec),
-        def(other.def),
-        tp(other.tp),
-        gen(other.gen),
-        autoval(other.autoval) {
+      : ref(1), nm(other.nm), ro(other.ro), type(other.type), req(other.req), len(other.len), prec(other.prec),
+        def(other.def), tp(other.tp), gen(other.gen), autoval(other.autoval)
+   {
    }
 
    bool operator==(const QSqlFieldPrivate &other) const {
@@ -105,97 +98,41 @@ QSqlField::~QSqlField()
    }
 }
 
-/*!
-    Sets the required status of this field to \a required.
-
-    \sa requiredStatus() setType() setLength() setPrecision() setDefaultValue() setGenerated() setReadOnly()
-*/
 void QSqlField::setRequiredStatus(RequiredStatus required)
 {
    detach();
    d->req = required;
 }
 
-/*! \fn void QSqlField::setRequired(bool required)
-
-    Sets the required status of this field to \l Required if \a
-    required is true; otherwise sets it to \l Optional.
-
-    \sa setRequiredStatus(), requiredStatus()
-*/
-
-/*!
-    Sets the field's length to \a fieldLength. For strings this is the
-    maximum number of characters the string can hold; the meaning
-    varies for other types.
-
-    \sa length() setType() setRequiredStatus() setPrecision() setDefaultValue() setGenerated() setReadOnly()
-*/
 void QSqlField::setLength(int fieldLength)
 {
    detach();
    d->len = fieldLength;
 }
 
-/*!
-    Sets the field's \a precision. This only affects numeric fields.
-
-    \sa precision() setType() setRequiredStatus() setLength() setDefaultValue() setGenerated() setReadOnly()
-*/
 void QSqlField::setPrecision(int precision)
 {
    detach();
    d->prec = precision;
 }
 
-/*!
-    Sets the default value used for this field to \a value.
-
-    \sa defaultValue() value() setType() setRequiredStatus() setLength() setPrecision() setGenerated() setReadOnly()
-*/
 void QSqlField::setDefaultValue(const QVariant &value)
 {
    detach();
    d->def = value;
 }
 
-/*!
-    \internal
-*/
 void QSqlField::setSqlType(int type)
 {
    detach();
    d->tp = type;
 }
 
-/*!
-    Sets the generated state. If \a gen is false, no SQL will
-    be generated for this field; otherwise, Qt classes such as
-    QSqlQueryModel and QSqlTableModel will generate SQL for this
-    field.
-
-    \sa isGenerated() setType() setRequiredStatus() setLength() setPrecision() setDefaultValue() setReadOnly()
-*/
 void QSqlField::setGenerated(bool gen)
 {
    detach();
    d->gen = gen;
 }
-
-
-/*!
-    Sets the value of the field to \a value. If the field is read-only
-    (isReadOnly() returns true), nothing happens.
-
-    If the data type of \a value differs from the field's current
-    data type, an attempt is made to cast it to the proper type. This
-    preserves the data type of the field in the case of assignment,
-    e.g. a QString to an integer data type.
-
-    To set the value to NULL, use clear().
-
-    \sa value() isReadOnly() defaultValue()
-*/
 
 void QSqlField::setValue(const QVariant &value)
 {
@@ -205,13 +142,6 @@ void QSqlField::setValue(const QVariant &value)
    val = value;
 }
 
-/*!
-    Clears the value of the field and sets it to NULL.
-    If the field is read-only, nothing happens.
-
-    \sa setValue() isReadOnly() requiredStatus()
-*/
-
 void QSqlField::clear()
 {
    if (isReadOnly()) {
@@ -219,12 +149,6 @@ void QSqlField::clear()
    }
    val = QVariant();
 }
-
-/*!
-    Sets the name of the field to \a name.
-
-    \sa name()
-*/
 
 void QSqlField::setName(const QString &name)
 {
@@ -237,7 +161,6 @@ void QSqlField::setReadOnly(bool readOnly)
    detach();
    d->ro = readOnly;
 }
-
 
 QString QSqlField::name() const
 {

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,9 +22,11 @@
 ***********************************************************************/
 
 #include <qcssutil_p.h>
-#include <qcssparser_p.h>
-#include <qpainter.h>
+
 #include <qmath.h>
+#include <qpainter.h>
+
+#include <qcssparser_p.h>
 
 #ifndef QT_NO_CSSPARSER
 

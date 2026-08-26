@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,23 +26,11 @@
 
 #include <qpaircontainer_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class GenericPredicate : public PairContainer
 {
  public:
-
-   /**
-    * Creates a predicate expression that filters the items gained
-    * from evaluating @p sourceExpression through the filter @p predicateExpression.
-    *
-    * This function performs type analyzis on the passed expressions, and may
-    * return more specialized expressions depending on the analyzis.
-    *
-    * If @p predicateExpression is an invalid predicate, an error is issued
-    * via the @p context.
-    */
    static Expression::Ptr create(const Expression::Ptr &sourceExpression,
                                  const Expression::Ptr &predicateExpression,
                                  const StaticContext::Ptr &context,
@@ -50,18 +38,7 @@ class GenericPredicate : public PairContainer
 
    static Expression::Ptr createFirstItem(const Expression::Ptr &sourceExpression);
 
-   /**
-    * Creates a source iterator which is passed to the ItemMappingIterator
-    * and the Focus. The ItemMappingIterator modifies it with
-    * its QAbstractXmlForwardIterator::next() calls, and since the Focus references the same QAbstractXmlForwardIterator,
-    * the focus is automatically moved.
-    */
    Item::Iterator::Ptr evaluateSequence(const DynamicContext::Ptr &context) const override;
-
-   /**
-    * Doesn't return the first item from calling evaluateSequence(), but does the mapping
-    * manually. This avoid allocating an ItemMappingIterator.
-    */
    Item evaluateSingleton(const DynamicContext::Ptr &context) const override;
 
    inline Item mapToItem(const Item &subject, const DynamicContext::Ptr &) const;
@@ -71,35 +48,19 @@ class GenericPredicate : public PairContainer
    ExpressionVisitorResult::Ptr accept(const ExpressionVisitor::Ptr &visitor) const override;
    ID id() const override;
 
-   /**
-    * @returns always CreatesFocusForLast.
-    */
    Properties properties() const override;
 
    QString description() const override;
 
  protected:
+   GenericPredicate(const Expression::Ptr &sourceExpression, const Expression::Ptr &predicate);
 
-   /**
-    * Creates a GenericPredicate which filters the items from the @p sourceExpression
-    * through @p predicate.
-    *
-    * This constructor is protected. The proper way to create predicates is via the static
-    * create() function.
-    */
-   GenericPredicate(const Expression::Ptr &sourceExpression,
-                    const Expression::Ptr &predicate);
-
-   /**
-    * @returns the ItemType of the first operand's staticType().
-    */
    ItemType::Ptr newFocusType() const override;
 
  private:
    typedef QExplicitlySharedDataPointer<const GenericPredicate> ConstPtr;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

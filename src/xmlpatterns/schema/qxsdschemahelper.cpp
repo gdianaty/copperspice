@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -29,8 +29,6 @@
 #include "qxsdmodelgroup_p.h"
 #include "qxsdsimpletype_p.h"
 #include "qxsdtypechecker_p.h"
-
-QT_BEGIN_NAMESPACE
 
 using namespace QPatternist;
 
@@ -150,13 +148,11 @@ bool XsdSchemaHelper::wildcardAllowsExpandedName(const QXmlName &name, const Xsd
    return true;
 }
 
-// small helper function that should be available in Qt 4.6
 template<class T>
 static inline bool containsSet(const QSet<T> &super, const QSet<T> &sub)
 {
-   QSetIterator<T> it(sub);
-   while (it.hasNext()) {
-      if (!super.contains(it.next())) {
+   for (const auto &item : sub) {
+      if (! super.contains(item)) {
          return false;
       }
    }
@@ -904,5 +900,3 @@ bool XsdSchemaHelper::isValidAttributeUsesExtension(const XsdAttributeUse::List 
 
    return true;
 }
-
-QT_END_NAMESPACE

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -30,6 +30,7 @@
 
 #include <qexport.h>
 #include <qfeatures.h>
+#include <qglobal_debug.h>
 
 #include <stddef.h>
 #include <stdint.h>
@@ -47,10 +48,10 @@
 #include <optional>
 #include <type_traits>
 
-#define QT_PREPEND_NAMESPACE(name)       ::name
-#define QT_MANGLE_NAMESPACE(name)        name
+#define QT_PREPEND_NAMESPACE(name)   ::name
+#define QT_MANGLE_NAMESPACE(name)    name
 
-#endif
+#endif   // defined(__cplusplus)
 
 #define QT_BEGIN_NAMESPACE
 #define QT_END_NAMESPACE
@@ -156,7 +157,6 @@
 
 #endif
 
-
 // **
 #if defined(__APPLE__) && defined(__GNUC__)
 #  define Q_OS_DARWIN
@@ -207,10 +207,8 @@
 #endif
 
 #if defined(Q_OS_DARWIN)
-
-// ensure it is not defined right now
+// ensure this is not defined yet
 #  undef Q_OS_IOS
-
 #endif
 
 #if defined(Q_OS_WIN)
@@ -221,11 +219,12 @@
 
 #endif
 
-#if defined(Q_OS_DARWIN) && ! defined(QT_LARGEFILE_SUPPORT)
+//
+#ifdef Q_OS_DARWIN
+
+#if ! defined(QT_LARGEFILE_SUPPORT)
 #  define QT_LARGEFILE_SUPPORT 64
 #endif
-
-#ifdef Q_OS_DARWIN
 
 #if ! defined (CS_DOXYPRESS)
 #  include <AvailabilityMacros.h>
@@ -278,6 +277,21 @@
 #     define MAC_OS_X_VERSION_13     130000
 #  endif
 
+// Sonoma OS 14
+#  if ! defined(MAC_OS_X_VERSION_14)
+#     define MAC_OS_X_VERSION_14     140000
+#  endif
+
+// Sequoia OS 15
+#  if ! defined(MAC_OS_X_VERSION_15)
+#     define MAC_OS_X_VERSION_15     150000
+#  endif
+
+// Tahoe OS 26
+#  if ! defined(MAC_OS_X_VERSION_26)
+#     define MAC_OS_X_VERSION_26     260000
+#  endif
+
 #endif
 
 #ifdef __LSB_VERSION__
@@ -294,8 +308,8 @@
 // ******
 #if defined(__clang__)
 
-#  if ( __clang_major__ < 6)
-#    error "CopperSpice requires Clang 6 or newer"
+#  if ( __clang_major__ < 15)
+#    error "CopperSpice requires Clang 15 or newer"
 #  endif
 
 #  define Q_CC_CLANG
@@ -314,8 +328,8 @@
 #elif defined(__GNUC__)
 //  ****
 
-#  if (__GNUC__ < 7) || (__GNUC__ == 7 && __GNUC_MINOR__ < 3)
-#    error "CopperSpice requires GCC 7.3 or newer"
+#  if (__GNUC__ < 13) || (__GNUC__ == 13 && __GNUC_MINOR__ < 2)
+#    error "CopperSpice requires GCC 13.2 or newer"
 #  endif
 
 #  define Q_CC_GNU
@@ -345,8 +359,8 @@
 #elif defined(_MSC_VER)
 //  ****
 
-#  if _MSC_VER < 1926
-#    error "CopperSpice requires Visual Studio 2019 Version 16.6 or newer"
+#  if _MSC_VER < 1944
+#    error "CopperSpice requires Visual Studio 2022 Version 17.14 or newer"
 #  endif
 
 #  define Q_CC_MSVC         (_MSC_VER)
@@ -426,59 +440,67 @@
 #endif
 
 #define Q_INIT_RESOURCE_EXTERN(name) \
-   extern int QT_MANGLE_NAMESPACE(qInitResources_ ## name) ();
+   extern int qInitResources_ ## name ();
 
 #define Q_INIT_RESOURCE(name) \
-   do { extern int QT_MANGLE_NAMESPACE(qInitResources_ ## name) ();       \
-   QT_MANGLE_NAMESPACE(qInitResources_ ## name) (); } while (false)
+   do { extern int qInitResources_ ## name ();       \
+   qInitResources_ ## name (); } while (false)
 
 #define Q_CLEANUP_RESOURCE(name) \
-   do { extern int QT_MANGLE_NAMESPACE(qCleanupResources_ ## name) ();    \
-   QT_MANGLE_NAMESPACE(qCleanupResources_ ## name) (); } while (false)
+   do { extern int qCleanupResources_ ## name ();    \
+   qCleanupResources_ ## name (); } while (false)
 
-// make sure to update QVariant when changing the following
+#if defined(__cplusplus)
+   // block c files
+   // make sure to update QVariant when changing the following
 
-typedef int8_t               qint8;
-typedef uint8_t              quint8;
+using qint8    = int8_t;
+using quint8   = uint8_t;
 
-typedef int16_t              qint16;
-typedef uint16_t             quint16;
+using qint16   = int16_t;
+using quint16  = uint16_t;
 
-typedef int32_t              qint32;
-typedef uint32_t             quint32;
+using qint32   = int32_t;
+using quint32  = uint32_t;
 
-typedef long long            qint64;
-typedef unsigned long long   quint64;
-
-#define Q_INT64_C(c)      static_cast<int64_t>(c ## LL)
-#define Q_UINT64_C(c)     static_cast<uint64_t>(c ## ULL)
-
-#ifndef QT_POINTER_SIZE
-#define QT_POINTER_SIZE   sizeof(void *)
-#endif
-
-#if defined(__cplusplus)      // block c
-
-using qintptr  = std::conditional<sizeof(void *) == 4, qint32, qint64>::type;
-using qptrdiff = qintptr;
-using quintptr = std::conditional<sizeof(void *) == 4, quint32, quint64>::type;
+using qint64   = long long;
+using quint64  = unsigned long long;
 
 using uchar    = unsigned char;
 using ushort   = unsigned short;
 using uint     = unsigned int;
 using ulong    = unsigned long;
 
-// ****
+using qreal    = double;
+
+using qintptr  = std::conditional<sizeof(void *) == 4, qint32, qint64>::type;
+using quintptr = std::conditional<sizeof(void *) == 4, quint32, quint64>::type;
+
+using qptrdiff = qintptr;
+
+#define Q_INT64_C(c)   static_cast<int64_t>(c ## LL)
+#define Q_UINT64_C(c)  static_cast<uint64_t>(c ## ULL)
+
+inline quint64 cs_enum_cast(auto value)
+{
+   static_assert(std::is_enum_v<decltype(value)>, "Argument must be an enum");
+   return quint64(value);
+}
+
+#ifndef QT_POINTER_SIZE
+#define QT_POINTER_SIZE  sizeof(void *)
+#endif
+
 #ifndef TRUE
-#  define TRUE  true
-#  define FALSE false
+#  define TRUE   true
+#  define FALSE  false
 #endif
 
 #if defined(__i386__) || defined(_WIN32)
 #  if defined(Q_CC_GNU)
 
 #    if ! defined(Q_CC_INTEL)
-#       define QT_FASTCALL      __attribute__((regparm(3)))
+#       define QT_FASTCALL    __attribute__((regparm(3)))
 #    else
 #       define QT_FASTCALL
 #    endif
@@ -505,14 +527,15 @@ using ulong    = unsigned long;
 #  define QT_WIN_CALLBACK CALLBACK             QT_ENSURE_STACK_ALIGNED_FOR_SSE
 #endif
 
-//
-using qreal = double;
-
 // utility macros and inline functions
 template <typename T>
 constexpr inline T qAbs(const T &value)
 {
-   return value >= 0 ? value : -value;
+   if constexpr (std::is_unsigned_v<T>) {
+      return value;
+   } else {
+      return value >= 0 ? value : -value;
+   }
 }
 
 constexpr inline int qRound(double value)
@@ -522,17 +545,22 @@ constexpr inline int qRound(double value)
 
 constexpr inline int qRound(float value)
 {
-   return value >= 0.0f ? int(value + 0.5f) : int(value - float(int(value - 1)) + 0.5f) + int(value- 1);
+   return value >= 0.0f ? int(value + 0.5f) : int(value - float(int(value - 1)) + 0.5f) + int(value - 1);
 }
 
-constexpr inline qint64 qRound64(double value)
+constexpr inline int16_t qRound16(double value)
 {
-   return value >= 0.0 ? qint64(value + 0.5) : qint64(value - double(qint64(value - 1)) + 0.5) + qint64(value - 1);
+   return value >= 0.0 ? int16_t(value + 0.5) : int16_t(value - double(int16_t(value - 1)) + 0.5) + int16_t(value - 1);
 }
 
-constexpr inline qint64 qRound64(float value)
+constexpr inline int64_t qRound64(double value)
 {
-   return value >= 0.0f ? qint64(value + 0.5f) : qint64(value - float(qint64(value - 1)) + 0.5f) + qint64(value - 1);
+   return value >= 0.0 ? int64_t(value + 0.5) : int64_t(value - double(int64_t(value - 1)) + 0.5) + int64_t(value - 1);
+}
+
+constexpr inline int64_t qRound64(float value)
+{
+   return value >= 0.0f ? int64_t(value + 0.5f) : int64_t(value - float(int64_t(value - 1)) + 0.5f) + int64_t(value - 1);
 }
 
 // enhanced to support size_type which can be 32 bit or 64 bit
@@ -573,7 +601,7 @@ class Q_CORE_EXPORT QMacAutoReleasePool
       void *pool;
 };
 
-#endif
+#endif  // Q_OS_DARWIN
 
 // System information
 class Q_CORE_EXPORT QSysInfo
@@ -595,17 +623,16 @@ class Q_CORE_EXPORT QSysInfo
       ByteOrder = LittleEndian
 
 #endif
-};
 
-#endif
+   };
+
+#endif   // Q_BYTE_ORDER
 
 #if defined(Q_OS_WIN)
    enum WinVersion {
-      WV_32s        = 0x0001,
       WV_95         = 0x0002,
       WV_98         = 0x0003,
       WV_Me         = 0x0004,
-      WV_DOS_based  = 0x000f,
 
       WV_NT         = 0x0010,
       WV_2000       = 0x0020,
@@ -617,6 +644,7 @@ class Q_CORE_EXPORT QSysInfo
       WV_WINDOWS8_1 = 0x00b0,
       WV_WINDOWS10  = 0x00c0,
       WV_WINDOWS11  = 0x00d0,
+
       WV_NT_based   = 0x00f0,
 
       WV_4_0        = WV_NT,
@@ -633,21 +661,27 @@ class Q_CORE_EXPORT QSysInfo
 
    static const WinVersion WindowsVersion;
    static WinVersion windowsVersion();
+   static QString windowsEdition(WinVersion winVersion);
 #endif
 
 #ifdef Q_OS_DARWIN
    enum MacVersion {
       MV_Unknown = 0x0000,
 
-      MV_10_11 = 0x000D,
-      MV_10_12 = 0x000E,
-      MV_10_13 = 0x000F,
-      MV_10_14 = 0x0010,
-      MV_10_15 = 0x0011,
-      MV_10_16 = 0x0012,                         // both 10_16 and 11
-      MV_11    = 0x0012,
-      MV_12    = 0x0013,
-      MV_13    = 0x0014,
+      MV_10_11 = 0x0001,
+      MV_10_12 = 0x0002,
+      MV_10_13 = 0x0003,
+      MV_10_14 = 0x0004,
+      MV_10_15 = 0x0005,
+      MV_10_16 = 0x0006,                         // 10_16 and 11 are the same os
+
+      MV_11    = 0x0006,
+      MV_12    = 0x0007,
+      MV_13    = 0x0008,
+      MV_14    = 0x0009,
+      MV_15    = 0x000A,
+
+      MV_26    = 0x000B,
 
       MV_EL_CAPITAN   = MV_10_11,                // current mimimum version
       MV_SIERRA       = MV_10_12,
@@ -658,6 +692,10 @@ class Q_CORE_EXPORT QSysInfo
       MV_BIGSUR       = MV_11,
       MV_MONTEREY     = MV_12,
       MV_VENTURA      = MV_13,
+      MV_SONOMA       = MV_14,
+      MV_SEQUOIA      = MV_15,
+
+      MV_TAHOE        = MV_26,
 
       MV_IOS       = 1 << 8,                     // unknown version
       MV_IOS_9_0   = MV_IOS | 9  << 4 | 0,       // 9.0
@@ -669,6 +707,8 @@ class Q_CORE_EXPORT QSysInfo
    };
 
    static const MacVersion MacintoshVersion;
+   static MacVersion macVersion();
+   static QString macEdition(MacVersion macVersion);
 #endif
 
    static QString buildCpuArchitecture();
@@ -679,11 +719,6 @@ Q_CORE_EXPORT const char *csVersion();
 
 // avoid "unused parameter" warnings
 #define Q_UNUSED(x) (void)x;
-
-// Debugging and error handling
-#if ! defined(QT_NO_DEBUG) && ! defined(QT_DEBUG)
-#  define QT_DEBUG
-#endif
 
 Q_CORE_EXPORT void qt_check_pointer(const char *, int);
 Q_CORE_EXPORT void qBadAlloc();
@@ -718,7 +753,7 @@ class QGlobalStaticDeleter
       : globalStatic(_globalStatic) {
    }
 
-   inline ~QGlobalStaticDeleter() {
+   ~QGlobalStaticDeleter() {
       delete globalStatic.pointer.load();
       globalStatic.pointer.store(nullptr);
       globalStatic.destroyed = true;
@@ -753,13 +788,11 @@ constexpr inline bool qFuzzyCompare(float p1, float p2)
    return (qAbs(p1 - p2) <= 0.00001f * qMin(qAbs(p1), qAbs(p2)));
 }
 
-// internal
 constexpr inline bool qFuzzyIsNull(double d)
 {
    return qAbs(d) <= 0.000000000001;
 }
 
-// internal
 constexpr inline bool qFuzzyIsNull(float f)
 {
    return qAbs(f) <= 0.00001f;
@@ -856,8 +889,6 @@ class QIncompatibleFlag
  private:
     T i;
 };
-
-#ifndef Q_NO_TYPESAFE_FLAGS
 
 template <typename E>
 class QFlags
@@ -995,7 +1026,6 @@ template <typename T>  \
 inline QIncompatibleFlag<Flags::int_type> operator|(Flags::enum_type f1, T f2) \
    { return QIncompatibleFlag<Flags::int_type>(Flags::int_type(f1) | f2); }
 
-
 #define Q_DECLARE_OPERATORS_FOR_FLAGS(Flags) \
 constexpr inline QFlags<Flags::enum_type> operator|(Flags::enum_type f1, Flags::enum_type f2) \
    { return QFlags<Flags::enum_type>(f1) | f2; } \
@@ -1003,14 +1033,8 @@ constexpr inline QFlags<Flags::enum_type> operator|(Flags::enum_type f1, QFlags<
    { return f2 | f1; } \
 Q_DECLARE_INCOMPATIBLE_FLAGS(Flags)
 
-#else
-// Q_NO_TYPESAFE_FLAGS
 
-#define Q_DECLARE_OPERATORS_FOR_FLAGS(Flags)
-
-#endif
-
-// raw pointer ( QEasingCurvePrivate, maybe a few other classes 12/28/2013 )
+// raw pointer ( QEasingCurvePrivate, maybe a few other classes )
 template <typename T>
 T *qGetPtrHelper(T *ptr)
 {
@@ -1048,7 +1072,7 @@ typename Wrapper::pointer qGetPtrHelper(const Wrapper &p)
 #define QT_TR_NOOP(text)                            cs_mark_tr_old(text)
 #define QT_TRANSLATE_NOOP3(context, text, comment)  cs_mark_tr_old(text, comment)
 
-// used internally
+// used internally by copperspice
 #define QT_TRANSLATE_NOOP(context, text)            cs_mark_tr_old(text)
 
 // not used in copperspice
@@ -1067,7 +1091,7 @@ constexpr const char * cs_mark_tr(const char *text) {
    return text;
 }
 
-// used internally in cs
+// used internally in copperspice
 constexpr const char * cs_mark_tr(const char *context, const char *text) {
    (void) context;
    return text;
@@ -1112,6 +1136,6 @@ Q_CORE_EXPORT int qrand();
 #endif
 
 
-#endif      // block c
+#endif   // defined(__cplusplus)
 
 #endif

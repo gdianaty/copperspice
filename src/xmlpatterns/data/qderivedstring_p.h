@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,13 @@
 #ifndef QDerivedString_P_H
 #define QDerivedString_P_H
 
+#include <qstringfwd.h>
 #include <qregularexpression.h>
+
 #include <qxmlutils_p.h>
 #include <qbuiltintypes_p.h>
 #include <qpatternistlocale_p.h>
 #include <qvalidationerror_p.h>
-#include <qstringfwd.h>
-
-QT_BEGIN_NAMESPACE
 
 namespace QPatternist {
 
@@ -39,7 +38,7 @@ template<TypeOfDerivedString DerivedType>
 class DerivedString : public AtomicValue
 {
  private:
-   static inline ItemType::Ptr itemType() {
+   static ItemType::Ptr itemType() {
       switch (DerivedType) {
          case TypeNormalizedString:
             return BuiltinTypes::xsNormalizedString;
@@ -69,14 +68,11 @@ class DerivedString : public AtomicValue
 
    const QString m_value;
 
-   inline DerivedString(const QString &value) : m_value(value) {
+   DerivedString(const QString &value)
+      : m_value(value) {
    }
 
-   /**
-    * @short This is an incomplete test for whether @p ch conforms to
-    * the XML 1.0 NameChar production.
-    */
-   static inline bool isNameChar(const QChar &ch) {
+   static bool isNameChar(const QChar &ch) {
       return ch.isLetter()            ||
              ch.isDigit()             ||
              ch == QLatin1Char('.')   ||
@@ -85,12 +81,7 @@ class DerivedString : public AtomicValue
              ch == QLatin1Char(':');
    }
 
-   /**
-    * @returns @c true if @p input is a valid @c xs:Name.
-    * @see <a href="http://www.w3.org/TR/REC-xml/#NT-Name">Extensible
-    * Markup Language (XML) 1.0 (Fourth Edition), [5] Name</a>
-    */
-   static inline bool isValidName(const QString &input) {
+   static bool isValidName(const QString &input) {
       if (input.isEmpty()) {
          return false;
       }
@@ -106,8 +97,6 @@ class DerivedString : public AtomicValue
             return true;
          }
 
-         /* Since we've checked the first character above, we start at
-          * position 1. */
          for (int i = 1; i < len; ++i) {
             if (!isNameChar(input.at(i))) {
                return false;
@@ -120,14 +109,7 @@ class DerivedString : public AtomicValue
       }
    }
 
-   /**
-    * @returns @c true if @p input conforms to the XML 1.0 @c Nmtoken product.
-    *
-    * @see <a
-    * href="http://www.w3.org/TR/2000/WD-xml-2e-20000814#NT-Nmtoken">Extensible
-    * Markup Language (XML) 1.0 (Second Edition), [7] Nmtoken</a>
-    */
-   static inline bool isValidNMTOKEN(const QString &input) {
+   static bool isValidNMTOKEN(const QString &input) {
       const int len = input.length();
 
       if (len == 0) {
@@ -143,19 +125,6 @@ class DerivedString : public AtomicValue
       return true;
    }
 
-   /**
-    * @short Performs attribute value normalization as if @p input was not
-    * from a @c CDATA section.
-    *
-    * Each whitespace character in @p input that's not a space, such as tab
-    * or new line character, is replaced with a space. This algorithm
-    * differs from QString::simplified() in that it doesn't collapse
-    * subsequent whitespace characters to a single one, or remove trailing
-    * and leading space.
-    *
-    * @see <a href="http://www.w3.org/TR/REC-xml/#AVNormalize">Extensible
-    * Markup Language (XML) 1.0 (Second Edition), 3.3.3 [E70]Attribute-Value Normalization</a>
-    */
    static QString attributeNormalize(const QString &input) {
       QString retval(input);
       const int len = retval.length();
@@ -178,22 +147,10 @@ class DerivedString : public AtomicValue
    }
 
  public:
-
-   /**
-    * @note This function doesn't perform any cleanup/normalizaiton of @p
-    * value. @p value must be a canonical value space of the type.
-    *
-    * If you want cleanup to be performed and/or the lexical space
-    * checked, use fromLexical().
-    */
    static AtomicValue::Ptr fromValue(const QString &value) {
       return AtomicValue::Ptr(new DerivedString(value));
    }
 
-   /**
-    * Constructs an instance from the lexical
-    * representation @p lexical.
-    */
    static AtomicValue::Ptr fromLexical(const NamePool::Ptr &np, const QString &lexical) {
       switch (DerivedType) {
          case TypeString:
@@ -240,12 +197,6 @@ class DerivedString : public AtomicValue
          case TypeIDREF:
          case TypeENTITY:
          case TypeNCName: {
-            /* We treat xs:ID, xs:ENTITY, xs:IDREF and xs:NCName in the exact same
-             * way, except for the type annotation.
-             *
-             * We use trimmed() instead of simplified() because it's
-             * faster and whitespace isn't allowed between
-             * non-whitespace characters anyway, for these types. */
             const QString trimmed(lexical.trimmed());
 
             if (QXmlUtils::isNCName(trimmed)) {
@@ -275,7 +226,5 @@ class DerivedString : public AtomicValue
    }
 };
 }
-
-QT_END_NAMESPACE
 
 #endif

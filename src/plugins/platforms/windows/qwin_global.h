@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,26 +24,27 @@
 #ifndef QTWINDOWSGLOBAL_H
 #define QTWINDOWSGLOBAL_H
 
-#include <qwin_additional.h>
 #include <qnamespace.h>
+#include <qwin_additional.h>
 
 namespace QtWindows {
 
-enum {
-   WindowEventFlag = 0x10000,
-   MouseEventFlag = 0x20000,
-   NonClientEventFlag = 0x40000,
+enum WindowsEventFlags {
+   WindowEventFlag      = 0x10000,
+   MouseEventFlag       = 0x20000,
+   NonClientEventFlag   = 0x40000,
    InputMethodEventFlag = 0x80000,
-   KeyEventFlag = 0x100000,
-   KeyDownEventFlag = 0x200000,
-   TouchEventFlag = 0x400000,
-   ClipboardEventFlag = 0x800000,
+   KeyEventFlag         = 0x100000,
+   KeyDownEventFlag     = 0x200000,
+   TouchEventFlag       = 0x400000,
+   ClipboardEventFlag   = 0x800000,
    ApplicationEventFlag = 0x1000000,
-   ThemingEventFlag = 0x2000000,
-   GenericEventFlag = 0x4000000, // Misc
+   ThemingEventFlag     = 0x2000000,
+   GenericEventFlag     = 0x4000000, // Misc
 };
 
-enum WindowsEventType { // Simplify event types
+// Simplify event types
+enum WindowsEventType {
    ExposeEvent = WindowEventFlag + 1,
    ActivateWindowEvent = WindowEventFlag + 2,
    DeactivateWindowEvent = WindowEventFlag + 3,

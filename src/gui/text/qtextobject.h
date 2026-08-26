@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,21 +24,22 @@
 #ifndef QTEXTOBJECT_H
 #define QTEXTOBJECT_H
 
+#include <qglyphrun.h>
 #include <qobject.h>
+#include <qscopedpointer.h>
 #include <qtextformat.h>
 #include <qtextlayout.h>
-#include <qglyphrun.h>
-#include <qscopedpointer.h>
 
-class QTextObjectPrivate;
-class QTextDocument;
-class QTextDocumentPrivate;
-class QTextCursor;
 class QTextBlock;
+class QTextCursor;
+class QTextDocument;
 class QTextFragment;
 class QTextList;
+
 class QTextBlockGroupPrivate;
+class QTextDocumentPrivate;
 class QTextFramePrivate;
+class QTextObjectPrivate;
 
 class Q_GUI_EXPORT QTextObject : public QObject
 {
@@ -222,8 +223,8 @@ class Q_GUI_EXPORT QTextBlock
    {
    }
 
-   inline QTextBlock(const QTextBlock &other) = default;
-   inline QTextBlock &operator=(const QTextBlock &other) = default;
+   QTextBlock(const QTextBlock &other) = default;
+   QTextBlock &operator=(const QTextBlock &other) = default;
 
    bool isValid() const;
 
@@ -286,6 +287,7 @@ class Q_GUI_EXPORT QTextBlock
       }
 
       iterator(const iterator &other) = default;
+      iterator(iterator &&other) = default;
 
       QTextFragment fragment() const;
 
@@ -293,11 +295,14 @@ class Q_GUI_EXPORT QTextBlock
          return n == e;
       }
 
-      inline bool operator==(const iterator &other) const {
+      iterator &operator=(const iterator &other) = default;
+      iterator &operator=(iterator &&other) = default;
+
+      bool operator==(const iterator &other) const {
          return p == other.p && n == other.n;
       }
 
-      inline bool operator!=(const iterator &other) const {
+      bool operator!=(const iterator &other) const {
          return p != other.p || n != other.n;
       }
 
@@ -318,7 +323,10 @@ class Q_GUI_EXPORT QTextBlock
       }
 
     private:
-      friend class QTextBlock;
+      iterator(const QTextDocumentPrivate *priv, int begin, int end, int f)
+         : p(priv), b(begin), e(end), n(f)
+      {
+      }
 
       const QTextDocumentPrivate *p;
 
@@ -326,10 +334,7 @@ class Q_GUI_EXPORT QTextBlock
       int e;
       int n;
 
-      iterator(const QTextDocumentPrivate *priv, int begin, int end, int f)
-         : p(priv), b(begin), e(end), n(f)
-      {
-      }
+      friend class QTextBlock;
    };
 
    iterator begin() const;
@@ -338,11 +343,11 @@ class Q_GUI_EXPORT QTextBlock
    QTextBlock next() const;
    QTextBlock previous() const;
 
-   inline QTextDocumentPrivate *docHandle() const {
+   QTextDocumentPrivate *docHandle() const {
       return p;
    }
 
-   inline int fragmentIndex() const {
+   int fragmentIndex() const {
       return n;
    }
 

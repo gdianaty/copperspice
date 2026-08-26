@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,21 +25,22 @@
 
 #ifndef QT_NO_GRAPHICSVIEW
 
-#include <qgraphicswidget.h>
+#include <qgraphics_widget_p.h>
+
+#include <qapplication.h>
+#include <qdebug.h>
 #include <qgraphicslayout.h>
+#include <qgraphicsproxywidget.h>
 #include <qgraphicsscene.h>
 #include <qgraphicssceneevent.h>
-#include <qmutex.h>
-#include <qapplication.h>
 #include <qgraphicsview.h>
-#include <qgraphicsproxywidget.h>
+#include <qgraphicswidget.h>
+#include <qmutex.h>
 #include <qpalette.h>
 #include <qstyleoption.h>
-#include <qdebug.h>
 
 #include <qapplication_p.h>
 #include <qgraphics_layout_p.h>
-#include <qgraphics_widget_p.h>
 #include <qgraphics_scene_p.h>
 
 #ifndef QT_NO_ACTION
@@ -57,7 +58,6 @@ QGraphicsWidget::QGraphicsWidget(QGraphicsItem *parent, Qt::WindowFlags flags)
    d->init(parent, flags);
 }
 
-// internal
 QGraphicsWidget::QGraphicsWidget(QGraphicsWidgetPrivate &dd, QGraphicsItem *parent, Qt::WindowFlags wFlags)
    : QGraphicsObject(dd, nullptr), QGraphicsLayoutItem(nullptr, false)
 {
@@ -65,7 +65,6 @@ QGraphicsWidget::QGraphicsWidget(QGraphicsWidgetPrivate &dd, QGraphicsItem *pare
    d->init(parent, wFlags);
 }
 
-// internal
 class QGraphicsWidgetStyles
 {
  public:
@@ -159,10 +158,11 @@ void QGraphicsWidget::resize(const QSizeF &size)
 
 void QGraphicsWidget::setGeometry(const QRectF &rect)
 {
-   QGraphicsWidgetPrivate *wd = QGraphicsWidget::d_func();
+   QGraphicsWidgetPrivate *wd    = QGraphicsWidget::d_func();
    QGraphicsLayoutItemPrivate *d = QGraphicsLayoutItem::d_ptr.data();
    QRectF newGeom;
-   QPointF oldPos = d->geom.topLeft();
+
+   QPointF oldPos = d->m_layoutItemRect.topLeft();
 
    if (!wd->inSetPos) {
       setAttribute(Qt::WA_Resized);
@@ -170,23 +170,24 @@ void QGraphicsWidget::setGeometry(const QRectF &rect)
       newGeom.setSize(rect.size().expandedTo(effectiveSizeHint(Qt::MinimumSize))
          .boundedTo(effectiveSizeHint(Qt::MaximumSize)));
 
-      if (newGeom == d->geom) {
+      if (newGeom == d->m_layoutItemRect) {
          goto relayoutChildrenAndReturn;
       }
 
       // setPos triggers ItemPositionChange, which can adjust position
       wd->inSetGeometry = 1;
       setPos(newGeom.topLeft());
+
       wd->inSetGeometry = 0;
       newGeom.moveTopLeft(pos());
 
-      if (newGeom == d->geom) {
+      if (newGeom == d->m_layoutItemRect) {
          goto relayoutChildrenAndReturn;
       }
 
       // Update and prepare to change the geometry (remove from index) if the size has changed.
-      if (wd->scene) {
-         if (rect.topLeft() == d->geom.topLeft()) {
+      if (wd->m_itemScene) {
+         if (rect.topLeft() == d->m_layoutItemRect.topLeft()) {
             prepareGeometryChange();
          }
       }
@@ -195,19 +196,23 @@ void QGraphicsWidget::setGeometry(const QRectF &rect)
    // Update the layout item geometry
    {
       bool moved = oldPos != pos();
+
       if (moved) {
          // Send move event.
          QGraphicsSceneMoveEvent event;
          event.setOldPos(oldPos);
          event.setNewPos(pos());
          QApplication::sendEvent(this, &event);
+
          if (wd->inSetPos) {
             //set the new pos
-            d->geom.moveTopLeft(pos());
+            d->m_layoutItemRect.moveTopLeft(pos());
+
             emit geometryChanged();
             goto relayoutChildrenAndReturn;
          }
       }
+
       QSizeF oldSize = size();
       QGraphicsLayoutItem::setGeometry(newGeom);
 
@@ -454,38 +459,43 @@ void QGraphicsWidget::initStyleOption(QStyleOption *option) const
    } else {
       option->palette.setCurrentColorGroup(QPalette::Inactive);
    }
+
    option->fontMetrics = QFontMetrics(font());
    option->styleObject = const_cast<QGraphicsWidget *>(this);
 }
 
-/*!
-    \reimp
-*/
 QSizeF QGraphicsWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
    Q_D(const QGraphicsWidget);
    QSizeF sh;
+
    if (d->layout) {
       QSizeF marginSize(0, 0);
+
       if (d->margins) {
          marginSize = QSizeF(d->margins[d->Left] + d->margins[d->Right],
                d->margins[d->Top] + d->margins[d->Bottom]);
       }
+
       sh = d->layout->effectiveSizeHint(which, constraint - marginSize);
       sh += marginSize;
+
    } else {
       switch (which) {
          case Qt::MinimumSize:
             sh = QSizeF(0, 0);
             break;
+
          case Qt::PreferredSize:
             sh = QSizeF(50, 50);    //rather arbitrary
             break;
+
          case Qt::MaximumSize:
             sh = QSizeF(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
             break;
+
          default:
-            qWarning("QGraphicsWidget::sizeHint(): Value of 'which' is not valid");
+            qWarning("QGraphicsWidget::sizeHint() Value for size hint is not valid");
             break;
       }
    }
@@ -513,8 +523,8 @@ void QGraphicsWidget::setLayout(QGraphicsLayout *l)
    QGraphicsLayoutItem *oldParent = l->parentLayoutItem();
 
    if (oldParent && oldParent != this) {
-      qWarning("QGraphicsWidget::setLayout: Attempting to set a layout on %s"
-         " \"%s\", when the layout already has a parent", csPrintable(metaObject()->className()), csPrintable(objectName()));
+      qWarning("QGraphicsWidget::setLayout() Unable to set a layout on %s, current layout already has a parent",
+         csPrintable(metaObject()->className()));
       return;
    }
 
@@ -573,10 +583,13 @@ void QGraphicsWidget::setStyle(QStyle *style)
 QFont QGraphicsWidget::font() const
 {
    Q_D(const QGraphicsWidget);
-   QFont fnt = d->font;
+
+   QFont fnt = d->m_graphicsFont;
    fnt.resolve(fnt.resolve() | d->inheritedFontResolveMask);
+
    return fnt;
 }
+
 void QGraphicsWidget::setFont(const QFont &font)
 {
    Q_D(QGraphicsWidget);
@@ -590,8 +603,9 @@ void QGraphicsWidget::setFont(const QFont &font)
 QPalette QGraphicsWidget::palette() const
 {
    Q_D(const QGraphicsWidget);
-   return d->palette;
+   return d->m_graphicsPalette;
 }
+
 void QGraphicsWidget::setPalette(const QPalette &palette)
 {
    Q_D(QGraphicsWidget);
@@ -640,11 +654,9 @@ void QGraphicsWidget::updateGeometry()
          }
 
       } else {
-         /**
-          * If this is the topmost widget, post a LayoutRequest event to the widget.
-          * When the event is received, it will start flowing all the way down to the leaf
-          * widgets in one go. This will make a relayout flicker-free.
-          */
+         // If this is the topmost widget, post a LayoutRequest event to the widget.
+         // When the event is received, it will start flowing all the way down to the leaf
+         // widgets in one go. This will make a relayout flicker-free.
 
          if (QGraphicsLayout::instantInvalidatePropagation()) {
 
@@ -732,7 +744,6 @@ QVariant QGraphicsWidget::itemChange(GraphicsItemChange change, const QVariant &
    return QGraphicsItem::itemChange(change, value);
 }
 
-// internal
 QVariant QGraphicsWidget::propertyChange(const QString &propertyName, const QVariant &value)
 {
    (void) propertyName;
@@ -830,6 +841,7 @@ Qt::WindowFrameSection QGraphicsWidget::windowFrameSectionAt(const QPointF &pos)
 bool QGraphicsWidget::event(QEvent *event)
 {
    Q_D(QGraphicsWidget);
+
    // Forward the event to the layout first.
    if (d->layout) {
       d->layout->widgetEvent(event);
@@ -840,32 +852,40 @@ bool QGraphicsWidget::event(QEvent *event)
       case QEvent::GraphicsSceneMove:
          moveEvent(static_cast<QGraphicsSceneMoveEvent *>(event));
          break;
+
       case QEvent::GraphicsSceneResize:
          resizeEvent(static_cast<QGraphicsSceneResizeEvent *>(event));
          break;
+
       case QEvent::Show:
          showEvent(static_cast<QShowEvent *>(event));
          break;
+
       case QEvent::Hide:
          hideEvent(static_cast<QHideEvent *>(event));
          break;
+
       case QEvent::Polish:
          polishEvent();
          d->polished = true;
-         if (!d->font.isCopyOf(QApplication::font())) {
-            d->updateFont(d->font);
+
+         if (! d->m_graphicsFont.isCopyOf(QApplication::font())) {
+            d->updateFont(d->m_graphicsFont);
          }
          break;
+
       case QEvent::WindowActivate:
       case QEvent::WindowDeactivate:
          update();
          break;
+
       case QEvent::StyleAnimationUpdate:
          if (isVisible()) {
             event->accept();
             update();
          }
          break;
+
       // Taken from QWidget::event
       case QEvent::ActivationChange:
       case QEvent::EnabledChange:
@@ -981,29 +1001,37 @@ void QGraphicsWidget::focusInEvent(QFocusEvent *event)
 bool QGraphicsWidget::focusNextPrevChild(bool next)
 {
    Q_D(QGraphicsWidget);
+
    // Let the parent's focusNextPrevChild implementation decide what to do.
    QGraphicsWidget *parent = nullptr;
-   if (!isWindow() && (parent = parentWidget())) {
+
+   if (! isWindow() && (parent = parentWidget())) {
       return parent->focusNextPrevChild(next);
    }
-   if (!d->scene) {
+
+   if (! d->m_itemScene) {
       return false;
    }
-   if (d->scene->focusNextPrevChild(next)) {
+
+   if (d->m_itemScene->focusNextPrevChild(next)) {
       return true;
    }
+
    if (isWindow()) {
       setFocus(next ? Qt::TabFocusReason : Qt::BacktabFocusReason);
+
       if (hasFocus()) {
          return true;
       }
    }
+
    return false;
 }
 
 void QGraphicsWidget::focusOutEvent(QFocusEvent *event)
 {
    (void) event;
+
    if (focusPolicy() != Qt::NoFocus) {
       update();
    }
@@ -1083,6 +1111,7 @@ void QGraphicsWidget::setWindowFlags(Qt::WindowFlags flags)
    if (d->m_flags == flags) {
       return;
    }
+
    bool wasPopup = (d->m_flags & Qt::WindowType_Mask) == Qt::Popup;
 
    d->adjustWindowFlags(&flags);
@@ -1096,18 +1125,18 @@ void QGraphicsWidget::setWindowFlags(Qt::WindowFlags flags)
 
    bool isPopup = (d->m_flags & Qt::WindowType_Mask) == Qt::Popup;
 
-   if (d->scene && isVisible() && wasPopup != isPopup) {
+   if (d->m_itemScene && isVisible() && wasPopup != isPopup) {
       // Popup state changed; update implicit mouse grab.
       if (! isPopup) {
-         d->scene->d_func()->removePopup(this);
+         d->m_itemScene->d_func()->removePopup(this);
       } else {
-         d->scene->d_func()->addPopup(this);
+         d->m_itemScene->d_func()->addPopup(this);
       }
    }
 
-   if (d->scene && d->scene->d_func()->allItemsIgnoreHoverEvents && d->hasDecoration()) {
-      d->scene->d_func()->allItemsIgnoreHoverEvents = false;
-      d->scene->d_func()->enableMouseTrackingOnViews();
+   if (d->m_itemScene && d->m_itemScene->d_func()->allItemsIgnoreHoverEvents && d->hasDecoration()) {
+      d->m_itemScene->d_func()->allItemsIgnoreHoverEvents = false;
+      d->m_itemScene->d_func()->enableMouseTrackingOnViews();
    }
 }
 
@@ -1153,8 +1182,9 @@ void QGraphicsWidget::setFocusPolicy(Qt::FocusPolicy policy)
 QGraphicsWidget *QGraphicsWidget::focusWidget() const
 {
    Q_D(const QGraphicsWidget);
-   if (d->subFocusItem && d->subFocusItem->d_ptr->isWidget) {
-      return static_cast<QGraphicsWidget *>(d->subFocusItem);
+
+   if (d->m_subFocusItem && d->m_subFocusItem->d_ptr->isWidget) {
+      return static_cast<QGraphicsWidget *>(d->m_subFocusItem);
    }
 
    return nullptr;
@@ -1215,7 +1245,7 @@ void QGraphicsWidget::addActions(const QList<QAction *> &actions)
 void QGraphicsWidget::insertAction(QAction *before, QAction *action)
 {
    if (!action) {
-      qWarning("QWidget::insertAction: Attempt to insert null action");
+      qWarning("QWidget::insertAction() Unable to to insert an invalid action (nullptr)");
       return;
    }
 
@@ -1275,18 +1305,18 @@ QList<QAction *> QGraphicsWidget::actions() const
 void QGraphicsWidget::setTabOrder(QGraphicsWidget *first, QGraphicsWidget *second)
 {
    if (!first && !second) {
-      qWarning("QGraphicsWidget::setTabOrder(0, 0) is undefined");
+      qWarning("QGraphicsWidget::setTabOrder() Both widgets are invalid (nullptr)");
       return;
    }
+
    if ((first && second) && first->scene() != second->scene()) {
-      qWarning("QGraphicsWidget::setTabOrder: scenes %p and %p are different",
-         first->scene(), second->scene());
+      qWarning("QGraphicsWidget::setTabOrder() Items belong to different QGraphicsScene");
       return;
    }
+
    QGraphicsScene *scene = first ? first->scene() : second->scene();
    if (!scene && (!first || !second)) {
-      qWarning("QGraphicsWidget::setTabOrder: assigning tab order from/to the"
-         " scene requires the item to be in a scene.");
+      qWarning("QGraphicsWidget::setTabOrder() Assigning a tab order requires both items to be in a QGraphicsScene");
       return;
    }
 

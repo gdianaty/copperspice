@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,10 +27,11 @@
 #include <qcolor.h>
 #include <qbrush.h>
 
-class QVariant;
-class QPenPrivate;
 class QBrush;
 class QPen;
+class QVariant;
+
+class QPenPrivate;
 
 Q_GUI_EXPORT QDataStream &operator<<(QDataStream &stream, const QPen &pen);
 Q_GUI_EXPORT QDataStream &operator>>(QDataStream &stream, QPen &pen);
@@ -113,7 +114,7 @@ class Q_GUI_EXPORT QPen
 
    typedef QPenPrivate *DataPtr;
 
-   inline DataPtr &data_ptr() {
+   DataPtr &data_ptr() {
       return d;
    }
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,18 +21,15 @@
 *
 ***********************************************************************/
 
-#include <QDebug>
+#include <qdebug.h>
 
-#include "qaxisstep_p.h"
-#include "qcommonsequencetypes_p.h"
-#include "qcommonvalues_p.h"
-#include "qitemmappingiterator_p.h"
-#include "qsequencemappingiterator_p.h"
-#include "qpatternistlocale_p.h"
-
-#include "qapplytemplate_p.h"
-
-QT_BEGIN_NAMESPACE
+#include <qapplytemplate_p.h>
+#include <qaxisstep_p.h>
+#include <qcommonsequencetypes_p.h>
+#include <qcommonvalues_p.h>
+#include <qitemmappingiterator_p.h>
+#include <qpatternistlocale_p.h>
+#include <qsequencemappingiterator_p.h>
 
 using namespace QPatternist;
 
@@ -182,5 +179,3 @@ CallTargetDescription::Ptr ApplyTemplate::callTargetDescription() const
    Q_ASSERT_X(false, Q_FUNC_INFO, "This function should never be called.");
    return CallTargetDescription::Ptr();
 }
-
-QT_END_NAMESPACE

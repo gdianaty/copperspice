@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,9 +28,9 @@
 #ifndef QCOMMANDLINEPARSER_H
 #define QCOMMANDLINEPARSER_H
 
-#include <qstringlist.h>
-#include <qcoreapplication.h>
 #include <qcommandlineoption.h>
+#include <qcoreapplication.h>
+#include <qstringlist.h>
 
 class QCommandLineParserPrivate;
 class QCoreApplication;
@@ -40,6 +40,11 @@ class Q_CORE_EXPORT QCommandLineParser
    Q_DECLARE_TR_FUNCTIONS(QCommandLineParser)
 
  public:
+   enum SingleDashWordOptionMode {
+      ParseAsCompactedShortOptions,
+      ParseAsLongOptions
+   };
+
    QCommandLineParser();
 
    QCommandLineParser(const QCommandLineParser &) = delete;
@@ -47,10 +52,6 @@ class Q_CORE_EXPORT QCommandLineParser
 
    ~QCommandLineParser();
 
-   enum SingleDashWordOptionMode {
-      ParseAsCompactedShortOptions,
-      ParseAsLongOptions
-   };
    void setSingleDashWordOptionMode(SingleDashWordOptionMode parsingMode);
 
    bool addOption(const QCommandLineOption &option);
@@ -80,6 +81,7 @@ class Q_CORE_EXPORT QCommandLineParser
    QStringList optionNames() const;
    QStringList unknownOptionNames() const;
 
+   void showVersion();
    void showHelp(int exitCode = 0);
    QString helpText() const;
 

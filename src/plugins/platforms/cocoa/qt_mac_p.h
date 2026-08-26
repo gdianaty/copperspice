@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,17 +24,17 @@
 #ifndef QT_MAC_P_H
 #define QT_MAC_P_H
 
-#include <qmacdefines_mac.h>
 #include <qglobal.h>
-#include <qvariant.h>
+#include <qmacdefines_mac.h>
 #include <qmimedata.h>
-#include <qpointer.h>
 #include <qpainter.h>
+#include <qpointer.h>
+#include <qvariant.h>
 
 #include <qcore_mac_p.h>
 
-class QWidget;
 class QDragMoveEvent;
+class QWidget;
 
 #ifdef __OBJC__
 #include <Cocoa/Cocoa.h>

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,30 +25,29 @@
 
 #ifndef QT_NO_MESSAGEBOX
 
-#include <qdialogbuttonbox.h>
-#include <qlist.h>
-#include <qdebug.h>
-#include <qstyle.h>
-#include <qstyleoption.h>
-#include <qgridlayout.h>
-#include <qdesktopwidget.h>
-#include <qpushbutton.h>
-#include <qcheckbox.h>
-
 #include <qaccessible.h>
+#include <qapplication.h>
+#include <qcheckbox.h>
+#include <qclipboard.h>
+#include <qdebug.h>
+#include <qdesktopwidget.h>
+#include <qdialogbuttonbox.h>
 #include <qfont.h>
 #include <qfontmetrics.h>
-#include <qclipboard.h>
+#include <qgridlayout.h>
 #include <qicon.h>
-#include <qtextdocument.h>
-#include <qapplication.h>
-#include <qtextedit.h>
-#include <qtextbrowser.h>
+#include <qlist.h>
 #include <qmenu.h>
+#include <qpushbutton.h>
+#include <qstyle.h>
+#include <qstyleoption.h>
+#include <qtextbrowser.h>
+#include <qtextdocument.h>
+#include <qtextedit.h>
 
-#include <qlabel_p.h>
 #include <qapplication_p.h>
 #include <qdialog_p.h>
+#include <qlabel_p.h>
 
 #ifdef Q_OS_WIN
 #include <qt_windows.h>
@@ -66,12 +65,24 @@ HMENU qt_getWindowsSystemMenu(const QWidget *w)
 }
 #endif
 
-enum Button { Old_Ok = 1, Old_Cancel = 2, Old_Yes = 3, Old_No = 4, Old_Abort = 5, Old_Retry = 6,
-   Old_Ignore = 7, Old_YesAll = 8, Old_NoAll = 9, Old_ButtonMask = 0xFF,
-   NewButtonMask = 0xFFFFFC00
+enum Button {
+   Old_Ok         = 1,
+   Old_Cancel     = 2,
+   Old_Yes        = 3,
+   Old_No         = 4,
+   Old_Abort      = 5,
+   Old_Retry      = 6,
+   Old_Ignore     = 7,
+   Old_YesAll     = 8,
+   Old_NoAll      = 9,
+   Old_ButtonMask = 0xFF,
+   NewButtonMask  = 0xFFFFFC00
 };
 
-enum DetailButtonLabel { ShowLabel = 0, HideLabel = 1 };
+enum DetailButtonLabel {
+   ShowLabel = 0,
+   HideLabel = 1
+};
 
 void cs_require_version(int argc, char *argv[], const char *str)
 {
@@ -129,7 +140,8 @@ class QMessageBoxDetailsText : public QWidget
    };
 
    QMessageBoxDetailsText(QWidget *parent = nullptr)
-      : QWidget(parent), copyAvailable(false) {
+      : QWidget(parent), copyAvailable(false)
+   {
       QVBoxLayout *layout = new QVBoxLayout;
       layout->setMargin(0);
 
@@ -389,8 +401,8 @@ void QMessageBoxPrivate::setupLayout()
 
 int QMessageBoxPrivate::layoutMinimumWidth()
 {
-   layout->activate();
-   return layout->totalMinimumSize().width();
+   m_widgetLayout->activate();
+   return m_widgetLayout->totalMinimumSize().width();
 }
 
 void QMessageBoxPrivate::updateSize()
@@ -409,9 +421,6 @@ void QMessageBoxPrivate::updateSize()
    if (screenSize.width() <= 1024) {
       hardLimit = screenSize.width();
    }
-
-
-
 
 #ifdef Q_OS_DARWIN
    int softLimit = qMin(screenSize.width() / 2, 420);
@@ -471,9 +480,9 @@ void QMessageBoxPrivate::updateSize()
       width = windowTitleWidth;
    }
 
-   layout->activate();
-   int height = (layout->hasHeightForWidth()) ? layout->totalHeightForWidth(width)
-      : layout->totalMinimumSize().height();
+   m_widgetLayout->activate();
+   int height = (m_widgetLayout->hasHeightForWidth()) ? m_widgetLayout->totalHeightForWidth(width)
+      : m_widgetLayout->totalMinimumSize().height();
 
    q->setFixedSize(width, height);
    QCoreApplication::removePostedEvents(q, QEvent::LayoutRequest);
@@ -1244,7 +1253,7 @@ void QMessageBox::aboutCs(QWidget *parent, const QString &title)
 
    QLabel *msg2 = new QLabel;
    msg2->setText(tr("CopperSpice is a set of C++ libraries for developing cross platform applications <br>"
-                     "on X11, Windows, and Mac OS X\n"));
+                     "on Unix/Linux, Windows, and Mac OS X\n"));
 
    font = msg2->font();
    font.setPointSize(10);
@@ -1252,7 +1261,7 @@ void QMessageBox::aboutCs(QWidget *parent, const QString &title)
 
    QLabel *msg3 = new QLabel;
 
-   msg3->setText("Copyright (c) 2012-2023 Ansel Sermersheim & Barbara Geller\n"
+   msg3->setText("Copyright (c) 2012-2026 Ansel Sermersheim & Barbara Geller\n"
          "CopperSpice is released under the terms of the GNU LGPL version 2.1\n"
          "\n"
          "Copyright (c) 2015 The Qt Company Ltd\n"

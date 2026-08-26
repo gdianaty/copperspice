@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,22 +25,22 @@
 
 #include "qgenerateidfn_p.h"
 
-QT_BEGIN_NAMESPACE
-
 using namespace QPatternist;
 
 Item GenerateIDFN::evaluateSingleton(const DynamicContext::Ptr &context) const
 {
-   const QXmlNodeModelIndex &node = m_operands.first()->evaluateSingleton(context).asNode();
+   const auto &data = m_operands.first()->evaluateSingleton(context);
+
+   if (data.isNull()) {
+      return AtomicString::fromValue(QString());
+   }
+
+   const QXmlNodeModelIndex &node = data.asNode();
 
    if (node.isNull()) {
       return AtomicString::fromValue(QString());
    }
 
-   return AtomicString::fromValue(QLatin1Char('T')
-                                  + QString::number(qptrdiff(node.model()))
-                                  + QString::number(qptrdiff(node.internalPointer()))
-                                  + QString::number(node.additionalData()));
+   return AtomicString::fromValue('T' + QString::number(qptrdiff(node.model()))
+         + QString::number(qptrdiff(node.internalPointer())) + QString::number(node.additionalData()));
 }
-
-QT_END_NAMESPACE

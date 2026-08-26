@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -131,29 +131,30 @@ void PhraseBookBox::save()
       QMessageBox::warning(this, tr("Linguist"), tr("Unable to savephrase book '%1'.").formatArg(fileName));
 }
 
-void PhraseBookBox::sourceChanged(const QString &source)
+void PhraseBookBox::sourceChanged(const QString &newSource)
 {
    QModelIndex index = currentPhraseIndex();
+
    if (index.isValid()) {
-      phrMdl->setData(phrMdl->index(index.row(), 0), source);
+      phrMdl->setData(phrMdl->index(index.row(), 0), newSource);
    }
 }
 
-void PhraseBookBox::targetChanged(const QString &target)
+void PhraseBookBox::targetChanged(const QString &newTarget)
 {
    QModelIndex index = currentPhraseIndex();
 
    if (index.isValid()) {
-      phrMdl->setData(phrMdl->index(index.row(), 1), target);
+      phrMdl->setData(phrMdl->index(index.row(), 1), newTarget);
    }
 }
 
-void PhraseBookBox::definitionChanged(const QString &definition)
+void PhraseBookBox::definitionChanged(const QString &newDefinition)
 {
    QModelIndex index = currentPhraseIndex();
 
    if (index.isValid()) {
-      phrMdl->setData(phrMdl->index(index.row(), 2), definition);
+      phrMdl->setData(phrMdl->index(index.row(), 2), newDefinition);
    }
 }
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,21 +21,21 @@
 *
 ***********************************************************************/
 
-#include "qcocoaintegration.h"
+#include <qcocoaintegration.h>
 
-#include "qcocoawindow.h"
-#include "qcocoabackingstore.h"
-#include "qcocoanativeinterface.h"
-#include "qcocoamenuloader.h"
-#include "qcocoaeventdispatcher.h"
-#include "qcocoahelpers.h"
-#include "qcocoaapplication.h"
-#include "qcocoaapplicationdelegate.h"
-#include "qcocoafiledialoghelper.h"
-#include "qcocoatheme.h"
-#include "qcocoainputcontext.h"
-#include "qcocoamimetypes.h"
-#include "qcocoaaccessibility.h"
+#include <qcocoaaccessibility.h>
+#include <qcocoaapplication.h>
+#include <qcocoaapplicationdelegate.h>
+#include <qcocoabackingstore.h>
+#include <qcocoaeventdispatcher.h>
+#include <qcocoafiledialoghelper.h>
+#include <qcocoahelpers.h>
+#include <qcocoainputcontext.h>
+#include <qcocoamenuloader.h>
+#include <qcocoamimetypes.h>
+#include <qcocoanativeinterface.h>
+#include <qcocoatheme.h>
+#include <qcocoawindow.h>
 #include <qcoreapplication.h>
 #include <qplatform_accessibility.h>
 
@@ -237,23 +237,31 @@ QPixmap QCocoaScreen::grabWindow(WId window, int x, int y, int width, int height
       const CGRect bounds = CGDisplayBounds(displays[i]);
       int w = (width < 0 ? bounds.size.width : width) * devicePixelRatio();
       int h = (height < 0 ? bounds.size.height : height) * devicePixelRatio();
+
       QRect displayRect = QRect(x, y, w, h);
       displayRect = displayRect.translated(qRound(-bounds.origin.x), qRound(-bounds.origin.y));
 
+      QPixmap pix(w, h);
+      pix.fill(Qt::transparent);
+
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_VERSION_15
+      // display a rectangle of the correct size which is transparent
+
+#else
       QCFType<CGImageRef> image = CGDisplayCreateImageForRect(displays[i],
             CGRectMake(displayRect.x(), displayRect.y(), displayRect.width(), displayRect.height()));
 
-      QPixmap pix(w, h);
-      pix.fill(Qt::transparent);
       CGRect rect = CGRectMake(0, 0, w, h);
       CGContextRef ctx = qt_mac_cg_context(&pix);
 
       qt_mac_drawCGImage(ctx, &rect, image);
       CGContextRelease(ctx);
+#endif
 
       QPainter painter(&windowPixmap);
       painter.drawPixmap(0, 0, pix);
    }
+
    return windowPixmap;
 }
 

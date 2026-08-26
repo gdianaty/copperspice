@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,18 +24,17 @@
 #ifndef QTEXTCONTROL_P_P_H
 #define QTEXTCONTROL_P_P_H
 
-#include <qtextdocumentfragment.h>
-#include <qscrollbar.h>
-#include <qtextcursor.h>
-#include <qtextformat.h>
-#include <qmenu.h>
 #include <qabstracttextdocumentlayout.h>
 #include <qbasictimer.h>
+#include <qmenu.h>
 #include <qpointer.h>
+#include <qscrollbar.h>
+#include <qtextcursor.h>
+#include <qtextdocumentfragment.h>
+#include <qtextformat.h>
 
 class QMimeData;
 class QAbstractScrollArea;
-
 
 class QTextControlPrivate
 {
@@ -43,7 +42,9 @@ class QTextControlPrivate
 
  public:
    QTextControlPrivate();
-   virtual ~QTextControlPrivate() {}
+
+   virtual ~QTextControlPrivate()
+   { }
 
    bool cursorMoveKeyEvent(QKeyEvent *e);
 
@@ -67,7 +68,7 @@ class QTextControlPrivate
    void setCursorPosition(int pos, QTextCursor::MoveMode mode = QTextCursor::MoveAnchor);
 
    void repaintCursor();
-   inline void repaintSelection() {
+   void repaintSelection() {
       repaintOldAndNewSelection(QTextCursor());
    }
    void repaintOldAndNewSelection(const QTextCursor &oldSelection);
@@ -95,8 +96,9 @@ class QTextControlPrivate
    QRectF cursorRectPlusUnicodeDirectionMarkers(const QTextCursor &cursor) const;
    QRectF rectForPosition(int position) const;
    QRectF selectionRect(const QTextCursor &cursor) const;
-   inline QRectF selectionRect() const {
-      return selectionRect(this->cursor);
+
+   QRectF selectionRect() const {
+      return selectionRect(m_textControlCursor);
    }
 
    QString anchorForCursor(const QTextCursor &anchor) const;
@@ -143,7 +145,7 @@ class QTextControlPrivate
 
    QTextDocument *doc;
    bool cursorOn;
-   QTextCursor cursor;
+   QTextCursor m_textControlCursor;
    bool cursorIsFocusIndicator;
    QTextCharFormat lastCharFormat;
 

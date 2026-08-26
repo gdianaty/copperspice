@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,7 +25,7 @@
 #define COMUTILS_H
 
 #if ! defined(_WINDOWS_) && ! defined(_WINDOWS_H) && ! defined(__WINDOWS__)
-#error Must include windows.h first
+#error Must include windows.h before including this header
 #endif
 
 #include <qstring.h>

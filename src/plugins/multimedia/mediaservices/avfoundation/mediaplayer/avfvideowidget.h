@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -39,14 +39,14 @@ class AVFVideoWidget : public QWidget
    AVFVideoWidget(QWidget *parent);
    virtual ~AVFVideoWidget();
 
-   QSize sizeHint() const;
+   QSize sizeHint() const override;
    Qt::AspectRatioMode aspectRatioMode() const;
    void setAspectRatioMode(Qt::AspectRatioMode mode);
    void setPlayerLayer(AVPlayerLayer *layer);
 
  protected:
-   void resizeEvent(QResizeEvent *);
-   void paintEvent(QPaintEvent *);
+   void resizeEvent(QResizeEvent *) override;
+   void paintEvent(QPaintEvent *)  override;
 
  private:
    void updateAspectRatio();

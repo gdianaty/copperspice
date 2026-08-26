@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,12 +21,10 @@
 *
 ***********************************************************************/
 
-#include <QString>
+#include <qstring.h>
 
-#include "qbuiltintypes_p.h"
-#include "qsorttuple_p.h"
-
-QT_BEGIN_NAMESPACE
+#include <qbuiltintypes_p.h>
+#include <qsorttuple_p.h>
 
 using namespace QPatternist;
 
@@ -63,5 +61,3 @@ ItemType::Ptr SortTuple::type() const
 {
    return BuiltinTypes::xsAnyAtomicType;
 }
-
-QT_END_NAMESPACE

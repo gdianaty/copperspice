@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,18 +25,19 @@
 
 #ifndef QT_NO_GRAPHICSVIEW
 
-#include <qdebug.h>
-#include <qnumeric.h>
-#include <qgraphicslayout.h>
+#include <qgraphics_widget_p.h>
+
 #include <qapplication.h>
+#include <qdebug.h>
+#include <qgraphicslayout.h>
 #include <qgraphicsscene.h>
+#include <qgraphicsscenemouseevent.h>
+#include <qnumeric.h>
 #include <qstyleoption.h>
 #include <qstyleoptiontitlebar.h>
-#include <qgraphicsscenemouseevent.h>
 
 #include <qgraphics_layoutitem_p.h>
 #include <qgraphics_scene_p.h>
-#include <qgraphics_widget_p.h>
 
 void QGraphicsWidgetPrivate::init(QGraphicsItem *parentItem, Qt::WindowFlags flags)
 {
@@ -76,7 +77,6 @@ qreal QGraphicsWidgetPrivate::titleBarHeight(const QStyleOptionTitleBar &options
    return (qreal)height;
 }
 
-// internal
 QGraphicsWidgetPrivate::~QGraphicsWidgetPrivate()
 {
    // Remove any lazily allocated data
@@ -85,12 +85,7 @@ QGraphicsWidgetPrivate::~QGraphicsWidgetPrivate()
    delete windowData;
 }
 
-/*!
-    \internal
-
-     Ensures that margins is allocated.
-     This function must be called before any dereferencing.
-*/
+// must be called before any dereferencing
 void QGraphicsWidgetPrivate::ensureMargins() const
 {
    if (!margins) {
@@ -101,12 +96,7 @@ void QGraphicsWidgetPrivate::ensureMargins() const
    }
 }
 
-/*!
-    \internal
-
-     Ensures that windowFrameMargins is allocated.
-     This function must be called before any dereferencing.
-*/
+// must be called before any dereferencing
 void QGraphicsWidgetPrivate::ensureWindowFrameMargins() const
 {
    if (!windowFrameMargins) {
@@ -117,12 +107,7 @@ void QGraphicsWidgetPrivate::ensureWindowFrameMargins() const
    }
 }
 
-/*!
-    \internal
-
-     Ensures that windowData is allocated.
-     This function must be called before any dereferencing.
-*/
+// must be called before any dereferencing
 void QGraphicsWidgetPrivate::ensureWindowData()
 {
    if (!windowData) {
@@ -132,7 +117,7 @@ void QGraphicsWidgetPrivate::ensureWindowData()
 
 void QGraphicsWidgetPrivate::setPalette_helper(const QPalette &palette)
 {
-   if (this->palette == palette && this->palette.resolve() == palette.resolve()) {
+   if (m_graphicsPalette == palette && m_graphicsPalette.resolve() == palette.resolve()) {
       return;
    }
    updatePalette(palette);
@@ -142,15 +127,16 @@ void QGraphicsWidgetPrivate::resolvePalette(uint inheritedMask)
 {
    inheritedPaletteResolveMask = inheritedMask;
    QPalette naturalPalette = naturalWidgetPalette();
-   QPalette resolvedPalette = palette.resolve(naturalPalette);
+   QPalette resolvedPalette = m_graphicsPalette.resolve(naturalPalette);
    updatePalette(resolvedPalette);
 }
 
 void QGraphicsWidgetPrivate::updatePalette(const QPalette &palette)
 {
    Q_Q(QGraphicsWidget);
+
    // Update local palette setting.
-   this->palette = palette;
+   m_graphicsPalette = palette;
 
    // Calculate new mask.
    if (q->isWindow() && !q->testAttribute(Qt::WA_WindowPropagation)) {
@@ -187,6 +173,7 @@ void QGraphicsWidgetPrivate::setLayoutDirection_helper(Qt::LayoutDirection direc
    // Propagate this change to all children.
    for (int i = 0; i < children.size(); ++i) {
       QGraphicsItem *item = children.at(i);
+
       if (item->isWidget()) {
          QGraphicsWidget *widget = static_cast<QGraphicsWidget *>(item);
          if (widget->parentWidget() && !widget->testAttribute(Qt::WA_SetLayoutDirection)) {
@@ -203,15 +190,19 @@ void QGraphicsWidgetPrivate::setLayoutDirection_helper(Qt::LayoutDirection direc
 void QGraphicsWidgetPrivate::resolveLayoutDirection()
 {
    Q_Q(QGraphicsWidget);
+
    if (q->testAttribute(Qt::WA_SetLayoutDirection)) {
       return;
    }
+
    if (QGraphicsWidget *parentWidget = q->parentWidget()) {
       setLayoutDirection_helper(parentWidget->layoutDirection());
-   } else if (scene) {
+
+   } else if (m_itemScene) {
       // ### shouldn't the scene have a layoutdirection really? how does
       // ### QGraphicsWidget get changes from QApplication::layoutDirection?
       setLayoutDirection_helper(QApplication::layoutDirection());
+
    } else {
       setLayoutDirection_helper(QApplication::layoutDirection());
    }
@@ -221,40 +212,48 @@ QPalette QGraphicsWidgetPrivate::naturalWidgetPalette() const
 {
    Q_Q(const QGraphicsWidget);
    QPalette palette;
+
    if (QGraphicsWidget *parent = q->parentWidget()) {
       palette = parent->palette();
-   } else if (scene) {
-      palette = scene->palette();
+   } else if (m_itemScene) {
+      palette = m_itemScene->palette();
    }
+
    palette.resolve(0);
+
    return palette;
 }
 
 void QGraphicsWidgetPrivate::setFont_helper(const QFont &font)
 {
-   if (this->font == font && this->font.resolve() == font.resolve()) {
+   if (m_graphicsFont == font && m_graphicsFont.resolve() == font.resolve()) {
       return;
    }
+
    updateFont(font);
 }
 
 void QGraphicsWidgetPrivate::resolveFont(uint inheritedMask)
 {
    Q_Q(QGraphicsWidget);
+
    inheritedFontResolveMask = inheritedMask;
+
    if (QGraphicsWidget *p = q->parentWidget()) {
       inheritedFontResolveMask |= p->d_func()->inheritedFontResolveMask;
    }
-   QFont naturalFont = naturalWidgetFont();
-   QFont resolvedFont = font.resolve(naturalFont);
+
+   QFont naturalFont  = naturalWidgetFont();
+   QFont resolvedFont = m_graphicsFont.resolve(naturalFont);
    updateFont(resolvedFont);
 }
 
 void QGraphicsWidgetPrivate::updateFont(const QFont &font)
 {
    Q_Q(QGraphicsWidget);
+
    // Update the local font setting.
-   this->font = font;
+   m_graphicsFont = font;
 
    // Calculate new mask.
    if (q->isWindow() && !q->testAttribute(Qt::WA_WindowPropagation)) {
@@ -265,11 +264,14 @@ void QGraphicsWidgetPrivate::updateFont(const QFont &font)
    // Propagate to children.
    for (int i = 0; i < children.size(); ++i) {
       QGraphicsItem *item = children.at(i);
+
       if (item->isWidget()) {
          QGraphicsWidget *w = static_cast<QGraphicsWidget *>(item);
+
          if (!w->isWindow() || w->testAttribute(Qt::WA_WindowPropagation)) {
             w->d_func()->resolveFont(mask);
          }
+
       } else {
          item->d_ptr->resolveFont(mask);
       }
@@ -278,6 +280,7 @@ void QGraphicsWidgetPrivate::updateFont(const QFont &font)
    if (!polished) {
       return;
    }
+
    // Notify change.
    QEvent event(QEvent::FontChange);
    QApplication::sendEvent(q, &event);
@@ -286,12 +289,15 @@ void QGraphicsWidgetPrivate::updateFont(const QFont &font)
 QFont QGraphicsWidgetPrivate::naturalWidgetFont() const
 {
    Q_Q(const QGraphicsWidget);
+
    QFont naturalFont; // ### no application font support
+
    if (QGraphicsWidget *parent = q->parentWidget()) {
       naturalFont = parent->font();
-   } else if (scene) {
-      naturalFont = scene->font();
+   } else if (m_itemScene) {
+      naturalFont = m_itemScene->font();
    }
+
    naturalFont.resolve(0);
    return naturalFont;
 }
@@ -299,12 +305,15 @@ QFont QGraphicsWidgetPrivate::naturalWidgetFont() const
 void QGraphicsWidgetPrivate::initStyleOptionTitleBar(QStyleOptionTitleBar *option)
 {
    Q_Q(QGraphicsWidget);
+
    ensureWindowData();
    q->initStyleOption(option);
+
    option->rect.setHeight(titleBarHeight(*option));
    option->titleBarFlags = m_flags;
    option->subControls = QStyle::SC_TitleBarCloseButton | QStyle::SC_TitleBarLabel | QStyle::SC_TitleBarSysMenu;
    option->activeSubControls = windowData->hoveredSubControl;
+
    bool isActive = q->isActiveWindow();
 
    if (isActive) {
@@ -318,8 +327,7 @@ void QGraphicsWidgetPrivate::initStyleOptionTitleBar(QStyleOptionTitleBar *optio
 
    QFont windowTitleFont = QApplication::font("QMdiSubWindowTitleBar");
    QRect textRect = q->style()->subControlRect(QStyle::CC_TitleBar, option, QStyle::SC_TitleBarLabel, nullptr);
-   option->text = QFontMetrics(windowTitleFont).elidedText(
-         windowData->windowTitle, Qt::ElideRight, textRect.width());
+   option->text = QFontMetrics(windowTitleFont).elidedText(windowData->windowTitle, Qt::ElideRight, textRect.width());
 }
 
 void QGraphicsWidgetPrivate::adjustWindowFlags(Qt::WindowFlags *flags)
@@ -405,18 +413,8 @@ void QGraphicsWidgetPrivate::windowFrameMousePressEvent(QGraphicsSceneMouseEvent
    event->setAccepted(windowData->grabbedSection != Qt::NoSection);
 }
 
-/*!
-  Used to calculate the
-  Precondition:
-  \a widget should support either hfw or wfh
-
-  If \a heightForWidth is set to false, this function will query the width for height
-  instead. \a width will then be interpreted as height, \a minh and \a maxh will be interpreted
-  as minimum width and maximum width.
- */
 static qreal minimumHeightForWidth(qreal width, qreal minh, qreal maxh,
-   const QGraphicsWidget *widget,
-   bool heightForWidth = true)
+      const QGraphicsWidget *widget, bool heightForWidth = true)
 {
    qreal minimumHeightForWidth = -1;
    const bool hasHFW = QGraphicsLayoutItemPrivate::get(widget)->hasHeightForWidth();
@@ -781,22 +779,26 @@ void QGraphicsWidgetPrivate::fixFocusChainBeforeReparenting(QGraphicsWidget *new
       // chains. so reparenting a panel is easy; there's nothing to do.
       return;
    }
+
    // we're not a panel, so find the first widget in the focus chain
    // (this), and the last (this, or the last widget that is still
    // a descendent of this). also find the widgets that currently /
    // before reparenting point to this widgets' focus chain.
-   QGraphicsWidget *focusFirst = q;
+   QGraphicsWidget *focusFirst  = q;
    QGraphicsWidget *focusBefore = focusPrev;
-   QGraphicsWidget *focusLast = focusFirst;
-   QGraphicsWidget *focusAfter = focusNext;
+   QGraphicsWidget *focusLast   = focusFirst;
+   QGraphicsWidget *focusAfter   = focusNext;
+
    do {
       if (!q->isAncestorOf(focusAfter)) {
          break;
       }
+
       focusLast = focusAfter;
+
    } while ((focusAfter = focusAfter->d_func()->focusNext));
 
-   if (!parent && oldScene && oldScene != newScene && oldScene->d_func()->tabFocusFirst == q) {
+   if (! m_itemParent && oldScene && oldScene != newScene && oldScene->d_func()->tabFocusFirst == q) {
       // detach from old scene's top level focus chain.
       oldScene->d_func()->tabFocusFirst = (focusAfter != q) ? focusAfter : nullptr;
    }
@@ -894,14 +896,15 @@ void QGraphicsWidgetPrivate::setGeometryFromSetPos()
    if (inSetGeometry) {
       return;
    }
+
    Q_Q(QGraphicsWidget);
    inSetPos = 1;
 
    // Ensure setGeometry is called (avoid recursion when setPos is
    // called from within setGeometry).
 
-   q->setGeometry(QRectF(pos, q->size()));
-   inSetPos = 0 ;
+   q->setGeometry(QRectF(m_itemPos, q->size()));
+   inSetPos = 0;
 }
 
 #endif //QT_NO_GRAPHICSVIEW

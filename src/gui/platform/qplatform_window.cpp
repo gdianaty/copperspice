@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,15 +22,15 @@
 ***********************************************************************/
 
 #include <qplatform_window.h>
-
-#include <qguiapplication_p.h>
-#include <qplatform_screen.h>
-#include <qwindowsysteminterface.h>
-#include <qwindow.h>
-#include <qscreen.h>
-
-#include <qhighdpiscaling_p.h>
 #include <qplatform_window_p.h>
+
+#include <qplatform_screen.h>
+#include <qscreen.h>
+#include <qwindow.h>
+#include <qwindowsysteminterface.h>
+
+#include <qapplication_p.h>
+#include <qhighdpiscaling_p.h>
 #include <qwindow_p.h>
 
 QPlatformWindow::QPlatformWindow(QWindow *window)
@@ -168,7 +168,7 @@ WId QPlatformWindow::winId() const
 void QPlatformWindow::setParent(const QPlatformWindow *parent)
 {
    (void) parent;
-   qWarning("This plugin does not support setParent");
+   qWarning("QPlatformWindow::setParent() Plugin does not support this method");
 }
 
 void QPlatformWindow::setWindowTitle(const QString &title)
@@ -188,29 +188,29 @@ void QPlatformWindow::setWindowIcon(const QIcon &icon)
 
 void QPlatformWindow::raise()
 {
-   qWarning("This plugin does not support raise()");
+   qWarning("QPlatformWindow::raise() Plugin does not support this method");
 }
 
 void QPlatformWindow::lower()
 {
-   qWarning("This plugin does not support lower()");
+   qWarning("QPlatformWindow::lower() Plugin does not support this method");
 }
 
 void QPlatformWindow::propagateSizeHints()
 {
-   qWarning("This plugin does not support propagateSizeHints()");
+   qWarning("QPlatformWindow::propagateSizeHints() Plugin does not support this method");
 }
 
 void QPlatformWindow::setOpacity(qreal level)
 {
    (void) level;
-   qWarning("This plugin does not support setting window opacity");
+   qWarning("QPlatformWindow::setOpacity() Plugin does not support this method");
 }
 
 void QPlatformWindow::setMask(const QRegion &region)
 {
    (void) region;
-   qWarning("This plugin does not support setting window masks");
+   qWarning("QPlatformWindow::setMask() Plugin does not support this method");
 }
 
 void QPlatformWindow::requestActivateWindow()
@@ -232,7 +232,7 @@ bool QPlatformWindow::setKeyboardGrabEnabled(bool grab)
 {
    (void) grab;
 
-   qWarning("This plugin does not support grabbing the keyboard");
+   qWarning("QPlatformWindow::setKeyboardGrabEnabled() Plugin does not support this method");
    return false;
 }
 
@@ -240,7 +240,7 @@ bool QPlatformWindow::setMouseGrabEnabled(bool grab)
 {
    (void) grab;
 
-   qWarning("This plugin does not support grabbing the mouse");
+   qWarning("QPlatformWindow::setMouseGrabEnabled() Plugin does not support this method");
    return false;
 }
 

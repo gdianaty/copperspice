@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,13 +22,15 @@
 ***********************************************************************/
 
 #include <qwin_gdi_nativeinterface.h>
-#include <qwin_backingstore.h>
+
 #include <qbackingstore.h>
+#include <qwin_backingstore.h>
 
 void *QWindowsGdiNativeInterface::nativeResourceForBackingStore(const QByteArray &resource, QBackingStore *bs)
 {
    if (! bs || ! bs->handle()) {
-      qWarning("%s: '%s' requested for null backingstore or backingstore without handle.", __FUNCTION__, resource.constData());
+      qWarning("QWindowsGdiNativeInterface::nativeResourceForBackingStore() Requested resource %s "
+            "for null backingstore or backingstore without handle", resource.constData());
       return nullptr;
    }
 
@@ -38,7 +40,7 @@ void *QWindowsGdiNativeInterface::nativeResourceForBackingStore(const QByteArray
       return wbs->getDC();
    }
 
-   qWarning("%s: Invalid key '%s' requested.", __FUNCTION__, resource.constData());
+   qWarning("QWindowsGdiNativeInterface::nativeResourceForBackingStore() Invalid key %s requested", resource.constData());
 
    return nullptr;
 }

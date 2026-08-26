@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,26 +24,27 @@
 #ifndef QPLATFORM_DIALOGHELPER_H
 #define QPLATFORM_DIALOGHELPER_H
 
-#include <qglobal.h>
-#include <qfont.h>
+#include <qdir.h>
 #include <qfiledialog.h>
-#include <qobject.h>
+#include <qfont.h>
+#include <qglobal.h>
 #include <qlist.h>
+#include <qobject.h>
+#include <qrgb.h>
 #include <qshareddatapointer.h>
 #include <qsharedpointer.h>
 #include <qstring.h>
-#include <qdir.h>
 #include <qurl.h>
-#include <qrgb.h>
 
 class QColor;
-class QWindow;
-class QVariant;
 class QUrl;
+class QVariant;
+class QWindow;
+
 class QColorDialogOptionsPrivate;
 class QFontDialogOptionsPrivate;
-class QPlatformFileDialogOptionsPrivate;
 class QMessageDialogOptionsPrivate;
+class QPlatformFileDialogOptionsPrivate;
 
 class Q_GUI_EXPORT QPlatformDialogHelper : public QObject
 {
@@ -84,10 +85,10 @@ class Q_GUI_EXPORT QPlatformDialogHelper : public QObject
       Reset              = 0x04000000,
       RestoreDefaults    = 0x08000000,
 
-      FirstButton        = Ok,                // internal
-      LastButton         = RestoreDefaults,   // internal
-      LowestBit          = 10,                // internal: log2(FirstButton)
-      HighestBit         = 27                 // internal: log2(LastButton)
+      FirstButton        = Ok,
+      LastButton         = RestoreDefaults,
+      LowestBit          = 10,                // log2(FirstButton)
+      HighestBit         = 27                 // log2(LastButton)
    };
 
    using StandardButtons = QFlags<StandardButton>;

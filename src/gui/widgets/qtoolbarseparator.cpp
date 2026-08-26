@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,12 +25,10 @@
 
 #ifndef QT_NO_TOOLBAR
 
+#include <qpainter.h>
 #include <qstyle.h>
 #include <qstyleoption.h>
 #include <qtoolbar.h>
-#include <qpainter.h>
-
-
 
 void QToolBarSeparator::initStyleOption(QStyleOption *option) const
 {

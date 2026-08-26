@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,10 +23,11 @@
 
 template<bool IsForGlobal>
 EvaluationCache<IsForGlobal>::EvaluationCache(const Expression::Ptr &op,
-            const VariableDeclaration *varDecl, const VariableSlotID aSlot)
-   : SingleContainer(op), m_declarationUsedByMany(varDecl->usedByMany()), m_varSlot(aSlot)
+            const VariableDeclaration::Ptr &varDecl, const VariableSlotID aSlot)
+   : SingleContainer(op), m_declaration(varDecl), m_varSlot(aSlot)
 {
-   Q_ASSERT(m_varSlot > -1);
+    Q_ASSERT(m_declaration);
+    Q_ASSERT(m_varSlot > -1);
 }
 
 template<bool IsForGlobal>
@@ -76,9 +77,6 @@ Item::Iterator::Ptr EvaluationCache<IsForGlobal>::evaluateSequence(const Dynamic
 
    switch (cell.cacheState) {
       case ItemSequenceCacheCell::Full: {
-         /**
-          * We don't use makeListIterator() here because the MIPSPro compiler can't handle it.
-          */
          return Item::Iterator::Ptr(new ListIterator<Item, Item::List>(cell.cachedItems));
       }
 
@@ -154,7 +152,7 @@ Expression::Ptr EvaluationCache<IsForGlobal>::compress(const StaticContext::Ptr 
       return m_operand;
    }
 
-   if (m_declarationUsedByMany) {
+   if (m_declaration->usedByMany()) {
       /* If it's only an atomic value an EvaluationCache is overkill. However,
        * it's still needed for functions like fn:current-time() that must adhere to
        * query stability. */

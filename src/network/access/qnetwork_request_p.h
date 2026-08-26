@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,9 +25,10 @@
 #define QNETWORK_REQUEST_P_H
 
 #include <qnetwork_request.h>
+
 #include <qbytearray.h>
-#include <qlist.h>
 #include <qhash.h>
+#include <qlist.h>
 #include <qshareddata.h>
 #include <qsharedpointer.h>
 
@@ -35,10 +36,10 @@
 class QNetworkHeadersPrivate
 {
  public:
-   typedef QPair<QByteArray, QByteArray> RawHeaderPair;
-   typedef QList<RawHeaderPair> RawHeadersList;
-   typedef QHash<QNetworkRequest::KnownHeaders, QVariant> CookedHeadersMap;
-   typedef QHash<QNetworkRequest::Attribute, QVariant> AttributesMap;
+   using RawHeaderPair    = QPair<QByteArray, QByteArray>;
+   using RawHeadersList   = QList<RawHeaderPair>;
+   using CookedHeadersMap = QHash<QNetworkRequest::KnownHeaders, QVariant>;
+   using AttributesMap    = QHash<QNetworkRequest::Attribute, QVariant>;
 
    RawHeadersList rawHeaders;
    CookedHeadersMap cookedHeaders;

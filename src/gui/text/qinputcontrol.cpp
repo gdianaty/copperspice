@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,6 +22,7 @@
 ***********************************************************************/
 
 #include <qinputcontrol_p.h>
+
 #include <qevent.h>
 
 QInputControl::QInputControl(Type type, QObject *parent)
@@ -58,7 +59,7 @@ bool QInputControl::isAcceptableInput(const QKeyEvent *event) const
       return true;
    }
 
-   if (m_type == TextEdit && c == QLatin1Char('\t')) {
+   if (m_type == TextEdit && c == QChar('\t')) {
       return true;
    }
 

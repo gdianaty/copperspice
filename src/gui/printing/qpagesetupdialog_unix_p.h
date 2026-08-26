@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,19 +21,19 @@
 *
 ***********************************************************************/
 
-#ifndef QPAGESETUPDialog_Unix_P_H
-#define QPAGESETUPDialog_Unix_P_H
+#ifndef QPAGESETUPDIALOG_UNIX_P_H
+#define QPAGESETUPDIALOG_UNIX_P_H
 
 #include <qglobal.h>
 
 #ifndef QT_NO_PRINTDIALOG
 
-#include <qprinter.h>
 #include <qpagelayout.h>
+#include <qprinter.h>
 #include <ui_qpagesetupwidget.h>
 
-class QPrinter;
 class QPagePreview;
+class QPrinter;
 
 class QPageSetupWidget : public QWidget
 {

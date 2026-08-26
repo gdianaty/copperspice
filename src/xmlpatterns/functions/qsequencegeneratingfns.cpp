@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,9 +21,10 @@
 *
 ***********************************************************************/
 
-#include <QStack>
-#include <QStringList>
-#include <QFileInfo>
+#include <qstack.h>
+#include <qstringlist.h>
+#include <qfileinfo.h>
+
 #include "qanyuri_p.h"
 #include "qboolean_p.h"
 #include "qcommonsequencetypes_p.h"
@@ -34,8 +35,6 @@
 #include "qpatternistlocale_p.h"
 #include "qxmlutils_p.h"
 #include "qsequencegeneratingfns_p.h"
-
-QT_BEGIN_NAMESPACE
 
 using namespace QPatternist;
 
@@ -167,9 +166,6 @@ Item::Iterator::Ptr IdrefFN::evaluateSequence(const DynamicContext::Ptr &context
    return CommonValues::emptyIterator; /* TODO Haven't implemented further. */
 }
 
-/*!
- * Attemps to resolve scheme if URL does not have scheme defined.
- */
 static QUrl resolveScheme(const QUrl &url)
 {
    // On Windows and Symbian the drive letter is detected as the scheme.
@@ -260,5 +256,3 @@ Item::Iterator::Ptr CollectionFN::evaluateSequence(const DynamicContext::Ptr &co
       }
    }
 }
-
-QT_END_NAMESPACE

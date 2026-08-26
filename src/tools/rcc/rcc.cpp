@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,15 +25,14 @@
 
 #include <qalgorithms.h>
 #include <qbytearray.h>
-#include <qdatetime.h>
 #include <qdebug.h>
 #include <qdir.h>
 #include <qdiriterator.h>
 #include <qdomdocument.h>
 #include <qfile.h>
 #include <qiodevice.h>
-#include <qmultihash.h>
 #include <qlocale.h>
+#include <qmultihash.h>
 #include <qstack.h>
 
 #include <algorithm>
@@ -503,16 +502,16 @@ bool RCCResourceLibrary::interpretResourceFile(QIODevice *inputDevice, const QSt
 
                      while (it.hasNext()) {
                         it.next();
-                        QFileInfo child(it.fileInfo());
+                        QFileInfo childFile(it.fileInfo());
 
-                        if (child.fileName() != "." && child.fileName() != "..") {
+                        if (childFile.fileName() != "." && childFile.fileName() != "..") {
 
-                           const bool arc = addFile(alias + child.fileName(),
-                                 RCCFileInfo(child.fileName(), child, language, country,
+                           const bool arc = addFile(alias + childFile.fileName(),
+                                 RCCFileInfo(childFile.fileName(), childFile, language, country,
                                     RCCFileInfo::NoFlags, compressLevel, compressThreshold));
 
                            if (! arc) {
-                              m_failedResources.push_back(child.fileName());
+                              m_failedResources.push_back(childFile.fileName());
                            }
                         }
                      }

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,16 +21,15 @@
 *
 ***********************************************************************/
 
-#include <qlayout.h>
 #include <qlayoutengine_p.h>
+
+#include <qdebug.h>
+#include <qlayout.h>
+#include <qvarlengtharray.h>
 #include <qvector.h>
 #include <qwidget.h>
-#include <qvarlengtharray.h>
-#include <qdebug.h>
 
 #include <algorithm>
-
-//#define QLAYOUT_EXTRA_DEBUG
 
 typedef qint64 Fixed64;
 
@@ -63,7 +62,7 @@ void qGeomCalc(QVector<QLayoutStruct> &chain, int start, int count, int pos, int
 {
    int cHint = 0;
    int cMin  = 0;
-   int cMax  = 0;
+
    int sumStretch = 0;
    int sumSpacing = 0;
    int expandingCount = 0;
@@ -77,9 +76,10 @@ void qGeomCalc(QVector<QLayoutStruct> &chain, int start, int count, int pos, int
       QLayoutStruct *data = &chain[i];
 
       data->done = false;
+
       cHint += data->smartSizeHint();
       cMin  += data->minimumSize;
-      cMax  += data->maximumSize;
+
       sumStretch += data->stretch;
 
       if (! data->empty) {
@@ -361,27 +361,27 @@ void qGeomCalc(QVector<QLayoutStruct> &chain, int start, int count, int pos, int
       }
    }
 
-#ifdef QLAYOUT_EXTRA_DEBUG
-   qDebug() << "qGeomCalc" << "start" << start <<  "count" << count <<  "pos" << pos
-      <<  "space" << space <<  "spacer" << spacer;
+#if defined(CS_SHOW_DEBUG_GUI)
+   qDebug() << "qGeomCalc()" << "start =" << start << " count =" << count << " pos =" << pos
+      <<  " space =" << space << " spacer =" << spacer;
+
    for (i = start; i < start + count; ++i) {
-      qDebug() << i << ':' << chain[i].minimumSize << chain[i].smartSizeHint()
-         << chain[i].maximumSize << "stretch" << chain[i].stretch
-         << "empty" << chain[i].empty << "expansive" << chain[i].expansive
-         << "spacing" << chain[i].spacing;
-      qDebug() << "result pos" << chain[i].pos << "size" << chain[i].size;
+      qDebug() << "   " << i << ':' << chain[i].minimumSize << chain[i].smartSizeHint()
+         << chain[i].maximumSize << " stretch =" << chain[i].stretch
+         << " empty =" << chain[i].empty << " expansive =" << chain[i].expansive
+         << " spacing =" << chain[i].spacing << " Result: pos ="
+         << chain[i].pos << "size =" << chain[i].size;
    }
 #endif
 }
 
 Q_GUI_EXPORT QSize qSmartMinSize(const QSize &sizeHint, const QSize &minSizeHint,
-   const QSize &minSize, const QSize &maxSize,
-   const QSizePolicy &sizePolicy)
+   const QSize &minSize, const QSize &maxSize, const QSizePolicy &sizePolicy)
 {
    QSize s(0, 0);
 
    if (sizePolicy.horizontalPolicy() != QSizePolicy::Ignored) {
-      if (sizePolicy.horizontalPolicy() & QSizePolicy::ShrinkFlag) {
+      if (cs_enum_cast(sizePolicy.horizontalPolicy()) & cs_enum_cast(QSizePolicy::ShrinkFlag)) {
          s.setWidth(minSizeHint.width());
       } else {
          s.setWidth(qMax(sizeHint.width(), minSizeHint.width()));
@@ -389,7 +389,7 @@ Q_GUI_EXPORT QSize qSmartMinSize(const QSize &sizeHint, const QSize &minSizeHint
    }
 
    if (sizePolicy.verticalPolicy() != QSizePolicy::Ignored) {
-      if (sizePolicy.verticalPolicy() & QSizePolicy::ShrinkFlag) {
+      if (cs_enum_cast(sizePolicy.verticalPolicy()) & cs_enum_cast(QSizePolicy::ShrinkFlag)) {
          s.setHeight(minSizeHint.height());
       } else {
          s.setHeight(qMax(sizeHint.height(), minSizeHint.height()));
@@ -433,12 +433,12 @@ Q_GUI_EXPORT QSize qSmartMaxSize(const QSize &sizeHint,
    QSize s = maxSize;
    QSize hint = sizeHint.expandedTo(minSize);
    if (s.width() == QWIDGETSIZE_MAX && !(align & Qt::AlignHorizontal_Mask))
-      if (!(sizePolicy.horizontalPolicy() & QSizePolicy::GrowFlag)) {
+      if (! (cs_enum_cast(sizePolicy.horizontalPolicy()) & cs_enum_cast(QSizePolicy::GrowFlag))) {
          s.setWidth(hint.width());
       }
 
    if (s.height() == QWIDGETSIZE_MAX && !(align & Qt::AlignVertical_Mask))
-      if (!(sizePolicy.verticalPolicy() & QSizePolicy::GrowFlag)) {
+      if (! (cs_enum_cast(sizePolicy.verticalPolicy()) & cs_enum_cast(QSizePolicy::GrowFlag))) {
          s.setHeight(hint.height());
       }
 

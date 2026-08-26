@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,11 +26,11 @@
 
 #include <qgraphicsitem.h>
 
-#include <qvideowidget.h>
 #include <qmediabindableinterface.h>
+#include <qvideowidget.h>
 
-class QVideoSurfaceFormat;
 class QGraphicsVideoItemPrivate;
+class QVideoSurfaceFormat;
 
 class Q_MULTIMEDIA_EXPORT QGraphicsVideoItem : public QGraphicsObject, public QMediaBindableInterface
 {

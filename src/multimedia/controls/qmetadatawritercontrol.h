@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,12 +24,11 @@
 #ifndef QMETADATAWRITERCONTROL_H
 #define QMETADATAWRITERCONTROL_H
 
-#include <qstring.h>
-
 #include <qmediacontrol.h>
 #include <qmediaobject.h>
 #include <qmediaresource.h>
 #include <qmultimedia.h>
+#include <qstring.h>
 
 class Q_MULTIMEDIA_EXPORT QMetaDataWriterControl : public QMediaControl
 {

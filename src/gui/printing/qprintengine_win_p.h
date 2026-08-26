@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,18 +28,19 @@
 
 #ifndef QT_NO_PRINTER
 
-#include <qpaintengine.h>
 #include <qpagelayout.h>
-#include <qprinter.h>
+#include <qpaintengine.h>
 #include <qprintengine.h>
+#include <qprinter.h>
 #include <qt_windows.h>
 
 #include <qpaintengine_alpha_p.h>
 #include <qprintdevice_p.h>
 
-class QWin32PrintEnginePrivate;
-class QPrinterPrivate;
 class QPainterState;
+
+class QPrinterPrivate;
+class QWin32PrintEnginePrivate;
 
 class Q_GUI_EXPORT QWin32PrintEngine : public QAlphaPaintEngine, public QPrintEngine
 {
@@ -95,7 +96,7 @@ class QWin32PrintEnginePrivate : public QAlphaPaintEnginePrivate
 
  public:
    QWin32PrintEnginePrivate()
-      : hPrinter(nullptr), globalDevMode(nullptr), devMode(nullptr), pInfo(nullptr), hMem(nullptr), hdc(nullptr),
+      : hPrinter(nullptr), globalDevMode(nullptr), devMode(nullptr), pInfo(nullptr), hMem(nullptr), m_hdc(nullptr),
         ownsDevMode(false), mode(QPrinter::ScreenResolution), state(QPrinter::Idle),
         resolution(0), m_pageLayout(QPageLayout(QPageSize(QPageSize::A4),
         QPageLayout::Portrait, QMarginsF(0, 0, 0, 0))),
@@ -140,7 +141,6 @@ class QWin32PrintEnginePrivate : public QAlphaPaintEnginePrivate
    void updatePageLayout();
 
    void updateMetrics();
-   void debugMetrics() const;
 
    // Windows GDI printer references.
    HANDLE hPrinter;
@@ -150,7 +150,7 @@ class QWin32PrintEnginePrivate : public QAlphaPaintEnginePrivate
    PRINTER_INFO_2 *pInfo;
    HGLOBAL hMem;
 
-   HDC hdc;
+   HDC m_hdc;
 
    // True if devMode was allocated separately from pInfo.
    bool ownsDevMode;
@@ -196,7 +196,7 @@ class QWin32PrintEnginePrivate : public QAlphaPaintEnginePrivate
    uint txop;
 
    QColor brush_color;
-   QPen pen;
+   QPen m_pen;
    QColor pen_color;
    QSizeF paper_size;
 

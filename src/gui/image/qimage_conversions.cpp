@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,11 +22,12 @@
 ***********************************************************************/
 
 #include <qendian.h>
+#include <qscopedarraypointer.h>
 
-#include <qdrawhelper_p.h>
 #include <qapplication_p.h>
-#include <qsimd_p.h>
+#include <qdrawhelper_p.h>
 #include <qimage_p.h>
+#include <qsimd_p.h>
 
 // table to flip bits
 static const uchar bitflip[256] = {
@@ -85,10 +86,6 @@ void qGamma_correct_back_to_linear_cs(QImage *image)
       }
    }
 }
-
-/*****************************************************************************
-  Internal routines for converting image depth.
- *****************************************************************************/
 
 // The drawhelper conversions from/to RGB32 are passthroughs which is not always correct for general image conversion.
 static const uint *convertRGB32FromARGB32PM(uint *buffer, const uint *src, int count,
@@ -1181,11 +1178,17 @@ void dither_to_Mono(QImageData *dst, const QImageData *src, Qt::ImageConversionF
    Q_ASSERT(src->height == dst->height);
    Q_ASSERT(dst->format == QImage::Format_Mono || dst->format == QImage::Format_MonoLSB);
 
+   enum DitherType {
+      Threshold,
+      Ordered,
+      Diffuse
+   };
+
+   DitherType dithermode;
+
    dst->colortable.clear();
    dst->colortable.append(0xffffffff);
    dst->colortable.append(0xff000000);
-
-   enum { Threshold, Ordered, Diffuse } dithermode;
 
    if (fromalpha) {
       if ((flags & Qt::AlphaDither_Mask) == Qt::DiffuseAlphaDither) {
@@ -1195,6 +1198,7 @@ void dither_to_Mono(QImageData *dst, const QImageData *src, Qt::ImageConversionF
       } else {
          dithermode = Threshold;
       }
+
    } else {
       if ((flags & Qt::Dither_Mask) == Qt::ThresholdDither) {
          dithermode = Threshold;
@@ -1205,11 +1209,13 @@ void dither_to_Mono(QImageData *dst, const QImageData *src, Qt::ImageConversionF
       }
    }
 
-   int          w = src->width;
-   int          h = src->height;
-   int          d = src->depth;
+   int w = src->width;
+   int h = src->height;
+   int d = src->depth;
+
    uchar gray[256];                                // gray map for 8 bit images
    bool  use_gray = (d == 8);
+
    if (use_gray) {                                // make gray map
       if (fromalpha) {
          // Alpha 0x00 -> 0 pixels (white)
@@ -1217,6 +1223,7 @@ void dither_to_Mono(QImageData *dst, const QImageData *src, Qt::ImageConversionF
          for (int i = 0; i < src->colortable.size(); i++) {
             gray[i] = (255 - (src->colortable.at(i) >> 24));
          }
+
       } else {
          // Pixel 0x00 -> 1 pixels (black)
          // Pixel 0xFF -> 0 pixels (white)
@@ -1228,31 +1235,39 @@ void dither_to_Mono(QImageData *dst, const QImageData *src, Qt::ImageConversionF
 
    uchar *dst_data = dst->data;
    int dst_bpl = dst->bytes_per_line;
+
    const uchar *src_data = src->data;
    int src_bpl = src->bytes_per_line;
 
    switch (dithermode) {
       case Diffuse: {
          QScopedArrayPointer<int> lineBuffer(new int[w * 2]);
+
          int *line1 = lineBuffer.data();
          int *line2 = lineBuffer.data() + w;
          int bmwidth = (w + 7) / 8;
 
-         int *b1, *b2;
+         int *b1;
+         int *b2;
          int wbytes = w * (d / 8);
-         const uchar *p = src->data;
+
+         const uchar *p   = src->data;
          const uchar *end = p + wbytes;
+
          b2 = line2;
+
          if (use_gray) {                        // 8 bit image
             while (p < end) {
                *b2++ = gray[*p++];
             }
+
          } else {                                // 32 bit image
             if (fromalpha) {
                while (p < end) {
                   *b2++ = 255 - (*(const uint *)p >> 24);
                   p += 4;
                }
+
             } else {
                while (p < end) {
                   *b2++ = qGray(*(const uint *)p);
@@ -1260,25 +1275,31 @@ void dither_to_Mono(QImageData *dst, const QImageData *src, Qt::ImageConversionF
                }
             }
          }
-         for (int y = 0; y < h; y++) {                    // for each scan line...
+
+         for (int y = 0; y < h; y++) {                    // for each scan line
             int *tmp = line1;
             line1 = line2;
             line2 = tmp;
+
             bool not_last_line = y < h - 1;
-            if (not_last_line) {                // calc. grayvals for next line
-               p = src->data + (y + 1) * src->bytes_per_line;
+
+            if (not_last_line) {                          // calc. grayvals for next line
+               p   = src->data + (y + 1) * src->bytes_per_line;
                end = p + wbytes;
-               b2 = line2;
-               if (use_gray) {                // 8 bit image
+               b2  = line2;
+
+               if (use_gray) {                            // 8 bit image
                   while (p < end) {
                      *b2++ = gray[*p++];
                   }
-               } else {                        // 24 bit image
+
+               } else {                                   // 24 bit image
                   if (fromalpha) {
                      while (p < end) {
                         *b2++ = 255 - (*(const uint *)p >> 24);
                         p += 4;
                      }
+
                   } else {
                      while (p < end) {
                         *b2++ = qGray(*(const uint *)p);
@@ -1289,44 +1310,56 @@ void dither_to_Mono(QImageData *dst, const QImageData *src, Qt::ImageConversionF
             }
 
             int err;
-            uchar *p = dst->data + y * dst->bytes_per_line;
-            memset(p, 0, bmwidth);
+            uchar *ptrLine = dst->data + y * dst->bytes_per_line;
+
+            memset(ptrLine, 0, bmwidth);
             b1 = line1;
             b2 = line2;
+
             int bit = 7;
+
             for (int x = 1; x <= w; x++) {
-               if (*b1 < 128) {                // black pixel
+               if (*b1 < 128) {                  // black pixel
                   err = *b1++;
-                  *p |= 1 << bit;
-               } else {                        // white pixel
+                  *ptrLine |= 1 << bit;
+
+               } else {                          // white pixel
                   err = *b1++ - 255;
                }
+
                if (bit == 0) {
-                  p++;
+                  ++ptrLine;
                   bit = 7;
+
                } else {
-                  bit--;
+                  --bit;
                }
+
                if (x < w) {
-                  *b1 += (err * 7) >> 4;   // spread error to right pixel
+                  *b1 += (err * 7) >> 4;         // spread error to right pixel
                }
+
                if (not_last_line) {
-                  b2[0] += (err * 5) >> 4;    // pixel below
+                  b2[0] += (err * 5) >> 4;       // pixel below
+
                   if (x > 1) {
                      b2[-1] += (err * 3) >> 4;   // pixel below left
                   }
+
                   if (x < w) {
-                     b2[1] += err >> 4;   // pixel below right
+                     b2[1] += err >> 4;          // pixel below right
                   }
                }
+
                b2++;
             }
          }
       }
       break;
-      case Ordered: {
 
+      case Ordered: {
          memset(dst->data, 0, dst->nbytes);
+
          if (d == 32) {
             for (int i = 0; i < h; i++) {
                const uint *p = (const uint *)src_data;
@@ -1362,13 +1395,16 @@ void dither_to_Mono(QImageData *dst, const QImageData *src, Qt::ImageConversionF
                dst_data += dst_bpl;
                src_data += src_bpl;
             }
+
          } else if (d == 8) {
             for (int i = 0; i < h; i++) {
                const uchar *p = src_data;
                const uchar *end = p + w;
+
                uchar *m = dst_data;
                int bit = 7;
-               int j = 0;
+               int j   = 0;
+
                while (p < end) {
                   if ((uint)gray[*p++] < qt_bayer_matrix[j++ & 15][i & 15]) {
                      *m |= 1 << bit;
@@ -1473,17 +1509,19 @@ static void convert_ARGB_PM_to_Mono(QImageData *dst, const QImageData *src, Qt::
    dither_to_Mono(dst, tmp.data(), flags, false);
 }
 
-//
 // convert_32_to_8:  Converts a 32 bits depth (true color) to an 8 bit
 // image with a colormap. If the 32 bit image has more than 256 colors,
 // we convert the red,green and blue bytes into a single byte encoded
 // as 6 shades of each of red, green and blue.
 //
 // if dithering is needed, only 1 color at most is available for alpha.
-//
+
 struct QRgbMap {
-   inline QRgbMap() : used(0) { }
-   uchar  pix;
+   QRgbMap()
+      : used(0)
+   { }
+
+   uchar m_pix;
    uchar used;
    QRgb  rgb;
 };
@@ -1495,23 +1533,27 @@ static void convert_RGB_to_Indexed8(QImageData *dst, const QImageData *src, Qt::
    Q_ASSERT(src->width == dst->width);
    Q_ASSERT(src->height == dst->height);
 
-   bool    do_quant = (flags & Qt::DitherMode_Mask) == Qt::PreferDither
-      || src->format == QImage::Format_ARGB32;
+   bool do_quant = (flags & Qt::DitherMode_Mask) == Qt::PreferDither
+         || src->format == QImage::Format_ARGB32;
+
    uint alpha_mask = src->format == QImage::Format_RGB32 ? 0xff000000 : 0;
 
    const int tablesize = 997; // prime
    QRgbMap table[tablesize];
-   int   pix = 0;
+   int pix = 0;
 
    if (!dst->colortable.isEmpty()) {
       QVector<QRgb> ctbl = dst->colortable;
       dst->colortable.resize(256);
+
       // Preload palette into table.
       // Almost same code as pixel insertion below
+
       for (int i = 0; i < dst->colortable.size(); ++i) {
          // Find in table...
          QRgb p = ctbl.at(i) | alpha_mask;
          int hash = p % tablesize;
+
          for (;;) {
             if (table[hash].used) {
                if (table[hash].rgb == p) {
@@ -1523,14 +1565,17 @@ static void convert_RGB_to_Indexed8(QImageData *dst, const QImageData *src, Qt::
                      hash = 0;
                   }
                }
+
             } else {
                // Cannot be in table
                Q_ASSERT (pix != 256);        // too many colors
+
                // Insert into table at this unused position
                dst->colortable[pix] = p;
-               table[hash].pix = pix++;
-               table[hash].rgb = p;
-               table[hash].used = 1;
+               table[hash].m_pix = pix++;
+               table[hash].rgb   = p;
+               table[hash].used  = 1;
+
                break;
             }
          }
@@ -1541,23 +1586,28 @@ static void convert_RGB_to_Indexed8(QImageData *dst, const QImageData *src, Qt::
       dst->colortable.resize(256);
       const uchar *src_data = src->data;
       uchar *dest_data = dst->data;
+
       for (int y = 0; y < src->height; y++) {        // check if <= 256 colors
          const QRgb *s = (const QRgb *)src_data;
          uchar *b = dest_data;
+
          for (int x = 0; x < src->width; ++x) {
             QRgb p = s[x] | alpha_mask;
             int hash = p % tablesize;
+
             for (;;) {
                if (table[hash].used) {
                   if (table[hash].rgb == (p)) {
                      // Found previous insertion - use it
                      break;
+
                   } else {
                      // Keep searching...
                      if (++hash == tablesize) {
                         hash = 0;
                      }
                   }
+
                } else {
                   // Cannot be in table
                   if (pix == 256) {        // too many colors
@@ -1565,22 +1615,26 @@ static void convert_RGB_to_Indexed8(QImageData *dst, const QImageData *src, Qt::
                      // Break right out
                      x = src->width;
                      y = src->height;
+
                   } else {
                      // Insert into table at this unused position
                      dst->colortable[pix] = p;
-                     table[hash].pix = pix++;
-                     table[hash].rgb = p;
-                     table[hash].used = 1;
+                     table[hash].m_pix = pix++;
+                     table[hash].rgb   = p;
+                     table[hash].used  = 1;
                   }
                   break;
                }
             }
-            *b++ = table[hash].pix;                // May occur once incorrectly
+
+            *b++ = table[hash].m_pix;                // May occur once incorrectly
          }
+
          src_data += src->bytes_per_line;
          dest_data += dst->bytes_per_line;
       }
    }
+
    int numColors = do_quant ? 256 : pix;
 
    dst->colortable.resize(numColors);
@@ -1653,54 +1707,66 @@ static void convert_RGB_to_Indexed8(QImageData *dst, const QImageData *src, Qt::
                      l2[i] = q2[i * 4 + chan + endian];
                   }
                }
+
                // Bi-directional error diffusion
                if (y & 1) {
                   for (int x = 0; x < src->width; x++) {
-                     int pix = qMax(qMin(5, (l1[x] * 5 + 128) / 255), 0);
-                     int err = l1[x] - pix * 255 / 5;
-                     pv[chan][x] = pix;
+                     int pix_A = qMax(qMin(5, (l1[x] * 5 + 128) / 255), 0);
+                     int err   = l1[x] - pix_A * 255 / 5;
+                     pv[chan][x] = pix_A;
 
-                     // Spread the error around...
+                     // Spread the error around
                      if (x + 1 < src->width) {
                         l1[x + 1] += (err * 7) >> 4;
                         l2[x + 1] += err >> 4;
                      }
+
                      l2[x] += (err * 5) >> 4;
+
                      if (x > 1) {
                         l2[x - 1] += (err * 3) >> 4;
                      }
                   }
+
                } else {
                   for (int x = src->width; x-- > 0;) {
-                     int pix = qMax(qMin(5, (l1[x] * 5 + 128) / 255), 0);
-                     int err = l1[x] - pix * 255 / 5;
-                     pv[chan][x] = pix;
+                     int pix_B = qMax(qMin(5, (l1[x] * 5 + 128) / 255), 0);
+                     int err   = l1[x] - pix_B * 255 / 5;
+                     pv[chan][x] = pix_B;
 
-                     // Spread the error around...
+                     // Spread the error around
                      if (x > 0) {
                         l1[x - 1] += (err * 7) >> 4;
                         l2[x - 1] += err >> 4;
                      }
+
                      l2[x] += (err * 5) >> 4;
+
                      if (x + 1 < src->width) {
                         l2[x + 1] += (err * 3) >> 4;
                      }
                   }
                }
             }
+
             if (endian) {
                for (int x = 0; x < src->width; x++) {
                   *b++ = INDEXOF(pv[0][x], pv[1][x], pv[2][x]);
                }
+
             } else {
                for (int x = 0; x < src->width; x++) {
                   *b++ = INDEXOF(pv[2][x], pv[1][x], pv[0][x]);
                }
             }
+
             src_data += src->bytes_per_line;
             dest_data += dst->bytes_per_line;
          }
-      } else { // OrderedDither
+
+      } else {
+         // OrderedDither
+
          for (int y = 0; y < src->height; y++) {
             const QRgb *p = (const QRgb *)src_data;
             const QRgb *end = p + src->width;

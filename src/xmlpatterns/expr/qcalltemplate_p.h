@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,9 +28,8 @@
 #include <qtemplateinvoker_p.h>
 #include <qtemplate_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class CallTemplate : public TemplateInvoker
 {
  public:
@@ -47,17 +46,7 @@ class CallTemplate : public TemplateInvoker
    Properties properties() const override;
    Properties dependencies() const override;
 
-   /**
-    * This is a bit complicated by that we have two required types, one
-    * specified by @c xsl:param in the template declaration, and one on @c
-    * xsl:with-param.
-    *
-    * @see UserFunctionCallsite::expectedOperandTypes()
-    * @see <a href="http://www.w3.org/TR/xslt20/#with-param">XSL
-    * Transformations (XSLT) Version 2.0, 10.1.1 Passing Parameters to Templates</a>
-    */
    Expression::Ptr typeCheck(const StaticContext::Ptr &context, const SequenceType::Ptr &reqType) override;
-
 
    void setTemplate(const Template::Ptr &templ) {
       m_template = templ;
@@ -70,8 +59,7 @@ class CallTemplate : public TemplateInvoker
  private:
    Template::Ptr   m_template;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

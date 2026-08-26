@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,13 +28,12 @@
 
 #ifndef QT_NO_FILESYSTEMWATCHER
 
-#include <qt_windows.h>
-
 #include <qdatetime.h>
 #include <qfile.h>
 #include <qfileinfo.h>
 #include <qhash.h>
 #include <qmutex.h>
+#include <qt_windows.h>
 #include <qvector.h>
 
 class QWindowsFileSystemWatcherEngineThread;
@@ -78,7 +77,8 @@ class QWindowsFileSystemWatcherEngine : public QFileSystemWatcherEngine
       // fileinfo bits
       uint ownerId;
       uint groupId;
-      QFile::Permissions permissions;
+
+      QFileDevice::Permissions permissions;
       QDateTime lastModified;
 
       PathInfo &operator=(const QFileInfo &fileInfo) {
@@ -90,10 +90,8 @@ class QWindowsFileSystemWatcherEngine : public QFileSystemWatcherEngine
       }
 
       bool operator!=(const QFileInfo &fileInfo) const {
-         return (ownerId != fileInfo.ownerId()
-                 || groupId != fileInfo.groupId()
-                 || permissions != fileInfo.permissions()
-                 || lastModified != fileInfo.lastModified());
+         return (ownerId != fileInfo.ownerId() || groupId != fileInfo.groupId()
+               || permissions != fileInfo.permissions() || lastModified != fileInfo.lastModified());
       }
    };
 
@@ -119,7 +117,7 @@ class QWindowsFileSystemWatcherEngineThread : public QThread
 
    QHash<QString, QWindowsFileSystemWatcherEngine::Handle> handleForDir;
 
-   QHash<HANDLE, QHash<QString, QWindowsFileSystemWatcherEngine::PathInfo> > pathInfoForHandle;
+   QHash<HANDLE, QHash<QString, QWindowsFileSystemWatcherEngine::PathInfo>> pathInfoForHandle;
 
    CORE_CS_SIGNAL_1(Public, void fileChanged(const QString &path, bool removed))
    CORE_CS_SIGNAL_2(fileChanged, path, removed)

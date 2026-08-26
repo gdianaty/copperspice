@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,13 +24,14 @@
 #ifndef QSCROLLBAR_H
 #define QSCROLLBAR_H
 
-#include <qwidget.h>
 #include <qabstractslider.h>
+#include <qwidget.h>
 
 #ifndef QT_NO_SCROLLBAR
 
-class QScrollBarPrivate;
 class QStyleOptionSlider;
+
+class QScrollBarPrivate;
 
 class Q_GUI_EXPORT QScrollBar : public QAbstractSlider
 {

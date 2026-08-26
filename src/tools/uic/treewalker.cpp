@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,6 +22,7 @@
 ***********************************************************************/
 
 #include <treewalker.h>
+
 #include <ui4.h>
 
 void TreeWalker::acceptUI(DomUI *ui)
@@ -118,14 +119,11 @@ void TreeWalker::acceptWidget(DomWidget *widget)
    if (! widget->elementLayout().isEmpty()) {
       acceptLayout(widget->elementLayout().at(0));
    }
-
-   const DomScripts scripts(widget->elementScript());
-   acceptWidgetScripts(scripts, widget, childWidgets);
 }
 
 void TreeWalker::acceptSpacer(DomSpacer *spacer)
 {
-   for (auto item :  spacer->elementProperty()) {
+   for (auto item : spacer->elementProperty()) {
       acceptProperty(item);
    }
 }
@@ -307,10 +305,6 @@ void TreeWalker::acceptConnectionHints(DomConnectionHints *connectionHints)
 void TreeWalker::acceptConnectionHint(DomConnectionHint *connectionHint)
 {
    (void) connectionHint;
-}
-
-void TreeWalker::acceptWidgetScripts(const DomScripts &, DomWidget *, const  DomWidgets &)
-{
 }
 
 void TreeWalker::acceptButtonGroups(const DomButtonGroups *domButtonGroups)

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -48,17 +48,12 @@ class QGstreamerBufferProbe
    virtual bool probeBuffer(GstBuffer *buffer);
 
  private:
-
-#if GST_CHECK_VERSION(1,0,0)
    static GstPadProbeReturn capsProbe(GstPad *pad, GstPadProbeInfo *info, gpointer user_data);
    static GstPadProbeReturn bufferProbe(GstPad *pad, GstPadProbeInfo *info, gpointer user_data);
-   int m_capsProbeId;
-#else
-   static gboolean bufferProbe(GstElement *element, GstBuffer *buffer, gpointer user_data);
-   GstCaps *m_caps;
-#endif
 
+   int m_capsProbeId;
    int m_bufferProbeId;
+
    const Flags m_flags;
 };
 

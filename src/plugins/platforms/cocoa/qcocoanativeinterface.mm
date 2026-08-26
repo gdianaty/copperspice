@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,30 +23,31 @@
 
 #include <qcocoanativeinterface.h>
 
-#include <qcocoaprintersupport.h>
-#include <qcocoawindow.h>
+#include <qapplication.h>
+#include <qbytearray.h>
+#include <qcocoaapplication.h>
+#include <qcocoaeventdispatcher.h>
+#include <qcocoahelpers.h>
+#include <qcocoaintegration.h>
 #include <qcocoamenu.h>
 #include <qcocoamenubar.h>
-#include <qcocoahelpers.h>
-#include <qcocoaapplication.h>
-#include <qcocoaintegration.h>
-#include <qcocoaeventdispatcher.h>
-#include <qapplication.h>
+#include <qcocoaprintersupport.h>
+#include <qcocoawindow.h>
 #include <qdebug.h>
-#include <qbytearray.h>
-#include <qwindow.h>
 #include <qpixmap.h>
-#include <qplatform_window.h>
 #include <qplatform_printersupport.h>
+#include <qplatform_window.h>
 #include <qsurfaceformat.h>
+#include <qwindow.h>
+
 #include <platformheaders/qcocoawindowfunctions.h>
 
 #include <qprintengine_mac_p.h>
 
 #ifndef QT_NO_OPENGL
-#include <qplatform_openglcontext.h>
-#include <qopenglcontext.h>
 #include <qcocoaglcontext.h>
+#include <qopenglcontext.h>
+#include <qplatform_openglcontext.h>
 #endif
 
 #include <Cocoa/Cocoa.h>

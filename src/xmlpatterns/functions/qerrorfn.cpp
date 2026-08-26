@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,10 +25,7 @@
 #include "qpatternistlocale_p.h"
 #include "qqnamevalue_p.h"
 #include "qatomicstring_p.h"
-
 #include "qerrorfn_p.h"
-
-QT_BEGIN_NAMESPACE
 
 using namespace QPatternist;
 
@@ -90,5 +87,3 @@ FunctionSignature::Ptr ErrorFN::signature() const
 
    return nev;
 }
-
-QT_END_NAMESPACE

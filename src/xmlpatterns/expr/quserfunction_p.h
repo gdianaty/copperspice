@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,25 +24,23 @@
 #ifndef QUserFunction_P_H
 #define QUserFunction_P_H
 
-template<typename T> class QList;
+#include <qshareddata.h>
 
-#include <QSharedData>
 #include <qexpression_p.h>
 #include <qfunctionsignature_p.h>
 #include <qvariabledeclaration_p.h>
 
-QT_BEGIN_NAMESPACE
+template<typename T>
+class QList;
 
 namespace QPatternist {
+
 class UserFunction : public QSharedData
 {
  public:
    typedef QExplicitlySharedDataPointer<UserFunction> Ptr;
    typedef QList<UserFunction::Ptr> List;
 
-   /**
-    * If @p slotOffset is -1, it means this function has no arguments.
-    */
    UserFunction(const FunctionSignature::Ptr &signature, const Expression::Ptr &body,
                 const VariableSlotID slotOffset, const VariableDeclaration::List &varDecls);
 
@@ -85,7 +83,5 @@ void UserFunction::setBody(const Expression::Ptr &newBody)
 }
 
 }
-
-QT_END_NAMESPACE
 
 #endif

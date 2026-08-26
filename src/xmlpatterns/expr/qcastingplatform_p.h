@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -36,17 +36,15 @@
 #include <qstaticcontext_p.h>
 #include <qvalidationerror_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 template<typename TSubClass, const bool issueError>
 class CastingPlatform
 {
  protected:
-
-   inline CastingPlatform(const ReportContext::ErrorCode code = ReportContext::FORG0001) : m_errorCode(code) {
-   }
+   CastingPlatform(const ReportContext::ErrorCode code = ReportContext::FORG0001)
+      : m_errorCode(code)
+   { }
 
    Item cast(const Item &sourceValue, const ReportContext::Ptr &context) const;
 
@@ -59,24 +57,18 @@ class CastingPlatform
                               const AtomicCaster::Ptr &caster,
                               const ReportContext::Ptr &context) const;
 
-   /**
-    * Locates the caster for casting values of type @p sourceType to targetType(), if
-    * possible.
-    *
-    * @p castImpossible is not initialized. Initialize it to @c false.
-    */
    static AtomicCaster::Ptr locateCaster(const ItemType::Ptr &sourceType,
                                          const ReportContext::Ptr &context,
                                          bool &castImpossible,
                                          const SourceLocationReflection *const location,
                                          const ItemType::Ptr &targetType);
- private:
+
    inline Item castWithCaster(const Item &sourceValue,
                               const AtomicCaster::Ptr &caster,
                               const DynamicContext::Ptr &context) const;
 
 
-   inline ItemType::Ptr targetType() const {
+   ItemType::Ptr targetType() const {
       Q_ASSERT(static_cast<const TSubClass *>(this)->targetType());
       return static_cast<const TSubClass *>(this)->targetType();
    }
@@ -95,7 +87,5 @@ class CastingPlatform
 #include "qcastingplatform.cpp"
 
 }
-
-QT_END_NAMESPACE
 
 #endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,37 +24,28 @@
 #ifndef QXsdAssertion_P_H
 #define QXsdAssertion_P_H
 
+#include <qlist.h>
+
 #include <qnamedschemacomponent_p.h>
 #include <qxsdannotated_p.h>
 #include <qxsdxpathexpression_p.h>
-#include <QList>
-
-QT_BEGIN_NAMESPACE
 
 namespace QPatternist {
+
 class XsdAssertion : public NamedSchemaComponent, public XsdAnnotated
 {
  public:
    typedef QExplicitlySharedDataPointer<XsdAssertion> Ptr;
    typedef QList<XsdAssertion::Ptr> List;
 
-   /**
-    * Sets the @p test of the assertion.
-    *
-    * @see <a href="http://www.w3.org/TR/xmlschema11-1/#as-test">Test Definition</a>
-    */
    void setTest(const XsdXPathExpression::Ptr &test);
 
-   /**
-    * Returns the test of the assertion.
-    */
    XsdXPathExpression::Ptr test() const;
 
  private:
    XsdXPathExpression::Ptr m_test;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,14 +23,13 @@
 
 #include <qnetaccess_cachebackend_p.h>
 
-#include <qassert.h>
-#include <qurlinfo_p.h>
 #include <qabstract_networkcache.h>
-#include <qfileinfo.h>
-#include <qdir.h>
+#include <qassert.h>
 #include <qcoreapplication.h>
+#include <qdir.h>
+#include <qfileinfo.h>
 
-//#define QNETWORKACCESSCACHEBACKEND_DEBUG
+#include <qurlinfo_p.h>
 
 QNetworkAccessCacheBackend::QNetworkAccessCacheBackend()
    : QNetworkAccessBackend()
@@ -90,11 +89,12 @@ bool QNetworkAccessCacheBackend::sendCacheContents()
       redirectionRequested(redirectionTarget.toUrl());
    }
 
-   // signal we're open
+   // signal we are open
    metaDataChanged();
 
    if (operation() == QNetworkAccessManager::GetOperation) {
       QIODevice *contents = nc->data(url());
+
       if (! contents) {
          return false;
       }
@@ -103,9 +103,10 @@ bool QNetworkAccessCacheBackend::sendCacheContents()
       writeDownstreamData(contents);
    }
 
-#if defined(QNETWORKACCESSCACHEBACKEND_DEBUG)
-   qDebug() << "Successfully sent cache:" << url();
+#if defined(CS_SHOW_DEBUG_NETWORK)
+   qDebug() << "Cache successfully sent:" << url();
 #endif
+
    return true;
 }
 
@@ -115,17 +116,15 @@ void QNetworkAccessCacheBackend::closeDownstreamChannel()
 
 void QNetworkAccessCacheBackend::closeUpstreamChannel()
 {
-   Q_ASSERT_X(false, Q_FUNC_INFO, "This method should not be called");
+   Q_ASSERT_X(false, "QNetworkAccessCacheBackend::closeUpstreamChannel()", "This method should not be called");
 }
 
 void QNetworkAccessCacheBackend::upstreamReadyRead()
 {
-   Q_ASSERT_X(false, Q_FUNC_INFO, "This method should not be called");
+   Q_ASSERT_X(false, "QNetworkAccessCacheBackend::upstreamReadyRead()", "This method should not be called");
 }
 
 void QNetworkAccessCacheBackend::downstreamReadyWrite()
 {
-   Q_ASSERT_X(false, Q_FUNC_INFO, "This method should not be called");
+   Q_ASSERT_X(false, "QNetworkAccessCacheBackend::downstreamReadyWrite()", "This method should not be called");
 }
-
-

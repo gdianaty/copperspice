@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,32 +26,16 @@
 
 #include <qsinglecontainer_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class CopyOf : public SingleContainer
 {
  public:
-   /**
-    * Creats a CopyOf where it is checked that the expression @p operand conforms
-    * to the type @p reqType.
-    */
-   CopyOf(const Expression::Ptr &operand,
-          const bool inheritNSS,
-          const bool preserveNSS);
+   CopyOf(const Expression::Ptr &operand, const bool inheritNSS,  const bool preserveNSS);
 
    void evaluateToSequenceReceiver(const DynamicContext::Ptr &context) const override;
 
-   /**
-    * @returns always the SequenceType passed in the constructor to this class. That is, the
-    * SequenceType that the operand must conform to.
-    */
    SequenceType::Ptr staticType() const override;
-
-   /**
-    * @returns a list containing one CommonSequenceTypes::ZeroOrMoreItems
-    */
    SequenceType::List expectedOperandTypes() const override;
 
    ExpressionVisitorResult::Ptr accept(const ExpressionVisitor::Ptr &visitor) const override;
@@ -65,12 +49,11 @@ class CopyOf : public SingleContainer
 
  private:
    typedef QExplicitlySharedDataPointer<const CopyOf> ConstPtr;
-   const bool                                      m_inheritNamespaces;
-   const bool                                      m_preserveNamespaces;
-   const QAbstractXmlNodeModel::NodeCopySettings   m_settings;
+   const bool m_inheritNamespaces;
+   const bool m_preserveNamespaces;
+   const QAbstractXmlNodeModel::NodeCopySettings m_settings;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

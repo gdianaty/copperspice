@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,17 +26,12 @@
 
 #include <qabstractdatetime_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 class GMonth : public AbstractDateTime
 {
  public:
    typedef AtomicValue::Ptr Ptr;
 
-   /**
-    * Creates an instance from the lexical representation @p string.
-    */
    static GMonth::Ptr fromLexical(const QString &string);
    static GMonth::Ptr fromDateTime(const QDateTime &dt);
 
@@ -49,7 +44,5 @@ class GMonth : public AbstractDateTime
    GMonth(const QDateTime &dateTime);
 };
 }
-
-QT_END_NAMESPACE
 
 #endif

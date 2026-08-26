@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,22 +24,23 @@
 #ifndef QSTYLE_H
 #define QSTYLE_H
 
-#include <qobject.h>
-#include <qrect.h>
-#include <qsize.h>
 #include <qicon.h>
-#include <qpixmap.h>
+#include <qobject.h>
 #include <qpalette.h>
+#include <qpixmap.h>
+#include <qrect.h>
+#include <qscopedpointer.h>
+#include <qsize.h>
 #include <qsizepolicy.h>
-#include <QScopedPointer>
 
 class QAction;
 class QDebug;
-class QTab;
 class QFontMetrics;
 class QStyleHintReturn;
 class QStyleOption;
 class QStyleOptionComplex;
+class QTab;
+
 class QStylePrivate;
 
 class Q_GUI_EXPORT QStyle : public QObject

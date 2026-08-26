@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,12 +26,13 @@
 
 #include <qsqldatabase.h>
 #include <qsqlquerymodel.h>
-#include <QSqlRecord>
+#include <qsqlrecord.h>
 
-class QSqlTableModelPrivate;
-class QSqlRecord;
 class QSqlField;
 class QSqlIndex;
+class QSqlRecord;
+
+class QSqlTableModelPrivate;
 
 class Q_SQL_EXPORT QSqlTableModel: public QSqlQueryModel
 {

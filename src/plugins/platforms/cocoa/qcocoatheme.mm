@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,30 +21,30 @@
 *
 ***********************************************************************/
 
-#import <Cocoa/Cocoa.h>
-
 #include <qcocoatheme.h>
+
 #include <messages.h>
-#include <qvariant.h>
-
-#include "qcocoacolordialoghelper.h"
-#include "qcocoafiledialoghelper.h"
-#include "qcocoafontdialoghelper.h"
-#include "qcocoasystemsettings.h"
-#include "qcocoasystemtrayicon.h"
-#include "qcocoamenuitem.h"
-#include "qcocoamenu.h"
-#include "qcocoamenubar.h"
-#include "qcocoahelpers.h"
-
+#include <qcocoacolordialoghelper.h>
+#include <qcocoafiledialoghelper.h>
+#include <qcocoafontdialoghelper.h>
+#include <qcocoahelpers.h>
+#include <qcocoamenu.h>
+#include <qcocoamenubar.h>
+#include <qcocoamenuitem.h>
+#include <qcocoasystemsettings.h>
+#include <qcocoasystemtrayicon.h>
 #include <qfileinfo.h>
 #include <qpainter.h>
 #include <qplatform_integration.h>
 #include <qplatform_nativeinterface.h>
 #include <qtextformat.h>
+#include <qvariant.h>
 
 #include <qapplication_p.h>
 #include <qcoretextfontdatabase_p.h>
+
+#import <Cocoa/Cocoa.h>
+
 
 QString QCocoaTheme::name = "cocoa";
 
@@ -142,7 +142,6 @@ const QFont *QCocoaTheme::font(Font type) const
    return m_fonts.value(type, nullptr);
 }
 
-//! \internal
 QPixmap qt_mac_convert_iconref(const IconRef icon, int width, int height)
 {
    QPixmap ret(width, height);

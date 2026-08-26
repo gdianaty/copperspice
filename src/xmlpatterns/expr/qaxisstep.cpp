@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,23 +21,18 @@
 *
 ***********************************************************************/
 
+#include "qaxisstep_p.h"
+
 #include "qbuiltintypes_p.h"
 #include "qcommonsequencetypes_p.h"
 #include "qitemmappingiterator_p.h"
 #include "qgenericsequencetype_p.h"
 #include "qparentnodeaxis_p.h"
 
-#include "qaxisstep_p.h"
-
-QT_BEGIN_NAMESPACE
-
 using namespace QPatternist;
 
 namespace QPatternist {
-/**
- * This operator is needed for the s_whenAxisNodeKindEmpty array. The @c int constructors
- * ensure we invoke another operator| such that we don't get an infinite loop.
- */
+
 static inline QXmlNodeModelIndex::NodeKind operator|(const QXmlNodeModelIndex::NodeKind &op1,
       const QXmlNodeModelIndex::NodeKind &op2)
 {
@@ -45,23 +40,25 @@ static inline QXmlNodeModelIndex::NodeKind operator|(const QXmlNodeModelIndex::N
 }
 }
 
-/**
- * @note The order is significant. It is of the same order as the values in QXmlNodeModelIndex::Axis is declared.
- */
+
+// order is significant. It is of the same order as the values in QXmlNodeModelIndex::Axis is declared.
+
 const QXmlNodeModelIndex::NodeKind AxisStep::s_whenAxisNodeKindEmpty[] = {
-   QXmlNodeModelIndex::Attribute | QXmlNodeModelIndex::Text | QXmlNodeModelIndex::ProcessingInstruction | QXmlNodeModelIndex::Comment | QXmlNodeModelIndex::Namespace, // child;
-   QXmlNodeModelIndex::Attribute | QXmlNodeModelIndex::Text | QXmlNodeModelIndex::ProcessingInstruction | QXmlNodeModelIndex::Comment | QXmlNodeModelIndex::Namespace, // descendant;
-   QXmlNodeModelIndex::Document | QXmlNodeModelIndex::Attribute | QXmlNodeModelIndex::Text | QXmlNodeModelIndex::ProcessingInstruction | QXmlNodeModelIndex::Comment | QXmlNodeModelIndex::Namespace, // attribute;
-   QXmlNodeModelIndex::NodeKind(0),                         // self;
-   QXmlNodeModelIndex::NodeKind(0),                         // descendant-or-self;
-   QXmlNodeModelIndex::Document | QXmlNodeModelIndex::Attribute | QXmlNodeModelIndex::Text | QXmlNodeModelIndex::ProcessingInstruction | QXmlNodeModelIndex::Comment | QXmlNodeModelIndex::Namespace, // namespace;
-   QXmlNodeModelIndex::Document,                                         // following;
-   QXmlNodeModelIndex::Document,                                         // parent;
-   QXmlNodeModelIndex::Document,                                         // ancestor
+   QXmlNodeModelIndex::Attribute | QXmlNodeModelIndex::Text | QXmlNodeModelIndex::ProcessingInstruction | QXmlNodeModelIndex::Comment | QXmlNodeModelIndex::Namespace,
+                                                                        // child;
+   QXmlNodeModelIndex::Attribute | QXmlNodeModelIndex::Text | QXmlNodeModelIndex::ProcessingInstruction | QXmlNodeModelIndex::Comment | QXmlNodeModelIndex::Namespace,
+                                                                        // descendant;
+   QXmlNodeModelIndex::Document | QXmlNodeModelIndex::Attribute | QXmlNodeModelIndex::Text | QXmlNodeModelIndex::ProcessingInstruction | QXmlNodeModelIndex::Comment | QXmlNodeModelIndex::Namespace,                                          // attribute;
+   QXmlNodeModelIndex::NodeKind(0),                                     // self;
+   QXmlNodeModelIndex::NodeKind(0),                                     // descendant-or-self;
+   QXmlNodeModelIndex::Document | QXmlNodeModelIndex::Attribute | QXmlNodeModelIndex::Text | QXmlNodeModelIndex::ProcessingInstruction | QXmlNodeModelIndex::Comment | QXmlNodeModelIndex::Namespace,                                          // namespace;
+   QXmlNodeModelIndex::Document,                                        // following;
+   QXmlNodeModelIndex::Document,                                        // parent;
+   QXmlNodeModelIndex::Document,                                        // ancestor
    QXmlNodeModelIndex::Document | QXmlNodeModelIndex::Attribute | QXmlNodeModelIndex::Namespace,     // preceding-sibling;
    QXmlNodeModelIndex::Document | QXmlNodeModelIndex::Attribute | QXmlNodeModelIndex::Namespace,     // following-sibling;
-   QXmlNodeModelIndex::Document,                                         // preceding;
-   QXmlNodeModelIndex::NodeKind(0)                          // ancestor-or-self;
+   QXmlNodeModelIndex::Document,                                        // preceding;
+   QXmlNodeModelIndex::NodeKind(0)                                      // ancestor-or-self;
 };
 
 bool AxisStep::isAlwaysEmpty(const QXmlNodeModelIndex::Axis axis, const QXmlNodeModelIndex::NodeKind nodeKind)
@@ -69,17 +66,14 @@ bool AxisStep::isAlwaysEmpty(const QXmlNodeModelIndex::Axis axis, const QXmlNode
    return (s_whenAxisNodeKindEmpty[(1 >> axis) - 1] & nodeKind) != 0;
 }
 
-AxisStep::AxisStep(const QXmlNodeModelIndex::Axis a,
-                   const ItemType::Ptr &nt) : m_axis(a),
+AxisStep::AxisStep(const QXmlNodeModelIndex::Axis a, const ItemType::Ptr &nt) : m_axis(a),
    m_nodeTest(nt)
 {
    Q_ASSERT(m_nodeTest);
-   Q_ASSERT_X(BuiltinTypes::node->xdtTypeMatches(m_nodeTest), Q_FUNC_INFO,
-              "We assume we're a node type.");
+   Q_ASSERT_X(BuiltinTypes::node->xdtTypeMatches(m_nodeTest), Q_FUNC_INFO, "Assume we are a node type.");
 }
 
-Item AxisStep::mapToItem(const QXmlNodeModelIndex &node,
-                         const DynamicContext::Ptr &context) const
+Item AxisStep::mapToItem(const QXmlNodeModelIndex &node, const DynamicContext::Ptr &context) const
 {
    Q_ASSERT(!node.isNull());
    Q_ASSERT(Item(node).isNode());
@@ -96,8 +90,6 @@ Item AxisStep::mapToItem(const QXmlNodeModelIndex &node,
 
 Item::Iterator::Ptr AxisStep::evaluateSequence(const DynamicContext::Ptr &context) const
 {
-   /* If we don't have a focus, it's either a bug or our parent isn't a Path
-    * that have advanced the focus iterator. Hence, attempt to advance the focus on our own. */
    if (!context->contextItem()) {
       context->focusIterator()->next();
    }
@@ -111,8 +103,6 @@ Item::Iterator::Ptr AxisStep::evaluateSequence(const DynamicContext::Ptr &contex
 
 Item AxisStep::evaluateSingleton(const DynamicContext::Ptr &context) const
 {
-   /* If we don't have a focus, it's either a bug or our parent isn't a Path
-    * that have advanced the focus iterator. Hence, attempt to advance the focus on our own. */
    if (!context->contextItem()) {
       context->focusIterator()->next();
    }
@@ -135,18 +125,11 @@ Item AxisStep::evaluateSingleton(const DynamicContext::Ptr &context) const
    return Item();
 }
 
-Expression::Ptr AxisStep::typeCheck(const StaticContext::Ptr &context,
-                                    const SequenceType::Ptr &reqType)
+Expression::Ptr AxisStep::typeCheck(const StaticContext::Ptr &context, const SequenceType::Ptr &reqType)
 {
    if (m_axis == QXmlNodeModelIndex::AxisParent && *m_nodeTest == *BuiltinTypes::node) {
-      /* We only rewrite parent::node() to ParentNodeAxis. */
       return rewrite(Expression::Ptr(new ParentNodeAxis()), context)->typeCheck(context, reqType);
-   }
-   /* TODO temporarily disabled
-   else if(isAlwaysEmpty(m_axis, static_cast<const AnyNodeType *>(m_nodeTest.data())->nodeKind()))
-       return EmptySequence::create(this, context);
-       */
-   else {
+   } else {
       return EmptyContainer::typeCheck(context, reqType);
    }
 }
@@ -161,8 +144,7 @@ SequenceType::Ptr AxisStep::staticType() const
       cardinality = Cardinality::zeroOrMore();
    }
 
-   return makeGenericSequenceType(m_nodeTest,
-                                  cardinality);
+   return makeGenericSequenceType(m_nodeTest, cardinality);
 }
 
 SequenceType::List AxisStep::expectedOperandTypes() const
@@ -197,7 +179,6 @@ QString AxisStep::axisName(const QXmlNodeModelIndex::Axis axis)
    const char *result = nullptr;
 
    switch (axis) {
-      /* These must not be translated. */
       case QXmlNodeModelIndex::AxisAncestorOrSelf:
          result = "ancestor-or-self";
          break;
@@ -258,5 +239,3 @@ Expression::ID AxisStep::id() const
 {
    return IDAxisStep;
 }
-
-QT_END_NAMESPACE

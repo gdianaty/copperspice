@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,28 +26,29 @@
 
 #include <qgl.h>
 
+#include <qatomic.h>
 #include <qcache.h>
 #include <qglcolormap.h>
+#include <qhashfunc.h>
 #include <qmap.h>
+#include <qopenglcontext.h>
 #include <qthread.h>
 #include <qthreadstorage.h>
-#include <qhashfunc.h>
-#include <qatomic.h>
-#include <qopenglcontext.h>
 
-#include <qwidget_p.h>
-#include <qopenglcontext_p.h>
-#include <qopengl_extensions_p.h>
 #include <qglpaintdevice_p.h>
+#include <qopengl_extensions_p.h>
+#include <qopenglcontext_p.h>
+#include <qwidget_p.h>
 
 class QGLContext;
+class QGLContextResourceBase;
 class QGLOverlayWidget;
-class QPixmap;
-class QOpenGLExtensions;
-class QGLTemporaryContextPrivate;
 class QGLTexture;
 class QGLTextureDestroyer;
-class QGLContextResourceBase;
+class QOpenGLExtensions;
+class QPixmap;
+
+class QGLTemporaryContextPrivate;
 
 QString cs_glGetString(GLenum data);
 QString cs_glGetStringI(GLenum data, GLuint index);
@@ -273,7 +274,7 @@ class QGLContextPrivate
    QGLFunctions *functions;
    bool vertexAttributeArraysEnabledState[QT_GL_VERTEX_ARRAY_TRACKED_COUNT];
 
-   static inline QGLContextGroup *contextGroup(const QGLContext *ctx) {
+   static QGLContextGroup *contextGroup(const QGLContext *ctx) {
       return ctx->d_ptr->group;
    }
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -60,7 +60,7 @@ class Q_GUI_EXPORT QRasterPlatformPixmap : public QPlatformPixmap
    int metric(QPaintDevice::PaintDeviceMetric metric) const override;
    void createPixmapForImage(QImage &sourceImage, Qt::ImageConversionFlags flags, bool inPlace);
    void setImage(const QImage &image);
-   QImage image;
+   QImage m_rasterImage;
 
  private:
    friend class QPixmap;

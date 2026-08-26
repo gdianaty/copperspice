@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,19 +25,20 @@
 #define QTEXTEDIT_H
 
 #include <qabstractscrollarea.h>
-#include <qtextdocument.h>
-#include <qtextoption.h>
 #include <qtextcursor.h>
+#include <qtextdocument.h>
 #include <qtextformat.h>
+#include <qtextoption.h>
 
 #ifndef QT_NO_TEXTEDIT
 
-class QStyleSheet;
-class QTextDocument;
 class QMenu;
-class QTextEditPrivate;
 class QMimeData;
 class QPagedPaintDevice;
+class QStyleSheet;
+class QTextDocument;
+
+class QTextEditPrivate;
 
 class Q_GUI_EXPORT QTextEdit : public QAbstractScrollArea
 {
@@ -375,7 +376,7 @@ class Q_GUI_EXPORT QTextEdit : public QAbstractScrollArea
    void inputMethodEvent(QInputMethodEvent *event) override;
    QTextEdit(QTextEditPrivate &dd, QWidget *parent);
 
-   virtual void scrollContentsBy(int dx, int dy) override;
+   void scrollContentsBy(int dx, int dy) override;
    virtual void doSetTextCursor(const QTextCursor &cursor);
 
    void zoomInF(float range);

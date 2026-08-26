@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,14 +24,14 @@
 #ifndef QRAWFONT_H
 #define QRAWFONT_H
 
-#include <qstring.h>
-#include <qiodevice.h>
+#include <qfont.h>
+#include <qfontdatabase.h>
 #include <qglobal.h>
+#include <qiodevice.h>
 #include <qobject.h>
 #include <qpoint.h>
-#include <qfont.h>
+#include <qstring.h>
 #include <qtransform.h>
-#include <qfontdatabase.h>
 
 class QRawFontPrivate;
 
@@ -73,7 +73,8 @@ class Q_GUI_EXPORT QRawFont
    }
 
    bool operator==(const QRawFont &other) const;
-   inline bool operator!=(const QRawFont &other) const {
+
+   bool operator!=(const QRawFont &other) const {
       return ! operator==(other);
    }
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,24 +24,24 @@
 #ifndef QHTTP_THREADDELEGATE_P_H
 #define QHTTP_THREADDELEGATE_P_H
 
-#include <qobject.h>
 #include <qlist.h>
-#include <qsharedpointer.h>
-#include <qthreadstorage.h>
+#include <qnetwork_reply.h>
 #include <qnetworkproxy.h>
+#include <qobject.h>
+#include <qsharedpointer.h>
+#include <qsslconfiguration.h>
 #include <qsslconfiguration.h>
 #include <qsslerror.h>
-#include <qnetwork_reply.h>
-#include <qsslconfiguration.h>
+#include <qthreadstorage.h>
 
-#include <qhttp_networkrequest_p.h>
 #include <qhttp_networkconnection_p.h>
-#include <qnoncontiguousbytedevice_p.h>
+#include <qhttp_networkrequest_p.h>
 #include <qnetaccess_authenticationmanager_p.h>
+#include <qnoncontiguousbytedevice_p.h>
 
 class QAuthenticator;
-class QHttpNetworkReply;
 class QEventLoop;
+class QHttpNetworkReply;
 class QNetworkAccessCache;
 class QNetworkAccessCachedHttpConnection;
 
@@ -116,8 +116,8 @@ class QHttpThreadDelegate : public QObject
 #endif
 
    NET_CS_SIGNAL_1(Public, void downloadMetaData(const QList <QPair <QByteArray,QByteArray>> &headers, int statusCode,
-         const QString &reason, bool isPipelined, QSharedPointer <char> downloadBuffer, qint64 contentLength, bool isSpdy))
-   NET_CS_SIGNAL_2(downloadMetaData, headers, statusCode, reason, isPipelined, downloadBuffer, contentLength, isSpdy)
+         const QString &reason, bool isPipelined, QSharedPointer <char> buffer, qint64 contentLength, bool isSpdy))
+   NET_CS_SIGNAL_2(downloadMetaData, headers, statusCode, reason, isPipelined, buffer, contentLength, isSpdy)
 
    NET_CS_SIGNAL_1(Public, void downloadProgress(qint64 bytesReceived, qint64 bytesTotal))
    NET_CS_SIGNAL_2(downloadProgress, bytesReceived, bytesTotal)

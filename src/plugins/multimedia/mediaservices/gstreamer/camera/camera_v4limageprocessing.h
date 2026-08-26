@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -42,7 +42,6 @@ class CameraBinV4LImageProcessing : public QCameraImageProcessingControl
    QVariant parameter(ProcessingParameter parameter) const;
    void setParameter(ProcessingParameter parameter, const QVariant &value);
 
- public :
    CS_SLOT_1(Public, void updateParametersInfo(QCamera::Status cameraStatus))
    CS_SLOT_2(updateParametersInfo)
 
@@ -62,7 +61,7 @@ class CameraBinV4LImageProcessing : public QCameraImageProcessingControl
       qint32 sourceValue, const SourceParameterValueInfo &sourceValueInfo);
    static qint32 sourceImageProcessingParameterValue(
       qreal scaledValue, const SourceParameterValueInfo &valueRange);
- private:
+
    CameraBinSession *m_session;
    QMap<ProcessingParameter, SourceParameterValueInfo> m_parametersInfo;
 };

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -27,10 +27,7 @@
 #include "qitemmappingiterator_p.h"
 #include "qoptimizationpasses_p.h"
 #include "qsequencemappingiterator_p.h"
-
 #include "qforclause_p.h"
-
-QT_BEGIN_NAMESPACE
 
 using namespace QPatternist;
 
@@ -177,5 +174,3 @@ Expression::ID ForClause::id() const
 {
    return IDForClause;
 }
-
-QT_END_NAMESPACE

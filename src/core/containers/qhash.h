@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,13 +24,13 @@
 #ifndef QHASH_H
 #define QHASH_H
 
-#include <initializer_list>
-#include <unordered_map>
-
 #include <qcontainerfwd.h>
 #include <qhashfunc.h>
 #include <qhashfwd.h>
 #include <qlist.h>
+
+#include <initializer_list>
+#include <unordered_map>
 
 template <typename Key, typename Val, typename Hash = qHashFunc<Key>, typename KeyEqual = qHashEqual<Key>>
 class QHashIterator;
@@ -42,6 +42,256 @@ template <typename Key, typename Val, typename Hash, typename KeyEqual>
 class QHash
 {
  public:
+   using difference_type = typename std::unordered_map<Key, Val, Hash, KeyEqual>::difference_type;
+   using pointer         = Val *;
+   using reference       = Val &;
+   using size_type       = typename std::unordered_map<Key, Val, Hash, KeyEqual>::difference_type;
+   using value_type      = Val;
+
+   using key_type        = typename std::unordered_map<Key, Val, Hash, KeyEqual>::key_type;
+   using mapped_type     = typename std::unordered_map<Key, Val, Hash, KeyEqual>::mapped_type;
+   using hasher          = typename std::unordered_map<Key, Val, Hash, KeyEqual>::hasher;
+   using key_equal       = typename std::unordered_map<Key, Val, Hash, KeyEqual>::key_equal;
+
+   using allocator_type  = typename std::unordered_map<Key, Val, Hash, KeyEqual>::allocator_type;
+
+   using const_pointer   = const Val *;
+   using const_reference = const Val &;
+
+   // stl
+   class iterator;
+   class const_iterator;
+
+   // java
+   using Java_Iterator        = QHashIterator<Key, Val, Hash, KeyEqual>;
+   using Java_MutableIterator = QMutableHashIterator<Key, Val, Hash, KeyEqual>;
+
+   QHash() = default;
+
+   QHash(std::initializer_list<std::pair<const Key, Val>> list, const Hash &hash = Hash(),
+         const KeyEqual &key = KeyEqual())
+      : m_data(list, 1, hash, key)
+   { }
+
+   explicit QHash(const Hash &hash, const KeyEqual &key = KeyEqual())
+      : m_data(hash, key)
+   { }
+
+   explicit QHash(const std::unordered_map<Key, Val, Hash, KeyEqual> &other)
+      : m_data(other)
+   { }
+
+   explicit QHash(std::unordered_map<Key, Val, Hash, KeyEqual> &&other)
+      : m_data(std::move(other))
+   { }
+
+   template <typename Input_Iterator>
+   QHash(Input_Iterator first, Input_Iterator last, const Hash &hash = Hash(), const KeyEqual &key = KeyEqual())
+      : m_data(first, last, hash, key)
+   { }
+
+   QHash(const QHash<Key, Val, Hash, KeyEqual> &other) = default;
+   QHash(QHash<Key, Val, Hash, KeyEqual> &&other) = default;
+
+   ~QHash() = default;
+
+   // methods
+   void clear() {
+      m_data.clear();
+   }
+
+   size_type capacity() const {
+      return m_data.bucket_count();
+   }
+
+   bool contains(const Key &key) const {
+      auto iter = m_data.find(key);
+
+      if (iter == m_data.end()) {
+         return false;
+      }
+
+      return true;
+   }
+
+   size_type count(const Key &key) const {
+      return m_data.count(key);
+   }
+
+   size_type count() const {
+      return m_data.size();
+   }
+
+   bool empty() const {
+      return isEmpty();
+   }
+
+   QPair<iterator, iterator> equal_range(const Key &key) {
+      return m_data.equal_range(key);
+   }
+
+   QPair<const_iterator, const_iterator> equal_range(const Key &key) const {
+      return m_data.equal_range(key);
+   }
+
+   size_type erase(const Key &key) {
+      return m_data.erase(key);
+   }
+
+   iterator erase(const_iterator iter) {
+      return m_data.erase(iter.m_iter);
+   }
+
+   iterator find(const Key &key) {
+      // find returns an std::map::iterator, default iterator constructor will convert to QMap::iterator
+      return m_data.find(key);
+   }
+
+   const_iterator find(const Key &key) const {
+      return m_data.find(key);
+   }
+
+   const_iterator constFind(const Key &key) const {
+      return m_data.find(key);
+   }
+
+   iterator insert(const std::pair<const Key, Val> &data) {
+      return m_data.insert_or_assign(data.first, data.second).first;
+   }
+
+   iterator insert(const Key &key, const Val &value) {
+      return m_data.insert_or_assign(key, value).first;
+   }
+
+   iterator insert(const Key &key, Val &&value) {
+      return m_data.insert_or_assign(key, std::move(value)).first;
+   }
+
+   bool isEmpty() const {
+      return m_data.empty();
+   }
+
+   const Key key(const Val &value) const;
+   const Key key(const Val &value, const Key &defaultKey) const;
+
+   QList<Key> keys() const;
+   QList<Key> keys(const Val &value) const;
+
+   size_type remove(const Key &key)  {
+      return m_data.erase(key);
+   }
+
+   void reserve(size_type size) {
+      m_data.reserve(size);
+   }
+
+   size_type size() const {
+      // returns unsigned, must convert to signed
+      return static_cast<size_type>(m_data.size());
+   }
+
+   void squeeze() {
+      m_data.rehash(0);
+   }
+
+   void swap(QHash<Key, Val, Hash, KeyEqual> &other) {
+      qSwap(m_data, other.m_data);
+   }
+
+   Val take(const Key &key)  {
+      auto iter = m_data.find(key);
+
+      if (iter == m_data.end()) {
+         return Val();
+      }
+
+      Val retval = std::move(iter->second);
+      m_data.erase(iter);
+
+      return retval;
+   }
+
+   QHash<Key, Val, Hash, KeyEqual> &unite(const QHash<Key, Val, Hash, KeyEqual> &other) {
+      m_data.insert(other.m_data.begin(), other.m_data.end());
+      return *this;
+   }
+
+   Val value(const Key &key) const {
+      auto iter = m_data.find(key);
+
+      if (iter == m_data.end()) {
+         // key was not found
+         return Val();
+      }
+
+      return iter->second;
+   }
+
+   Val value(const Key &key, const Val &defaultValue) const {
+      auto iter = m_data.find(key);
+
+      if (iter == m_data.end()) {
+         // key was not found
+         return defaultValue;
+      }
+
+      return iter->second;
+   }
+
+   QList<Val> values() const;
+
+   // operators
+   QHash<Key, Val, Hash, KeyEqual> &operator=(const QHash<Key, Val, Hash, KeyEqual> &other) = default;
+   QHash<Key, Val, Hash, KeyEqual> &operator=(QHash<Key, Val, Hash, KeyEqual> &&other) = default;
+
+   bool operator==(const QHash<Key, Val, Hash, KeyEqual> &other) const {
+      return m_data == other.m_data;
+   }
+
+   bool operator!=(const QHash<Key, Val, Hash, KeyEqual> &other) const {
+      return ! (*this == other);
+   }
+
+   Val &operator[](const Key &key) {
+      return m_data[key];
+   }
+
+   const Val operator[](const Key &key) const  {
+      return value(key);
+   }
+
+   // iterators
+   iterator begin() {
+      return m_data.begin();
+   }
+
+   const_iterator begin() const {
+      return m_data.begin();
+   }
+
+   const_iterator cbegin() const {
+      return m_data.begin();
+   }
+
+   const_iterator constBegin() const {
+      return m_data.begin();
+   }
+
+   iterator end() {
+      return m_data.end();
+   }
+
+   const_iterator end() const {
+      return m_data.end();
+   }
+
+   const_iterator cend() const {
+      return m_data.end();
+   }
+
+   const_iterator constEnd() const {
+      return m_data.end();
+   }
 
    class iterator
    {
@@ -225,243 +475,6 @@ class QHash
 
    };
 
-   using difference_type = typename std::unordered_map<Key, Val, Hash, KeyEqual>::difference_type;
-   using pointer         = Val *;
-   using reference       = Val &;
-   using size_type       = typename std::unordered_map<Key, Val, Hash, KeyEqual>::difference_type;
-   using value_type      = Val;
-
-   using key_type        = typename std::unordered_map<Key, Val, Hash, KeyEqual>::key_type;
-   using mapped_type     = typename std::unordered_map<Key, Val, Hash, KeyEqual>::mapped_type;
-   using hasher          = typename std::unordered_map<Key, Val, Hash, KeyEqual>::hasher;
-   using key_equal       = typename std::unordered_map<Key, Val, Hash, KeyEqual>::key_equal;
-
-   using allocator_type  = typename std::unordered_map<Key, Val, Hash, KeyEqual>::allocator_type;
-
-   static constexpr int bucket_count = 1;
-
-   // iterator and const_iterator are classes
-
-   using const_pointer   = const Val *;
-   using const_reference = const Val &;
-
-   // java
-   using Java_Iterator        = QHashIterator<Key, Val, Hash, KeyEqual>;
-   using Java_MutableIterator = QMutableHashIterator<Key, Val, Hash, KeyEqual>;
-
-   QHash() = default;
-
-   QHash(const QHash<Key, Val, Hash, KeyEqual> &other) = default;
-   QHash(QHash<Key, Val, Hash, KeyEqual> &&other) = default;
-
-   QHash(std::initializer_list<std::pair<const Key, Val> > list, const Hash & hash = Hash(), const KeyEqual &key_equal = KeyEqual())
-      : m_data(list, bucket_count, hash, key_equal) {}
-
-   explicit QHash(const Hash & hash, const KeyEqual &key_equal = KeyEqual())
-      : m_data(hash, key_equal) {}
-
-   explicit QHash(const std::unordered_map<Key, Val, Hash, KeyEqual> &other)
-       : m_data(other) {}
-
-   explicit QHash(std::unordered_map<Key, Val, Hash, KeyEqual> &&other)
-       : m_data(std::move(other)) {}
-
-   template <typename Input_Iterator>
-   QHash(Input_Iterator first, Input_Iterator last, const Hash & hash = Hash(), const KeyEqual &key_equal = KeyEqual())
-      : m_data(first, last, hash, key_equal) {}
-
-   ~QHash() = default;
-
-   // methods
-   void clear() {
-      m_data.clear();
-   }
-
-   size_type capacity() const {
-      return m_data.bucket_count();
-   }
-
-   bool contains(const Key &key) const {
-      auto iter = m_data.find(key);
-
-      if (iter == m_data.end()) {
-         return false;
-      }
-
-      return true;
-   }
-
-   size_type count(const Key &key) const {
-      return m_data.count(key);
-   }
-
-   size_type count() const {
-      return m_data.size();
-   }
-
-   bool empty() const {
-      return isEmpty();
-   }
-
-   bool isEmpty() const {
-      return m_data.empty();
-   }
-
-   QPair<iterator, iterator> equal_range(const Key &key) {
-      return m_data.equal_range(key);
-   }
-
-   QPair<const_iterator, const_iterator> equal_range(const Key &key) const {
-      return m_data.equal_range(key);
-   }
-
-   iterator erase(const_iterator iter) {
-      return m_data.erase(iter.m_iter);
-   }
-
-   iterator find(const Key &key) {
-      // find returns an std::map::iterator, default iterator constructor will convert to QMap::iterator
-      return m_data.find(key);
-   }
-
-   const_iterator find(const Key &key) const {
-      return m_data.find(key);
-   }
-
-   const_iterator constFind(const Key &key) const {
-      return m_data.find(key);
-   }
-
-   iterator insert(const std::pair<const Key, Val> &data) {
-      return m_data.insert_or_assign(data.first, data.second).first;
-   }
-
-   iterator insert(const Key &key, const Val &value) {
-      return m_data.insert_or_assign(key, value).first;
-   }
-
-   const Key key(const Val &value) const;
-   const Key key(const Val &value, const Key &defaultKey) const;
-
-   QList<Key> keys() const;
-   QList<Key> keys(const Val &value) const;
-
-   void reserve(size_type size) {
-      m_data.reserve(size);
-   }
-
-   size_type remove(const Key &key)  {
-      return m_data.erase(key);
-   }
-
-   size_type size() const {
-      // returns unsigned, must convert to signed
-      return static_cast<size_type>(m_data.size());
-   }
-
-   void squeeze() {
-      m_data.rehash(0);
-   }
-
-   void swap(QHash<Key, Val, Hash, KeyEqual> &other) {
-      qSwap(m_data, other.m_data);
-   }
-
-   Val take(const Key &key)  {
-      auto iter = m_data.find(key);
-
-      if (iter == m_data.end()) {
-         return Val();
-      }
-
-      Val retval = std::move(iter->second);
-      m_data.erase(iter);
-
-      return retval;
-   }
-
-   QHash<Key, Val, Hash, KeyEqual> &unite(const QHash<Key, Val, Hash, KeyEqual> &other) {
-      m_data.insert(other.m_data.begin(), other.m_data.end());
-      return *this;
-   }
-
-   Val value(const Key &key) const {
-      auto iter = m_data.find(key);
-
-      if (iter == m_data.end()) {
-         // key was not found
-         return Val();
-      }
-
-      return iter->second;
-   }
-
-   Val value(const Key &key, const Val &defaultValue) const {
-      auto iter = m_data.find(key);
-
-      if (iter == m_data.end()) {
-         // key was not found
-         return defaultValue;
-      }
-
-      return iter->second;
-   }
-
-   QList<Val> values() const;
-
-   // operators
-   QHash<Key, Val, Hash, KeyEqual> &operator=(const QHash<Key, Val, Hash, KeyEqual> &other) = default;
-   QHash<Key, Val, Hash, KeyEqual> &operator=(QHash<Key, Val, Hash, KeyEqual> &&other) = default;
-
-   bool operator==(const QHash<Key, Val, Hash, KeyEqual> &other) const {
-      return m_data == other.m_data;
-   }
-
-   inline bool operator!=(const QHash<Key, Val, Hash, KeyEqual> &other) const {
-      return ! (*this == other);
-   }
-
-   Val &operator[](const Key &key) {
-      return m_data[key];
-   }
-
-   const Val operator[](const Key &key) const  {
-      return value(key);
-   }
-
-   // iterators
-   inline iterator begin() {
-      return m_data.begin();
-   }
-
-   inline const_iterator begin() const {
-      return m_data.begin();
-   }
-
-   inline const_iterator cbegin() const {
-      return m_data.begin();
-   }
-
-   inline const_iterator constBegin() const {
-      return m_data.begin();
-   }
-
-   inline iterator end() {
-      return m_data.end();
-   }
-
-   inline const_iterator end() const {
-      return m_data.end();
-   }
-
-   inline const_iterator cend() const {
-      return m_data.end();
-   }
-
-   inline const_iterator constEnd() const {
-      return m_data.end();
-   }
-
  private:
    std::unordered_map<Key, Val, Hash, KeyEqual> m_data;
 };
@@ -540,8 +553,8 @@ QList<Val> QHash<Key, Val, Hash, KeyEqual>::values() const
 template <typename Key, typename Val, typename Hash, typename KeyEqual>
 class QHashIterator
 {
-   typedef typename QHash<Key, Val, Hash, KeyEqual>::const_iterator const_iterator;
-   typedef const_iterator Item;
+   using const_iterator = typename QHash<Key, Val, Hash, KeyEqual>::const_iterator;
+   using Item           = const_iterator;
 
  public:
    QHashIterator(const QHash<Key, Val, Hash, KeyEqual> &hash)
@@ -549,9 +562,7 @@ class QHashIterator
    {
    }
 
-   ~QHashIterator()
-   {
-   }
+   ~QHashIterator() = default;
 
    QHashIterator &operator=(const QHash<Key, Val, Hash, KeyEqual> &hash) {
       c = hash;
@@ -635,7 +646,7 @@ class QHashIterator
    const_iterator i;
    const_iterator n;
 
-   inline bool item_exists() const {
+   bool item_exists() const {
       return n != c->constEnd();
    }
 };
@@ -643,9 +654,9 @@ class QHashIterator
 template <typename Key, typename Val, typename Hash, typename KeyEqual>
 class QMutableHashIterator
 {
-   typedef typename QHash<Key, Val, Hash, KeyEqual>::iterator iterator;
-   typedef typename QHash<Key, Val, Hash, KeyEqual>::const_iterator const_iterator;
-   typedef iterator Item;
+   using const_iterator = typename QHash<Key, Val, Hash, KeyEqual>::const_iterator;
+   using iterator       = typename QHash<Key, Val, Hash, KeyEqual>::iterator;
+   using Item           = iterator;
 
  public:
    QMutableHashIterator(QHash<Key, Val, Hash, KeyEqual> &hash)
@@ -653,8 +664,7 @@ class QMutableHashIterator
    {
    }
 
-   ~QMutableHashIterator()
-   { }
+   ~QMutableHashIterator() = default;
 
    QMutableHashIterator &operator=(QHash<Key, Val, Hash, KeyEqual> &hash) {
       c = &hash;
@@ -714,7 +724,7 @@ class QMutableHashIterator
       }
    }
 
-  Val &value() {
+   Val &value() {
       Q_ASSERT(item_exists());
       return *n;
    }

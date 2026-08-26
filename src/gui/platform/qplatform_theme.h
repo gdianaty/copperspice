@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,24 +25,24 @@
 #define QPLATFORM_THEME_H
 
 #include <qglobal.h>
-#include <qscopedpointer.h>
 #include <qkeysequence.h>
+#include <qscopedpointer.h>
 
+class QFileInfo;
+class QFont;
 class QIconEngine;
 class QMenu;
 class QMenuBar;
-class QPlatformMenuItem;
+class QPalette;
+class QPixmap;
+class QPlatformDialogHelper;
 class QPlatformMenu;
 class QPlatformMenuBar;
-class QPlatformDialogHelper;
+class QPlatformMenuItem;
 class QPlatformSystemTrayIcon;
 class QPlatformThemePrivate;
-class QVariant;
-class QPalette;
-class QFont;
-class QPixmap;
 class QSizeF;
-class QFileInfo;
+class QVariant;
 
 class Q_GUI_EXPORT QPlatformTheme
 {
@@ -229,12 +229,12 @@ class Q_GUI_EXPORT QPlatformTheme
    };
 
    enum UiEffect {
-      GeneralUiEffect = 0x1,
-      AnimateMenuUiEffect = 0x2,
-      FadeMenuUiEffect = 0x4,
-      AnimateComboUiEffect = 0x8,
+      GeneralUiEffect        = 0x1,
+      AnimateMenuUiEffect    = 0x2,
+      FadeMenuUiEffect       = 0x4,
+      AnimateComboUiEffect   = 0x8,
       AnimateTooltipUiEffect = 0x10,
-      FadeTooltipUiEffect = 0x20,
+      FadeTooltipUiEffect    = 0x20,
       AnimateToolBoxUiEffect = 0x40
    };
 

@@ -1,12 +1,12 @@
 /***********************************************************************
 *
-* Copyright (c) 2017-2023 Barbara Geller
-* Copyright (c) 2017-2023 Ansel Sermersheim
+* Copyright (c) 2017-2026 Barbara Geller
+* Copyright (c) 2017-2026 Ansel Sermersheim
 *
 * This file is part of CsString.
 *
-* CsString is free software, released under the BSD 2-Clause license.
-* For license details refer to LICENSE provided with this project.
+* CsString is free software which is released under the BSD 2-Clause license.
+* For license details refer to the LICENSE provided with this project.
 *
 * CsString is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 
+#include <compare>
 #include <functional>
 #include <memory>
 
@@ -74,22 +75,12 @@ class CsChar
       {
       }
 
-#ifdef __cpp_char8_t
-      // support new data type added in C++20
-
       CsChar(char8_t c)
          : m_char(c)
       {
       }
-#endif
 
-      inline bool operator!=(const CsChar &other) const;
-      inline bool operator==(const CsChar &other) const;
-
-      inline bool operator<(const CsChar &other) const;
-      inline bool operator<=(const CsChar &other) const;
-      inline bool operator>(const CsChar &other) const;
-      inline bool operator>=(const CsChar &other) const;
+      auto operator<=>(const CsChar &other) const = default;
 
       inline CsChar &operator=(char c) &;
       inline CsChar &operator=(char32_t c) &;
@@ -100,37 +91,6 @@ class CsChar
    private:
       uint32_t m_char;
 };
-
-// comparisons
-inline bool CsChar::operator!=(const CsChar &other) const
-{
-   return m_char != other.m_char;
-}
-
-inline bool CsChar::operator==(const CsChar &other) const
-{
-   return m_char == other.m_char;
-}
-
-inline bool CsChar::operator<(const CsChar &other) const
-{
-   return m_char < other.m_char;
-}
-
-inline bool CsChar::operator<=(const CsChar &other) const
-{
-   return m_char <= other.m_char;
-}
-
-inline bool CsChar::operator>(const CsChar &other) const
-{
-   return m_char > other.m_char;
-}
-
-inline bool CsChar::operator>=(const CsChar &other) const
-{
-   return m_char >= other.m_char;
-}
 
 inline CsChar &CsChar::operator=(char c) &
 {

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2013 Klarälvdalens Datakonsult AB, a KDAB Group company
 * Copyright (c) 2015 The Qt Company Ltd.
@@ -33,21 +33,18 @@ class QOpenGLContext;
 class CachedShader
 {
 public:
-    inline CachedShader(const QByteArray &, const QByteArray &)
-    {}
+    CachedShader(const QByteArray &, const QByteArray &)
+    { }
 
-    inline bool isCached()
-    {
+    bool isCached() {
         return false;
     }
 
-    inline bool load(QOpenGLShaderProgram *, QOpenGLContext *)
-    {
+    bool load(QOpenGLShaderProgram *, QOpenGLContext *) {
         return false;
     }
 
-    inline bool store(QOpenGLShaderProgram *, QOpenGLContext *)
-    {
+    bool store(QOpenGLShaderProgram *, QOpenGLContext *) {
         return false;
     }
 };

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,31 +28,34 @@
 #include <cs_mac_p.h>
 
 #include <qmacstyle.h>
-#include <qcommonstyle_p.h>
-#include <qapplication_p.h>
-#include <qcombobox_p.h>
-#include <qpainter_p.h>
-#include <qstylehelper_p.h>
+
 #include <qapplication.h>
 #include <qbitmap.h>
 #include <qcheckbox.h>
 #include <qcombobox.h>
+#include <qdatetimeedit.h>
+#include <qdebug.h>
 #include <qdialogbuttonbox.h>
 #include <qdockwidget.h>
 #include <qevent.h>
 #include <qfocusframe.h>
 #include <qformlayout.h>
+#include <qgraphicsproxywidget.h>
+#include <qgraphicsview.h>
 #include <qgroupbox.h>
 #include <qhash.h>
 #include <qheaderview.h>
 #include <qlayout.h>
+#include <qlibrary.h>
 #include <qlineedit.h>
 #include <qlistview.h>
 #include <qmainwindow.h>
 #include <qmap.h>
+#include <qmath.h>
 #include <qmenubar.h>
 #include <qpaintdevice.h>
 #include <qpainter.h>
+#include <qpair.h>
 #include <qpixmapcache.h>
 #include <qpointer.h>
 #include <qprogressbar.h>
@@ -63,23 +66,20 @@
 #include <qspinbox.h>
 #include <qsplitter.h>
 #include <qstyleoption.h>
+#include <qtableview.h>
 #include <qtextedit.h>
 #include <qtextstream.h>
 #include <qtoolbar.h>
 #include <qtoolbutton.h>
 #include <qtreeview.h>
-#include <qtableview.h>
-#include <qwizard.h>
-#include <qdebug.h>
-#include <qlibrary.h>
-#include <qdatetimeedit.h>
-#include <qmath.h>
-#include <qpair.h>
 #include <qvector.h>
+#include <qwizard.h>
 
-#include <qgraphicsproxywidget.h>
-#include <qgraphicsview.h>
-
+#include <qapplication_p.h>
+#include <qcombobox_p.h>
+#include <qcommonstyle_p.h>
+#include <qpainter_p.h>
+#include <qstylehelper_p.h>
 
 /*
     AHIG:
@@ -155,7 +155,7 @@ class QMacStylePrivate : public QCommonStylePrivate
    void getSliderInfo(QStyle::ComplexControl cc, const QStyleOptionSlider *slider,
       HIThemeTrackDrawInfo *tdi, const QWidget *needToRemoveMe) const;
 
-   inline int animateSpeed(Animates) const {
+   int animateSpeed(Animates) const {
       return 33;
    }
 
@@ -189,7 +189,9 @@ class QMacStylePrivate : public QCommonStylePrivate
 
    NSView *cocoaControl(QCocoaWidget widget) const;
 
-   void drawNSViewInRect(QCocoaWidget widget, NSView *view, const QRect &rect, QPainter *p, bool isQWidget = true, QCocoaDrawRectBlock drawRectBlock = nil) const;
+   void drawNSViewInRect(QCocoaWidget widget, NSView *view, const QRect &rect, QPainter *p, bool isQWidget = true,
+         QCocoaDrawRectBlock drawRectBlock = nil) const;
+
    void resolveCurrentNSView(QWindow *window);
 
    void drawFocusRing(QPainter *p, const QRect &targetRect, int hMargin, int vMargin, qreal radius = 0) const;
@@ -202,8 +204,16 @@ class QMacStylePrivate : public QCommonStylePrivate
 
    struct ButtonState {
       int frame;
-      enum { ButtonDark, ButtonLight } dir;
-   } buttonState;
+
+      enum ButtonColor {
+         ButtonDark,
+         ButtonLight
+      };
+
+      ButtonColor dir;
+   };
+
+   ButtonState buttonState;
 
    mutable QPointer<QFocusFrame> focusWidget;
    CFAbsoluteTime defaultButtonStart;
@@ -217,6 +227,5 @@ class QMacStylePrivate : public QCommonStylePrivate
    NSView *backingStoreNSView;
    QHash<QCocoaWidget, NSView *> cocoaControls;
 };
-
 
 #endif

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,8 +21,8 @@
 *
 ***********************************************************************/
 
-#include "qmediaservice.h"
-#include "qmediaservice_p.h"
+#include <qmediaservice.h>
+#include <qmediaservice_p.h>
 
 #include <qtimer.h>
 
@@ -32,7 +32,6 @@ QMediaService::QMediaService(QObject *parent)
    d_ptr->q_ptr = this;
 }
 
-// internal
 QMediaService::QMediaService(QMediaServicePrivate &dd, QObject *parent)
    : QObject(parent)
    , d_ptr(&dd)

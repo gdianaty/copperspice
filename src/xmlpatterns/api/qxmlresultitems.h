@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,10 +24,8 @@
 #ifndef QXMLRESULTITEMS_H
 #define QXMLRESULTITEMS_H
 
-#include <QString>
-#include <QScopedPointer>
-
-QT_BEGIN_NAMESPACE
+#include <qstring.h>
+#include <qscopedpointer.h>
 
 class QXmlItem;
 class QXmlQuery;
@@ -52,7 +50,5 @@ class Q_XMLPATTERNS_EXPORT QXmlResultItems
 
    QScopedPointer<QXmlResultItemsPrivate> d_ptr;
 };
-
-QT_END_NAMESPACE
 
 #endif

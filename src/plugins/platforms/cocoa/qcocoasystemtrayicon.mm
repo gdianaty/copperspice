@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -31,14 +31,14 @@
 #define QT_MAC_SYSTEMTRAY_USE_GROWL
 
 #include <qcocoasystemtrayicon.h>
-#include <qtemporaryfile.h>
-#include <qimagewriter.h>
-#include <qdebug.h>
 
 #include <qcocoamenu.h>
+#include <qdebug.h>
+#include <qimagewriter.h>
+#include <qtemporaryfile.h>
 
-#include <qt_mac_p.h>
 #include <qcocoahelpers.h>
+#include <qt_mac_p.h>
 
 #import <AppKit/AppKit.h>
 

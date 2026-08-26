@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,14 +21,13 @@
 *
 ***********************************************************************/
 
-#include <qstandardpaths.h>
-
 #include <qcoreapplication.h>
 #include <qdir.h>
 #include <qfile.h>
 #include <qhash.h>
-#include <qtextstream.h>
 #include <qregularexpression.h>
+#include <qstandardpaths.h>
+#include <qtextstream.h>
 
 #include <qfilesystemengine_p.h>
 
@@ -89,6 +88,7 @@ QString QStandardPaths::writableLocation(StandardLocation type)
          if (type == AppDataLocation || type == AppLocalDataLocation) {
             appendOrganizationAndApp(xdgDataHome);
          }
+
          return xdgDataHome;
       }
 
@@ -98,7 +98,6 @@ QString QStandardPaths::writableLocation(StandardLocation type)
          // http://standards.freedesktop.org/basedir-spec/latest/
          QString xdgConfigHome = QFile::decodeName(qgetenv("XDG_CONFIG_HOME"));
 
-
          if (xdgConfigHome.isEmpty()) {
             xdgConfigHome = QDir::homePath() + "/.config";
          }
@@ -106,6 +105,7 @@ QString QStandardPaths::writableLocation(StandardLocation type)
          if (type == AppConfigLocation) {
             appendOrganizationAndApp(xdgConfigHome);
          }
+
          return xdgConfigHome;
       }
 
@@ -125,54 +125,58 @@ QString QStandardPaths::writableLocation(StandardLocation type)
 
             if (! fileInfo.isDir()) {
                if (! QDir().mkdir(xdgRuntimeDir)) {
-                  qWarning("QStandardPaths: Error creating runtime directory %s: %s", csPrintable(xdgRuntimeDir),
-                           csPrintable(qt_error_string(errno)));
+                  qWarning("QStandardPaths::writableLocation() Error creating runtime directory %s: %s",
+                        csPrintable(xdgRuntimeDir), csPrintable(qt_error_string(errno)));
                   return QString();
                }
             }
-            qWarning("QStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '%s'", csPrintable(xdgRuntimeDir));
 
-        } else {
+            qWarning("QStandardPaths::writableLocation() XDG_RUNTIME_DIR not set, defaulting to %s",
+                  csPrintable(xdgRuntimeDir));
+
+         } else {
             fileInfo.setFile(xdgRuntimeDir);
-            if (! fileInfo.exists()) {
-                qWarning("QStandardPaths: XDG_RUNTIME_DIR points to a non-existing path '%s', "
-                         "Create with 0700 permissions.", csPrintable(xdgRuntimeDir));
 
-                return QString();
+            if (! fileInfo.exists()) {
+               qWarning("QStandardPaths::writableLocation() XDG_RUNTIME_DIR points to an invalid path of %s, "
+                     "create using permissions of 0700", csPrintable(xdgRuntimeDir));
+
+               return QString();
             }
 
             if (! fileInfo.isDir()) {
-                qWarning("QStandardPaths: XDG_RUNTIME_DIR points to '%s' which is not a directory",
-                         csPrintable(xdgRuntimeDir));
+               qWarning("QStandardPaths::writableLocation() XDG_RUNTIME_DIR points to %s which is not a directory",
+                     csPrintable(xdgRuntimeDir));
 
-                return QString();
+               return QString();
             }
-        }
+         }
 
-        // "The directory MUST be owned by the user"
+         // the directory MUST be owned by the user
 
-        if (fileInfo.ownerId() != myUid) {
-            qWarning("QStandardPaths: Incorrect ownership on runtime directory %s, %d instead of %d", csPrintable(xdgRuntimeDir),
-                     fileInfo.ownerId(), myUid);
+         if (fileInfo.ownerId() != myUid) {
+            qWarning("QStandardPaths::writableLocation() Incorrect ownership on runtime directory %s, %d instead of %d",
+                  csPrintable(xdgRuntimeDir), fileInfo.ownerId(), myUid);
+
             return QString();
-        }
+         }
 
-        // Unix access mode MUST be 0700
-        const QFile::Permissions wantedPerms = QFile::ReadUser | QFile::WriteUser | QFile::ExeUser
-                          | QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner;
+         // Unix access mode MUST be 0700
+         const QFileDevice::Permissions wantedPerms = QFile::ReadUser | QFile::WriteUser | QFile::ExeUser
+               | QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner;
 
-        if (fileInfo.permissions() != wantedPerms) {
-           QFile file(xdgRuntimeDir);
+         if (fileInfo.permissions() != wantedPerms) {
+            QFile file(xdgRuntimeDir);
 
-           if (! file.setPermissions(wantedPerms)) {
-              qWarning("QStandardPaths: Unable to set permissions on runtime directory %s: %s",
+            if (! file.setPermissions(wantedPerms)) {
+               qWarning("QStandardPaths::writableLocation() Unable to set permissions on runtime directory %s: %s",
                      csPrintable(xdgRuntimeDir), csPrintable(file.errorString()));
 
-              return QString();
-           }
-        }
+               return QString();
+            }
+         }
 
-        return xdgRuntimeDir;
+         return xdgRuntimeDir;
 
       }
 
@@ -265,6 +269,7 @@ QString QStandardPaths::writableLocation(StandardLocation type)
    }
 
    QString path;
+
    switch (type) {
       case DesktopLocation:
          path = QDir::homePath() + "/Desktop";
@@ -323,13 +328,13 @@ static QStringList xdgDataDirs()
       QMutableListIterator<QString> it(dirs);
 
       while (it.hasNext()) {
-            const QString dir = it.next();
+         const QString dir = it.next();
 
-            if (! dir.startsWith('/')) {
-               it.remove();
-            } else {
-               it.setValue(QDir::cleanPath(dir));
-            }
+         if (! dir.startsWith('/')) {
+            it.remove();
+         } else {
+            it.setValue(QDir::cleanPath(dir));
+         }
       }
 
       dirs.removeDuplicates();
@@ -340,18 +345,18 @@ static QStringList xdgDataDirs()
 
 static QStringList xdgConfigDirs()
 {
-    QStringList dirs;
-    // http://standards.freedesktop.org/basedir-spec/latest/
+   QStringList dirs;
 
-    const QString xdgConfigDirs = QFile::decodeName(qgetenv("XDG_CONFIG_DIRS"));
+   // http://standards.freedesktop.org/basedir-spec/latest/
+   const QString xdgConfigDirs = QFile::decodeName(qgetenv("XDG_CONFIG_DIRS"));
 
-    if (xdgConfigDirs.isEmpty()) {
-        dirs.append(QString::fromLatin1("/etc/xdg"));
-    } else {
-        dirs = xdgConfigDirs.split(':');
-    }
+   if (xdgConfigDirs.isEmpty()) {
+      dirs.append(QString::fromLatin1("/etc/xdg"));
+   } else {
+      dirs = xdgConfigDirs.split(':');
+   }
 
-    return dirs;
+   return dirs;
 }
 
 QStringList QStandardPaths::standardLocations(StandardLocation type)
@@ -370,6 +375,7 @@ QStringList QStandardPaths::standardLocations(StandardLocation type)
          for (int i = 0; i < dirs.count(); ++i) {
             appendOrganizationAndApp(dirs[i]);
          }
+
          break;
 
       case GenericDataLocation:
@@ -378,17 +384,21 @@ QStringList QStandardPaths::standardLocations(StandardLocation type)
 
       case ApplicationsLocation:
          dirs = xdgDataDirs();
+
          for (int i = 0; i < dirs.count(); ++i) {
             dirs[i].append("/applications");
          }
+
          break;
 
       case AppDataLocation:
       case AppLocalDataLocation:
          dirs = xdgDataDirs();
+
          for (int i = 0; i < dirs.count(); ++i) {
             appendOrganizationAndApp(dirs[i]);
          }
+
          break;
 
       default:

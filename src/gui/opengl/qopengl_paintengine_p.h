@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2013 Klarälvdalens Datakonsult AB, a KDAB Group company
 * Copyright (c) 2015 The Qt Company Ltd.
@@ -89,39 +89,39 @@ class Q_GUI_EXPORT QOpenGL2PaintEngineEx : public QPaintEngineEx
     void ensureActive();
     bool end() override;
 
-    virtual void clipEnabledChanged() override;
-    virtual void penChanged() override;
-    virtual void brushChanged() override;
-    virtual void brushOriginChanged() override;
-    virtual void opacityChanged() override;
-    virtual void compositionModeChanged() override;
-    virtual void renderHintsChanged() override;
-    virtual void transformChanged() override;
+    void clipEnabledChanged() override;
+    void penChanged() override;
+    void brushChanged() override;
+    void brushOriginChanged() override;
+    void opacityChanged() override;
+    void compositionModeChanged() override;
+    void renderHintsChanged() override;
+    void transformChanged() override;
 
-    virtual void drawPixmap(const QRectF &rect, const QPixmap &pm, const QRectF &srcRect) override;
-    virtual void drawPixmapFragments(const QPainter::PixmapFragment *fragments, int fragmentCount, const QPixmap &pixmap,
+    void drawPixmap(const QRectF &rect, const QPixmap &pm, const QRectF &srcRect) override;
+    void drawPixmapFragments(const QPainter::PixmapFragment *fragments, int fragmentCount, const QPixmap &pixmap,
                QPainter::PixmapFragmentHints hints) override;
-    virtual void drawImage(const QRectF &rect, const QImage &pm, const QRectF &srcRect,
+    void drawImage(const QRectF &rect, const QImage &pm, const QRectF &srcRect,
                Qt::ImageConversionFlags flags = Qt::AutoColor) override;
-    virtual void drawTextItem(const QPointF &point, const QTextItem &textItem) override;
-    virtual void fill(const QVectorPath &path, const QBrush &brush) override;
-    virtual void stroke(const QVectorPath &path, const QPen &pen) override;
-    virtual void clip(const QVectorPath &path, Qt::ClipOperation op) override;
+    void drawTextItem(const QPointF &point, const QTextItem &textItem) override;
+    void fill(const QVectorPath &path, const QBrush &brush) override;
+    void stroke(const QVectorPath &path, const QPen &pen) override;
+    void clip(const QVectorPath &path, Qt::ClipOperation op) override;
 
-    virtual void drawStaticTextItem(QStaticTextItem *textItem) override;
+    void drawStaticTextItem(QStaticTextItem *textItem) override;
 
     bool drawTexture(const QRectF &rect, GLuint texture_id, const QSize &size, const QRectF &srcRect);
 
     Type type() const override { return OpenGL2; }
 
-    virtual void setState(QPainterState *s) override;
-    virtual QPainterState *createState(QPainterState *orig) const override;
+    void setState(QPainterState *s) override;
+    QPainterState *createState(QPainterState *orig) const override;
 
-    inline QOpenGL2PaintEngineState *state() {
+    QOpenGL2PaintEngineState *state() {
         return static_cast<QOpenGL2PaintEngineState *>(QPaintEngineEx::state());
     }
 
-    inline const QOpenGL2PaintEngineState *state() const {
+    const QOpenGL2PaintEngineState *state() const {
         return static_cast<const QOpenGL2PaintEngineState *>(QPaintEngineEx::state());
     }
 
@@ -141,8 +141,8 @@ class Q_GUI_EXPORT QOpenGL2PaintEngineEx : public QPaintEngineEx
     friend class QOpenGLEngineShaderManager;
 };
 
-// This probably needs to grow to GL_MAX_VERTEX_ATTRIBS, but 3 is ok for now as that's
-// all the GL2 engine uses:
+// This probably needs to grow to GL_MAX_VERTEX_ATTRIBS, but 3 is ok for now since
+//  that is all the GL2 engine uses
 #define QT_GL_VERTEX_ARRAY_TRACKED_COUNT 3
 
 class QOpenGL2PaintEngineExPrivate : public QPaintEngineExPrivate
@@ -154,9 +154,13 @@ class QOpenGL2PaintEngineExPrivate : public QPaintEngineExPrivate
         TriStripStrokeFillMode
     };
 
-    QOpenGL2PaintEngineExPrivate(QOpenGL2PaintEngineEx *q_ptr)
-      : q(q_ptr), shaderManager(nullptr), width(0), height(0), ctx(nullptr), useSystemClip(true), elementIndicesVBOId(0),
-        snapToPixelGrid(false), nativePaintingActive(false), inverseScale(1),
+    enum TextureUpdateMode {
+       UpdateIfNeeded, ForceUpdate
+    };
+
+    QOpenGL2PaintEngineExPrivate(QOpenGL2PaintEngineEx *newPtr)
+      : m_gl2PaintEngine(newPtr), shaderManager(nullptr), m_glWidth(0), m_glHeight(0), ctx(nullptr), useSystemClip(true),
+        elementIndicesVBOId(0), snapToPixelGrid(false), nativePaintingActive(false), inverseScale(1),
         lastTextureUnitUsed(QT_UNKNOWN_TEXTURE_UNIT)
     {
     }
@@ -167,8 +171,6 @@ class QOpenGL2PaintEngineExPrivate : public QPaintEngineExPrivate
     void updateBrushUniforms();
     void updateMatrix();
     void updateCompositionMode();
-
-    enum TextureUpdateMode { UpdateIfNeeded, ForceUpdate };
 
     template <typename T>
     void updateTexture(GLenum textureUnit, const T &texture, GLenum wrapMode, GLenum filterMode,
@@ -205,12 +207,12 @@ class QOpenGL2PaintEngineExPrivate : public QPaintEngineExPrivate
     void composite(const QOpenGLRect& boundingRect);
 
     // Calls drawVertexArrays to render into stencil buffer:
-    void fillStencilWithVertexArray(const float *data, int count, const int *stops, int stopCount, const QOpenGLRect &bounds,
-                  StencilFillMode mode);
+    void fillStencilWithVertexArray(const float *data, int count, const int *stops, int stopCount,
+          const QOpenGLRect &bounds, StencilFillMode mode);
 
     void fillStencilWithVertexArray(QOpenGL2PEXVertexArray& vertexArray, bool useWindingFill) {
-        fillStencilWithVertexArray((const float *) vertexArray.data(), 0, vertexArray.stops(), vertexArray.stopCount(),
-                  vertexArray.boundingRect(), useWindingFill ? WindingFillMode : OddEvenFillMode);
+          fillStencilWithVertexArray((const float *) vertexArray.data(), 0, vertexArray.stops(), vertexArray.stopCount(),
+          vertexArray.boundingRect(), useWindingFill ? WindingFillMode : OddEvenFillMode);
     }
 
     void setBrush(const QBrush& brush);
@@ -236,37 +238,46 @@ class QOpenGL2PaintEngineExPrivate : public QPaintEngineExPrivate
     void setVertexAttribArrayEnabled(int arrayIndex, bool enabled = true);
     void syncGlState();
 
-    static QOpenGLEngineShaderManager* shaderManagerForEngine(QOpenGL2PaintEngineEx *engine) { return engine->d_func()->shaderManager; }
-    static QOpenGL2PaintEngineExPrivate *getData(QOpenGL2PaintEngineEx *engine) { return engine->d_func(); }
+    static QOpenGLEngineShaderManager* shaderManagerForEngine(QOpenGL2PaintEngineEx *engine) {
+      return engine->d_func()->shaderManager;
+    }
+
+    static QOpenGL2PaintEngineExPrivate *getData(QOpenGL2PaintEngineEx *engine) {
+       return engine->d_func();
+    }
+
     static void cleanupVectorPath(QPaintEngineEx *engine, void *data);
 
     QOpenGLExtensions funcs;
 
-    QOpenGL2PaintEngineEx* q;
-    QOpenGLEngineShaderManager* shaderManager;
+    QOpenGL2PaintEngineEx *m_gl2PaintEngine;
+    QOpenGLEngineShaderManager *shaderManager;
     QOpenGLPaintDevice* device;
-    int width, height;
+
+    int m_glWidth;
+    int m_glHeight;
+
     QOpenGLContext *ctx;
-    EngineMode mode;
+    EngineMode m_gl2Mode;
     QFontEngine::GlyphFormat glyphCacheFormat;
 
     bool vertexAttributeArraysEnabledState[QT_GL_VERTEX_ARRAY_TRACKED_COUNT];
 
-    // Dirty flags
-    bool matrixDirty; // Implies matrix uniforms are also dirty
+    // dirty flags
+    bool matrixDirty;             // Implies matrix uniforms are also dirty
     bool compositionModeDirty;
     bool brushTextureDirty;
     bool brushUniformsDirty;
     bool opacityUniformDirty;
     bool matrixUniformDirty;
 
-    bool stencilClean; // Has the stencil not been used for clipping so far?
+    bool stencilClean;            // Has the stencil not been used for clipping so far?
     bool useSystemClip;
     QRegion dirtyStencilRegion;
     QRect currentScissorBounds;
     uint maxClip;
 
-    QBrush currentBrush; // May not be the state's brush!
+    QBrush currentBrush;          // May not be the state's brush!
     const QBrush noBrush;
 
     QImage currentBrushImage;
@@ -311,10 +322,11 @@ void QOpenGL2PaintEngineExPrivate::setVertexAttributePointer(unsigned int arrayI
 
     vertexAttribPointers[arrayIndex] = pointer;
 
-    if (arrayIndex == QT_OPACITY_ATTR)
+    if (arrayIndex == QT_OPACITY_ATTR) {
         funcs.glVertexAttribPointer(arrayIndex, 1, GL_FLOAT, GL_FALSE, 0, pointer);
-    else
+    } else {
         funcs.glVertexAttribPointer(arrayIndex, 2, GL_FLOAT, GL_FALSE, 0, pointer);
+    }
 }
 
 #endif

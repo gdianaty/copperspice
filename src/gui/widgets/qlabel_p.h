@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,16 +25,18 @@
 #define QLABEL_P_H
 
 #include <qlabel.h>
-#include <qtextdocumentlayout_p.h>
-#include <qtextcontrol_p.h>
-#include <qtextdocumentfragment.h>
-#include <qframe_p.h>
-#include <qtextdocument.h>
-#include <qmovie.h>
-#include <qimage.h>
+
 #include <qbitmap.h>
-#include <qpicture.h>
+#include <qimage.h>
 #include <qmenu.h>
+#include <qmovie.h>
+#include <qpicture.h>
+#include <qtextdocument.h>
+#include <qtextdocumentfragment.h>
+
+#include <qframe_p.h>
+#include <qtextcontrol_p.h>
+#include <qtextdocumentlayout_p.h>
 
 class QLabelPrivate : public QFramePrivate
 {
@@ -58,7 +60,7 @@ class QLabelPrivate : public QFramePrivate
    void updateShortcut();
 #endif
 
-   inline bool needTextControl() const {
+   bool needTextControl() const {
       return isTextLabel && (isRichText
             || (!isRichText && (textInteractionFlags & (Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard))));
    }
@@ -88,7 +90,7 @@ class QLabelPrivate : public QFramePrivate
 #endif
 
 #ifndef QT_NO_CURSOR
-   QCursor cursor;
+   QCursor m_cursor;
 #endif
 
 #ifndef QT_NO_SHORTCUT
@@ -101,7 +103,7 @@ class QLabelPrivate : public QFramePrivate
    mutable QSizePolicy sizePolicy;
    int margin;
 
-   ushort align;
+   ushort m_align;
    short indent;
    mutable uint valid_hints : 1;
    uint scaledcontents : 1;

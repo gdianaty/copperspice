@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -57,8 +57,7 @@ int QDesktopScreenWidget::screenNumber() const
 const QRect QDesktopWidget::screenGeometry(const QWidget *widget) const
 {
    if (!widget) {
-      qWarning("QDesktopWidget::screenGeometry(): Attempt "
-         "to get the screen geometry of a null widget");
+      qWarning("QDesktopWidget::screenGeometry() Unable to retrieve screen geometry for an invalid widget (nullptr)");
       return QRect();
    }
 
@@ -73,8 +72,8 @@ const QRect QDesktopWidget::screenGeometry(const QWidget *widget) const
 const QRect QDesktopWidget::availableGeometry(const QWidget *widget) const
 {
    if (!widget) {
-      qWarning("QDesktopWidget::availableGeometry(): Attempt "
-         "to get the available geometry of a null widget");
+      qWarning("QDesktopWidget::availableGeometry() Unable to retrieve screen geometry for an invalid widget (nullptr)");
+
       return QRect();
    }
 
@@ -184,7 +183,7 @@ QDesktopWidget::QDesktopWidget()
 {
    Q_D(QDesktopWidget);
 
-   setObjectName(QLatin1String("desktop"));
+   setObjectName("desktop");
    d->_q_updateScreens();
 
    connect(qApp, &QApplication::screenAdded,          this, &QDesktopWidget::_q_updateScreens);

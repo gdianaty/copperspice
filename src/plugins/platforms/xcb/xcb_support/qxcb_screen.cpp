@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,14 +25,14 @@
 
 #include <qdebug.h>
 #include <qnamespace.h>
-#include <qxcb_window.h>
+#include <qwindowsysteminterface.h>
 #include <qxcb_cursor.h>
 #include <qxcb_image.h>
+#include <qxcb_window.h>
 #include <qxcb_xsettings.h>
-#include <qwindowsysteminterface.h>
 
-#include <qmath_p.h>
 #include <qhighdpiscaling_p.h>
+#include <qmath_p.h>
 
 #include <stdio.h>
 
@@ -833,30 +833,33 @@ QDebug operator<<(QDebug debug, const QXcbScreen *screen)
 {
    const QDebugStateSaver saver(debug);
    debug.nospace();
-   debug << "QXcbScreen(" << (const void *)screen;
 
-   if (screen) {
+   debug << "QXcbScreen()" << (const void *)screen;
+
+   if (screen != nullptr) {
       debug << fixed << qSetRealNumberPrecision(1);
-      debug << ", name=" << screen->name();
-      debug << ", geometry=";
+      debug << ", name = " << screen->name();
+
+      debug << "\n   geometry = ";
       formatRect(debug, screen->geometry());
-      debug << ", availableGeometry=";
+      debug << ", availableGeometry = ";
       formatRect(debug, screen->availableGeometry());
-      debug << ", devicePixelRatio=" << screen->devicePixelRatio();
-      debug << ", logicalDpi=" << screen->logicalDpi();
-      debug << ", physicalSize=";
+
+      debug << "\n   devicePixelRatio = " << screen->devicePixelRatio();
+      debug << ", logicalDpi = " << screen->logicalDpi();
+      debug << ", physicalSize = ";
       formatSizeF(debug, screen->physicalSize());
-      // TODO 5.6 if (debug.verbosity() > 2) {
-      debug << ", screenNumber=" << screen->screenNumber();
-      debug << ", virtualSize=" << screen->virtualSize().width() << 'x' << screen->virtualSize().height() << " (";
+
+      debug << "\n   screenNumber = " << screen->screenNumber();
+      debug << ", virtualSize = " << screen->virtualSize().width() << 'x' << screen->virtualSize().height() << " (";
       formatSizeF(debug, screen->virtualSize());
-      debug << "), orientation=" << screen->orientation();
-      debug << ", depth=" << screen->depth();
-      debug << ", refreshRate=" << screen->refreshRate();
-      debug << ", root=" << hex << screen->root();
-      debug << ", windowManagerName=" << screen->windowManagerName();
+
+      debug << "), orientation = " << screen->orientation();
+      debug << "\n   depth = " << screen->depth();
+      debug << ", refreshRate = " << screen->refreshRate();
+      debug << ", root =" << hex << screen->root();
+      debug << ", windowManagerName = " << screen->windowManagerName();
    }
 
-   debug << ')';
    return debug;
 }

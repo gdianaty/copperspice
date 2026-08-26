@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,8 +26,6 @@
 
 #include <qanynodetype_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class XSLTNodeTest : public AnyNodeType
@@ -41,15 +39,10 @@ class XSLTNodeTest : public AnyNodeType
  protected:
    friend class BuiltinTypes;
 
-   /**
-    * This constructor does nothing, but exists in order to make it impossible to
-    * instantiate this class from anywhere but from BuiltinTypes.
-    */
-   inline XSLTNodeTest() {
-   }
+   XSLTNodeTest()
+   { }
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

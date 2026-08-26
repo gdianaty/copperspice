@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,11 +25,12 @@
 #define QLAYOUT_P_H
 
 #include <qstyle.h>
+
 #include <qsizepolicy.h>
 
-class QWidgetItem;
-class QSpacerItem;
 class QLayoutItem;
+class QSpacerItem;
+class QWidgetItem;
 
 class Q_GUI_EXPORT QLayoutPrivate
 {
@@ -68,17 +69,19 @@ class Q_GUI_EXPORT QLayoutPrivate
    int userTopMargin;
    int userRightMargin;
    int userBottomMargin;
+
    uint topLevel : 1;
    uint enabled : 1;
    uint activated : 1;
    uint autoNewChild : 1;
+
    QLayout::SizeConstraint constraint;
-   QRect rect;
+   QRect m_layoutRect;
+
    QWidget *menubar;
 
  protected:
    QLayout *q_ptr;
-
 };
 
 #endif

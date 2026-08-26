@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,9 +28,9 @@
 
 #include <cs_string_view.h>
 
-#include <qglobal.h>
 #include <qbytearray.h>
 #include <qchar32.h>
+#include <qglobal.h>
 #include <qstringfwd.h>
 
 class QStringParser;
@@ -223,6 +223,12 @@ class QStringView : public CsString::CsBasicStringView<S>
       }
 
       QStringView<S> mid(size_type indexStart, size_type numOfChars = -1) const;
+      QStringView<S> midView(size_type indexStart, size_type numOfChars = -1) const;
+
+      [[nodiscard]] QStringView<S> remaining(size_type indexStart) const {
+         return midView(indexStart);
+      }
+
       QStringView<S> right(size_type numOfChars) const;
 
       size_type size() const{
@@ -776,6 +782,13 @@ QStringView<S> QStringView<S>::mid(size_type indexStart, size_type numOfChars) c
    return QStringView<S>(iter_begin, iter_end);
 }
 
+
+template <typename S>
+QStringView<S> QStringView<S>::midView(size_type indexStart, size_type numOfChars) const
+{
+   return mid(indexStart, numOfChars);
+}
+
 template <typename S>
 QStringView<S> QStringView<S>::right(size_type numOfChars) const
 {
@@ -922,13 +935,8 @@ QByteArray QStringView<S>::toLatin1() const
 template <typename S>
 QByteArray QStringView<S>::toUtf8() const
 {
-   QByteArray retval;
-
-   for (value_type ch : *this) {
-      CsString::utf8::insert(retval, retval.cend(), ch);
-   }
-
-   return retval;
+   S tmp(this->begin(), this->end());
+   return tmp.toUtf8();
 }
 
 template <typename S>

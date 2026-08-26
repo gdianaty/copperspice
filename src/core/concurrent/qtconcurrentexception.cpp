@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -53,21 +53,22 @@ class Base
 {
  public:
    Base(Exception *exception)
-      : exception(exception), refCount(1), hasThrown(false)
+      : m_exception(exception), refCount(1), hasThrown(false)
    { }
 
    ~Base() {
-      delete exception;
+      delete m_exception;
    }
 
-   Exception *exception;
+   Exception *m_exception;
    QAtomicInt refCount;
    bool hasThrown;
 };
 
 ExceptionHolder::ExceptionHolder(Exception *exception)
    : base(new Base(exception))
-{ }
+{
+}
 
 ExceptionHolder::ExceptionHolder(const ExceptionHolder &other)
    : base(other.base)
@@ -98,7 +99,7 @@ ExceptionHolder::~ExceptionHolder()
 
 Exception *ExceptionHolder::exception() const
 {
-   return base->exception;
+   return base->m_exception;
 }
 
 void ExceptionStore::setException(const Exception &e)
@@ -132,7 +133,6 @@ bool ExceptionStore::hasThrown() const
 }
 
 }   // end namespace
-
 
 } // namespace QtConcurrent
 

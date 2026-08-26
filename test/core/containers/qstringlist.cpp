@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -39,7 +39,7 @@ TEST_CASE("QStringList count", "[qstringlist]")
    REQUIRE(list.count() == 0);
    REQUIRE(list.size() == 0);
    REQUIRE(list.length() == 0);
-   REQUIRE(list.isEmpty());
+   REQUIRE(list.isEmpty() == true);
 }
 
 TEST_CASE("QStringList join", "[qstringlist]")

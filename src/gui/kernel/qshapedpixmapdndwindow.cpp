@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,11 +23,11 @@
 
 #include <qshapedpixmapdndwindow_p.h>
 
-#include <qpainter.h>
-#include <qcursor.h>
-#include <qguiapplication.h>
-#include <qpalette.h>
+#include <qapplication.h>
 #include <qbitmap.h>
+#include <qcursor.h>
+#include <qpainter.h>
+#include <qpalette.h>
 
 QShapedPixmapWindow::QShapedPixmapWindow(QScreen *screen)
    : m_useCompositing(true)

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,9 +24,8 @@
 #ifndef QVIDEOFRAMECONVERSIONHELPER_P_H
 #define QVIDEOFRAMECONVERSIONHELPER_P_H
 
-#include <qvideoframe.h>
 #include <qsimd_p.h>
-
+#include <qvideoframe.h>
 
 using VideoFrameConvertFunc = void (*)(const QVideoFrame &frame, uchar *output);
 

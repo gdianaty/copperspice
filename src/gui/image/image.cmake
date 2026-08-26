@@ -2,7 +2,6 @@ list(APPEND GUI_PUBLIC_INCLUDES
    QBitmap
    QIcon
    QIconEngine
-   QIconEngineFactoryInterface
    QIconEnginePlugin
    QIconSet
    QImage
@@ -10,7 +9,6 @@ list(APPEND GUI_PUBLIC_INCLUDES
    QImageIOHandlerFactoryInterface
    QImageIOPlugin
    QImageReader
-   QImageTextKeyLang
    QImageWriter
    QMovie
    QPicture
@@ -25,7 +23,6 @@ list(APPEND GUI_INCLUDES
    ${CMAKE_CURRENT_SOURCE_DIR}/image/qbitmap.h
    ${CMAKE_CURRENT_SOURCE_DIR}/image/qicon.h
    ${CMAKE_CURRENT_SOURCE_DIR}/image/qiconengine.h
-   ${CMAKE_CURRENT_SOURCE_DIR}/image/qiconenginefactoryinterface.h
    ${CMAKE_CURRENT_SOURCE_DIR}/image/qiconengineplugin.h
    ${CMAKE_CURRENT_SOURCE_DIR}/image/qiconset.h
    ${CMAKE_CURRENT_SOURCE_DIR}/image/qimage.h
@@ -33,7 +30,6 @@ list(APPEND GUI_INCLUDES
    ${CMAKE_CURRENT_SOURCE_DIR}/image/qimageiohandlerfactoryinterface.h
    ${CMAKE_CURRENT_SOURCE_DIR}/image/qimageioplugin.h
    ${CMAKE_CURRENT_SOURCE_DIR}/image/qimagereader.h
-   ${CMAKE_CURRENT_SOURCE_DIR}/image/qimagetextkeylang.h
    ${CMAKE_CURRENT_SOURCE_DIR}/image/qimagewriter.h
    ${CMAKE_CURRENT_SOURCE_DIR}/image/qmovie.h
    ${CMAKE_CURRENT_SOURCE_DIR}/image/qpicture.h
@@ -153,6 +149,7 @@ target_sources(CsGui
    ${CMAKE_SOURCE_DIR}/src/3rdparty/libtiff/libtiff/tif_fax3sm.c
    ${CMAKE_SOURCE_DIR}/src/3rdparty/libtiff/libtiff/tif_flush.c
    ${CMAKE_SOURCE_DIR}/src/3rdparty/libtiff/libtiff/tif_getimage.c
+   ${CMAKE_SOURCE_DIR}/src/3rdparty/libtiff/libtiff/tif_hash_set.c
    ${CMAKE_SOURCE_DIR}/src/3rdparty/libtiff/libtiff/tif_luv.c
    ${CMAKE_SOURCE_DIR}/src/3rdparty/libtiff/libtiff/tif_lzw.c
    ${CMAKE_SOURCE_DIR}/src/3rdparty/libtiff/libtiff/tif_next.c
@@ -168,6 +165,7 @@ target_sources(CsGui
    ${CMAKE_SOURCE_DIR}/src/3rdparty/libtiff/libtiff/tif_tile.c
    ${CMAKE_SOURCE_DIR}/src/3rdparty/libtiff/libtiff/tif_version.c
    ${CMAKE_SOURCE_DIR}/src/3rdparty/libtiff/libtiff/tif_warning.c
+   ${CMAKE_SOURCE_DIR}/src/3rdparty/libtiff/libtiff/tif_webp.c
    ${CMAKE_SOURCE_DIR}/src/3rdparty/libtiff/libtiff/tif_write.c
    ${CMAKE_SOURCE_DIR}/src/3rdparty/libtiff/libtiff/tif_zip.c
 )

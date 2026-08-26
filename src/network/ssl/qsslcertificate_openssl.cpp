@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,11 +21,11 @@
 *
 ***********************************************************************/
 
-#include <qsslsocket_openssl_symbols_p.h>
+#include <qmutexpool_p.h>
+#include <qsslcertificate_extension_p.h>
 #include <qsslcertificate_p.h>
 #include <qsslkey_p.h>
-#include <qsslcertificate_extension_p.h>
-#include <qmutexpool_p.h>
+#include <qsslsocket_openssl_symbols_p.h>
 
 // forward declaration
 static QMultiMap<QByteArray, QString> _q_mapFromX509Name(X509_NAME *name);
@@ -47,7 +47,7 @@ bool QSslCertificate::operator==(const QSslCertificate &other) const
    return false;
 }
 
-uint qHash(const QSslCertificate &key, uint seed)
+uint QSslCertificate::hash(const QSslCertificate &key, uint seed)
 {
    if (X509 *const x509 = key.d->x509) {
       // populate x509->sha1_hash
@@ -67,6 +67,11 @@ uint qHash(const QSslCertificate &key, uint seed)
    } else {
       return seed;
    }
+}
+
+uint qHash(const QSslCertificate &key, uint seed)
+{
+   return QSslCertificate::hash(key, seed);
 }
 
 bool QSslCertificate::isNull() const
@@ -391,7 +396,8 @@ static QVariant x509ExtensionToValue(X509_EXTENSION *ext)
          BASIC_CONSTRAINTS *basic = reinterpret_cast<BASIC_CONSTRAINTS *>(q_X509V3_EXT_d2i(ext));
 
          QVariantMap result;
-         result[QLatin1String("ca")] = basic->ca ? true : false;
+         result[QString("ca")] = basic->ca ? true : false;
+
          if (basic->pathlen) {
             result["pathLenConstraint"] = (qint64)q_ASN1_INTEGER_get(basic->pathlen);
          }
@@ -422,7 +428,7 @@ static QVariant x509ExtensionToValue(X509_EXTENSION *ext)
                result[QString::fromUtf8(QSslCertificatePrivate::asn1ObjectName(ad->method))] = uri;
 
             } else {
-               qWarning() << "Strange location type" << name->type;
+               qWarning() << "x509ExtensionToValue() Location type unknown, " << name->type;
             }
          }
 
@@ -456,9 +462,8 @@ static QVariant x509ExtensionToValue(X509_EXTENSION *ext)
 
          // keyid
          if (auth_key->keyid) {
-            QByteArray keyid(reinterpret_cast<const char *>(auth_key->keyid->data),
-                             auth_key->keyid->length);
-            result[QLatin1String("keyid")] = keyid.toHex();
+            QByteArray keyid(reinterpret_cast<const char *>(auth_key->keyid->data), auth_key->keyid->length);
+            result[QString("keyid")] = keyid.toHex();
          }
 
          // issuer
@@ -466,7 +471,7 @@ static QVariant x509ExtensionToValue(X509_EXTENSION *ext)
 
          // serial
          if (auth_key->serial) {
-            result[QLatin1String("serial")] = (qint64)q_ASN1_INTEGER_get(auth_key->serial);
+            result[QString("serial")] = (qint64)q_ASN1_INTEGER_get(auth_key->serial);
          }
 
          q_AUTHORITY_KEYID_free(auth_key);
@@ -575,7 +580,7 @@ void QSslCertificatePrivate::init(const QByteArray &data, QSsl::EncodingFormat f
 QByteArray QSslCertificatePrivate::QByteArray_from_X509(X509 *x509, QSsl::EncodingFormat format)
 {
    if (!x509) {
-      qWarning("QSslSocketBackendPrivate::X509_to_QByteArray: null X509");
+      qWarning("QSslSocketBackend::X509_to_QByteArray() Device is invalid (nullptr)");
       return QByteArray();
    }
 
@@ -614,7 +619,7 @@ QByteArray QSslCertificatePrivate::QByteArray_from_X509(X509 *x509, QSsl::Encodi
 QString QSslCertificatePrivate::text_from_X509(X509 *x509)
 {
    if (!x509) {
-      qWarning("QSslSocketBackendPrivate::text_from_X509: null X509");
+      qWarning("QSslSocketBackend::text_from_X509() Device is invalid (nullptr)");
       return QString();
    }
 
@@ -662,11 +667,11 @@ static QMultiMap<QByteArray, QString> _q_mapFromX509Name(X509_NAME *name)
    for (int i = 0; i < q_X509_NAME_entry_count(name); ++i) {
       X509_NAME_ENTRY *e = q_X509_NAME_get_entry(name, i);
 
-      QByteArray name = QSslCertificatePrivate::asn1ObjectName(q_X509_NAME_ENTRY_get_object(e));
+      QByteArray certName = QSslCertificatePrivate::asn1ObjectName(q_X509_NAME_ENTRY_get_object(e));
       unsigned char *data = nullptr;
 
       int size = q_ASN1_STRING_to_UTF8(&data, q_X509_NAME_ENTRY_get_data(e));
-      info.insertMulti(name, QString::fromUtf8((char *)data, size));
+      info.insertMulti(certName, QString::fromUtf8((char *)data, size));
       q_CRYPTO_free(data);
    }
 

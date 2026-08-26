@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,12 +25,12 @@
 #define QABSTRACTVIDEOSURFACE_H
 
 #include <qobject.h>
+#include <qscopedpointer.h>
 #include <qvideoframe.h>
-#include <QScopedPointer>
-#include <QVideoSurfaceFormat>
+#include <qvideosurfaceformat.h>
 
-class QRectF;
 class QAbstractVideoSurfacePrivate;
+class QRectF;
 
 class Q_MULTIMEDIA_EXPORT QAbstractVideoSurface : public QObject
 {

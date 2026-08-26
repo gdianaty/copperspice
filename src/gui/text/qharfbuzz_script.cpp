@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,10 +21,10 @@
 *
 ***********************************************************************/
 
-#include <qharfbuzz_p.h>
-
 #include <qstring.h>
 #include <qvector.h>
+
+#include <qharfbuzz_p.h>
 
 static const hb_script_t cs_internal_scriptTable[] = {
    HB_SCRIPT_UNKNOWN,
@@ -215,11 +215,18 @@ static const hb_script_t cs_internal_scriptTable[] = {
    HB_SCRIPT_YEZIDI,
 
    // Unicode 14.0
-   //   HB_SCRIPT_CYPRO_MINOAN,
-   //   HB_SCRIPT_OLD_UYGHUR,
-   //   HB_SCRIPT_TANGSA,
-   //   HB_SCRIPT_TOTO,
-   //   HB_SCRIPT_VITHKUQI
+   HB_SCRIPT_CYPRO_MINOAN,
+   HB_SCRIPT_OLD_UYGHUR,
+   HB_SCRIPT_TANGSA,
+   HB_SCRIPT_TOTO,
+   HB_SCRIPT_VITHKUQI,
+
+   // Unicode 15.0
+   HB_SCRIPT_KAWI,
+   HB_SCRIPT_NAG_MUNDARI,
+
+   // Unicode 15.1
+   // nothing was added
 };
 static_assert(QChar::ScriptCount == sizeof(cs_internal_scriptTable) / sizeof(cs_internal_scriptTable[0]), "QChar script count mismatch");
 

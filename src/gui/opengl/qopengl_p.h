@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2013 Klarälvdalens Datakonsult AB, a KDAB Group company
 * Copyright (c) 2015 The Qt Company Ltd.
@@ -54,10 +54,11 @@ class Q_GUI_EXPORT QOpenGLConfig
 public:
     struct Q_GUI_EXPORT Gpu {
         Gpu() : vendorId(0), deviceId(0) {}
-        bool isValid() const { return deviceId || !glVendor.isEmpty(); }
+        bool isValid() const { return deviceId || ! glVendor.isEmpty(); }
+
         bool equals(const Gpu &other) const {
-            return vendorId == other.vendorId && deviceId == other.deviceId && driverVersion == other.driverVersion
-                && driverDescription == other.driverDescription && glVendor == other.glVendor;
+           return vendorId == other.vendorId && deviceId == other.deviceId && driverVersion == other.driverVersion
+                 && driverDescription == other.driverDescription && glVendor == other.glVendor;
         }
 
         uint vendorId;

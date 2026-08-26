@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,13 +21,14 @@
 *
 ***********************************************************************/
 
-#include "qacceltreeresourceloader_p.h"
-#include "qxmlschema.h"
-#include "qxmlschema_p.h"
+#include <qxmlschema.h>
+#include <qxmlschema_p.h>
 
-#include <QBuffer>
-#include <QIODevice>
-#include <QUrl>
+#include <qbuffer.h>
+#include <qiodevice.h>
+#include <qurl.h>
+
+#include <qacceltreeresourceloader_p.h>
 
 QXmlSchemaPrivate::QXmlSchemaPrivate(const QXmlNamePool &namePool)
    : m_namePool(namePool), m_userMessageHandler(nullptr), m_uriResolver(nullptr), m_userNetworkAccessManager(nullptr),

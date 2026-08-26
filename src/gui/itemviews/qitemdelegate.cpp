@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,32 +24,33 @@
 #include <qitemdelegate.h>
 
 #ifndef QT_NO_ITEMVIEWS
+
 #include <qabstractitemmodel.h>
 #include <qapplication.h>
+#include <qbitmap.h>
 #include <qbrush.h>
-
+#include <qdatetime.h>
+#include <qdebug.h>
+#include <qdialog.h>
+#include <qevent.h>
+#include <qitemeditorfactory.h>
+#include <qlocale.h>
+#include <qmath.h>
+#include <qmetaobject.h>
 #include <qpainter.h>
 #include <qpalette.h>
+#include <qpixmap.h>
+#include <qpixmapcache.h>
 #include <qpoint.h>
 #include <qrect.h>
 #include <qsize.h>
 #include <qstyle.h>
-#include <qdatetime.h>
 #include <qstyleoption.h>
-#include <qevent.h>
-#include <qpixmap.h>
-#include <qbitmap.h>
-#include <qpixmapcache.h>
-#include <qitemeditorfactory.h>
-#include <qmetaobject.h>
 #include <qtextlayout.h>
 
 #include <qabstractitemdelegate_p.h>
 #include <qtextengine_p.h>
-#include <qdebug.h>
-#include <qlocale.h>
-#include <qdialog.h>
-#include <qmath.h>
+
 #include <limits.h>
 
 #ifndef DBL_DIG
@@ -66,11 +67,11 @@ class QItemDelegatePrivate : public QAbstractItemDelegatePrivate
    {
    }
 
-   inline const QItemEditorFactory *editorFactory() const {
+   const QItemEditorFactory *editorFactory() const {
       return f ? f : QItemEditorFactory::defaultFactory();
    }
 
-   inline QIcon::Mode iconMode(QStyle::State state) const {
+   QIcon::Mode iconMode(QStyle::State state) const {
       if (! (state & QStyle::State_Enabled)) {
          return QIcon::Disabled;
       }
@@ -82,11 +83,11 @@ class QItemDelegatePrivate : public QAbstractItemDelegatePrivate
       return QIcon::Normal;
    }
 
-   inline QIcon::State iconState(QStyle::State state) const {
+   QIcon::State iconState(QStyle::State state) const {
       return state & QStyle::State_Open ? QIcon::On : QIcon::Off;
    }
 
-   static inline QString replaceNewLine(QString text) {
+   static QString replaceNewLine(QString text) {
       const QChar ch = QChar::LineSeparator;
       text.replace('\n', ch);
 
@@ -555,10 +556,6 @@ void QItemDelegate::drawBackground(QPainter *painter, const QStyleOptionViewItem
    }
 }
 
-/*!
-    Code duplicated in QCommonStylePrivate::viewItemLayout
-*/
-
 void QItemDelegate::doLayout(const QStyleOptionViewItem &option,
    QRect *checkRect, QRect *pixmapRect, QRect *textRect, bool hint) const
 {
@@ -692,9 +689,10 @@ void QItemDelegate::doLayout(const QStyleOptionViewItem &option,
          break;
    }
 
-   if (!hint) { // we only need to do the internal layout if we are going to paint
-      *checkRect = QStyle::alignedRect(option.direction, Qt::AlignCenter,
-            checkRect->size(), check);
+   if (! hint) {
+      // only need to do the layout if we are going to paint
+
+      *checkRect = QStyle::alignedRect(option.direction, Qt::AlignCenter, checkRect->size(), check);
 
       *pixmapRect = QStyle::alignedRect(option.direction, option.decorationAlignment,
             pixmapRect->size(), decoration);
@@ -713,14 +711,6 @@ void QItemDelegate::doLayout(const QStyleOptionViewItem &option,
       *textRect   = display;
    }
 }
-
-/*!
-    \internal
-
-    Returns the pixmap used to decorate the root of the item view.
-    The style \a option controls the appearance of the root; the \a variant
-    refers to the data associated with an item.
-*/
 
 QPixmap QItemDelegate::decoration(const QStyleOptionViewItem &option, const QVariant &variant) const
 {
@@ -860,10 +850,7 @@ QRect QItemDelegate::doCheck(const QStyleOptionViewItem &option,
    return QRect();
 }
 
-/*!
-  \internal
-*/
-QRect QItemDelegate::textRectangle(QPainter * /*painter*/, const QRect &rect,
+QRect QItemDelegate::textRectangle(QPainter *, const QRect &rect,
    const QFont &font, const QString &text) const
 {
    Q_D(const QItemDelegate);
@@ -947,7 +934,7 @@ bool QItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *model,
 }
 
 QStyleOptionViewItem QItemDelegate::setOptions(const QModelIndex &index,
-   const QStyleOptionViewItem &option) const
+      const QStyleOptionViewItem &option) const
 {
    QStyleOptionViewItem opt = option;
 

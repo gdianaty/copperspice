@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,27 +28,28 @@
 
 #ifndef QT_NO_ICON
 
+#include <qhash.h>
 #include <qicon.h>
 #include <qiconengine.h>
 #include <qpixmapcache.h>
-#include <qhash.h>
 #include <qvector.h>
 
-#include <qicon_p.h>
 #include <qfactoryloader_p.h>
+#include <qicon_p.h>
 
 class QIconLoader;
 
 struct QIconDirInfo {
-   enum Type { Fixed, Scalable, Threshold };
+   enum Type {
+      Fixed,
+      Scalable,
+      Threshold
+   };
 
-   QIconDirInfo(const QString &_path = QString()) :
-      path(_path),
-      size(0),
-      maxSize(0),
-      minSize(0),
-      threshold(0),
-      type(Threshold) {}
+   QIconDirInfo(const QString &_path = QString())
+      : path(_path), size(0), maxSize(0), minSize(0), threshold(0), type(Threshold)
+   { }
+
    QString path;
    short size;
    short maxSize;

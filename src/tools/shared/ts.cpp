@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -216,6 +216,7 @@ QString TSReader::readTransContents()
             break;
          }
       }
+
       return result;
 
    } else {
@@ -231,28 +232,23 @@ bool TSReader::read(Translator &translator)
       readNext();
 
       if (isStartDocument()) {
-         // <!DOCTYPE TS>
-         //qDebug() << attributes();
+         // ignore state
 
       } else if (isEndDocument()) {
-         // <!DOCTYPE TS>
-         //qDebug() << attributes();
+         // ignore state
 
       } else if (isDTD()) {
-         // <!DOCTYPE TS>
-         //qDebug() << tokenString();
+         // ignore state
 
       } else if (elementStarts(text_TS)) {
-         // <TS>
-         //qDebug() << "TS " << attributes();
          QHash<QString, int> currentLine;
          QString currentFile;
          bool maybeRelative = false, maybeAbsolute = false;
 
-         QXmlStreamAttributes atts = attributes();
+         QXmlStreamAttributes elementAttribute = attributes();
 
-         translator.setLanguageCode(atts.value(text_language).toString());
-         translator.setSourceLanguageCode(atts.value(text_sourcelanguage).toString());
+         translator.setLanguageCode(elementAttribute.value(text_language).toString());
+         translator.setSourceLanguageCode(elementAttribute.value(text_sourcelanguage).toString());
 
          while (! atEnd()) {
             readNext();
@@ -267,7 +263,6 @@ bool TSReader::read(Translator &translator)
 
                readElementText();
                m_cd.appendError("Warning: ignoring <defaultcodec> element");
-
 
             } else if (isStartElement() && name().toString().startsWith(text_extrans)) {
 
@@ -293,8 +288,8 @@ bool TSReader::read(Translator &translator)
 
                   } else if (elementStarts(text_dependency)) {
                      // <dependency>
-                     QXmlStreamAttributes atts = attributes();
-                     dependencies.append(atts.value(text_catalog).toString());
+                     QXmlStreamAttributes newAttribute = attributes();
+                     dependencies.append(newAttribute.value(text_catalog).toString());
 
                      while (! atEnd()) {
                         readNext();
@@ -373,9 +368,9 @@ bool TSReader::read(Translator &translator)
                         } else if (elementStarts(text_location)) {
                            // <location/>
                            maybeAbsolute = true;
-                           QXmlStreamAttributes atts = attributes();
+                           QXmlStreamAttributes newAttribute = attributes();
 
-                           QString fileName = atts.value(text_filename).toString();
+                           QString fileName = newAttribute.value(text_filename).toString();
 
                            if (fileName.isEmpty()) {
                               fileName = currentMsgFile;
@@ -389,7 +384,7 @@ bool TSReader::read(Translator &translator)
                               currentMsgFile = fileName;
                            }
 
-                           const QString lin = atts.value(text_line).toString();
+                           const QString lin = newAttribute.value(text_line).toString();
 
                            if (lin.isEmpty()) {
                               refs.append(TranslatorMessage::Reference(fileName, -1));
@@ -418,8 +413,8 @@ bool TSReader::read(Translator &translator)
 
                         } else if (elementStarts(text_translation)) {
                            // <translation>
-                           QXmlStreamAttributes atts = attributes();
-                           QStringView type = atts.value(text_type);
+                           QXmlStreamAttributes newAttribute = attributes();
+                           QStringView type = newAttribute.value(text_type);
 
                            if (type == text_unfinished) {
                               msg.setType(TranslatorMessage::Type::Unfinished);
@@ -458,7 +453,6 @@ bool TSReader::read(Translator &translator)
                            } else {
                               msg.setTranslation(readTransContents());
                            }
-
 
                         } else if (isStartElement() && name().toString().startsWith(text_extrans)) {
                            // <extra-...>

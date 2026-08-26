@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,23 +24,23 @@
 #include <qicon.h>
 #include <qicon_p.h>
 
+#include <qcache.h>
+#include <qdebug.h>
 #include <qfileinfo.h>
 #include <qiconengine.h>
 #include <qiconengineplugin.h>
-#include <qpainter.h>
-#include <qplatform_theme.h>
-#include <qpixmapcache.h>
-#include <qvariant.h>
-#include <qcache.h>
-#include <qdebug.h>
-#include <qpalette.h>
 #include <qmath.h>
+#include <qpainter.h>
+#include <qpalette.h>
+#include <qpixmapcache.h>
+#include <qplatform_theme.h>
+#include <qvariant.h>
 
 #include <qapplication_p.h>
-#include <qhexstring_p.h>
-#include <qimagereader.h>
 #include <qfactoryloader_p.h>
+#include <qhexstring_p.h>
 #include <qiconloader_p.h>
+#include <qimagereader.h>
 
 #ifndef QT_NO_ICON
 
@@ -394,7 +394,7 @@ void QPixmapIconEngine::addFile(const QString &fileName, const QSize &size, QIco
       return;
    }
 
-   const QString abs = fileName.startsWith(QLatin1Char(':')) ? fileName : QFileInfo(fileName).absoluteFilePath();
+   const QString abs = fileName.startsWith(QChar(':')) ? fileName : QFileInfo(fileName).absoluteFilePath();
    const bool ignoreSize = !size.isValid();
    ImageReader imageReader(abs);
    const QString format = imageReader.format();
@@ -454,7 +454,7 @@ void QPixmapIconEngine::addFile(const QString &fileName, const QSize &size, QIco
 
 QString QPixmapIconEngine::key() const
 {
-   return QLatin1String("QPixmapIconEngine");
+   return QString("QPixmapIconEngine");
 }
 
 QIconEngine *QPixmapIconEngine::clone() const
@@ -472,16 +472,19 @@ bool QPixmapIconEngine::read(QDataStream &in)
    uint state;
 
    in >> num_entries;
+
    for (int i = 0; i < num_entries; ++i) {
       if (in.atEnd()) {
          pixmaps.clear();
          return false;
       }
+
       in >> pm;
       in >> fileName;
       in >> sz;
       in >> mode;
       in >> state;
+
       if (pm.isNull()) {
          addFile(fileName, sz, QIcon::Mode(mode), QIcon::State(state));
       } else {
@@ -490,6 +493,7 @@ bool QPixmapIconEngine::read(QDataStream &in)
          pixmaps += pe;
       }
    }
+
    return true;
 }
 
@@ -700,15 +704,11 @@ bool QIcon::isNull() const
    return !d;
 }
 
-/*!\internal
- */
 bool QIcon::isDetached() const
 {
    return !d || d->ref.load() == 1;
 }
 
-/*! \internal
- */
 void QIcon::detach()
 {
    if (d) {
@@ -724,15 +724,6 @@ void QIcon::detach()
    }
 }
 
-/*!
-    Adds \a pixmap to the icon, as a specialization for \a mode and
-    \a state.
-
-    Custom icon engines are free to ignore additionally added
-    pixmaps.
-
-    \sa addFile()
-*/
 void QIcon::addPixmap(const QPixmap &pixmap, Mode mode, State state)
 {
    if (pixmap.isNull()) {

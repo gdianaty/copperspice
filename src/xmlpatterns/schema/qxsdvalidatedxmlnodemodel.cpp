@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,13 +21,11 @@
 *
 ***********************************************************************/
 
-#include "qxsdvalidatedxmlnodemodel_p.h"
+#include <qurl.h>
+#include <qvariant.h>
+#include <qvector.h>
 
-#include <QUrl>
-#include <QVariant>
-#include <QVector>
-
-QT_BEGIN_NAMESPACE
+#include <qxsdvalidatedxmlnodemodel_p.h>
 
 using namespace QPatternist;
 
@@ -201,5 +199,3 @@ QSet<NamedSchemaComponent::Ptr> XsdValidatedXmlNodeModel::idIdRefBindings(const 
 {
    return m_idIdRefBindings.value(id);
 }
-
-QT_END_NAMESPACE

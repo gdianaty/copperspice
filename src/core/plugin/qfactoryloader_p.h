@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,11 +24,11 @@
 #ifndef QFACTORYLOADER_P_H
 #define QFACTORYLOADER_P_H
 
-#include <qobject.h>
-#include <qstringlist.h>
 #include <qmultimap.h>
-#include <qset.h>
+#include <qobject.h>
 #include <qscopedpointer.h>
+#include <qset.h>
+#include <qstringlist.h>
 
 #include <qlibrary_p.h>
 
@@ -48,7 +48,7 @@ class Q_CORE_EXPORT QFactoryLoader : public QObject
 #endif
 
    QObject *instance(QString key) const;
-   QObject *instance(QLibraryHandle * library) const;
+   QObject *instance(QLibraryHandle *library) const;
 
    QSet<QString> keySet() const;
    QSet<QLibraryHandle *> librarySet(QString key) const;

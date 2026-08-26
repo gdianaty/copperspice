@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2013 Klarälvdalens Datakonsult AB, a KDAB Group company
 * Copyright (c) 2015 The Qt Company Ltd.
@@ -39,7 +39,7 @@ void Q_GUI_EXPORT qtInitializeVertexArrayObjectHelper(QOpenGLVertexArrayObjectHe
 class QOpenGLVertexArrayObjectHelper
 {
  public:
-    explicit inline QOpenGLVertexArrayObjectHelper(QOpenGLContext *context)
+    explicit QOpenGLVertexArrayObjectHelper(QOpenGLContext *context)
         : GenVertexArrays(nullptr), DeleteVertexArrays(nullptr),
           BindVertexArray(nullptr), IsVertexArray(nullptr)
     {
@@ -61,8 +61,7 @@ class QOpenGLVertexArrayObjectHelper
         DeleteVertexArrays(n, arrays);
     }
 
-    inline void glBindVertexArray(GLuint array) const
-    {
+    void glBindVertexArray(GLuint array) const {
         BindVertexArray(array);
     }
 

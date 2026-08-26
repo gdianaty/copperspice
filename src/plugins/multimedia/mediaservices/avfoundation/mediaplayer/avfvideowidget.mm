@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -44,10 +44,6 @@ AVFVideoWidget::AVFVideoWidget(QWidget *parent)
 
 AVFVideoWidget::~AVFVideoWidget()
 {
-#ifdef QT_DEBUG_AVF
-   qDebug() << Q_FUNC_INFO;
-#endif
-
    if (m_playerLayer) {
       [m_playerLayer removeFromSuperlayer];
       [m_playerLayer release];
@@ -108,7 +104,7 @@ void AVFVideoWidget::setPlayerLayer(AVPlayerLayer *layer)
       [nativeLayer addSublayer: m_playerLayer];
       updatePlayerLayerBounds(this->size());
    }
-#ifdef QT_DEBUG_AVF
+#if defined(CS_SHOW_DEBUG_PLUGINS_AVF)
    NSArray *sublayers = [nativeLayer sublayers];
    qDebug() << "playerlayer: " << "at z:" << [m_playerLayer zPosition]
       << " frame: " << m_playerLayer.frame.size.width << "x"  << m_playerLayer.frame.size.height;

@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,13 +24,13 @@
 #ifndef QResourceDelegator_P_H
 #define QResourceDelegator_P_H
 
-#include <QSet>
-#include <QUrl>
+#include <qset.h>
+#include <qurl.h>
+
 #include <qdeviceresourceloader_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class ResourceDelegator : public DeviceResourceLoader
 {
  public:
@@ -52,10 +52,6 @@ class ResourceDelegator : public DeviceResourceLoader
    Item::Iterator::Ptr openCollection(const QUrl &uri) override;
    SequenceType::Ptr announceCollection(const QUrl &uri) override;
 
-   /**
-    * Returns the union of the deviceURIs() that ResourceDelegator's two
-    * resource loaders has.
-    */
    QSet<QUrl> deviceURIs() const override;
 
  private:
@@ -63,8 +59,7 @@ class ResourceDelegator : public DeviceResourceLoader
    const ResourceLoader::Ptr m_parentLoader;
    const ResourceDelegator::Ptr m_forDeviceLoader;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

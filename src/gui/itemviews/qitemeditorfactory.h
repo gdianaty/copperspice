@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,9 +24,9 @@
 #ifndef QITEMEDITORFACTORY_H
 #define QITEMEDITORFACTORY_H
 
-#include <qmetaobject.h>
 #include <qbytearray.h>
 #include <qhash.h>
+#include <qmetaobject.h>
 #include <qvariant.h>
 
 #ifndef QT_NO_ITEMVIEWS
@@ -48,11 +48,11 @@ class QItemEditorCreator : public QItemEditorCreatorBase
  public:
    inline explicit QItemEditorCreator(const QString &valuePropertyName);
 
-   inline QWidget *createWidget(QWidget *parent) const override {
+   QWidget *createWidget(QWidget *parent) const override {
       return new T(parent);
    }
 
-   inline QString valuePropertyName() const override {
+   QString valuePropertyName() const override {
       return propertyName;
    }
 
@@ -64,15 +64,15 @@ template <class T>
 class QStandardItemEditorCreator: public QItemEditorCreatorBase
 {
  public:
-   inline QStandardItemEditorCreator()
+   QStandardItemEditorCreator()
       : propertyName(T::staticMetaObject.userProperty().name()) {
    }
 
-   inline QWidget *createWidget(QWidget *parent) const override {
+   QWidget *createWidget(QWidget *parent) const override {
       return new T(parent);
    }
 
-   inline QString valuePropertyName() const override {
+   QString valuePropertyName() const override {
       return propertyName;
    }
 
@@ -89,7 +89,9 @@ QItemEditorCreator<T>::QItemEditorCreator(const QString &valuePropertyName)
 class Q_GUI_EXPORT QItemEditorFactory
 {
  public:
-   inline QItemEditorFactory() {}
+   QItemEditorFactory()
+   { }
+
    virtual ~QItemEditorFactory();
 
    virtual QWidget *createEditor(QVariant::Type type, QWidget *parent) const;
@@ -105,7 +107,6 @@ class Q_GUI_EXPORT QItemEditorFactory
 };
 
 #endif // QT_NO_ITEMVIEWS
-
 
 
 #endif // QITEMEDITORFACTORY_H

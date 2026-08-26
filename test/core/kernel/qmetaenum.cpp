@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * This file is part of CopperSpice.
 *
@@ -52,23 +52,28 @@ TEST_CASE("QMetaEnum enum_count_b", "[qmetaenum]")
 {
    const QMetaObject &metaObject = Qt::staticMetaObject();
 
-   int index = metaObject.indexOfEnumerator("AlignmentFlag");
-   QMetaEnum enumObj = metaObject.enumerator(index);
+   {
+      int index = metaObject.indexOfEnumerator("AlignmentFlag");
+      QMetaEnum enumObj = metaObject.enumerator(index);
 
-   REQUIRE(enumObj.isValid() == true);
+      REQUIRE(enumObj.isValid() == true);
 
-   REQUIRE(enumObj.name()   == "AlignmentFlag");
-   REQUIRE(enumObj.scope()  == "Qt");
-   REQUIRE(enumObj.isFlag() == false);
+      REQUIRE(enumObj.name()   == "AlignmentFlag");
+      REQUIRE(enumObj.scope()  == "Qt");
+      REQUIRE(enumObj.isFlag() == false);
 
-   REQUIRE(enumObj.keyCount() == 14);
+      REQUIRE(enumObj.keyCount() == 14);
 
-   REQUIRE(enumObj.keyToValue("AlignLeft")    == 1);
-   REQUIRE(enumObj.keyToValue("AlignRight")   == 2);
-   REQUIRE(enumObj.keyToValue("AlignVCenter") == 128);
-   REQUIRE(enumObj.keyToValue("AlignHCenter") == 4);
-   REQUIRE(enumObj.keyToValue("AlignTop")     == 32);
-   REQUIRE(enumObj.keyToValue("AlignBottom")  == 64);
+      REQUIRE(enumObj.keyToValue("AlignLeft")    == 1);
+      REQUIRE(enumObj.keyToValue("AlignRight")   == 2);
+      REQUIRE(enumObj.keyToValue("AlignVCenter") == 128);
+      REQUIRE(enumObj.keyToValue("AlignHCenter") == 4);
+      REQUIRE(enumObj.keyToValue("AlignTop")     == 32);
+      REQUIRE(enumObj.keyToValue("AlignBottom")  == 64);
+
+      REQUIRE(enumObj.keysToValue("AlignLeft | AlignTop") == 33);
+      REQUIRE(enumObj.keysToValue("AlignVCenter | AlignHCenter") == 132);
+   }
 
    {
       // part 2
@@ -88,6 +93,9 @@ TEST_CASE("QMetaEnum enum_count_b", "[qmetaenum]")
 
 TEST_CASE("QMetaEnum enum_count_c", "[qmetaenum]")
 {
+   // disable QWarning() for this test
+   csInstallMsgHandler([](QtMsgType, QStringView){ });
+
    const QMetaObject &metaObject = Qt::staticMetaObject();
 
    int index = metaObject.indexOfEnumerator("SortOrder");
@@ -104,9 +112,11 @@ TEST_CASE("QMetaEnum enum_count_c", "[qmetaenum]")
 
    REQUIRE(enumObj.key(0)   == "");
    REQUIRE(enumObj.value(0) == -1);
+
+   csInstallMsgHandler(nullptr);
 }
 
-TEST_CASE("QMetaEnum enum_count_d", "[qmetaenum]")
+TEST_CASE("QMetaEnum keyToValue_enum", "[qmetaenum]")
 {
    const QMetaObject &metaObject = Qt::staticMetaObject();
 
@@ -126,12 +136,20 @@ TEST_CASE("QMetaEnum enum_count_d", "[qmetaenum]")
    REQUIRE(enumObj.keyToValue("ClickFocus") == 2);
 }
 
-TEST_CASE("QMetaEnum flag_value", "[qmetaenum]")
+TEST_CASE("QMetaEnum keyToValue_flag", "[qmetaenum]")
 {
    const QMetaObject &metaObject = Qt::staticMetaObject();
 
-   int index = metaObject.indexOfEnumerator("InputMethodHint");
+   int index = metaObject.indexOfEnumerator("InputMethodHints");
    QMetaEnum enumObj = metaObject.enumerator(index);
+
+   REQUIRE(enumObj.isValid() == true);
+
+   REQUIRE(enumObj.name()   == "InputMethodHints");
+   REQUIRE(enumObj.scope()  == "Qt");
+   REQUIRE(enumObj.isFlag() == true);
+
+   REQUIRE(enumObj.keyCount() == 21);
 
    REQUIRE(enumObj.keyToValue("ImhNone") == 0);
    REQUIRE(enumObj.keyToValue("ImhDate") == 0x80);
@@ -139,4 +157,32 @@ TEST_CASE("QMetaEnum flag_value", "[qmetaenum]")
 
    REQUIRE(enumObj.keyToValue("ImhLatinOnly")          == 0x800000);
    REQUIRE(enumObj.keyToValue("ImhExclusiveInputMask") == static_cast<int>(0xffff0000));
+}
+
+TEST_CASE("QMetaEnum valueToKey", "[qmetaenum]")
+{
+   const QMetaObject &metaObject = Qt::staticMetaObject();
+
+   int index = metaObject.indexOfEnumerator("AlignmentFlag");
+   QMetaEnum enumObj = metaObject.enumerator(index);
+
+   REQUIRE(enumObj.isValid() == true);
+
+   REQUIRE(enumObj.name()   == "AlignmentFlag");
+   REQUIRE(enumObj.scope()  == "Qt");
+   REQUIRE(enumObj.isFlag() == false);
+
+   REQUIRE(enumObj.keyCount() == 14);
+
+   // REQUIRE(enumObj.valueToKey(1) == "AlignLeft");
+   REQUIRE(enumObj.valueToKey(1)    == "AlignLeading");
+
+   REQUIRE(enumObj.valueToKey(2)   == "AlignRight");
+   REQUIRE(enumObj.valueToKey(128) == "AlignVCenter");
+   REQUIRE(enumObj.valueToKey(4)   == "AlignHCenter");
+   REQUIRE(enumObj.valueToKey(32)  == "AlignTop");
+   REQUIRE(enumObj.valueToKey(64)  == "AlignBottom");
+
+   REQUIRE(enumObj.valueToKeys(40)  == "AlignJustify|AlignTop");
+   REQUIRE(enumObj.valueToKeys(132) == "AlignCenter|AlignHCenter|AlignVCenter");
 }

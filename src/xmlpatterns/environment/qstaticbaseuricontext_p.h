@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,16 +26,11 @@
 
 #include <qdelegatingstaticcontext_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
+
 class StaticBaseURIContext : public DelegatingStaticContext
 {
  public:
-   /**
-    * The @p bURI is the new static base URI, and it must be valid
-    * and absolute.
-    */
    StaticBaseURIContext(const QUrl &bURI, const StaticContext::Ptr &prevContext);
 
    QUrl baseURI() const override;
@@ -43,8 +38,7 @@ class StaticBaseURIContext : public DelegatingStaticContext
  private:
    const QUrl m_baseURI;
 };
-}
 
-QT_END_NAMESPACE
+}
 
 #endif

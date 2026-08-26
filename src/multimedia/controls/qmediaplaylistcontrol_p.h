@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,8 +24,9 @@
 #ifndef QMEDIAPLAYLISTCONTROL_P_H
 #define QMEDIAPLAYLISTCONTROL_P_H
 
-#include <qobject.h>
 #include <qmediacontrol.h>
+#include <qobject.h>
+
 #include <qmediaplaylistnavigator_p.h>
 
 class QMediaPlaylistProvider;

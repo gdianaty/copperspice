@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -24,17 +24,18 @@
 #ifndef QLAYOUT_H
 #define QLAYOUT_H
 
-#include <qobject.h>
 #include <qlayoutitem.h>
-#include <qsizepolicy.h>
-#include <qrect.h>
 #include <qmargins.h>
-#include <QScopedPointer>
+#include <qobject.h>
+#include <qrect.h>
+#include <qscopedpointer.h>
+#include <qsizepolicy.h>
 
 #include <limits.h>
 
 class QLayout;
 class QSize;
+
 class QLayoutPrivate;
 
 class Q_GUI_EXPORT QLayout : public QObject, public QLayoutItem

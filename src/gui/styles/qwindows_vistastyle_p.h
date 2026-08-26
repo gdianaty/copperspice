@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,36 +28,36 @@
 
 #if ! defined(QT_NO_STYLE_WINDOWSVISTA)
 
-#include <qlibrary.h>
-#include <qpaintengine.h>
-#include <qwidget.h>
 #include <qapplication.h>
+#include <qcheckbox.h>
+#include <qcombobox.h>
+#include <qcommandlinkbutton.h>
+#include <qdatetime.h>
+#include <qdialogbuttonbox.h>
+#include <qdockwidget.h>
+#include <qgroupbox.h>
+#include <qinputdialog.h>
+#include <qlibrary.h>
+#include <qlineedit.h>
+#include <qlistview.h>
+#include <qmessagebox.h>
+#include <qpaintengine.h>
 #include <qpixmapcache.h>
-#include <qstyleoption.h>
+#include <qprogressbar.h>
 #include <qpushbutton.h>
 #include <qradiobutton.h>
-#include <qcheckbox.h>
-#include <qlineedit.h>
-#include <qgroupbox.h>
-#include <qtoolbutton.h>
-#include <qspinbox.h>
-#include <qtoolbar.h>
-#include <qcombobox.h>
 #include <qscrollbar.h>
-#include <qprogressbar.h>
-#include <qdockwidget.h>
-#include <qlistview.h>
-#include <qtreeview.h>
-#include <qtextedit.h>
-#include <qmessagebox.h>
-#include <qdialogbuttonbox.h>
-#include <qinputdialog.h>
+#include <qspinbox.h>
+#include <qstyleoption.h>
 #include <qtableview.h>
-#include <qdatetime.h>
-#include <qcommandlinkbutton.h>
+#include <qtextedit.h>
+#include <qtoolbar.h>
+#include <qtoolbutton.h>
+#include <qtreeview.h>
+#include <qwidget.h>
 
-#include <qstyleanimation_p.h>
 #include <qpaintengine_raster_p.h>
+#include <qstyleanimation_p.h>
 
 class QWindowsVistaStylePrivate;
 
@@ -140,7 +140,7 @@ class QWindowsVistaStyle : public QWindowsXPStyle
       const QWidget *widget = nullptr) const override;
 
    QIcon standardIcon(StandardPixmap standardIcon, const QStyleOption *option = nullptr,
-      const QWidget *widget = nullptr) const;
+      const QWidget *widget = nullptr) const override;
 
    QPixmap standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option,
       const QWidget *widget = nullptr) const override;
@@ -173,7 +173,7 @@ class QWindowsVistaAnimation : public QBlendStyleAnimation
       : QBlendStyleAnimation(type, target)
    { }
 
-   virtual bool isUpdateNeeded() const;
+   bool isUpdateNeeded() const override;
    void paint(QPainter *painter, const QStyleOption *option);
 };
 
@@ -185,7 +185,7 @@ class QWindowsVistaTransition : public QWindowsVistaAnimation
  public :
    QWindowsVistaTransition(QObject *target)
       : QWindowsVistaAnimation(Transition, target)
-   {}
+   { }
 };
 
 // Handles pulse animations (default buttons)
@@ -196,7 +196,7 @@ class QWindowsVistaPulse: public QWindowsVistaAnimation
  public :
    QWindowsVistaPulse(QObject *target)
       : QWindowsVistaAnimation(Pulse, target)
-   {}
+   { }
 };
 
 class QWindowsVistaStylePrivate :  public QWindowsXPStylePrivate

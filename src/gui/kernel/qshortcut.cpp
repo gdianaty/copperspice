@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,22 +26,21 @@
 
 #ifndef QT_NO_SHORTCUT
 
+#include <qapplication.h>
 #include <qevent.h>
-#include <qwhatsthis.h>
 #include <qmenu.h>
 #include <qmenubar.h>
-#include <qapplication.h>
-
-#include <qapplication_p.h>
-#include <qshortcutmap_p.h>
+#include <qplatform_menu.h>
+#include <qwhatsthis.h>
 
 #include <qaction_p.h>
+#include <qapplication_p.h>
+#include <qshortcutmap_p.h>
 #include <qwidgetwindow_p.h>
-#include <qplatform_menu.h>
 
 #define QAPP_CHECK(functionName) \
-    if (!qApp) { \
-        qWarning("QShortcut: Initialize QApplication before calling '" functionName "'."); \
+    if (! qApp) { \
+        qWarning("QShortcut()::" functionName " QApplication must be started before calling this method"); \
         return; \
     }
 
@@ -56,7 +55,7 @@ static bool correctActionContext(Qt::ShortcutContext context, QAction *a, QWidge
 #endif
 bool qWidgetShortcutContextMatcher(QObject *object, Qt::ShortcutContext context)
 {
-   Q_ASSERT_X(object, "QShortcutMap", "Shortcut has no owner. Illegal map state!");
+   Q_ASSERT_X(object, "QShortcutMap", "Shortcut has no owner, invalid map state");
 
    QWidget *active_window = QApplication::activeWindow();
 
@@ -189,9 +188,6 @@ static bool correctWidgetContext(Qt::ShortcutContext context, QWidget *w, QWidge
       return sw == focus_widget;
    }
 
-#if defined(DEBUG_QSHORTCUTMAP)
-   qDebug().nospace() << "..true [Pass-through]";
-#endif
    return true;
 }
 
@@ -205,7 +201,7 @@ static bool correctGraphicsWidgetContext(Qt::ShortcutContext context, QGraphicsW
    }
 #endif
 
-   if (!visible || !w->isEnabled() || !w->scene()) {
+   if (! visible || !w->isEnabled() || !w->scene()) {
       return false;
    }
 
@@ -263,13 +259,13 @@ static bool correctGraphicsWidgetContext(Qt::ShortcutContext context, QGraphicsW
 #endif
 
 #ifndef QT_NO_ACTION
-static bool correctActionContext(Qt::ShortcutContext context, QAction *a, QWidget *active_window)
+static bool correctActionContext(Qt::ShortcutContext context, QAction *actionMenu, QWidget *active_window)
 {
-   const QList<QWidget *> &widgets = static_cast<QActionPrivate *>(QActionPrivate::get(a))->widgets;
+   const QList<QWidget *> &widgets = static_cast<QActionPrivate *>(QActionPrivate::get(actionMenu))->widgets;
 
-#if defined(DEBUG_QSHORTCUTMAP)
+#if defined(CS_SHOW_DEBUG_GUI)
    if (widgets.isEmpty()) {
-      qDebug() << a << "not connected to any widgets, will not trigger";
+      qDebug() << "QShortCut() " << actionMenu << "is not connected to any widget, will not trigger";
    }
 #endif
 
@@ -290,14 +286,16 @@ static bool correctActionContext(Qt::ShortcutContext context, QAction *a, QWidge
          // need to check whether the QPA menu is actually disabled.
 
          QPlatformMenu *pm = menu->platformMenu();
-         if (!pm || !pm->isEnabled()) {
+         if (pm == nullptr || ! pm->isEnabled()) {
             continue;
          }
 #endif
-         QAction *a = menu->menuAction();
-         if (correctActionContext(context, a, active_window)) {
+
+         QAction *menuA = menu->menuAction();
+         if (correctActionContext(context, menuA, active_window)) {
             return true;
          }
+
       } else
 #endif
          if (correctWidgetContext(context, w, active_window)) {
@@ -306,24 +304,27 @@ static bool correctActionContext(Qt::ShortcutContext context, QAction *a, QWidge
    }
 
 #ifndef QT_NO_GRAPHICSVIEW
-   const QList<QGraphicsWidget *> &graphicsWidgets = static_cast<QActionPrivate *>(QActionPrivate::get(a))->graphicsWidgets;
+   const QList<QGraphicsWidget *> &graphicsWidgets = static_cast<QActionPrivate *>(QActionPrivate::get(actionMenu))->graphicsWidgets;
 
-#if defined(DEBUG_QSHORTCUTMAP)
+#if defined(CS_SHOW_DEBUG_GUI)
    if (graphicsWidgets.isEmpty()) {
-      qDebug() << a << " is not connected to any widgets and will not trigger";
+      qDebug() << "QShortCut() " << actionMenu << " is not connected to any widget, will not trigger";
    }
 #endif
 
    for (int i = 0; i < graphicsWidgets.size(); ++i) {
       QGraphicsWidget *w = graphicsWidgets.at(i);
+
       if (correctGraphicsWidgetContext(context, w, active_window)) {
          return true;
       }
    }
 #endif
+
    return false;
 }
 #endif // QT_NO_ACTION
+
 class QShortcutPrivate
 {
    Q_DECLARE_PUBLIC(QShortcut)
@@ -350,7 +351,7 @@ void QShortcutPrivate::redoGrab(QShortcutMap &map)
    Q_Q(QShortcut);
 
    if (! q->parent()) {
-      qWarning("QShortcut: No widget parent defined");
+      qWarning("QShortcut::redoGrab() Parent window was not defined");
       return;
    }
 
@@ -373,13 +374,6 @@ void QShortcutPrivate::redoGrab(QShortcutMap &map)
    }
 }
 
-/*!
-    Constructs a QShortcut object for the \a parent widget. Since no
-    shortcut key sequence is specified, the shortcut will not emit any
-    signals.
-
-    \sa setKey()
-*/
 QShortcut::QShortcut(QWidget *parent)
    : QObject(parent), d_ptr(new QShortcutPrivate)
 {
@@ -483,7 +477,6 @@ QString QShortcut::whatsThis() const
    return d->sc_whatsthis;
 }
 
-
 void QShortcut::setAutoRepeat(bool on)
 {
    Q_D(QShortcut);
@@ -501,16 +494,12 @@ bool QShortcut::autoRepeat() const
    return d->sc_autorepeat;
 }
 
-
 int QShortcut::id() const
 {
    Q_D(const QShortcut);
    return d->sc_id;
 }
 
-/*!
-    \internal
-*/
 bool QShortcut::event(QEvent *e)
 {
    Q_D(QShortcut);

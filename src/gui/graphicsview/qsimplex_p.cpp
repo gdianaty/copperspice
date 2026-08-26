@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,56 +23,21 @@
 
 #include <qsimplex_p.h>
 
-#include <qset.h>
 #include <qdebug.h>
+#include <qset.h>
 
 #include <stdlib.h>
 
-/*!
-  \internal
-  \class QSimplex
-
-  The QSimplex class is a Linear Programming problem solver based on the two-phase
-  simplex method.
-
-  It takes a set of QSimplexConstraints as its restrictive constraints and an
-  additional QSimplexConstraint as its objective function. Then methods to maximize
-  and minimize the problem solution are provided.
-
-  The two-phase simplex method is based on the following steps:
-  First phase:
-  1.a) Modify the original, complex, and possibly not feasible problem, into a new,
-       easy to solve problem.
-  1.b) Set as the objective of the new problem, a feasible solution for the original
-       complex problem.
-  1.c) Run simplex to optimize the modified problem and check whether a solution for
-       the original problem exists.
-
-  Second phase:
-  2.a) Go back to the original problem with the feasibl (but not optimal) solution
-       found in the first phase.
-  2.b) Set the original objective.
-  3.c) Run simplex to optimize the original problem towards its optimal solution.
-*/
-
-/*!
-  \internal
-*/
-QSimplex::QSimplex() : objective(nullptr), rows(0), columns(0), firstArtificial(0), matrix(nullptr)
+QSimplex::QSimplex()
+   : objective(nullptr), rows(0), columns(0), firstArtificial(0), matrix(nullptr)
 {
 }
 
-/*!
-  \internal
-*/
 QSimplex::~QSimplex()
 {
    clearDataStructures();
 }
 
-/*!
-  \internal
-*/
 void QSimplex::clearDataStructures()
 {
    if (matrix == nullptr) {
@@ -87,26 +52,19 @@ void QSimplex::clearDataStructures()
    matrix = nullptr;
 
    // Constraints
-   for (int i = 0; i < constraints.size(); ++i) {
-      delete constraints[i]->helper.first;
-      delete constraints[i]->artificial;
-      delete constraints[i];
+   for (int i = 0; i < m_simplexConstraints.size(); ++i) {
+      delete m_simplexConstraints[i]->helper.first;
+      delete m_simplexConstraints[i]->artificial;
+      delete m_simplexConstraints[i];
    }
-   constraints.clear();
+
+   m_simplexConstraints.clear();
 
    // Other
    variables.clear();
    objective = nullptr;
 }
 
-/*!
-  \internal
-  Sets the new constraints in the simplex solver and returns whether the problem
-  is feasible.
-
-  This method sets the new constraints, normalizes them, creates the simplex matrix
-  and runs the first simplex phase.
-*/
 bool QSimplex::setConstraints(const QList<QSimplexConstraint *> &newConstraints)
 {
    // Reset to initial state
@@ -123,27 +81,25 @@ bool QSimplex::setConstraints(const QList<QSimplexConstraint *> &newConstraints)
       c->constant = newConstraints[i]->constant;
       c->ratio = newConstraints[i]->ratio;
       c->variables = newConstraints[i]->variables;
-      constraints << c;
+      m_simplexConstraints << c;
    }
 
    // Remove constraints of type Var == K and replace them for their value.
-   if (!simplifyConstraints(&constraints)) {
-      qWarning("QSimplex: No feasible solution");
+   if (! simplifyConstraints(&m_simplexConstraints)) {
+      qWarning("QSimplex::setConstraints() No feasible solution");
       clearDataStructures();
       return false;
    }
-
-   ///////////////////////////////////////
-   // Prepare variables and constraints //
-   ///////////////////////////////////////
 
    // Set Variables direct mapping.
    // "variables" is a list that provides a stable, indexed list of all variables
    // used in this problem.
    QSet<QSimplexVariable *> variablesSet;
-   for (int i = 0; i < constraints.size(); ++i)
-      variablesSet += \
-         QSet<QSimplexVariable *>::fromList(constraints[i]->variables.keys());
+
+   for (int i = 0; i < m_simplexConstraints.size(); ++i) {
+      variablesSet += QSet<QSimplexVariable *>::fromList(m_simplexConstraints[i]->variables.keys());
+   }
+
    variables = variablesSet.toList();
 
    // Set Variables reverse mapping
@@ -169,33 +125,33 @@ bool QSimplex::setConstraints(const QList<QSimplexConstraint *> &newConstraints)
    int variableIndex = variables.size();
    QList <QSimplexVariable *> artificialList;
 
-   for (int i = 0; i < constraints.size(); ++i) {
+   for (int i = 0; i < m_simplexConstraints.size(); ++i) {
       QSimplexVariable *slack;
       QSimplexVariable *surplus;
       QSimplexVariable *artificial;
 
-      Q_ASSERT(constraints[i]->helper.first == nullptr);
-      Q_ASSERT(constraints[i]->artificial == nullptr);
+      Q_ASSERT(m_simplexConstraints[i]->helper.first == nullptr);
+      Q_ASSERT(m_simplexConstraints[i]->artificial == nullptr);
 
-      switch (constraints[i]->ratio) {
+      switch (m_simplexConstraints[i]->ratio) {
          case QSimplexConstraint::LessOrEqual:
             slack = new QSimplexVariable;
             slack->index = ++variableIndex;
-            constraints[i]->helper.first = slack;
-            constraints[i]->helper.second = 1.0;
+            m_simplexConstraints[i]->helper.first = slack;
+            m_simplexConstraints[i]->helper.second = 1.0;
             break;
 
          case QSimplexConstraint::MoreOrEqual:
             surplus = new QSimplexVariable;
             surplus->index = ++variableIndex;
-            constraints[i]->helper.first = surplus;
-            constraints[i]->helper.second = -1.0;
+            m_simplexConstraints[i]->helper.first = surplus;
+            m_simplexConstraints[i]->helper.second = -1.0;
             [[fallthrough]];
 
          case QSimplexConstraint::Equal:
             artificial = new QSimplexVariable;
-            constraints[i]->artificial = artificial;
-            artificialList += constraints[i]->artificial;
+            m_simplexConstraints[i]->artificial = artificial;
+            artificialList += m_simplexConstraints[i]->artificial;
             break;
       }
    }
@@ -215,11 +171,11 @@ bool QSimplex::setConstraints(const QList<QSimplexConstraint *> &newConstraints)
    // One for each variable plus the Basic and BFS columns (first and last)
    columns = variableIndex + 2;
    // One for each constraint plus the objective function
-   rows = constraints.size() + 1;
+   rows = m_simplexConstraints.size() + 1;
 
    matrix = (qreal *)malloc(sizeof(qreal) * columns * rows);
    if (!matrix) {
-      qWarning() << "QSimplex: Unable to allocate memory!";
+      qWarning("QSimplex::setConstraints() Unable to allocate memory");
       return false;
    }
    for (int i = columns * rows - 1; i >= 0; --i) {
@@ -227,8 +183,8 @@ bool QSimplex::setConstraints(const QList<QSimplexConstraint *> &newConstraints)
    }
 
    // Fill Matrix
-   for (int i = 1; i <= constraints.size(); ++i) {
-      QSimplexConstraint *c = constraints[i - 1];
+   for (int i = 1; i <= m_simplexConstraints.size(); ++i) {
+      QSimplexConstraint *c = m_simplexConstraints[i - 1];
 
       if (c->artificial) {
          // Will use artificial basic variable
@@ -239,6 +195,7 @@ bool QSimplex::setConstraints(const QList<QSimplexConstraint *> &newConstraints)
             // Surplus variable
             setValueAt(i, c->helper.first->index, c->helper.second);
          }
+
       } else {
          // Slack is used as the basic variable
          Q_ASSERT(c->helper.second == 1.0);
@@ -272,7 +229,7 @@ bool QSimplex::setConstraints(const QList<QSimplexConstraint *> &newConstraints)
    // Otherwise, we clean up our structures and report there is
    // no feasible solution.
    if ((valueAt(0, columns - 1) != 0.0) && (qAbs(valueAt(0, columns - 1)) > 0.00001)) {
-      qWarning("QSimplex: No feasible solution");
+      qWarning("QSimplex::setConstraints() No feasible solution");
       clearDataStructures();
       return false;
    }
@@ -285,32 +242,17 @@ bool QSimplex::setConstraints(const QList<QSimplexConstraint *> &newConstraints)
    return true;
 }
 
-/*!
-  \internal
-
-  Run simplex on the current matrix with the current objective.
-
-  This is the iterative method. The matrix lines are combined
-  as to modify the variable values towards the best solution possible.
-  The method returns when the matrix is in the optimal state.
-*/
 void QSimplex::solveMaxHelper()
 {
    reducedRowEchelon();
    while (iterate()) ;
 }
 
-/*!
-  \internal
-*/
 void QSimplex::setObjective(QSimplexConstraint *newObjective)
 {
    objective = newObjective;
 }
 
-/*!
-  \internal
-*/
 void QSimplex::clearRow(int rowIndex)
 {
    qreal *item = matrix + rowIndex * columns;
@@ -319,9 +261,6 @@ void QSimplex::clearRow(int rowIndex)
    }
 }
 
-/*!
-  \internal
-*/
 void QSimplex::clearColumns(int first, int last)
 {
    for (int i = 0; i < rows; ++i) {
@@ -332,36 +271,6 @@ void QSimplex::clearColumns(int first, int last)
    }
 }
 
-/*!
-  \internal
-*/
-void QSimplex::dumpMatrix()
-{
-   qDebug("---- Simplex Matrix ----\n");
-
-   QString str(QLatin1String("       "));
-   for (int j = 0; j < columns; ++j) {
-      str += QString::fromLatin1("  <%1 >").formatArg(j, 2);
-   }
-
-   qDebug("%s", csPrintable(str));
-
-   for (int i = 0; i < rows; ++i) {
-      str = QString::fromLatin1("Row %1:").formatArg(i, 2);
-
-      qreal *row = matrix + i * columns;
-      for (int j = 0; j < columns; ++j) {
-         str += QString::fromLatin1("%1").formatArg(row[j], 7, 'f', 2);
-      }
-      qDebug("%s", csPrintable(str));
-   }
-
-   qDebug("------------------------\n");
-}
-
-/*!
-  \internal
-*/
 void QSimplex::combineRows(int toIndex, int fromIndex, qreal factor)
 {
    if (!factor) {
@@ -388,9 +297,6 @@ void QSimplex::combineRows(int toIndex, int fromIndex, qreal factor)
    }
 }
 
-/*!
-  \internal
-*/
 int QSimplex::findPivotColumn()
 {
    qreal min = 0;
@@ -406,23 +312,6 @@ int QSimplex::findPivotColumn()
    return minIndex;
 }
 
-/*!
-  \internal
-
-  For a given pivot column, find the pivot row. That is, the row with the
-  minimum associated "quotient" where:
-
-  - quotient is the division of the value in the last column by the value
-    in the pivot column.
-  - rows with value less or equal to zero are ignored
-  - if two rows have the same quotient, lines are chosen based on the
-    highest variable index (value in the first column)
-
-  The last condition avoids a bug where artificial variables would be
-  left behind for the second-phase simplex, and with 'good'
-  constraints would be removed before it, what would lead to incorrect
-  results.
-*/
 int QSimplex::pivotRowForColumn(int column)
 {
    qreal min = qreal(999999999999.0); // ###
@@ -446,9 +335,6 @@ int QSimplex::pivotRowForColumn(int column)
    return minIndex;
 }
 
-/*!
-  \internal
-*/
 void QSimplex::reducedRowEchelon()
 {
    for (int i = 1; i < rows; ++i) {
@@ -457,12 +343,6 @@ void QSimplex::reducedRowEchelon()
    }
 }
 
-/*!
-  \internal
-
-  Does one iteration towards a better solution for the problem.
-  See 'solveMaxHelper'.
-*/
 bool QSimplex::iterate()
 {
    // Find Pivot column
@@ -474,7 +354,7 @@ bool QSimplex::iterate()
    // Find Pivot row for column
    int pivotRow = pivotRowForColumn(pivotColumn);
    if (pivotRow == -1) {
-      qWarning("QSimplex: Unbounded problem");
+      qWarning("QSimplex::iterate() Unbounded problem");
       return false;
    }
 
@@ -496,24 +376,9 @@ bool QSimplex::iterate()
    // Update first column
    setValueAt(pivotRow, 0, pivotColumn);
 
-   //    dumpMatrix();
-   //    qDebug("------------ end of iteration --------------\n");
    return true;
 }
 
-/*!
-  \internal
-
-  Both solveMin and solveMax are interfaces to this method.
-
-  The enum solverFactor admits 2 values: Minimum (-1) and Maximum (+1).
-
-  This method sets the original objective and runs the second phase
-  Simplex to obtain the optimal solution for the problem. As the internal
-  simplex solver is only able to _maximize_ objectives, we handle the
-  minimization case by inverting the original objective and then
-  maximizing it.
-*/
 qreal QSimplex::solver(SolverFactor factor)
 {
    // Remove old objective
@@ -522,9 +387,8 @@ qreal QSimplex::solver(SolverFactor factor)
    // Set new objective in the first row of the simplex matrix
    qreal resultOffset = 0;
    QHash<QSimplexVariable *, qreal>::const_iterator iter;
-   for (iter = objective->variables.constBegin();
-      iter != objective->variables.constEnd();
-      ++iter) {
+
+   for (iter = objective->variables.constBegin(); iter != objective->variables.constEnd(); ++iter) {
 
       // Check if the variable was removed in the simplification process.
       // If so, we save its offset to the objective function and skip adding
@@ -540,41 +404,36 @@ qreal QSimplex::solver(SolverFactor factor)
    solveMaxHelper();
    collectResults();
 
-#ifdef QT_DEBUG
-   for (int i = 0; i < constraints.size(); ++i) {
-      Q_ASSERT(constraints[i]->isSatisfied());
+#if defined(CS_SHOW_DEBUG_GUI_GRAPHICSVIEW)
+   for (int i = 0; i < m_simplexConstraints.size(); ++i) {
+      Q_ASSERT(m_simplexConstraints[i]->isSatisfied());
    }
 #endif
 
-   // Return the value calculated by the simplex plus the value of the
-   // fixed variables.
-   return (factor * valueAt(0, columns - 1)) + resultOffset;
+   // return the value calculated by the simplex plus the value of the fixed variables
+   switch (factor) {
+      case SolverFactor::Minimum:
+         return (-1 * valueAt(0, columns - 1)) + resultOffset;
+
+      case SolverFactor::Maximum:
+         return (1 * valueAt(0, columns - 1)) + resultOffset;
+   }
+
+   // unreachable code
+
+   return 0;
 }
 
-/*!
-  \internal
-  Minimize the original objective.
-*/
 qreal QSimplex::solveMin()
 {
-   return solver(Minimum);
+   return solver(SolverFactor::Minimum);
 }
 
-/*!
-  \internal
-  Maximize the original objective.
-*/
 qreal QSimplex::solveMax()
 {
-   return solver(Maximum);
+   return solver(SolverFactor::Maximum);
 }
 
-/*!
-  \internal
-
-  Reads results from the simplified matrix and saves them in the
-  "result" member of each QSimplexVariable.
-*/
 void QSimplex::collectResults()
 {
    // All variables are zero unless overridden below.
@@ -586,8 +445,7 @@ void QSimplex::collectResults()
    }
 
    // Basic variables
-   // Update the variable indicated in the first column with the value
-   // in the last column.
+   // Update the variable indicated in the first column with the value in the last column.
    for (int i = 1; i < rows; ++i) {
       int index = valueAt(i, 0) - 1;
       if (index < variables.size()) {
@@ -596,11 +454,6 @@ void QSimplex::collectResults()
    }
 }
 
-/*!
-  \internal
-
-  Looks for single-valued variables and remove them from the constraints list.
-*/
 bool QSimplex::simplifyConstraints(QList<QSimplexConstraint *> *constraints)
 {
    QHash<QSimplexVariable *, qreal> results;   // List of single-valued variables

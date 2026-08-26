@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -21,12 +21,11 @@
 *
 ***********************************************************************/
 
-#include <QDebug>
-#include "qxmlutils_p.h"
-#include "qxpathhelper_p.h"
-#include "qnamepool_p.h"
+#include <qdebug.h>
 
-QT_BEGIN_NAMESPACE
+#include <qnamepool_p.h>
+#include <qxmlutils_p.h>
+#include <qxpathhelper_p.h>
 
 using namespace QPatternist;
 
@@ -61,7 +60,8 @@ NamePool::NamePool()
       unlockedAllocateNamespace(QLatin1String("  |  InternalXSLT"));
 
       Q_ASSERT_X(m_namespaces.count() == StandardNamespaceCount, Q_FUNC_INFO,
-                 csPrintable(QString::fromLatin1("Expected is %1, actual is %2.").formatArg(StandardNamespaceCount).formatArg(m_namespaces.count())));
+            csPrintable(QString::fromLatin1("Expected is %1, actual is %2.")
+            .formatArg(StandardNamespaceCount).formatArg(m_namespaces.count())));
    }
 
    /* Prefixes. */
@@ -397,4 +397,3 @@ QXmlName NamePool::fromClarkName(const QString &clarkName)
       }
    }
 }
-QT_END_NAMESPACE

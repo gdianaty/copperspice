@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -28,21 +28,21 @@
 
 #include <gst/gst.h>
 
-class QAudioInputSelectorControl;
-class QVideoDeviceSelectorControl;
-class CameraBinSession;
 class CameraBinControl;
-class QGstreamerMessage;
-class QGstreamerBusHelper;
-class QGstreamerVideoRenderer;
-class QGstreamerVideoWindow;
-class QGstreamerVideoWidgetControl;
-class QGstreamerElementFactory;
-class CameraBinMetaData;
 class CameraBinImageCapture;
 class CameraBinMetaData;
-class CameraBinViewfinderSettings;
+class CameraBinMetaData;
+class CameraBinSession;
 class CameraBinViewfinderSettings2;
+class CameraBinViewfinderSettings;
+class QAudioInputSelectorControl;
+class QGstreamerBusHelper;
+class QGstreamerElementFactory;
+class QGstreamerMessage;
+class QGstreamerVideoRenderer;
+class QGstreamerVideoWidgetControl;
+class QGstreamerVideoWindow;
+class QVideoDeviceSelectorControl;
 
 class CameraBinService : public QMediaService
 {

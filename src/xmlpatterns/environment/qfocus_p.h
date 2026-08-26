@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,8 +26,6 @@
 
 #include <qdelegatingdynamiccontext_p.h>
 
-QT_BEGIN_NAMESPACE
-
 namespace QPatternist {
 
 class Focus : public DelegatingDynamicContext
@@ -42,10 +40,6 @@ class Focus : public DelegatingDynamicContext
    void setFocusIterator(const Item::Iterator::Ptr &it) override;
    Item::Iterator::Ptr focusIterator() const override;
 
-   /**
-    * If there is no top level expression that sets the current item,
-    * the focus should be used. This implementation ensures that.
-    */
    Item currentItem() const override;
 
  private:
@@ -53,7 +47,5 @@ class Focus : public DelegatingDynamicContext
    xsInteger           m_contextSizeCached;
 };
 }
-
-QT_END_NAMESPACE
 
 #endif

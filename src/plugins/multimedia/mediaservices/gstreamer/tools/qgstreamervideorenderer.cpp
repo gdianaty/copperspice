@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -22,10 +22,10 @@
 ***********************************************************************/
 
 #include <qgstreamervideorenderer_p.h>
-#include <qvideosurfacegstsink_p.h>
-#include <qgstutils_p.h>
+
 #include <qabstractvideosurface.h>
-#include <qdebug.h>
+
+#include <qgstutils_p.h>
 
 #include <gst/gst.h>
 
@@ -66,7 +66,7 @@ QAbstractVideoSurface *QGstreamerVideoRenderer::surface() const
 void QGstreamerVideoRenderer::setSurface(QAbstractVideoSurface *surface)
 {
    if (m_surface != surface) {
-      //qDebug() << Q_FUNC_INFO << surface;
+
       if (m_videoSink) {
          gst_object_unref(GST_OBJECT(m_videoSink));
       }
@@ -95,8 +95,6 @@ void QGstreamerVideoRenderer::setSurface(QAbstractVideoSurface *surface)
 
 void QGstreamerVideoRenderer::handleFormatChange()
 {
-   //qDebug() << "Supported formats list has changed, reload video output";
-
    if (m_videoSink) {
       gst_object_unref(GST_OBJECT(m_videoSink));
    }

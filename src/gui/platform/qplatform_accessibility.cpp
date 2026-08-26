@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -23,10 +23,10 @@
 
 #include <qplatform_accessibility.h>
 
-#include <qalgorithms.h>
-#include <qaccessibleplugin.h>
-#include <qaccessibleobject.h>
 #include <qaccessiblebridge.h>
+#include <qaccessibleobject.h>
+#include <qaccessibleplugin.h>
+#include <qalgorithms.h>
 #include <qapplication.h>
 #include <qdebug.h>
 

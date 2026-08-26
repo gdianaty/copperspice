@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -25,17 +25,18 @@
 
 #ifndef QT_NO_GRAPHICSVIEW
 
+#include <qgraphicsgridlayout.h>
+
 #include <qapplication.h>
 #include <qdebug.h>
-#include <qwidget.h>
 #include <qgraphicslayoutitem.h>
-#include <qgraphicsgridlayout.h>
 #include <qgraphicswidget.h>
 #include <qscopedpointer.h>
+#include <qwidget.h>
 
+#include <qgraphics_gridlayoutengine_p.h>
 #include <qgraphics_layout_p.h>
 #include <qgraphics_layoutstyleinfo_p.h>
-#include <qgraphics_gridlayoutengine_p.h>
 
 class QGraphicsGridLayoutPrivate : public QGraphicsLayoutPrivate
 {
@@ -45,7 +46,8 @@ class QGraphicsGridLayoutPrivate : public QGraphicsLayoutPrivate
 
    mutable QScopedPointer<QGraphicsLayoutStyleInfo> m_styleInfo;
    QGraphicsGridLayoutEngine engine;
-#ifdef QGRIDLAYOUTENGINE_DEBUG
+
+#if defined(CS_SHOW_DEBUG_GUI_GRAPHICSVIEW)
    void dump(int indent) const;
 #endif
 };
@@ -55,6 +57,7 @@ QGraphicsLayoutStyleInfo *QGraphicsGridLayoutPrivate::styleInfo() const
    if (!m_styleInfo) {
       m_styleInfo.reset(new QGraphicsLayoutStyleInfo(this));
    }
+
    return m_styleInfo.data();
 }
 
@@ -86,21 +89,21 @@ void QGraphicsGridLayout::addItem(QGraphicsLayoutItem *item, int row, int column
 {
    Q_D(QGraphicsGridLayout);
    if (row < 0 || column < 0) {
-      qWarning("QGraphicsGridLayout::addItem: invalid row/column: %d",
+      qWarning("QGraphicsGridLayout::addItem() Invalid row/column: %d",
          row < 0 ? row : column);
       return;
    }
    if (columnSpan < 1 || rowSpan < 1) {
-      qWarning("QGraphicsGridLayout::addItem: invalid row span/column span: %d",
+      qWarning("QGraphicsGridLayout::addItem() Invalid row span/column span: %d",
          rowSpan < 1 ? rowSpan : columnSpan);
       return;
    }
    if (!item) {
-      qWarning("QGraphicsGridLayout::addItem: cannot add null item");
+      qWarning("QGraphicsGridLayout::addItem() Unable to add an invalid item (nullptr)");
       return;
    }
    if (item == this) {
-      qWarning("QGraphicsGridLayout::addItem: cannot insert itself");
+      qWarning("QGraphicsGridLayout::addItem() Unable to insert an item which has already been added");
       return;
    }
 
@@ -345,7 +348,7 @@ QGraphicsLayoutItem *QGraphicsGridLayout::itemAt(int row, int column) const
 {
    Q_D(const QGraphicsGridLayout);
    if (row < 0 || row >= rowCount() || column < 0 || column >= columnCount()) {
-      qWarning("QGraphicsGridLayout::itemAt: invalid row, column %d, %d", row, column);
+      qWarning("QGraphicsGridLayout::itemAt() Invalid row or column %d, %d", row, column);
       return nullptr;
    }
 
@@ -367,7 +370,7 @@ QGraphicsLayoutItem *QGraphicsGridLayout::itemAt(int index) const
    Q_D(const QGraphicsGridLayout);
 
    if (index < 0 || index >= d->engine.itemCount()) {
-      qWarning("QGraphicsGridLayout::itemAt: invalid index %d", index);
+      qWarning("QGraphicsGridLayout::itemAt() Invalid index %d", index);
       return nullptr;
    }
 
@@ -382,8 +385,9 @@ QGraphicsLayoutItem *QGraphicsGridLayout::itemAt(int index) const
 void QGraphicsGridLayout::removeAt(int index)
 {
    Q_D(QGraphicsGridLayout);
+
    if (index < 0 || index >= d->engine.itemCount()) {
-      qWarning("QGraphicsGridLayout::removeAt: invalid index %d", index);
+      qWarning("QGraphicsGridLayout::removeAt() Invalid index %d", index);
       return;
    }
 
@@ -395,10 +399,10 @@ void QGraphicsGridLayout::removeAt(int index)
       d->engine.removeItem(gridItem);
 
       // recalculate rowInfo.count if we remove an item that is on the right/bottommost row
-      for (int j = 0; j < NOrientations; ++j) {
-         // 0: Hor, 1: Ver
+      for (int j = 0; j < GridOrientation_Count; ++j) {
          const Qt::Orientation orient = (j == 0 ? Qt::Horizontal : Qt::Vertical);
          const int oldCount = d->engine.rowCount(orient);
+
          if (gridItem->lastRow(orient) == oldCount - 1) {
             const int newCount = d->engine.effectiveLastRow(orient) + 1;
             d->engine.removeRows(newCount, oldCount - newCount, orient);
@@ -427,18 +431,18 @@ void QGraphicsGridLayout::invalidate()
    QGraphicsLayout::invalidate();
 }
 
-#ifdef QGRIDLAYOUTENGINE_DEBUG
+#if defined(CS_SHOW_DEBUG_GUI_GRAPHICSVIEW)
 void QGraphicsGridLayoutPrivate::dump(int indent) const
 {
-   if (qt_graphicsLayoutDebug()) {
-      engine.dump(indent + 1);
-   }
+   engine.dump(indent + 1);
+
 }
 #endif
 
 void QGraphicsGridLayout::setGeometry(const QRectF &rect)
 {
    Q_D(QGraphicsGridLayout);
+
    QGraphicsLayout::setGeometry(rect);
    QRectF effectiveRect = geometry();
    qreal left, top, right, bottom;
@@ -453,22 +457,24 @@ void QGraphicsGridLayout::setGeometry(const QRectF &rect)
    effectiveRect.adjust(+left, +top, -right, -bottom);
    d->engine.setGeometries(effectiveRect, d->styleInfo());
 
-#ifdef QGRIDLAYOUTENGINE_DEBUG
-   if (qt_graphicsLayoutDebug()) {
-      static int counter = 0;
-      qDebug("==== BEGIN DUMP OF QGraphicsGridLayout (%d)====", counter++);
-      d->dump(1);
-      qDebug("==== END DUMP OF QGraphicsGridLayout ====");
-   }
+#if defined(CS_SHOW_DEBUG_GUI_GRAPHICSVIEW)
+   static int counter = 0;
+
+   qDebug("==== BEGIN DUMP OF QGraphicsGridLayout (%d)====", counter++);
+   d->dump(1);
+   qDebug("==== END DUMP OF QGraphicsGridLayout ====");
+
 #endif
 }
 
 QSizeF QGraphicsGridLayout::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
    Q_D(const QGraphicsGridLayout);
+
    qreal left, top, right, bottom;
    getContentsMargins(&left, &top, &right, &bottom);
    const QSizeF extraMargins(left + right, top + bottom);
+
    return d->engine.sizeHint(which, constraint - extraMargins, d->styleInfo()) + extraMargins;
 }
 

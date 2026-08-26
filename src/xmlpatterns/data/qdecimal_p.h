@@ -1,7 +1,7 @@
 /***********************************************************************
 *
-* Copyright (c) 2012-2023 Barbara Geller
-* Copyright (c) 2012-2023 Ansel Sermersheim
+* Copyright (c) 2012-2026 Barbara Geller
+* Copyright (c) 2012-2026 Ansel Sermersheim
 *
 * Copyright (c) 2015 The Qt Company Ltd.
 * Copyright (c) 2012-2016 Digia Plc and/or its subsidiary(-ies).
@@ -26,8 +26,6 @@
 
 #include <qschemanumeric_p.h>
 
-QT_BEGIN_NAMESPACE
-
 Q_CORE_EXPORT char *qdtoa(double d, int mode, int ndigits, int *decpt, int *sign, char **rve, char **resultp);
 
 namespace QPatternist {
@@ -44,9 +42,6 @@ class Decimal : public Numeric
 
    QString stringValue() const override;
 
-   /**
-    * @returns always BuiltinTypes::xsDecimal
-    */
    ItemType::Ptr type() const override;
 
    xsDouble toDouble() const override;
@@ -61,25 +56,10 @@ class Decimal : public Numeric
    Numeric::Ptr ceiling() const override;
    Numeric::Ptr abs() const override;
 
-   /**
-    * @returns always @c false, xs:decimal doesn't have
-    * not-a-number in its value space.
-    */
    bool isNaN() const override;
-
-   /**
-    * @returns always @c false, xs:decimal doesn't have
-    * infinity in its value space.
-    */
    bool isInf() const override;
 
    Item toNegated() const override;
-
-   /**
-    * Converts @p value into a canonical string representation for @c xs:decimal. This
-    * function is used internally by various classes. Users probably wants to call
-    * stringValue() which in turn calls this function.
-    */
    static QString toString(const xsDecimal value);
 
    bool isSigned() const override;
@@ -91,7 +71,5 @@ class Decimal : public Numeric
    const xsDecimal m_value;
 };
 }
-
-QT_END_NAMESPACE
 
 #endif
